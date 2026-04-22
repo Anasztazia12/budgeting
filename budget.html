@@ -21,9 +21,18 @@
 			<p data-i18n="heroText">Rogzitsd a varhato beveteleket es kiadasokat datum szerint.</p>
 		</header>
 
-		<nav class="top-nav">
-			<a href="index.html" data-i18n="homeLink">Kezdolap</a>
-			<a href="monthly_budget.html" data-i18n="summaryLink">Monthly Budget</a>
+		<nav class="menu-wrap">
+			<button id="menu-toggle" type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-panel">
+				<span class="sr-only" data-i18n="menuButton">Menu</span>
+				<span class="hamburger-line"></span>
+				<span class="hamburger-line"></span>
+				<span class="hamburger-line"></span>
+			</button>
+			<div id="menu-panel" class="menu-panel">
+				<a href="index.html" data-i18n="homeLink">Kezdolap</a>
+				<a href="monthly_budget.html" data-i18n="summaryLink">Monthly Budget</a>
+				<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezes</button>
+			</div>
 		</nav>
 
 		<section class="card controls compact-controls">
@@ -36,7 +45,7 @@
 			</div>
 		</section>
 
-		<section class="grid auth-grid">
+		<section class="grid auth-grid" id="auth-section">
 			<article class="card">
 				<h2 data-i18n="registerTitle">Regisztracio</h2>
 				<form id="register-form" class="stack">
@@ -75,7 +84,6 @@
 
 		<section class="card session-card">
 			<p id="session-info">Nincs bejelentkezett felhasznalo.</p>
-			<button id="logout-button" type="button" class="secondary" data-i18n="logoutButton">Kijelentkezes</button>
 			<p id="auth-message" class="auth-message" aria-live="polite"></p>
 		</section>
 
@@ -195,6 +203,7 @@
 				pageTitle: "Budget",
 				heroTitle: "Budget",
 				heroText: "Rögzitsd a várható bevételeket es kiadásokat dátum szerint.",
+				menuButton: "Menu",
 				homeLink: "Kezdőlap",
 				summaryLink: "Havi összegzés",
 				languageLabel: "Nyelv",
@@ -281,6 +290,7 @@
 				pageTitle: "Budget",
 				heroTitle: "Budget",
 				heroText: "Save expected income and expenses with exact dates.",
+				menuButton: "Menu",
 				homeLink: "Home",
 				summaryLink: "Monthly Budget",
 				languageLabel: "Language",
@@ -376,9 +386,12 @@
 		const incomeForm = document.getElementById("income-form");
 		const expenseForm = document.getElementById("expense-form");
 		const exportCsvButton = document.getElementById("export-csv-button");
-		const logoutButton = document.getElementById("logout-button");
+		const menuToggle = document.getElementById("menu-toggle");
+		const menuPanel = document.getElementById("menu-panel");
+		const menuLogoutButton = document.getElementById("menu-logout-button");
 		const authMessage = document.getElementById("auth-message");
 		const sessionInfo = document.getElementById("session-info");
+		const authSection = document.getElementById("auth-section");
 		const budgetContent = document.getElementById("budget-content");
 		const lockedMessage = document.getElementById("locked-message");
 		const activeMonthInput = document.getElementById("active-month");
@@ -405,9 +418,23 @@
 
 		activeMonthInput.addEventListener("change", render);
 		exportCsvButton.addEventListener("click", exportMonthCsv);
-		logoutButton.addEventListener("click", handleLogout);
+		menuLogoutButton.addEventListener("click", handleLogout);
 		incomeCancelEdit.addEventListener("click", resetIncomeForm);
 		expenseCancelEdit.addEventListener("click", resetExpenseForm);
+
+		menuToggle.addEventListener("click", () => {
+			const isOpen = menuPanel.classList.toggle("is-open");
+			menuToggle.classList.toggle("is-open", isOpen);
+			menuToggle.setAttribute("aria-expanded", String(isOpen));
+		});
+
+		document.addEventListener("click", (event) => {
+			if (!event.target.closest(".menu-wrap")) {
+				menuPanel.classList.remove("is-open");
+				menuToggle.classList.remove("is-open");
+				menuToggle.setAttribute("aria-expanded", "false");
+			}
+		});
 
 		registerForm.addEventListener("submit", async (event) => {
 			event.preventDefault();
@@ -736,21 +763,26 @@
 		}
 
 		function handleLogout() {
+			menuPanel.classList.remove("is-open");
+			menuToggle.classList.remove("is-open");
+			menuToggle.setAttribute("aria-expanded", "false");
 			currentUser = "";
 			appState = { incomes: [], expenses: [] };
 			localStorage.removeItem(SESSION_KEY);
-			resetIncomeForm();
-			resetExpenseForm();
-			updateAccessUI();
-			render();
-			showMessage(t("logoutSuccess"), false);
+			window.location.href = "index.html";
 		}
 
 		function updateAccessUI() {
 			const loggedIn = Boolean(currentUser);
+			authSection.classList.toggle("hidden", loggedIn);
 			budgetContent.classList.toggle("hidden", !loggedIn);
 			lockedMessage.classList.toggle("hidden", loggedIn);
-			logoutButton.disabled = !loggedIn;
+			menuToggle.disabled = !loggedIn;
+			if (!loggedIn) {
+				menuPanel.classList.remove("is-open");
+				menuToggle.classList.remove("is-open");
+				menuToggle.setAttribute("aria-expanded", "false");
+			}
 			updateSessionLabel();
 		}
 

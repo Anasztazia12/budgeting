@@ -65,6 +65,7 @@ body {
 }
 
 .hero {
+    text-align: center;
 	padding: 1.25rem 1.5rem;
 	margin-bottom: 1.2rem;
 	border-radius: 16px;
@@ -115,6 +116,92 @@ body {
 	gap: 0.7rem;
 	margin-bottom: 0.8rem;
 	flex-wrap: wrap;
+}
+
+.menu-wrap {
+	position: relative;
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 0.8rem;
+}
+
+.menu-toggle {
+	width: 48px;
+	height: 42px;
+	margin-top: 0;
+	padding: 0.45rem 0.55rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.24rem;
+	flex-direction: column;
+}
+
+.hamburger-line {
+	width: 20px;
+	height: 2px;
+	border-radius: 99px;
+	background: #fff;
+	transition: transform 180ms ease, opacity 160ms ease;
+}
+
+.menu-toggle.is-open .hamburger-line:nth-child(2) {
+	transform: translateY(6px) rotate(45deg);
+}
+
+.menu-toggle.is-open .hamburger-line:nth-child(3) {
+	opacity: 0;
+}
+
+.menu-toggle.is-open .hamburger-line:nth-child(4) {
+	transform: translateY(-6px) rotate(-45deg);
+}
+
+.menu-panel {
+	position: absolute;
+	top: calc(100% + 0.35rem);
+	right: 0;
+	min-width: 220px;
+	padding: 0.45rem;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	background: #fffdf9;
+	box-shadow: 0 8px 22px rgba(58, 34, 13, 0.15);
+	display: grid;
+	gap: 0.4rem;
+	z-index: 40;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transform: translateY(-8px) scale(0.98);
+	transform-origin: top right;
+	transition: opacity 180ms ease, transform 200ms ease, visibility 180ms ease;
+}
+
+.menu-panel.is-open {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	transform: translateY(0) scale(1);
+}
+
+.menu-panel a,
+.menu-panel button {
+	width: 100%;
+	margin: 0;
+	text-align: left;
+	text-decoration: none;
+	color: #fff;
+	padding: 0.55rem 0.7rem;
+	border-radius: 10px;
+	background: linear-gradient(125deg, var(--accent), var(--accent-strong));
+	border: none;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.menu-panel .menu-logout {
+	background: linear-gradient(125deg, #8f7b69, #6e5b4a);
 }
 
 .top-nav a,
@@ -420,5 +507,15 @@ button:disabled {
 	.form-actions,
 	.row-actions {
 		flex-direction: column;
+	}
+
+	.menu-wrap {
+		justify-content: flex-start;
+	}
+
+	.menu-panel {
+		left: 0;
+		right: auto;
+		min-width: min(260px, 90vw);
 	}
 }

@@ -21,9 +21,18 @@
 			<p data-i18n="heroText">Havi osszegzes, mai koltesek es jovobeli tetelek datum szerint.</p>
 		</header>
 
-		<nav class="top-nav">
-			<a href="index.html" data-i18n="homeLink">Kezdolap</a>
-			<a href="budget.html" data-i18n="budgetLink">Budget</a>
+		<nav class="menu-wrap">
+			<button id="menu-toggle" type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-panel">
+				<span class="sr-only" data-i18n="menuButton">Menu</span>
+				<span class="hamburger-line"></span>
+				<span class="hamburger-line"></span>
+				<span class="hamburger-line"></span>
+			</button>
+			<div id="menu-panel" class="menu-panel">
+				<a href="index.html" data-i18n="homeLink">Kezdolap</a>
+				<a href="monthly_budget.html" data-i18n="monthlyLink">Monthly Budget</a>
+				<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutAction">Kijelentkezes</button>
+			</div>
 		</nav>
 
 		<section class="card controls compact-controls">
@@ -95,8 +104,10 @@
 				pageTitle: "Monthly Budget",
 				heroTitle: "Monthly Budget",
 				heroText: "Havi osszegzes, mai koltesek es jovobeli tetelek datum szerint.",
+				menuButton: "Menu",
 				homeLink: "Kezdolap",
-				budgetLink: "Koltsegterv",
+				monthlyLink: "Havi osszegzes",
+				logoutAction: "Kijelentkezes",
 				languageLabel: "Nyelv",
 				monthLabel: "Valasztott honap",
 				loggedOut: "Nincs bejelentkezett felhasznalo.",
@@ -140,8 +151,10 @@
 				pageTitle: "Monthly Budget",
 				heroTitle: "Monthly Budget",
 				heroText: "Monthly summary, current spending, and upcoming dated entries.",
+				menuButton: "Menu",
 				homeLink: "Home",
-				budgetLink: "Budget",
+				monthlyLink: "Monthly Budget",
+				logoutAction: "Sign out",
 				languageLabel: "Language",
 				monthLabel: "Selected month",
 				loggedOut: "No user is signed in.",
@@ -189,6 +202,9 @@
 		let appLanguage = loadLanguage();
 		const state = getCurrentUserState();
 
+		const menuToggle = document.getElementById("menu-toggle");
+		const menuPanel = document.getElementById("menu-panel");
+		const menuLogoutButton = document.getElementById("menu-logout-button");
 		const languageSelect = document.getElementById("app-language");
 		const activeMonthInput = document.getElementById("active-month");
 		const sessionInfo = document.getElementById("session-info");
@@ -209,6 +225,22 @@
 			localStorage.setItem(LANGUAGE_KEY, appLanguage);
 			applyTranslations();
 			render();
+		});
+
+		menuToggle.addEventListener("click", () => {
+			const isOpen = menuPanel.classList.toggle("is-open");
+			menuToggle.classList.toggle("is-open", isOpen);
+			menuToggle.setAttribute("aria-expanded", String(isOpen));
+		});
+
+		menuLogoutButton.addEventListener("click", handleLogout);
+
+		document.addEventListener("click", (event) => {
+			if (!event.target.closest(".menu-wrap")) {
+				menuPanel.classList.remove("is-open");
+				menuToggle.classList.remove("is-open");
+				menuToggle.setAttribute("aria-expanded", "false");
+			}
 		});
 
 		activeMonthInput.addEventListener("change", render);
@@ -284,6 +316,14 @@
 
 			const monthEndDate = getMonthEndDate(selectedMonth);
 			projectionTextEl.textContent = t("projectionText").replace("{date}", monthEndDate).replace("{amount}", formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses)));
+		}
+
+		function handleLogout() {
+			menuPanel.classList.remove("is-open");
+			menuToggle.classList.remove("is-open");
+			menuToggle.setAttribute("aria-expanded", "false");
+			localStorage.removeItem(SESSION_KEY);
+			window.location.href = "index.html";
 		}
 
 		function paintList(target, entries) {

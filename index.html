@@ -21,7 +21,7 @@
             <p data-i18n="heroText">Jelentkezz be, regisztralj vagy folytasd vendegkent.</p>
         </header>
 
-        <section class="grid auth-grid">
+        <section id="auth-options" class="grid auth-grid">
             <article class="card">
                 <h2 data-i18n="registerTitle">Regisztracio</h2>
                 <form id="register-form" class="stack">
@@ -61,7 +61,7 @@
         <section class="card session-card">
             <p id="session-info" data-i18n="loggedOut">Nincs bejelentkezett felhasznalo.</p>
             <button type="button" id="guest-button" class="secondary" data-i18n="guestButton">Folytatas vendegkent</button>
-            <button type="button" id="logout-button" class="secondary" data-i18n="logoutButton">Kijelentkezes</button>
+            <button type="button" id="logout-button" class="secondary hidden" data-i18n="logoutButton">Kijelentkezes</button>
             <p id="auth-message" class="auth-message" aria-live="polite"></p>
         </section>
 
@@ -164,6 +164,7 @@
         };
 
         const users = loadUsers();
+        const authOptions = document.getElementById("auth-options");
         const registerForm = document.getElementById("register-form");
         const loginForm = document.getElementById("login-form");
         const guestButton = document.getElementById("guest-button");
@@ -273,8 +274,10 @@
 
         function updateAccessUI() {
             const loggedIn = Boolean(currentUser);
+            authOptions.classList.toggle("hidden", loggedIn);
+            guestButton.classList.toggle("hidden", loggedIn);
+            logoutButton.classList.toggle("hidden", !loggedIn);
             appLinks.classList.toggle("hidden", !loggedIn);
-            logoutButton.disabled = !loggedIn;
             updateSessionLabel();
         }
 
