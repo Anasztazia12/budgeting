@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#d45f2c">
+    <meta name="theme-color" content="#2452b8">
     <title>Költségvetési app</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" href="assets/images/budget-icon.png">
@@ -11,33 +11,42 @@
 </head>
 <body>
     <main class="app-shell">
-        <div class="language-corner">
-            <label for="app-language" class="sr-only" data-i18n="languageLabel">Nyelv</label>
-            <select id="app-language" aria-label="Language selector">
-                <option value="hu">HU</option>
-                <option value="en">EN</option>
-            </select>
-        </div>
-
         <header class="hero">
+            <div class="hero-toolbar">
+                <div class="hero-toolbar-group">
+                    <div class="language-corner">
+                        <label for="app-language" class="sr-only" data-i18n="languageLabel">Nyelv</label>
+                        <select id="app-language" aria-label="Language selector">
+                            <option value="hu">HU</option>
+                            <option value="en">EN</option>
+                        </select>
+                    </div>
+                    <p class="version-badge"><span data-i18n="versionLabel">Verzió</span> <span id="app-version">1.0.0</span></p>
+                </div>
+                <nav class="menu-wrap hero-menu-wrap">
+                    <button id="menu-toggle" type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-panel">
+                        <span class="sr-only" data-i18n="menuButton">Menü</span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                    <div id="menu-panel" class="menu-panel">
+                        <button type="button" id="install-app-button" class="hidden" data-i18n="downloadAppButton">App letöltése</button>
+                    </div>
+                </nav>
+            </div>
             <h1 data-i18n="heroTitle">Költségvetési app</h1>
             <p data-i18n="heroText">Jelentkezz be, regisztrálj vagy folytasd vendégként.</p>
         </header>
 
-        <nav class="menu-wrap">
-            <button id="menu-toggle" type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-panel">
-                <span class="sr-only" data-i18n="menuButton">Menü</span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-            <div id="menu-panel" class="menu-panel">
-                <button type="button" id="install-app-button" class="hidden" data-i18n="downloadAppButton">App letöltése</button>
-            </div>
-        </nav>
+        <section id="auth-actions" class="card auth-action-bar">
+            <button type="button" id="show-register-button" data-i18n="registerTitle">Regisztráció</button>
+            <button type="button" id="show-login-button" data-i18n="loginTitle">Bejelentkezés</button>
+            <button type="button" id="guest-button" class="secondary" data-i18n="guestButton">Folytatás vendégként</button>
+        </section>
 
-        <section id="auth-options" class="grid auth-grid">
-            <article class="card">
+        <section id="auth-options" class="grid auth-grid hidden">
+            <article class="card hidden" id="register-card">
                 <h2 data-i18n="registerTitle">Regisztráció</h2>
                 <form id="register-form" class="stack">
                     <label for="register-username" data-i18n="usernameLabel">Felhasználónév</label>
@@ -59,7 +68,7 @@
                 </form>
             </article>
 
-            <article class="card">
+            <article class="card hidden" id="login-card">
                 <h2 data-i18n="loginTitle">Bejelentkezés</h2>
                 <form id="login-form" class="stack">
                     <label for="login-username" data-i18n="usernameLabel">Felhasználónév</label>
@@ -75,7 +84,6 @@
 
         <section class="card session-card">
             <p id="session-info" data-i18n="loggedOut">Nincs bejelentkezett felhasználó.</p>
-            <button type="button" id="guest-button" class="secondary" data-i18n="guestButton">Folytatás vendégként</button>
             <button type="button" id="logout-button" class="secondary hidden" data-i18n="logoutButton">Kijelentkezés</button>
             <p id="auth-message" class="auth-message" aria-live="polite"></p>
         </section>
@@ -107,6 +115,7 @@
                 pageTitle: "Költségvetési app",
                 heroTitle: "Költségvetési app",
                 heroText: "Jelentkezz be, regisztrálj vagy folytasd vendégként.",
+                versionLabel: "Verzió",
                 menuButton: "Menü",
                 languageLabel: "Nyelv",
                 registerTitle: "Regisztráció",
@@ -144,6 +153,7 @@
                 pageTitle: "Budgeting App",
                 heroTitle: "Budgeting App",
                 heroText: "Sign in, register, or continue as a guest.",
+                versionLabel: "Version",
                 menuButton: "Menu",
                 languageLabel: "Language",
                 registerTitle: "Register",
@@ -182,7 +192,12 @@
         const users = loadUsers();
         const menuToggle = document.getElementById("menu-toggle");
         const menuPanel = document.getElementById("menu-panel");
+        const authActions = document.getElementById("auth-actions");
         const authOptions = document.getElementById("auth-options");
+        const showRegisterButton = document.getElementById("show-register-button");
+        const showLoginButton = document.getElementById("show-login-button");
+        const registerCard = document.getElementById("register-card");
+        const loginCard = document.getElementById("login-card");
         const registerForm = document.getElementById("register-form");
         const loginForm = document.getElementById("login-form");
         const guestButton = document.getElementById("guest-button");
@@ -210,6 +225,18 @@
                 menuToggle.classList.remove("is-open");
                 menuToggle.setAttribute("aria-expanded", "false");
             }
+        });
+
+        showRegisterButton.addEventListener("click", () => {
+            authOptions.classList.remove("hidden");
+            registerCard.classList.remove("hidden");
+            loginCard.classList.add("hidden");
+        });
+
+        showLoginButton.addEventListener("click", () => {
+            authOptions.classList.remove("hidden");
+            loginCard.classList.remove("hidden");
+            registerCard.classList.add("hidden");
         });
 
         languageSelect.addEventListener("change", () => {
@@ -344,8 +371,10 @@
 
         function updateAccessUI() {
             const loggedIn = Boolean(currentUser);
-            authOptions.classList.toggle("hidden", loggedIn);
-            guestButton.classList.toggle("hidden", loggedIn);
+            authActions.classList.toggle("hidden", loggedIn);
+            authOptions.classList.toggle("hidden", true);
+            registerCard.classList.add("hidden");
+            loginCard.classList.add("hidden");
             logoutButton.classList.toggle("hidden", !loggedIn);
             appLinks.classList.toggle("hidden", !loggedIn);
             updateSessionLabel();

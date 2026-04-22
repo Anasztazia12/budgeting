@@ -5,8 +5,8 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f8f2e8",
-  "theme_color": "#d45f2c",
+  "background_color": "#e9f1ff",
+  "theme_color": "#2452b8",
   "icons": [
     {
       "src": "assets/images/budget-icon.png",
