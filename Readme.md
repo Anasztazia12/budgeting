@@ -26,6 +26,16 @@ Managing monthly income and expenses is often fragmented: people track data in n
 
 The strategy is to deliver a practical browser-based budgeting app with strong day-to-day usability first, then scale to a production architecture later.
 
+## NVP Table
+
+| Need | Value | Proof in this project |
+| --- | --- | --- |
+| Users need one place for monthly money tracking. | Clear and focused budgeting workflow. | Dedicated pages for login, budgeting, forecast, and monthly summary. |
+| Users need quick visibility of financial status. | Fast decision support for day-to-day spending. | Total income, total expense, spent-to-date, and month-end balance cards. |
+| Users need low-friction usage on any device. | Better adoption and repeat usage. | Responsive layout, mobile hamburger navigation, and simple forms. |
+| Users need basic account separation without backend setup. | Personal data isolation for local use. | Registered users, guest mode, and session-based local data handling. |
+| Users need understandable planning, not only raw records. | Better short-term forecasting confidence. | Forecast planner and upcoming dated entries on summary pages. |
+
 Core strategic goals:
 
 - Keep interaction simple and task-oriented.
@@ -178,10 +188,20 @@ UX principles:
 
 screenshot on laptop device and on Laptop dev tool phone view
 
-![screenshot1](screenshots/screenshot1.png)
+![screenshot1](assets/images/screenshot1.png)
 
-![screenshot1](screenshots/screenshot2.png)
+![screenshot2](assets/images/screenshot2.png)
+
+light mode
+
+![screenshot3 - light mode](assets/images/screenshot3.png)
+
+Dark mode
+
+![screenshot4 - dark mode](assets/images/screenshot4.png)
 
 ## Note
 
 This is a client-side prototype. For production use, add a backend service, secure server-side sessions, and database storage.
+
+Thank you for checking out my project
