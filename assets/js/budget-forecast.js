@@ -269,7 +269,9 @@ const USERS_KEY = "budgetAppUsers";
 		const incomeSubmitButton = document.getElementById("income-submit-button");
 		const expenseSubmitButton = document.getElementById("expense-submit-button");
 		const incomeCancelEdit = document.getElementById("income-cancel-edit");
+		const incomeDeleteButton = document.getElementById("income-delete");
 		const expenseCancelEdit = document.getElementById("expense-cancel-edit");
+		const expenseDeleteButton = document.getElementById("expense-delete");
 		const forecastPlanner = document.getElementById("forecast-planner");
 		const forecastTargetDateInput = document.getElementById("forecast-target-date");
 		const addWhatIfRowButton = document.getElementById("add-whatif-row");
@@ -364,8 +366,18 @@ const USERS_KEY = "budgetAppUsers";
 		if (incomeCancelEdit) {
 			incomeCancelEdit.addEventListener("click", resetIncomeForm);
 		}
+		if (incomeDeleteButton) {
+			incomeDeleteButton.addEventListener("click", () => {
+				handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm);
+			});
+		}
 		if (expenseCancelEdit) {
 			expenseCancelEdit.addEventListener("click", resetExpenseForm);
+		}
+		if (expenseDeleteButton) {
+			expenseDeleteButton.addEventListener("click", () => {
+				handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm);
+			});
 		}
 
 		menuToggle.addEventListener("click", () => {
@@ -770,6 +782,24 @@ const USERS_KEY = "budgetAppUsers";
 			}
 
 			appState[collectionName].push(entry);
+		}
+
+		function handleDeleteFromForm(collectionName, editIdField, resetForm) {
+			const editId = document.getElementById(editIdField).value;
+			if (!editId) {
+				resetForm();
+				return;
+			}
+
+			if (!window.confirm(t("confirmDelete"))) {
+				return;
+			}
+
+			appState[collectionName] = appState[collectionName].filter((item) => item.id !== editId);
+			saveState();
+			resetForm();
+			showMessage(t("entryDeleted"), false);
+			render();
 		}
 
 		function handleLogout() {
