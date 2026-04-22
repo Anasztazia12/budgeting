@@ -789,8 +789,17 @@
 			const activeMonth = activeMonthInput.value;
 			const incomes = monthEntries(appState.incomes, activeMonth);
 			const expenses = monthEntries(appState.expenses, activeMonth);
-			const targetDate = forecastTargetDateInput.value || getMonthEndDate(activeMonth);
-			const whatIfDate = forecastWhatIfDateInput.value;
+			let targetDate = forecastTargetDateInput.value || getMonthEndDate(activeMonth);
+			if (!targetDate.startsWith(activeMonth)) {
+				targetDate = getMonthEndDate(activeMonth);
+				forecastTargetDateInput.value = targetDate;
+			}
+
+			let whatIfDate = forecastWhatIfDateInput.value;
+			if (whatIfDate && !whatIfDate.startsWith(activeMonth)) {
+				whatIfDate = targetDate;
+				forecastWhatIfDateInput.value = whatIfDate;
+			}
 			const whatIfAmount = Number(forecastWhatIfAmountInput.value || 0);
 
 			const baseUntil = sumEntries(expenses.filter((item) => item.date <= targetDate));
