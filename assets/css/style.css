@@ -329,19 +329,6 @@ button:hover::after {
 	box-shadow: 0 18px 30px rgba(24, 58, 122, 0.28);
 }
 
-.auth-action-bar:has(button:hover) button:not(:hover) {
-	transform: translateY(-1px) scale(0.99);
-	filter: brightness(1.03) saturate(1.03);
-	opacity: 0.92;
-}
-
-.auth-action-bar button:hover + button,
-.auth-action-bar button:has(+ button:hover) {
-	transform: translateY(-2px) scale(1.01);
-	filter: brightness(1.07) saturate(1.07);
-	box-shadow: 0 12px 22px rgba(24, 58, 122, 0.2);
-}
-
 .forms-grid,
 .lists-grid {
 	grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -438,6 +425,10 @@ button:hover::after {
 	display: none;
 }
 
+.always-hidden {
+	display: none !important;
+}
+
 h2,
 h3 {
 	margin-top: 0;
@@ -458,21 +449,6 @@ label {
 	display: flex;
 	gap: 0.6rem;
 	flex-wrap: wrap;
-}
-
-.form-actions:has(button:hover) button:not(:hover),
-.row-actions:has(button:hover) button:not(:hover) {
-	transform: translateY(-1px) scale(0.99);
-	filter: brightness(1.03) saturate(1.03);
-	opacity: 0.93;
-}
-
-.form-actions button:hover + button,
-.form-actions button:has(+ button:hover),
-.row-actions button:hover + button,
-.row-actions button:has(+ button:hover) {
-	transform: translateY(-2px) scale(1.01);
-	filter: brightness(1.06) saturate(1.06);
 }
 
 input,

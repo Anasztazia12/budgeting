@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="theme-color" content="#2452b8">
-	<title>Budget</title>
+	<title>Budget Forecast Planner</title>
 	<link rel="manifest" href="manifest.webmanifest">
 	<link rel="icon" type="image/png" href="assets/images/budget-icon.png">
 	<link rel="stylesheet" href="assets/css/style.css">
@@ -29,22 +29,16 @@
 					</button>
 					<div id="menu-panel" class="menu-panel">
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
-						<div class="menu-group">
-							<button id="budget-menu-toggle" type="button" class="menu-parent" data-i18n="budgetMenuGroup" aria-expanded="false" aria-controls="budget-submenu">Budget</button>
-							<div id="budget-submenu" class="menu-subpanel" aria-hidden="true">
-								<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
-								<a href="budget-forecast.html" data-i18n="forecastMenuLink">Budget Forecast Planner</a>
-								<a href="monthly_budget.html" data-i18n="summaryLink">Monthly Budget</a>
-							</div>
-						</div>
+						<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
+						<a href="monthly_budget.html" data-i18n="summaryLink">Monthly Budget</a>
 						<button id="menu-back-button" type="button" data-i18n="backAction">Vissza</button>
 						<button id="install-app-button" type="button" data-i18n="downloadAppButton">App letöltése</button>
 						<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
 					</div>
 				</nav>
 			</div>
-			<h1 data-i18n="heroTitle">Budget</h1>
-			<p data-i18n="heroText">Rögzítsd a várható bevételeket és kiadásokat dátum szerint.</p>
+			<h1 data-i18n="heroTitle">Budget Forecast Planner</h1>
+			<p data-i18n="heroText">Tervezd meg előre a kiadásaidat dátum és mi lenne ha vásárlás alapján.</p>
 		</header>
 
 		<section class="card controls compact-controls">
@@ -62,10 +56,7 @@
 				</select>
 			</div>
 			<div class="control-action">
-				<div class="stack">
-					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Budget Forecast Planner</button>
-					<button id="save-state-button" type="button" class="secondary" data-i18n="saveAllButton">Mentés</button>
-				</div>
+				<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Vissza a Költségvetéshez</button>
 			</div>
 		</section>
 
@@ -201,27 +192,21 @@
 				</article>
 			</section>
 
-			<section id="forecast-planner" class="card hidden always-hidden">
+			<section id="forecast-planner" class="card">
 				<h2 data-i18n="forecastTitle">Budget Forecast Planner</h2>
 				<div class="grid forecast-grid">
 					<div>
 						<label for="forecast-target-date" data-i18n="forecastTargetDateLabel">Elemzés dátuma</label>
 						<input type="date" id="forecast-target-date">
 					</div>
-					<div>
-						<label for="forecast-whatif-date" data-i18n="forecastWhatIfDateLabel">Mi lenne ha vásárlás dátuma</label>
-						<input type="date" id="forecast-whatif-date">
-					</div>
-					<div>
-						<label for="forecast-whatif-amount" data-i18n="forecastWhatIfAmountLabel">Mi lenne ha összeg</label>
-						<input type="number" id="forecast-whatif-amount" min="0" step="1" value="0">
+					<div class="control-action">
+						<button id="add-whatif-row" type="button" data-i18n="forecastAddRowButton">+ Mi lenne ha tétel hozzáadása</button>
 					</div>
 				</div>
-				<p class="forecast-hint" data-i18n="forecastDateQuickPickLabel">Kattints egy dátumra gyors elemzéshez:</p>
-				<div id="forecast-date-picks" class="forecast-date-picks"></div>
+				<div id="whatif-rows" class="stack forecast-rows"></div>
 				<div class="forecast-results">
-					<p><strong data-i18n="forecastBaseUntilLabel">Kiadás eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
-					<p><strong data-i18n="forecastWithPurchaseLabel">Kiadás ezzel a vásárlással:</strong> <span id="forecast-with-purchase">0</span></p>
+					<p><strong data-i18n="forecastBaseUntilLabel">Egyenleg eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
+					<p><strong data-i18n="forecastWithPurchaseLabel">Egyenleg tervezett tételekkel:</strong> <span id="forecast-with-purchase">0</span></p>
 					<p><strong data-i18n="forecastDifferenceLabel">Különbség:</strong> <span id="forecast-difference">0</span></p>
 					<p><strong data-i18n="forecastMonthEndImpactLabel">Hóvégi egyenleg új állapotban:</strong> <span id="forecast-month-end">0</span></p>
 				</div>
@@ -254,7 +239,7 @@
 			hu: {
 				pageTitle: "Költségvetés",
 				heroTitle: "Költségvetés",
-				heroText: "Rögzítsd a várható bevételeket és kiadásokat dátum szerint.",
+				heroText: "Tervezd meg előre a kiadásaidat dátum és mi lenne ha vásárlás alapján.",
 				menuButton: "Menü",
 				homeLink: "Kezdőlap",
 				budgetLink: "Költségvetés",
@@ -268,18 +253,20 @@
 				currencyUsd: "USD (dollár)",
 				currencyEur: "EUR (euró)",
 				monthLabel: "Választott hónap",
-				forecastButton: "Budget Forecast Planner",
+				forecastButton: "Vissza a Költségvetéshez",
 				forecastTitle: "Budget Forecast Planner",
 				forecastTargetDateLabel: "Elemzés dátuma",
-				forecastWhatIfDateLabel: "Mi lenne ha vásárlás dátuma",
-				forecastWhatIfAmountLabel: "Mi lenne ha összeg",
-				forecastDateQuickPickLabel: "Kattints egy dátumra gyors elemzéshez:",
-				forecastBaseUntilLabel: "Kiadás eddig a dátumig:",
-				forecastWithPurchaseLabel: "Kiadás ezzel a vásárlással:",
+				forecastAddRowButton: "+ Mi lenne ha tétel hozzáadása",
+				forecastRowTypeLabel: "Típus",
+				forecastRowAmountLabel: "Összeg",
+				forecastRowDateLabel: "Dátum",
+				forecastTypeExpense: "Extra kiadás",
+				forecastTypeIncome: "Extra bevétel",
+				forecastRemoveRow: "Sor törlése",
+				forecastBaseUntilLabel: "Egyenleg eddig a dátumig:",
+				forecastWithPurchaseLabel: "Egyenleg tervezett tételekkel:",
 				forecastDifferenceLabel: "Különbség:",
 				forecastMonthEndImpactLabel: "Hóvégi egyenleg új állapotban:",
-				saveAllButton: "Mentés",
-				saveAllDone: "A módosítások mentve.",
 				registerTitle: "Regisztráció",
 				loginTitle: "Bejelentkezés",
 				usernameLabel: "Felhasználónév",
@@ -359,9 +346,9 @@
 				}
 			},
 			en: {
-				pageTitle: "Budget",
-				heroTitle: "Budget",
-				heroText: "Save expected income and expenses with exact dates.",
+				pageTitle: "Budget Forecast Planner",
+				heroTitle: "Budget Forecast Planner",
+				heroText: "Plan future spending by date and what-if purchases.",
 				menuButton: "Menu",
 				homeLink: "Home",
 				budgetLink: "Budget",
@@ -375,18 +362,20 @@
 				currencyUsd: "USD (dollar)",
 				currencyEur: "EUR (euro)",
 				monthLabel: "Selected month",
-				forecastButton: "Budget Forecast Planner",
+				forecastButton: "Back to Budget",
 				forecastTitle: "Budget Forecast Planner",
 				forecastTargetDateLabel: "Analyze up to date",
-				forecastWhatIfDateLabel: "What-if purchase date",
-				forecastWhatIfAmountLabel: "What-if amount",
-				forecastDateQuickPickLabel: "Click a date for quick analysis:",
-				forecastBaseUntilLabel: "Spending until that date:",
-				forecastWithPurchaseLabel: "Spending with this purchase:",
+				forecastAddRowButton: "+ Add what-if row",
+				forecastRowTypeLabel: "Type",
+				forecastRowAmountLabel: "Amount",
+				forecastRowDateLabel: "Date",
+				forecastTypeExpense: "Extra expense",
+				forecastTypeIncome: "Extra income",
+				forecastRemoveRow: "Remove row",
+				forecastBaseUntilLabel: "Balance until date:",
+				forecastWithPurchaseLabel: "Balance with planned rows:",
 				forecastDifferenceLabel: "Difference:",
 				forecastMonthEndImpactLabel: "Updated month-end balance:",
-				saveAllButton: "Save",
-				saveAllDone: "Changes saved.",
 				registerTitle: "Register",
 				loginTitle: "Sign in",
 				usernameLabel: "Username",
@@ -468,6 +457,7 @@
 		};
 
 		const today = new Date();
+		const pageParams = new URLSearchParams(window.location.search);
 		const users = loadUsers();
 		let currentUser = loadSession(users);
 		let appLanguage = loadLanguage();
@@ -479,7 +469,6 @@
 		const incomeForm = document.getElementById("income-form");
 		const expenseForm = document.getElementById("expense-form");
 		const forecastToggleButton = document.getElementById("forecast-toggle-button");
-		const saveStateButton = document.getElementById("save-state-button");
 		const menuToggle = document.getElementById("menu-toggle");
 		const menuPanel = document.getElementById("menu-panel");
 		const menuBackButton = document.getElementById("menu-back-button");
@@ -505,9 +494,8 @@
 		const expenseCancelEdit = document.getElementById("expense-cancel-edit");
 		const forecastPlanner = document.getElementById("forecast-planner");
 		const forecastTargetDateInput = document.getElementById("forecast-target-date");
-		const forecastWhatIfDateInput = document.getElementById("forecast-whatif-date");
-		const forecastWhatIfAmountInput = document.getElementById("forecast-whatif-amount");
-		const forecastDatePicks = document.getElementById("forecast-date-picks");
+		const addWhatIfRowButton = document.getElementById("add-whatif-row");
+		const whatIfRowsContainer = document.getElementById("whatif-rows");
 		const forecastBaseUntilEl = document.getElementById("forecast-base-until");
 		const forecastWithPurchaseEl = document.getElementById("forecast-with-purchase");
 		const forecastDifferenceEl = document.getElementById("forecast-difference");
@@ -531,22 +519,24 @@
 
 		activeMonthInput.addEventListener("change", render);
 		forecastToggleButton.addEventListener("click", () => {
-			const monthParam = encodeURIComponent(activeMonthInput.value || toMonthInput(today));
-			window.location.href = `budget-forecast.html?month=${monthParam}`;
-		});
-		saveStateButton.addEventListener("click", () => {
-			saveState();
-			showMessage(t("saveAllDone"), false);
+			window.location.href = "budget.html";
 		});
 		forecastTargetDateInput.addEventListener("change", renderForecastPlanner);
-		forecastWhatIfDateInput.addEventListener("change", renderForecastPlanner);
-		forecastWhatIfAmountInput.addEventListener("input", renderForecastPlanner);
-		forecastDatePicks.addEventListener("click", (event) => {
-			const button = event.target.closest("button[data-date]");
-			if (!button) {
+		addWhatIfRowButton.addEventListener("click", () => {
+			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value });
+			renderForecastPlanner();
+		});
+		whatIfRowsContainer.addEventListener("input", renderForecastPlanner);
+		whatIfRowsContainer.addEventListener("change", renderForecastPlanner);
+		whatIfRowsContainer.addEventListener("click", (event) => {
+			const removeButton = event.target.closest("button[data-action='remove-whatif']");
+			if (!removeButton) {
 				return;
 			}
-			forecastTargetDateInput.value = button.dataset.date;
+			removeButton.closest(".whatif-row")?.remove();
+			if (!whatIfRowsContainer.children.length) {
+				appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value });
+			}
 			renderForecastPlanner();
 		});
 		menuBackButton.addEventListener("click", () => {
@@ -734,12 +724,14 @@
 				return;
 			}
 
-			activeMonthInput.value = toMonthInput(today);
+			const queryMonth = pageParams.get("month");
+			activeMonthInput.value = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : toMonthInput(today);
 			languageSelect.value = appLanguage;
 			currencySelect.value = appCurrency;
 			resetIncomeForm();
 			resetExpenseForm();
 			setDefaultForecastDates();
+			setDefaultWhatIfRows();
 			applyTranslations();
 			updateAccessUI();
 			updateInstallButtonState();
@@ -759,6 +751,7 @@
 
 			updateSessionLabel();
 			updateFormButtonLabels();
+			refreshWhatIfRowLabels();
 		}
 
 		function render() {
@@ -790,8 +783,84 @@
 		function setDefaultForecastDates() {
 			const monthValue = activeMonthInput.value || toMonthInput(today);
 			forecastTargetDateInput.value = getMonthEndDate(monthValue);
-			forecastWhatIfDateInput.value = toDateInput(today);
-			forecastWhatIfAmountInput.value = "0";
+		}
+
+		function setDefaultWhatIfRows() {
+			whatIfRowsContainer.innerHTML = "";
+			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || toDateInput(today) });
+		}
+
+		function appendWhatIfRow(row) {
+			const wrapper = document.createElement("div");
+			wrapper.className = "grid forecast-grid whatif-row";
+			wrapper.innerHTML = `
+				<div>
+					<label>${t("forecastRowTypeLabel")}</label>
+					<select class="forecast-whatif-type">
+						<option value="expense">${t("forecastTypeExpense")}</option>
+						<option value="income">${t("forecastTypeIncome")}</option>
+					</select>
+				</div>
+				<div>
+					<label>${t("forecastRowAmountLabel")}</label>
+					<input type="number" class="forecast-whatif-amount" min="0" step="1" value="${row.amount ?? ""}">
+				</div>
+				<div>
+					<label>${t("forecastRowDateLabel")}</label>
+					<input type="date" class="forecast-whatif-date" value="${row.date || ""}">
+				</div>
+				<div class="control-action">
+					<button type="button" class="secondary" data-action="remove-whatif">${t("forecastRemoveRow")}</button>
+				</div>
+			`;
+
+			const typeSelect = wrapper.querySelector(".forecast-whatif-type");
+			typeSelect.value = row.type || "expense";
+			whatIfRowsContainer.appendChild(wrapper);
+		}
+
+		function refreshWhatIfRowLabels() {
+			whatIfRowsContainer.querySelectorAll(".whatif-row").forEach((row) => {
+				const labels = row.querySelectorAll("label");
+				if (labels[0]) {
+					labels[0].textContent = t("forecastRowTypeLabel");
+				}
+				if (labels[1]) {
+					labels[1].textContent = t("forecastRowAmountLabel");
+				}
+				if (labels[2]) {
+					labels[2].textContent = t("forecastRowDateLabel");
+				}
+
+				const typeSelect = row.querySelector(".forecast-whatif-type");
+				const currentType = typeSelect ? typeSelect.value : "expense";
+				if (typeSelect) {
+					typeSelect.innerHTML = `
+						<option value="expense">${t("forecastTypeExpense")}</option>
+						<option value="income">${t("forecastTypeIncome")}</option>
+					`;
+					typeSelect.value = currentType;
+				}
+
+				const removeButton = row.querySelector("button[data-action='remove-whatif']");
+				if (removeButton) {
+					removeButton.textContent = t("forecastRemoveRow");
+				}
+			});
+		}
+
+		function collectWhatIfRows(activeMonth) {
+			return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => {
+				const type = row.querySelector(".forecast-whatif-type")?.value || "expense";
+				const amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
+				const date = row.querySelector(".forecast-whatif-date")?.value || "";
+				return {
+					type,
+					amount,
+					date,
+					valid: amount > 0 && Boolean(date) && date.startsWith(activeMonth)
+				};
+			});
 		}
 
 		function renderForecastPlanner() {
@@ -800,7 +869,6 @@
 				forecastWithPurchaseEl.textContent = formatCurrency(0);
 				forecastDifferenceEl.textContent = formatCurrency(0);
 				forecastMonthEndEl.textContent = formatCurrency(0);
-				forecastDatePicks.innerHTML = "";
 				return;
 			}
 
@@ -813,39 +881,25 @@
 				forecastTargetDateInput.value = targetDate;
 			}
 
-			let whatIfDate = forecastWhatIfDateInput.value;
-			if (whatIfDate && !whatIfDate.startsWith(activeMonth)) {
-				whatIfDate = targetDate;
-				forecastWhatIfDateInput.value = whatIfDate;
-			}
-			const whatIfAmount = Number(forecastWhatIfAmountInput.value || 0);
-
-			const baseUntil = sumEntries(expenses.filter((item) => item.date <= targetDate));
-			const includeWhatIf = whatIfAmount > 0 && Boolean(whatIfDate) && whatIfDate <= targetDate && whatIfDate.startsWith(activeMonth);
-			const simulatedUntil = baseUntil + (includeWhatIf ? whatIfAmount : 0);
-			const difference = simulatedUntil - baseUntil;
+			const whatIfRows = collectWhatIfRows(activeMonth);
+			const baseUntil = sumEntries(incomes.filter((item) => item.date <= targetDate)) - sumEntries(expenses.filter((item) => item.date <= targetDate));
+			const adjustmentsUntilTarget = whatIfRows
+				.filter((item) => item.valid && item.date <= targetDate)
+				.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
+			const simulatedUntil = baseUntil + adjustmentsUntilTarget;
+			const difference = adjustmentsUntilTarget;
 
 			const monthIncomeTotal = sumEntries(incomes);
 			const monthExpenseTotal = sumEntries(expenses);
-			const monthEndWithWhatIf = monthIncomeTotal - monthExpenseTotal - (whatIfAmount > 0 && whatIfDate.startsWith(activeMonth) ? whatIfAmount : 0);
+			const allAdjustmentsInMonth = whatIfRows
+				.filter((item) => item.valid)
+				.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
+			const monthEndWithWhatIf = monthIncomeTotal - monthExpenseTotal + allAdjustmentsInMonth;
 
 			forecastBaseUntilEl.textContent = formatCurrency(baseUntil);
 			forecastWithPurchaseEl.textContent = formatCurrency(simulatedUntil);
 			forecastDifferenceEl.textContent = formatCurrency(difference);
 			forecastMonthEndEl.textContent = formatCurrency(monthEndWithWhatIf);
-
-			renderForecastDatePicks(expenses, targetDate, activeMonth);
-		}
-
-		function renderForecastDatePicks(expenses, selectedDate, activeMonth) {
-			const dateSet = new Set(expenses.map((item) => item.date));
-			dateSet.add(toDateInput(today));
-			dateSet.add(getMonthEndDate(activeMonth));
-
-			const sorted = Array.from(dateSet).filter((date) => date.startsWith(activeMonth)).sort();
-			forecastDatePicks.innerHTML = sorted
-				.map((date) => `<button type="button" class="inline-button ${date === selectedDate ? "secondary" : ""}" data-date="${date}">${formatDisplayDate(date)}</button>`)
-				.join("");
 		}
 
 		function paintList(target, entries, listType) {
