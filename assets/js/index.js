@@ -261,10 +261,12 @@ const USERS_KEY = "budgetAppUsers";
             showMessage(t("guestSuccess"), false);
         });
 
-        logoutButton.addEventListener("click", () => {
-            performLogout();
-            showMessage(t("logoutSuccess"), false);
-        });
+        if (logoutButton) {
+            logoutButton.addEventListener("click", () => {
+                performLogout();
+                showMessage(t("logoutSuccess"), false);
+            });
+        }
 
         installAppButton.addEventListener("click", async () => {
             if (isAppInstalled() && !deferredInstallPrompt) {
@@ -334,11 +336,13 @@ const USERS_KEY = "budgetAppUsers";
 
         function updateAccessUI() {
             const loggedIn = Boolean(currentUser);
-            authActions.classList.toggle("hidden", loggedIn);
+            authActions.classList.remove("hidden");
             authOptions.classList.toggle("hidden", true);
             registerCard.classList.add("hidden");
             loginCard.classList.add("hidden");
-            logoutButton.classList.toggle("hidden", !loggedIn);
+            if (logoutButton) {
+                logoutButton.classList.toggle("hidden", !loggedIn);
+            }
             appLinks.classList.toggle("hidden", !loggedIn);
             updateSessionLabel();
         }

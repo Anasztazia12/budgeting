@@ -246,7 +246,7 @@ const USERS_KEY = "budgetAppUsers";
 		const expenseList = document.getElementById("expense-list");
 		const incomeSubmitButton = document.getElementById("income-submit-button");
 		const expenseSubmitButton = document.getElementById("expense-submit-button");
-		const incomeCancelEdit = document.getElementById("income-cancel-edit");
+		const incomeCancelEdit = document.getElementById("income-cancel-edit") || document.getElementById("income-cancel");
 		const expenseCancelEdit = document.getElementById("expense-cancel-edit");
 		let deferredInstallPrompt = null;
 
@@ -551,7 +551,9 @@ const USERS_KEY = "budgetAppUsers";
 				document.getElementById("income-category").value = entry.category;
 				document.getElementById("income-amount").value = entry.amount;
 				document.getElementById("income-date").value = entry.date;
-				incomeCancelEdit.classList.remove("hidden");
+				if (incomeCancelEdit) {
+					incomeCancelEdit.classList.remove("hidden");
+				}
 			} else {
 				document.getElementById("expense-edit-id").value = entry.id;
 				document.getElementById("expense-category").value = entry.category;
@@ -567,7 +569,9 @@ const USERS_KEY = "budgetAppUsers";
 			incomeForm.reset();
 			document.getElementById("income-edit-id").value = "";
 			document.getElementById("income-date").value = toDateInput(today);
-			incomeCancelEdit.classList.add("hidden");
+			if (incomeCancelEdit) {
+				incomeCancelEdit.classList.add("hidden");
+			}
 			updateFormButtonLabels();
 		}
 

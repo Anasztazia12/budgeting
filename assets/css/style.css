@@ -510,6 +510,11 @@ button:hover::after {
 	gap: 0.4rem;
 }
 
+[data-theme="dark"] .forecast-results {
+	border-color: #3f568d;
+	background: #13213d;
+}
+
 .forecast-results p {
 	margin: 0;
 }
@@ -711,6 +716,39 @@ h2[data-i18n="projectionTitle"] {
 	font-weight: 700;
 }
 
+[data-theme="dark"] #spent-to-date {
+	color: #dce7ff;
+}
+
+[data-theme="dark"] #month-end-left {
+	color: #9ec2ff;
+	text-shadow: none;
+}
+
+[data-theme="dark"] h3[data-i18n="monthEndTitle"],
+[data-theme="dark"] h2[data-i18n="projectionTitle"] {
+	color: #c8dbff;
+}
+
+[data-theme="dark"] #projection-text {
+	color: #d3e3ff;
+}
+
+[data-theme="dark"] .stat:has(#monthly-expense) {
+	background: linear-gradient(155deg, #1a2a4e, #15213d 70%);
+	border-color: #465f98;
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+}
+
+[data-theme="dark"] .stat:has(#monthly-expense) h3 {
+	color: #d3e2ff;
+}
+
+[data-theme="dark"] .stat:has(#monthly-expense) #monthly-expense {
+	color: #ffb7cb;
+	text-shadow: none;
+}
+
 .entry-list {
 	list-style: none;
 	padding: 0;
@@ -730,6 +768,11 @@ h2[data-i18n="projectionTitle"] {
 	border-radius: 10px;
 	padding: 0.6rem 0.65rem;
 	background: #fdfefe;
+}
+
+[data-theme="dark"] .entry-list li {
+	border-color: #3d5487;
+	background: #12203a;
 }
 
 .entry-list li strong {
