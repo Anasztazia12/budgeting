@@ -385,7 +385,7 @@ body {
 .menu-panel button,
 .top-nav a,
 .btn-link,
-button {
+button:not(.btn):not([class*="btn-"]) {
 	position: relative;
 	overflow: hidden;
 	isolation: isolate;
@@ -395,7 +395,7 @@ button {
 .menu-panel button::after,
 .top-nav a::after,
 .btn-link::after,
-button::after {
+button:not(.btn):not([class*="btn-"])::after {
 	content: "";
 	position: absolute;
 	top: -40%;
@@ -413,7 +413,7 @@ button::after {
 .menu-panel button:hover::after,
 .top-nav a:hover::after,
 .btn-link:hover::after,
-button:hover::after {
+button:not(.btn):not([class*="btn-"]):hover::after {
 	left: 130%;
 }
 
@@ -481,9 +481,9 @@ button:hover::after {
 
 .auth-action-bar button:hover,
 .auth-action-bar button:focus-visible {
-	transform: translateY(-4px) scale(1.03);
-	filter: brightness(1.12) saturate(1.12);
-	box-shadow: 0 18px 30px rgba(24, 58, 122, 0.28);
+	transform: translateY(-1px);
+	filter: brightness(1.08) saturate(1.06);
+	box-shadow: 0 10px 18px rgba(24, 58, 122, 0.2);
 }
 
 #guest-button.guest-accent {
