@@ -796,43 +796,6 @@ const USERS_KEY = "budgetAppUsers";
 			appState[collectionName].push(entry);
 		}
 
-		function exportMonthCsv() {
-			if (!requireLogin()) {
-				return;
-			}
-
-			const activeMonth = activeMonthInput.value;
-			const rows = [[t("csvType"), t("csvCategory"), t("csvAmount"), t("csvDate")]];
-
-			monthEntries(appState.incomes, activeMonth).forEach((entry) => {
-				rows.push([t("typeIncome"), translateCategory(entry.category), String(entry.amount), entry.date]);
-			});
-
-			monthEntries(appState.expenses, activeMonth).forEach((entry) => {
-				rows.push([t("typeExpense"), translateCategory(entry.category), String(entry.amount), entry.date]);
-			});
-
-			if (rows.length === 1) {
-				showMessage(t("exportEmpty"), true);
-				return;
-			}
-
-			const csv = rows.map((row) => row.map(escapeCsv).join(";")).join("\n");
-			const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.download = `budget-${currentUser}-${activeMonth}.csv`;
-			link.click();
-			URL.revokeObjectURL(url);
-			showMessage(t("exportDone"), false);
-		}
-
-		function escapeCsv(value) {
-			const text = String(value).replace(/"/g, '""');
-			return `"${text}"`;
-		}
-
 		function handleLogout() {
 			menuPanel.classList.remove("is-open");
 			menuToggle.classList.remove("is-open");

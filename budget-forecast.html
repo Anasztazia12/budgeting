@@ -38,7 +38,7 @@
 					</div>
 				</nav>
 			</div>
-			<h1 data-i18n="heroTitle">Budget Forecast Planner</h1>
+			<h1 data-i18n="heroTitle">Költségvetési előrejelző</h1>
 			<p data-i18n="heroText">Tervezd meg előre a kiadásaidat dátum és mi lenne ha vásárlás alapján.</p>
 		</header>
 
@@ -164,8 +164,8 @@
 						<input type="date" id="expense-date" required>
 
 						<div class="form-actions">
-							<button type="submit" id="expense-submit-button" data-i18n="saveExpenseButton">Kiadas mentese</button>
-							<button type="button" id="expense-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztes megse</button>
+							<button type="submit" id="expense-submit-button" data-i18n="saveExpenseButton">Kiadás mentése</button>
+							<button type="button" id="expense-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztés</button>
 						</div>
 					</form>
 				</article>
@@ -173,28 +173,28 @@
 
 			<section class="grid stats-grid hidden always-hidden">
 				<article class="card stat">
-					<h3 data-i18n="monthlyIncomeTitle">Osszes havi bevetel</h3>
+					<h3 data-i18n="monthlyIncomeTitle">Összes havi bevétel</h3>
 					<p id="monthly-income">0</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="monthEndTitle">Hovegi varhato egyenleg</h3>
+					<h3 data-i18n="monthEndTitle">Hóvégi várható egyenleg</h3>
 					<p id="month-end-left">0</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="monthlyExpenseTitle">Osszes havi kiadas</h3>
+					<h3 data-i18n="monthlyExpenseTitle">Összes havi kiadás</h3>
 					<p id="monthly-expense">0</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="spentToDateTitle">Koltseg mai napig</h3>
+					<h3 data-i18n="spentToDateTitle">Költség mai napig</h3>
 					<p id="spent-to-date">0</p>
 				</article>
 			</section>
 
 			<section id="forecast-planner" class="card">
-				<h2 data-i18n="forecastTitle">Budget Forecast Planner</h2>
+				<h2 data-i18n="forecastTitle">Költségvetés előrejelző</h2>
 				<div class="grid forecast-grid">
 					<div>
 						<label for="forecast-target-date" data-i18n="forecastTargetDateLabel">Elemzés dátuma</label>
@@ -215,12 +215,12 @@
 
 			<section class="grid summary-grid hidden always-hidden">
 				<article class="card">
-					<h2 data-i18n="incomeEntriesTitle">Bevetelek ebben a honapban</h2>
+					<h2 data-i18n="incomeEntriesTitle">Bevételek ebben a hónapban</h2>
 					<ul id="income-list" class="entry-list action-list"></ul>
 				</article>
 
 				<article class="card">
-					<h2 data-i18n="expenseEntriesTitle">Kiadasok ebben a honapban</h2>
+					<h2 data-i18n="expenseEntriesTitle">Kiadások ebben a hónapban</h2>
 					<ul id="expense-list" class="entry-list action-list"></ul>
 				</article>
 			</section>

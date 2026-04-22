@@ -174,6 +174,14 @@ UX principles:
 2. Register, sign in, or continue as guest.
 3. Open Budget or Monthly Budget and start tracking.
 
+### Manual testing
+
+screenshot on laptop device and on Laptop dev tool phone view
+
+![screenshot1](screenshots/screenshot1.png)
+
+![screenshot1](screenshots/screenshot2.png)
+
 ## Note
 
 This is a client-side prototype. For production use, add a backend service, secure server-side sessions, and database storage.
