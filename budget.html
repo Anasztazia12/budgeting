@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Budget</title>
+	<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+	<main class="app-shell">
+		<div class="language-corner">
+			<label for="app-language" class="sr-only" data-i18n="languageLabel">Nyelv</label>
+			<select id="app-language" aria-label="Language selector">
+				<option value="hu">HU</option>
+				<option value="en">EN</option>
+			</select>
+		</div>
+
+		<header class="hero">
+			<h1 data-i18n="heroTitle">Budget</h1>
+			<p data-i18n="heroText">Rogzitsd a varhato beveteleket es kiadasokat datum szerint.</p>
+		</header>
+
+		<nav class="top-nav">
+			<a href="index.html" data-i18n="homeLink">Kezdolap</a>
+			<a href="monthly_budget.html" data-i18n="summaryLink">Monthly Budget</a>
+		</nav>
+
+		<section class="card controls compact-controls">
+			<div>
+				<label for="active-month" data-i18n="monthLabel">Valasztott honap</label>
+				<input type="month" id="active-month">
+			</div>
+			<div class="control-action">
+				<button id="export-csv-button" type="button" data-i18n="exportButton">CSV export a honapra</button>
+			</div>
+		</section>
+
+		<section class="grid auth-grid">
+			<article class="card">
+				<h2 data-i18n="registerTitle">Regisztracio</h2>
+				<form id="register-form" class="stack">
+					<label for="register-username" data-i18n="usernameLabel">Felhasznalonev</label>
+					<input type="text" id="register-username" minlength="5" required>
+
+					<label for="register-email-address" data-i18n="emailLabel">Email cim</label>
+					<input type="email" id="register-email-address" required>
+
+					<label for="register-email-address-confirm" data-i18n="emailConfirmLabel">Email cim megerositese</label>
+					<input type="email" id="register-email-address-confirm" required>
+
+					<label for="register-password" data-i18n="passwordLabel">Jelszo</label>
+					<input type="password" id="register-password" minlength="6" required>
+
+					<label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszo megerositese</label>
+					<input type="password" id="register-password-confirm" minlength="6" required>
+
+					<button type="submit" data-i18n="registerButton">Regisztralok</button>
+				</form>
+			</article>
+
+			<article class="card">
+				<h2 data-i18n="loginTitle">Bejelentkezes</h2>
+				<form id="login-form" class="stack">
+					<label for="login-username" data-i18n="usernameLabel">Felhasznalonev</label>
+					<input type="text" id="login-username" required>
+
+					<label for="login-password" data-i18n="passwordLabel">Jelszo</label>
+					<input type="password" id="login-password" required>
+
+					<button type="submit" data-i18n="loginButton">Belepes</button>
+				</form>
+			</article>
+		</section>
+
+		<section class="card session-card">
+			<p id="session-info">Nincs bejelentkezett felhasznalo.</p>
+			<button id="logout-button" type="button" class="secondary" data-i18n="logoutButton">Kijelentkezes</button>
+			<p id="auth-message" class="auth-message" aria-live="polite"></p>
+		</section>
+
+		<section id="locked-message" class="card">
+			<p data-i18n="loginRequired">A rogziteshez jelentkezz be vagy regisztralj.</p>
+		</section>
+
+		<section id="budget-content" class="hidden">
+			<section class="grid forms-grid">
+				<article class="card">
+					<h2 data-i18n="incomeFormTitle">Bevetel hozzaadasa</h2>
+					<form id="income-form" class="stack">
+						<input type="hidden" id="income-edit-id">
+						<label for="income-category" data-i18n="categoryLabel">Kategoria</label>
+						<select id="income-category" required>
+							<option value="fizetes">Fizetes</option>
+							<option value="egyeb">Egyeb</option>
+						</select>
+
+						<label for="income-amount" data-i18n="amountLabel">Osszeg (Ft)</label>
+						<input type="number" id="income-amount" min="1" step="1" required>
+
+						<label for="income-date" data-i18n="incomeDateLabel">Mikor varhato? (datum)</label>
+						<input type="date" id="income-date" required>
+
+						<div class="form-actions">
+							<button type="submit" id="income-submit-button" data-i18n="saveIncomeButton">Bevetel mentese</button>
+							<button type="button" id="income-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztes megse</button>
+						</div>
+					</form>
+				</article>
+
+				<article class="card">
+					<h2 data-i18n="expenseFormTitle">Kiadas hozzaadasa</h2>
+					<form id="expense-form" class="stack">
+						<input type="hidden" id="expense-edit-id">
+						<label for="expense-category" data-i18n="categoryLabel">Kategoria</label>
+						<select id="expense-category" required>
+							<option value="szamlak">Szamlak</option>
+							<option value="viz">Viz</option>
+							<option value="gaz">Gaz</option>
+							<option value="aram">Aram</option>
+							<option value="auto">Auto</option>
+							<option value="benzin">Benzin</option>
+							<option value="elemiszer">Elemiszer</option>
+							<option value="ruhak">Ruhak</option>
+							<option value="rent">Rent</option>
+							<option value="biztositas">Biztositas</option>
+							<option value="hitelkartya 3">Hitelkartya 3</option>
+							<option value="zilch">Zilch</option>
+							<option value="tv">TV</option>
+							<option value="telefon">Telefon</option>
+							<option value="internet">Internet</option>
+							<option value="suli">Suli</option>
+							<option value="egyeb kiadas">Egyeb kiadas</option>
+						</select>
+
+						<label for="expense-amount" data-i18n="amountLabel">Osszeg (Ft)</label>
+						<input type="number" id="expense-amount" min="1" step="1" required>
+
+						<label for="expense-date" data-i18n="expenseDateLabel">Mikor lesz levonas? (datum)</label>
+						<input type="date" id="expense-date" required>
+
+						<div class="form-actions">
+							<button type="submit" id="expense-submit-button" data-i18n="saveExpenseButton">Kiadas mentese</button>
+							<button type="button" id="expense-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztes megse</button>
+						</div>
+					</form>
+				</article>
+			</section>
+
+			<section class="grid stats-grid">
+				<article class="card stat">
+					<h3 data-i18n="monthlyIncomeTitle">Osszes havi bevetel</h3>
+					<p id="monthly-income">0 Ft</p>
+				</article>
+
+				<article class="card stat">
+					<h3 data-i18n="monthlyExpenseTitle">Osszes havi kiadas</h3>
+					<p id="monthly-expense">0 Ft</p>
+				</article>
+
+				<article class="card stat">
+					<h3 data-i18n="spentToDateTitle">Koltseg mai napig</h3>
+					<p id="spent-to-date">0 Ft</p>
+				</article>
+
+				<article class="card stat">
+					<h3 data-i18n="monthEndTitle">Hovegi varhato egyenleg</h3>
+					<p id="month-end-left">0 Ft</p>
+				</article>
+			</section>
+
+			<section class="grid summary-grid">
+				<article class="card">
+					<h2 data-i18n="incomeEntriesTitle">Bevetelek ebben a honapban</h2>
+					<ul id="income-list" class="entry-list action-list"></ul>
+				</article>
+
+				<article class="card">
+					<h2 data-i18n="expenseEntriesTitle">Kiadasok ebben a honapban</h2>
+					<ul id="expense-list" class="entry-list action-list"></ul>
+				</article>
+			</section>
+		</section>
+	</main>
+
+	<script>
+		const USERS_KEY = "budgetAppUsers";
+		const SESSION_KEY = "budgetAppSession";
+		const LANGUAGE_KEY = "budgetAppLanguage";
+		const GUEST_SESSION_VALUE = "__guest__";
+		const GUEST_DATA_KEY = "budgetAppGuestData";
+
+		const dictionary = {
+			hu: {
+				pageTitle: "Budget",
+				heroTitle: "Budget",
+				heroText: "Rögzitsd a várható bevételeket es kiadásokat dátum szerint.",
+				homeLink: "Kezdőlap",
+				summaryLink: "Havi összegzés",
+				languageLabel: "Nyelv",
+				monthLabel: "Választott hónap",
+				exportButton: "CSV export a hónapra",
+				registerTitle: "Regisztráció",
+				loginTitle: "Bejelentkezés",
+				usernameLabel: "Felhasznélonév",
+				emailLabel: "Email cim",
+				emailConfirmLabel: "Email cím megerősítése",
+				passwordLabel: "Jelszó",
+				passwordConfirmLabel: "Jelszó megerösitse",
+				registerButton: "Regisztralok",
+				loginButton: "Belepes",
+				logoutButton: "Kijelentkezés",
+				loginRequired: "A rogziteshez jelentkezz be vagy regisztralj.",
+				incomeFormTitle: "Bevetel hozzaadasa",
+				expenseFormTitle: "Kiadas hozzaadasa",
+				categoryLabel: "Kategoria",
+				amountLabel: "Osszeg (Ft)",
+				incomeDateLabel: "Mikor varhato? (datum)",
+				expenseDateLabel: "Mikor lesz levonas? (datum)",
+				saveIncomeButton: "Bevetel mentese",
+				saveExpenseButton: "Kiadas mentese",
+				updateIncomeButton: "Bevetel frissitese",
+				updateExpenseButton: "Kiadas frissitese",
+				cancelEditButton: "Szerkesztes megse",
+				monthlyIncomeTitle: "Osszes havi bevetel",
+				monthlyExpenseTitle: "Osszes havi kiadas",
+				spentToDateTitle: "Koltseg mai napig",
+				monthEndTitle: "Hovegi varhato egyenleg",
+				incomeEntriesTitle: "Bevetelek ebben a honapban",
+				expenseEntriesTitle: "Kiadasok ebben a honapban",
+				loggedOut: "Nincs bejelentkezett felhasznalo.",
+				loggedIn: "Bejelentkezve:",
+				guestUser: "Vendeg",
+				emailMismatch: "Az email cimek nem egyeznek.",
+				passwordMismatch: "A jelszavak nem egyeznek.",
+				usernameTaken: "Ez a felhasznalonev mar foglalt.",
+				registerSuccess: "Sikeres regisztracio.",
+				loginSuccess: "Sikeres bejelentkezes.",
+				logoutSuccess: "Sikeres kijelentkezes.",
+				invalidLogin: "Hibas felhasznalonev vagy jelszo.",
+				loginFirst: "Eloszor jelentkezz be.",
+				entrySaved: "A tetel elmentve.",
+				entryUpdated: "A tetel frissitve.",
+				entryDeleted: "A tetel torolve.",
+				confirmDelete: "Biztosan torolni szeretned ezt a tetelt?",
+				emptyEntries: "Nincs rogzitett tetel erre a honapra.",
+				exportEmpty: "Nincs exportalhato tetel ebben a honapban.",
+				exportDone: "A havi CSV export letoltese elindult.",
+				currency: "Ft",
+				editAction: "Szerkesztes",
+				deleteAction: "Torles",
+				csvType: "Tipus",
+				csvCategory: "Kategoria",
+				csvAmount: "Osszeg",
+				csvDate: "Datum",
+				typeIncome: "Bevetel",
+				typeExpense: "Kiadas",
+				categories: {
+					fizetes: "Fizetes",
+					egyeb: "Egyeb",
+					szamlak: "Szamlak",
+					viz: "Viz",
+					gaz: "Gaz",
+					aram: "Aram",
+					auto: "Auto",
+					benzin: "Benzin",
+					elemiszer: "Elemiszer",
+					ruhak: "Ruhak",
+					rent: "Rent",
+					biztositas: "Biztositas",
+					"hitelkartya 3": "Hitelkartya 3",
+					zilch: "Zilch",
+					tv: "TV",
+					telefon: "Telefon",
+					internet: "Internet",
+					suli: "Suli",
+					"egyeb kiadas": "Egyeb kiadas"
+				}
+			},
+			en: {
+				pageTitle: "Budget",
+				heroTitle: "Budget",
+				heroText: "Save expected income and expenses with exact dates.",
+				homeLink: "Home",
+				summaryLink: "Monthly Budget",
+				languageLabel: "Language",
+				monthLabel: "Selected month",
+				exportButton: "Export month as CSV",
+				registerTitle: "Register",
+				loginTitle: "Sign in",
+				usernameLabel: "Username",
+				emailLabel: "Email address",
+				emailConfirmLabel: "Confirm email address",
+				passwordLabel: "Password",
+				passwordConfirmLabel: "Confirm password",
+				registerButton: "Create account",
+				loginButton: "Sign in",
+				logoutButton: "Sign out",
+				loginRequired: "Please sign in or register to manage entries.",
+				incomeFormTitle: "Add income",
+				expenseFormTitle: "Add expense",
+				categoryLabel: "Category",
+				amountLabel: "Amount (HUF)",
+				incomeDateLabel: "Expected date",
+				expenseDateLabel: "Deduction date",
+				saveIncomeButton: "Save income",
+				saveExpenseButton: "Save expense",
+				updateIncomeButton: "Update income",
+				updateExpenseButton: "Update expense",
+				cancelEditButton: "Cancel edit",
+				monthlyIncomeTitle: "Total monthly income",
+				monthlyExpenseTitle: "Total monthly expense",
+				spentToDateTitle: "Spent to date",
+				monthEndTitle: "Expected month-end balance",
+				incomeEntriesTitle: "Income entries this month",
+				expenseEntriesTitle: "Expense entries this month",
+				loggedOut: "No user is signed in.",
+				loggedIn: "Signed in as:",
+				guestUser: "Guest",
+				emailMismatch: "Email addresses do not match.",
+				passwordMismatch: "Passwords do not match.",
+				usernameTaken: "This username is already taken.",
+				registerSuccess: "Registration successful.",
+				loginSuccess: "Signed in successfully.",
+				logoutSuccess: "Signed out successfully.",
+				invalidLogin: "Invalid username or password.",
+				loginFirst: "Please sign in first.",
+				entrySaved: "Entry saved.",
+				entryUpdated: "Entry updated.",
+				entryDeleted: "Entry deleted.",
+				confirmDelete: "Delete this entry?",
+				emptyEntries: "No saved entries for this month.",
+				exportEmpty: "There are no entries to export for this month.",
+				exportDone: "Monthly CSV export started.",
+				currency: "HUF",
+				editAction: "Edit",
+				deleteAction: "Delete",
+				csvType: "Type",
+				csvCategory: "Category",
+				csvAmount: "Amount",
+				csvDate: "Date",
+				typeIncome: "Income",
+				typeExpense: "Expense",
+				categories: {
+					fizetes: "Salary",
+					egyeb: "Other",
+					szamlak: "Bills",
+					viz: "Water",
+					gaz: "Gas",
+					aram: "Electricity",
+					auto: "Car",
+					benzin: "Fuel",
+					elemiszer: "Groceries",
+					ruhak: "Clothes",
+					rent: "Rent",
+					biztositas: "Insurance",
+					"hitelkartya 3": "Credit card 3",
+					zilch: "Zilch",
+					tv: "TV",
+					telefon: "Phone",
+					internet: "Internet",
+					suli: "School",
+					"egyeb kiadas": "Other expense"
+				}
+			}
+		};
+
+		const today = new Date();
+		const users = loadUsers();
+		let currentUser = loadSession(users);
+		let appLanguage = loadLanguage();
+		let appState = getCurrentUserState();
+
+		const registerForm = document.getElementById("register-form");
+		const loginForm = document.getElementById("login-form");
+		const incomeForm = document.getElementById("income-form");
+		const expenseForm = document.getElementById("expense-form");
+		const exportCsvButton = document.getElementById("export-csv-button");
+		const logoutButton = document.getElementById("logout-button");
+		const authMessage = document.getElementById("auth-message");
+		const sessionInfo = document.getElementById("session-info");
+		const budgetContent = document.getElementById("budget-content");
+		const lockedMessage = document.getElementById("locked-message");
+		const activeMonthInput = document.getElementById("active-month");
+		const languageSelect = document.getElementById("app-language");
+		const monthlyIncomeEl = document.getElementById("monthly-income");
+		const monthlyExpenseEl = document.getElementById("monthly-expense");
+		const spentToDateEl = document.getElementById("spent-to-date");
+		const monthEndLeftEl = document.getElementById("month-end-left");
+		const incomeList = document.getElementById("income-list");
+		const expenseList = document.getElementById("expense-list");
+		const incomeSubmitButton = document.getElementById("income-submit-button");
+		const expenseSubmitButton = document.getElementById("expense-submit-button");
+		const incomeCancelEdit = document.getElementById("income-cancel-edit");
+		const expenseCancelEdit = document.getElementById("expense-cancel-edit");
+
+		initializePage();
+
+		languageSelect.addEventListener("change", () => {
+			appLanguage = languageSelect.value;
+			saveLanguage();
+			applyTranslations();
+			render();
+		});
+
+		activeMonthInput.addEventListener("change", render);
+		exportCsvButton.addEventListener("click", exportMonthCsv);
+		logoutButton.addEventListener("click", handleLogout);
+		incomeCancelEdit.addEventListener("click", resetIncomeForm);
+		expenseCancelEdit.addEventListener("click", resetExpenseForm);
+
+		registerForm.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			const username = document.getElementById("register-username").value.trim();
+			const email = document.getElementById("register-email-address").value.trim();
+			const emailConfirm = document.getElementById("register-email-address-confirm").value.trim();
+			const password = document.getElementById("register-password").value;
+			const passwordConfirm = document.getElementById("register-password-confirm").value;
+
+			if (email !== emailConfirm) {
+				showMessage(t("emailMismatch"), true);
+				return;
+			}
+
+			if (password !== passwordConfirm) {
+				showMessage(t("passwordMismatch"), true);
+				return;
+			}
+
+			if (users[username]) {
+				showMessage(t("usernameTaken"), true);
+				return;
+			}
+
+			const salt = createSalt();
+			const hashedPassword = await hashPassword(password, salt);
+
+			users[username] = {
+				email,
+				salt,
+				hashedPassword,
+				data: { incomes: [], expenses: [] }
+			};
+
+			saveUsers();
+			loginUser(username);
+			registerForm.reset();
+			showMessage(t("registerSuccess"), false);
+		});
+
+		loginForm.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			const username = document.getElementById("login-username").value.trim();
+			const password = document.getElementById("login-password").value;
+			const userRecord = users[username];
+
+			if (!userRecord) {
+				showMessage(t("invalidLogin"), true);
+				return;
+			}
+
+			const valid = await verifyPassword(userRecord, password);
+			if (!valid) {
+				showMessage(t("invalidLogin"), true);
+				return;
+			}
+
+			loginUser(username);
+			loginForm.reset();
+			showMessage(t("loginSuccess"), false);
+		});
+
+		incomeForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+			if (!requireLogin()) {
+				return;
+			}
+
+			const entry = buildEntryFromForm("income");
+			const editId = document.getElementById("income-edit-id").value;
+
+			if (editId) {
+				upsertEntry("incomes", { ...entry, id: editId });
+				showMessage(t("entryUpdated"), false);
+			} else {
+				upsertEntry("incomes", { ...entry, id: createEntryId() });
+				showMessage(t("entrySaved"), false);
+			}
+
+			saveState();
+			resetIncomeForm();
+			render();
+		});
+
+		expenseForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+			if (!requireLogin()) {
+				return;
+			}
+
+			const entry = buildEntryFromForm("expense");
+			const editId = document.getElementById("expense-edit-id").value;
+
+			if (editId) {
+				upsertEntry("expenses", { ...entry, id: editId });
+				showMessage(t("entryUpdated"), false);
+			} else {
+				upsertEntry("expenses", { ...entry, id: createEntryId() });
+				showMessage(t("entrySaved"), false);
+			}
+
+			saveState();
+			resetExpenseForm();
+			render();
+		});
+
+		incomeList.addEventListener("click", (event) => {
+			handleEntryAction(event, "incomes");
+		});
+
+		expenseList.addEventListener("click", (event) => {
+			handleEntryAction(event, "expenses");
+		});
+
+		function initializePage() {
+			if (!currentUser) {
+				window.location.href = "index.html";
+				return;
+			}
+
+			activeMonthInput.value = toMonthInput(today);
+			languageSelect.value = appLanguage;
+			resetIncomeForm();
+			resetExpenseForm();
+			applyTranslations();
+			updateAccessUI();
+			render();
+		}
+
+		function applyTranslations() {
+			document.documentElement.lang = appLanguage;
+			document.title = t("pageTitle");
+			document.querySelectorAll("[data-i18n]").forEach((element) => {
+				element.textContent = t(element.dataset.i18n);
+			});
+
+			document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
+				option.textContent = translateCategory(option.value);
+			});
+
+			updateSessionLabel();
+			updateFormButtonLabels();
+		}
+
+		function render() {
+			if (!currentUser) {
+				monthlyIncomeEl.textContent = formatCurrency(0);
+				monthlyExpenseEl.textContent = formatCurrency(0);
+				spentToDateEl.textContent = formatCurrency(0);
+				monthEndLeftEl.textContent = formatCurrency(0);
+				paintList(incomeList, []);
+				paintList(expenseList, []);
+				return;
+			}
+
+			const activeMonth = activeMonthInput.value;
+			const todayText = toDateInput(new Date());
+			const incomes = monthEntries(appState.incomes, activeMonth);
+			const expenses = monthEntries(appState.expenses, activeMonth);
+
+			monthlyIncomeEl.textContent = formatCurrency(sumEntries(incomes));
+			monthlyExpenseEl.textContent = formatCurrency(sumEntries(expenses));
+			spentToDateEl.textContent = formatCurrency(sumEntries(expenses.filter((item) => item.date <= todayText)));
+			monthEndLeftEl.textContent = formatCurrency(sumEntries(incomes) - sumEntries(expenses));
+
+			paintList(incomeList, incomes, "incomes");
+			paintList(expenseList, expenses, "expenses");
+		}
+
+		function paintList(target, entries, listType) {
+			target.innerHTML = "";
+
+			if (!entries.length) {
+				const li = document.createElement("li");
+				li.className = "empty";
+				li.textContent = t("emptyEntries");
+				target.appendChild(li);
+				return;
+			}
+
+			entries
+				.slice()
+				.sort((left, right) => left.date.localeCompare(right.date))
+				.forEach((entry) => {
+					const li = document.createElement("li");
+					li.className = "entry-row";
+					li.innerHTML = `
+						<div>
+							<span>${entry.date}</span>
+							<strong>${translateCategory(entry.category)}</strong>
+						</div>
+						<span>${formatCurrency(entry.amount)}</span>
+						<div class="row-actions">
+							<button type="button" class="inline-button" data-action="edit" data-id="${entry.id}">${t("editAction")}</button>
+							<button type="button" class="inline-button danger" data-action="delete" data-id="${entry.id}">${t("deleteAction")}</button>
+						</div>
+					`;
+					target.appendChild(li);
+				});
+		}
+
+		function handleEntryAction(event, listType) {
+			const button = event.target.closest("button[data-action]");
+			if (!button) {
+				return;
+			}
+
+			const entryId = button.dataset.id;
+			const action = button.dataset.action;
+			const entry = appState[listType].find((item) => item.id === entryId);
+
+			if (!entry) {
+				return;
+			}
+
+			if (action === "edit") {
+				populateFormForEdit(listType, entry);
+				return;
+			}
+
+			if (action === "delete" && window.confirm(t("confirmDelete"))) {
+				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
+				saveState();
+				if (listType === "incomes") {
+					resetIncomeForm();
+				} else {
+					resetExpenseForm();
+				}
+				showMessage(t("entryDeleted"), false);
+				render();
+			}
+		}
+
+		function populateFormForEdit(listType, entry) {
+			if (listType === "incomes") {
+				document.getElementById("income-edit-id").value = entry.id;
+				document.getElementById("income-category").value = entry.category;
+				document.getElementById("income-amount").value = entry.amount;
+				document.getElementById("income-date").value = entry.date;
+				incomeCancelEdit.classList.remove("hidden");
+			} else {
+				document.getElementById("expense-edit-id").value = entry.id;
+				document.getElementById("expense-category").value = entry.category;
+				document.getElementById("expense-amount").value = entry.amount;
+				document.getElementById("expense-date").value = entry.date;
+				expenseCancelEdit.classList.remove("hidden");
+			}
+
+			updateFormButtonLabels();
+		}
+
+		function resetIncomeForm() {
+			incomeForm.reset();
+			document.getElementById("income-edit-id").value = "";
+			document.getElementById("income-date").value = toDateInput(today);
+			incomeCancelEdit.classList.add("hidden");
+			updateFormButtonLabels();
+		}
+
+		function resetExpenseForm() {
+			expenseForm.reset();
+			document.getElementById("expense-edit-id").value = "";
+			document.getElementById("expense-date").value = toDateInput(today);
+			expenseCancelEdit.classList.add("hidden");
+			updateFormButtonLabels();
+		}
+
+		function updateFormButtonLabels() {
+			incomeSubmitButton.textContent = document.getElementById("income-edit-id").value ? t("updateIncomeButton") : t("saveIncomeButton");
+			expenseSubmitButton.textContent = document.getElementById("expense-edit-id").value ? t("updateExpenseButton") : t("saveExpenseButton");
+		}
+
+		function buildEntryFromForm(prefix) {
+			return {
+				category: document.getElementById(`${prefix}-category`).value,
+				amount: Number(document.getElementById(`${prefix}-amount`).value),
+				date: document.getElementById(`${prefix}-date`).value
+			};
+		}
+
+		function upsertEntry(collectionName, entry) {
+			const existingIndex = appState[collectionName].findIndex((item) => item.id === entry.id);
+			if (existingIndex >= 0) {
+				appState[collectionName][existingIndex] = entry;
+				return;
+			}
+
+			appState[collectionName].push(entry);
+		}
+
+		function exportMonthCsv() {
+			if (!requireLogin()) {
+				return;
+			}
+
+			const activeMonth = activeMonthInput.value;
+			const rows = [[t("csvType"), t("csvCategory"), t("csvAmount"), t("csvDate")]];
+
+			monthEntries(appState.incomes, activeMonth).forEach((entry) => {
+				rows.push([t("typeIncome"), translateCategory(entry.category), String(entry.amount), entry.date]);
+			});
+
+			monthEntries(appState.expenses, activeMonth).forEach((entry) => {
+				rows.push([t("typeExpense"), translateCategory(entry.category), String(entry.amount), entry.date]);
+			});
+
+			if (rows.length === 1) {
+				showMessage(t("exportEmpty"), true);
+				return;
+			}
+
+			const csv = rows.map((row) => row.map(escapeCsv).join(";")).join("\n");
+			const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = `budget-${currentUser}-${activeMonth}.csv`;
+			link.click();
+			URL.revokeObjectURL(url);
+			showMessage(t("exportDone"), false);
+		}
+
+		function escapeCsv(value) {
+			const text = String(value).replace(/"/g, '""');
+			return `"${text}"`;
+		}
+
+		function handleLogout() {
+			currentUser = "";
+			appState = { incomes: [], expenses: [] };
+			localStorage.removeItem(SESSION_KEY);
+			resetIncomeForm();
+			resetExpenseForm();
+			updateAccessUI();
+			render();
+			showMessage(t("logoutSuccess"), false);
+		}
+
+		function updateAccessUI() {
+			const loggedIn = Boolean(currentUser);
+			budgetContent.classList.toggle("hidden", !loggedIn);
+			lockedMessage.classList.toggle("hidden", loggedIn);
+			logoutButton.disabled = !loggedIn;
+			updateSessionLabel();
+		}
+
+		function updateSessionLabel() {
+			if (!currentUser) {
+				sessionInfo.textContent = t("loggedOut");
+				return;
+			}
+
+			const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
+			sessionInfo.textContent = `${t("loggedIn")} ${name}`;
+		}
+
+		function loginUser(username) {
+			currentUser = username;
+			if (username !== GUEST_SESSION_VALUE) {
+				ensureUserData(username);
+			}
+			appState = getCurrentUserState();
+			localStorage.setItem(SESSION_KEY, username);
+			resetIncomeForm();
+			resetExpenseForm();
+			updateAccessUI();
+			render();
+		}
+
+		function requireLogin() {
+			if (currentUser) {
+				return true;
+			}
+
+			showMessage(t("loginFirst"), true);
+			return false;
+		}
+
+		function monthEntries(entries, activeMonth) {
+			return entries.filter((item) => item.date.startsWith(activeMonth));
+		}
+
+		function sumEntries(entries) {
+			return entries.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+		}
+
+		function translateCategory(value) {
+			return t(`categories.${value}`) || value;
+		}
+
+		function t(key) {
+			const parts = key.split(".");
+			let current = dictionary[appLanguage] || dictionary.hu;
+			for (const part of parts) {
+				current = current ? current[part] : undefined;
+			}
+			return current || key;
+		}
+
+		function showMessage(message, isError) {
+			authMessage.textContent = message;
+			authMessage.classList.toggle("error", isError);
+			authMessage.classList.toggle("ok", !isError);
+		}
+
+		function formatCurrency(amount) {
+			const locale = appLanguage === "en" ? "en-US" : "hu-HU";
+			return `${Math.round(amount).toLocaleString(locale)} ${t("currency")}`;
+		}
+
+		function toMonthInput(dateObj) {
+			const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+			return `${dateObj.getFullYear()}-${month}`;
+		}
+
+		function toDateInput(dateObj) {
+			const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+			const day = String(dateObj.getDate()).padStart(2, "0");
+			return `${dateObj.getFullYear()}-${month}-${day}`;
+		}
+
+		function createEntryId() {
+			if (window.crypto && typeof window.crypto.randomUUID === "function") {
+				return window.crypto.randomUUID();
+			}
+
+			return `entry-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+		}
+
+		function createSalt() {
+			if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+				const values = new Uint8Array(16);
+				window.crypto.getRandomValues(values);
+				return Array.from(values, (value) => value.toString(16).padStart(2, "0")).join("");
+			}
+
+			return `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`;
+		}
+
+		async function hashPassword(password, salt) {
+			const source = `${salt}:${password}`;
+			if (window.crypto && window.crypto.subtle && typeof TextEncoder !== "undefined") {
+				const data = new TextEncoder().encode(source);
+				const digest = await window.crypto.subtle.digest("SHA-256", data);
+				return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+			}
+
+			let hash = 2166136261;
+			for (let index = 0; index < source.length; index += 1) {
+				hash ^= source.charCodeAt(index);
+				hash = Math.imul(hash, 16777619);
+			}
+
+			return `fallback-${(hash >>> 0).toString(16)}`;
+		}
+
+		async function verifyPassword(userRecord, password) {
+			if (userRecord.hashedPassword && userRecord.salt) {
+				const candidateHash = await hashPassword(password, userRecord.salt);
+				return candidateHash === userRecord.hashedPassword;
+			}
+
+			if (userRecord.password && userRecord.password === password) {
+				const salt = createSalt();
+				userRecord.salt = salt;
+				userRecord.hashedPassword = await hashPassword(password, salt);
+				delete userRecord.password;
+				saveUsers();
+				return true;
+			}
+
+			return false;
+		}
+
+		function loadUsers() {
+			try {
+				const raw = localStorage.getItem(USERS_KEY);
+				if (!raw) {
+					return {};
+				}
+				const parsed = JSON.parse(raw);
+				return typeof parsed === "object" && parsed ? parsed : {};
+			} catch (_error) {
+				return {};
+			}
+		}
+
+		function saveUsers() {
+			localStorage.setItem(USERS_KEY, JSON.stringify(users));
+		}
+
+		function ensureUserData(username) {
+			if (!users[username]) {
+				return;
+			}
+
+			const data = users[username].data || {};
+			users[username].data = {
+				incomes: Array.isArray(data.incomes) ? data.incomes : [],
+				expenses: Array.isArray(data.expenses) ? data.expenses : []
+			};
+			saveUsers();
+		}
+
+		function loadSession(userMap) {
+			const saved = localStorage.getItem(SESSION_KEY);
+			if (saved === GUEST_SESSION_VALUE) {
+				return saved;
+			}
+			if (saved && userMap[saved]) {
+				return saved;
+			}
+			return "";
+		}
+
+		function getCurrentUserState() {
+			if (currentUser === GUEST_SESSION_VALUE) {
+				return loadGuestData();
+			}
+
+			if (!currentUser || !users[currentUser]) {
+				return { incomes: [], expenses: [] };
+			}
+
+			const data = users[currentUser].data || {};
+			return {
+				incomes: Array.isArray(data.incomes) ? data.incomes : [],
+				expenses: Array.isArray(data.expenses) ? data.expenses : []
+			};
+		}
+
+		function saveState() {
+			if (currentUser === GUEST_SESSION_VALUE) {
+				saveGuestData(appState);
+				return;
+			}
+
+			if (!currentUser || !users[currentUser]) {
+				return;
+			}
+
+			users[currentUser].data = appState;
+			saveUsers();
+		}
+
+		function loadLanguage() {
+			return localStorage.getItem(LANGUAGE_KEY) === "en" ? "en" : "hu";
+		}
+
+		function saveLanguage() {
+			localStorage.setItem(LANGUAGE_KEY, appLanguage);
+		}
+
+		function loadGuestData() {
+			try {
+				const raw = localStorage.getItem(GUEST_DATA_KEY);
+				if (!raw) {
+					return { incomes: [], expenses: [] };
+				}
+
+				const parsed = JSON.parse(raw);
+				if (!parsed || typeof parsed !== "object") {
+					return { incomes: [], expenses: [] };
+				}
+
+				return {
+					incomes: Array.isArray(parsed.incomes) ? parsed.incomes : [],
+					expenses: Array.isArray(parsed.expenses) ? parsed.expenses : []
+				};
+			} catch (_error) {
+				return { incomes: [], expenses: [] };
+			}
+		}
+
+		function saveGuestData(data) {
+			localStorage.setItem(GUEST_DATA_KEY, JSON.stringify({
+				incomes: Array.isArray(data.incomes) ? data.incomes : [],
+				expenses: Array.isArray(data.expenses) ? data.expenses : []
+			}));
+		}
+	</script>
+</body>
+</html>

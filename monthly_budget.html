@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Monthly Budget</title>
+	<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+	<main class="app-shell">
+		<div class="language-corner">
+			<label for="app-language" class="sr-only" data-i18n="languageLabel">Nyelv</label>
+			<select id="app-language" aria-label="Language selector">
+				<option value="hu">HU</option>
+				<option value="en">EN</option>
+			</select>
+		</div>
+
+		<header class="hero">
+			<h1 data-i18n="heroTitle">Monthly Budget</h1>
+			<p data-i18n="heroText">Havi osszegzes, mai koltesek es jovobeli tetelek datum szerint.</p>
+		</header>
+
+		<nav class="top-nav">
+			<a href="index.html" data-i18n="homeLink">Kezdolap</a>
+			<a href="budget.html" data-i18n="budgetLink">Budget</a>
+		</nav>
+
+		<section class="card controls compact-controls">
+			<div>
+				<label for="active-month" data-i18n="monthLabel">Valasztott honap</label>
+				<input type="month" id="active-month">
+			</div>
+		</section>
+
+		<section class="card session-card">
+			<p id="session-info">Nincs bejelentkezett felhasznalo.</p>
+		</section>
+
+		<section id="locked-message" class="card">
+			<p data-i18n="loginRequired">A havi osszegzeshez jelentkezz be a Budget oldalon.</p>
+		</section>
+
+		<section id="summary-content" class="hidden">
+			<section class="grid stats-grid">
+				<article class="card stat">
+					<h3 data-i18n="monthlyIncomeTitle">Havi bevetel</h3>
+					<p id="monthly-income">0 Ft</p>
+				</article>
+
+				<article class="card stat">
+					<h3 data-i18n="monthlyExpenseTitle">Havi kiadas</h3>
+					<p id="monthly-expense">0 Ft</p>
+				</article>
+
+				<article class="card stat">
+					<h3 data-i18n="spentToDateTitle">Mai napig kiadas</h3>
+					<p id="spent-to-date">0 Ft</p>
+				</article>
+
+				<article class="card stat">
+					<h3 data-i18n="currentBalanceTitle">Aktualis egyenleg</h3>
+					<p id="current-balance">0 Ft</p>
+				</article>
+			</section>
+
+			<section class="grid summary-grid">
+				<article class="card">
+					<h2 data-i18n="upcomingExpensesTitle">Varhato kiadasok datum szerint</h2>
+					<ul id="upcoming-expenses" class="entry-list"></ul>
+				</article>
+
+				<article class="card">
+					<h2 data-i18n="upcomingIncomesTitle">Varhato bevetelek datum szerint</h2>
+					<ul id="upcoming-incomes" class="entry-list"></ul>
+				</article>
+			</section>
+
+			<section class="card">
+				<h2 data-i18n="projectionTitle">Honap vegei becsles</h2>
+				<p id="projection-text">Nincs adat.</p>
+			</section>
+		</section>
+	</main>
+
+	<script>
+		const USERS_KEY = "budgetAppUsers";
+		const SESSION_KEY = "budgetAppSession";
+		const LANGUAGE_KEY = "budgetAppLanguage";
+		const GUEST_SESSION_VALUE = "__guest__";
+		const GUEST_DATA_KEY = "budgetAppGuestData";
+
+		const dictionary = {
+			hu: {
+				pageTitle: "Monthly Budget",
+				heroTitle: "Monthly Budget",
+				heroText: "Havi osszegzes, mai koltesek es jovobeli tetelek datum szerint.",
+				homeLink: "Kezdolap",
+				budgetLink: "Koltsegterv",
+				languageLabel: "Nyelv",
+				monthLabel: "Valasztott honap",
+				loggedOut: "Nincs bejelentkezett felhasznalo.",
+				loggedIn: "Bejelentkezve:",
+				guestUser: "Vendeg",
+				loginRequired: "A havi osszegzeshez jelentkezz be a Budget oldalon.",
+				monthlyIncomeTitle: "Havi bevetel",
+				monthlyExpenseTitle: "Havi kiadas",
+				spentToDateTitle: "Mai napig kiadas",
+				currentBalanceTitle: "Aktualis egyenleg",
+				upcomingExpensesTitle: "Varhato kiadasok datum szerint",
+				upcomingIncomesTitle: "Varhato bevetelek datum szerint",
+				projectionTitle: "Honap vegei becsles",
+				noData: "Nincs adat.",
+				emptyEntries: "Nincs varhato tetel a honap tovabbi reszere.",
+				projectionText: "Varhato egyenleg {date} datumra: {amount}.",
+				currency: "Ft",
+				categories: {
+					fizetes: "Fizetes",
+					egyeb: "Egyeb",
+					szamlak: "Szamlak",
+					viz: "Viz",
+					gaz: "Gaz",
+					aram: "Aram",
+					auto: "Auto",
+					benzin: "Benzin",
+					elemiszer: "Elemiszer",
+					ruhak: "Ruhak",
+					rent: "Rent",
+					biztositas: "Biztositas",
+					"hitelkartya 3": "Hitelkartya 3",
+					zilch: "Zilch",
+					tv: "TV",
+					telefon: "Telefon",
+					internet: "Internet",
+					suli: "Suli",
+					"egyeb kiadas": "Egyeb kiadas"
+				}
+			},
+			en: {
+				pageTitle: "Monthly Budget",
+				heroTitle: "Monthly Budget",
+				heroText: "Monthly summary, current spending, and upcoming dated entries.",
+				homeLink: "Home",
+				budgetLink: "Budget",
+				languageLabel: "Language",
+				monthLabel: "Selected month",
+				loggedOut: "No user is signed in.",
+				loggedIn: "Signed in as:",
+				guestUser: "Guest",
+				loginRequired: "Please sign in on the Budget page first.",
+				monthlyIncomeTitle: "Monthly income",
+				monthlyExpenseTitle: "Monthly expense",
+				spentToDateTitle: "Spent to date",
+				currentBalanceTitle: "Current balance",
+				upcomingExpensesTitle: "Upcoming expenses by date",
+				upcomingIncomesTitle: "Upcoming income by date",
+				projectionTitle: "Month-end projection",
+				noData: "No data.",
+				emptyEntries: "No upcoming entries for the rest of this month.",
+				projectionText: "Projected balance for {date}: {amount}.",
+				currency: "HUF",
+				categories: {
+					fizetes: "Salary",
+					egyeb: "Other",
+					szamlak: "Bills",
+					viz: "Water",
+					gaz: "Gas",
+					aram: "Electricity",
+					auto: "Car",
+					benzin: "Fuel",
+					elemiszer: "Groceries",
+					ruhak: "Clothes",
+					rent: "Rent",
+					biztositas: "Insurance",
+					"hitelkartya 3": "Credit card 3",
+					zilch: "Zilch",
+					tv: "TV",
+					telefon: "Phone",
+					internet: "Internet",
+					suli: "School",
+					"egyeb kiadas": "Other expense"
+				}
+			}
+		};
+
+		const today = new Date();
+		const users = loadUsers();
+		const currentUser = loadSession(users);
+		let appLanguage = loadLanguage();
+		const state = getCurrentUserState();
+
+		const languageSelect = document.getElementById("app-language");
+		const activeMonthInput = document.getElementById("active-month");
+		const sessionInfo = document.getElementById("session-info");
+		const lockedMessage = document.getElementById("locked-message");
+		const summaryContent = document.getElementById("summary-content");
+		const monthlyIncomeEl = document.getElementById("monthly-income");
+		const monthlyExpenseEl = document.getElementById("monthly-expense");
+		const spentToDateEl = document.getElementById("spent-to-date");
+		const currentBalanceEl = document.getElementById("current-balance");
+		const upcomingExpensesEl = document.getElementById("upcoming-expenses");
+		const upcomingIncomesEl = document.getElementById("upcoming-incomes");
+		const projectionTextEl = document.getElementById("projection-text");
+
+		initializePage();
+
+		languageSelect.addEventListener("change", () => {
+			appLanguage = languageSelect.value;
+			localStorage.setItem(LANGUAGE_KEY, appLanguage);
+			applyTranslations();
+			render();
+		});
+
+		activeMonthInput.addEventListener("change", render);
+
+		function initializePage() {
+			if (!currentUser) {
+				window.location.href = "index.html";
+				return;
+			}
+
+			languageSelect.value = appLanguage;
+			activeMonthInput.value = toMonthInput(today);
+			applyTranslations();
+			updateAccessUI();
+			render();
+		}
+
+		function applyTranslations() {
+			document.documentElement.lang = appLanguage;
+			document.title = t("pageTitle");
+			document.querySelectorAll("[data-i18n]").forEach((element) => {
+				element.textContent = t(element.dataset.i18n);
+			});
+			if (!currentUser) {
+				projectionTextEl.textContent = t("noData");
+			}
+			updateSessionLabel();
+		}
+
+		function updateAccessUI() {
+			if (!currentUser) {
+				lockedMessage.classList.remove("hidden");
+				summaryContent.classList.add("hidden");
+				updateSessionLabel();
+				return;
+			}
+
+			lockedMessage.classList.add("hidden");
+			summaryContent.classList.remove("hidden");
+			updateSessionLabel();
+		}
+
+		function updateSessionLabel() {
+			if (!currentUser) {
+				sessionInfo.textContent = t("loggedOut");
+				return;
+			}
+
+			const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
+			sessionInfo.textContent = `${t("loggedIn")} ${name}`;
+		}
+
+		function render() {
+			if (!currentUser) {
+				return;
+			}
+
+			const selectedMonth = activeMonthInput.value;
+			const todayIso = toDateInput(today);
+			const monthIncomes = monthEntries(state.incomes, selectedMonth);
+			const monthExpenses = monthEntries(state.expenses, selectedMonth);
+
+			monthlyIncomeEl.textContent = formatCurrency(sumEntries(monthIncomes));
+			monthlyExpenseEl.textContent = formatCurrency(sumEntries(monthExpenses));
+			spentToDateEl.textContent = formatCurrency(sumEntries(monthExpenses.filter((item) => item.date <= todayIso)));
+			currentBalanceEl.textContent = formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses));
+
+			const upcomingExpenses = monthExpenses.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
+			const upcomingIncomes = monthIncomes.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
+
+			paintList(upcomingExpensesEl, upcomingExpenses);
+			paintList(upcomingIncomesEl, upcomingIncomes);
+
+			const monthEndDate = getMonthEndDate(selectedMonth);
+			projectionTextEl.textContent = t("projectionText").replace("{date}", monthEndDate).replace("{amount}", formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses)));
+		}
+
+		function paintList(target, entries) {
+			target.innerHTML = "";
+			if (!entries.length) {
+				const li = document.createElement("li");
+				li.className = "empty";
+				li.textContent = t("emptyEntries");
+				target.appendChild(li);
+				return;
+			}
+
+			entries.forEach((entry) => {
+				const li = document.createElement("li");
+				li.innerHTML = `<div><span>${entry.date}</span><strong>${translateCategory(entry.category)}</strong></div><span>${formatCurrency(entry.amount)}</span>`;
+				target.appendChild(li);
+			});
+		}
+
+		function monthEntries(entries, activeMonth) {
+			return entries.filter((item) => item.date.startsWith(activeMonth));
+		}
+
+		function sumEntries(entries) {
+			return entries.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+		}
+
+		function translateCategory(value) {
+			return t(`categories.${value}`) || value;
+		}
+
+		function t(key) {
+			const parts = key.split(".");
+			let current = dictionary[appLanguage] || dictionary.hu;
+			for (const part of parts) {
+				current = current ? current[part] : undefined;
+			}
+			return current || key;
+		}
+
+		function formatCurrency(amount) {
+			const locale = appLanguage === "en" ? "en-US" : "hu-HU";
+			return `${Math.round(amount).toLocaleString(locale)} ${t("currency")}`;
+		}
+
+		function loadUsers() {
+			try {
+				const raw = localStorage.getItem(USERS_KEY);
+				if (!raw) {
+					return {};
+				}
+				const parsed = JSON.parse(raw);
+				return typeof parsed === "object" && parsed ? parsed : {};
+			} catch (_error) {
+				return {};
+			}
+		}
+
+		function loadSession(userMap) {
+			const saved = localStorage.getItem(SESSION_KEY);
+			if (saved === GUEST_SESSION_VALUE) {
+				return saved;
+			}
+			if (saved && userMap[saved]) {
+				return saved;
+			}
+			return "";
+		}
+
+		function getCurrentUserState() {
+			if (currentUser === GUEST_SESSION_VALUE) {
+				return loadGuestData();
+			}
+
+			if (!currentUser || !users[currentUser]) {
+				return { incomes: [], expenses: [] };
+			}
+
+			const data = users[currentUser].data || {};
+			return {
+				incomes: Array.isArray(data.incomes) ? data.incomes : [],
+				expenses: Array.isArray(data.expenses) ? data.expenses : []
+			};
+		}
+
+		function loadLanguage() {
+			return localStorage.getItem(LANGUAGE_KEY) === "en" ? "en" : "hu";
+		}
+
+		function toMonthInput(dateObj) {
+			const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+			return `${dateObj.getFullYear()}-${month}`;
+		}
+
+		function toDateInput(dateObj) {
+			const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+			const day = String(dateObj.getDate()).padStart(2, "0");
+			return `${dateObj.getFullYear()}-${month}-${day}`;
+		}
+
+		function getMonthEndDate(monthValue) {
+			const [year, month] = monthValue.split("-").map(Number);
+			if (!year || !month) {
+				return toDateInput(today);
+			}
+			const day = new Date(year, month, 0).getDate();
+			return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+		}
+
+		function loadGuestData() {
+			try {
+				const raw = localStorage.getItem(GUEST_DATA_KEY);
+				if (!raw) {
+					return { incomes: [], expenses: [] };
+				}
+
+				const parsed = JSON.parse(raw);
+				if (!parsed || typeof parsed !== "object") {
+					return { incomes: [], expenses: [] };
+				}
+
+				return {
+					incomes: Array.isArray(parsed.incomes) ? parsed.incomes : [],
+					expenses: Array.isArray(parsed.expenses) ? parsed.expenses : []
+				};
+			} catch (_error) {
+				return { incomes: [], expenses: [] };
+			}
+		}
+	</script>
+</body>
+</html>

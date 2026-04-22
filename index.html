@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeting App</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <main class="app-shell">
+        <div class="language-corner">
+            <label for="app-language" class="sr-only" data-i18n="languageLabel">Nyelv</label>
+            <select id="app-language" aria-label="Language selector">
+                <option value="hu">HU</option>
+                <option value="en">EN</option>
+            </select>
+        </div>
+
+        <header class="hero">
+            <h1 data-i18n="heroTitle">Budgeting App</h1>
+            <p data-i18n="heroText">Jelentkezz be, regisztralj vagy folytasd vendegkent.</p>
+        </header>
+
+        <section class="grid auth-grid">
+            <article class="card">
+                <h2 data-i18n="registerTitle">Regisztracio</h2>
+                <form id="register-form" class="stack">
+                    <label for="register-username" data-i18n="usernameLabel">Felhasznalonev</label>
+                    <input type="text" id="register-username" minlength="5" required>
+
+                    <label for="register-email" data-i18n="emailLabel">Email cim</label>
+                    <input type="email" id="register-email" required>
+
+                    <label for="register-email-confirm" data-i18n="emailConfirmLabel">Email cim megerositese</label>
+                    <input type="email" id="register-email-confirm" required>
+
+                    <label for="register-password" data-i18n="passwordLabel">Jelszo</label>
+                    <input type="password" id="register-password" minlength="6" required>
+
+                    <label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszo megerositese</label>
+                    <input type="password" id="register-password-confirm" minlength="6" required>
+
+                    <button type="submit" data-i18n="registerButton">Regisztralok</button>
+                </form>
+            </article>
+
+            <article class="card">
+                <h2 data-i18n="loginTitle">Bejelentkezes</h2>
+                <form id="login-form" class="stack">
+                    <label for="login-username" data-i18n="usernameLabel">Felhasznalonev</label>
+                    <input type="text" id="login-username" required>
+
+                    <label for="login-password" data-i18n="passwordLabel">Jelszo</label>
+                    <input type="password" id="login-password" required>
+
+                    <button type="submit" data-i18n="loginButton">Belepes</button>
+                </form>
+            </article>
+        </section>
+
+        <section class="card session-card">
+            <p id="session-info" data-i18n="loggedOut">Nincs bejelentkezett felhasznalo.</p>
+            <button type="button" id="guest-button" class="secondary" data-i18n="guestButton">Folytatas vendegkent</button>
+            <button type="button" id="logout-button" class="secondary" data-i18n="logoutButton">Kijelentkezes</button>
+            <p id="auth-message" class="auth-message" aria-live="polite"></p>
+        </section>
+
+        <section class="grid landing-grid hidden" id="app-links">
+            <article class="card">
+                <h2 data-i18n="budgetTitle">Koltsegterv</h2>
+                <p data-i18n="budgetText">Bevetel es kiadas rogzites, szerkesztes, torles, CSV export es felhasznalo kezeles.</p>
+                <a class="btn-link" href="budget.html" data-i18n="openButton">Megnyitas</a>
+            </article>
+
+            <article class="card">
+                <h2 data-i18n="monthlyTitle">Havi osszegzes</h2>
+                <p data-i18n="monthlyText">Havi osszegzes, mai napig kiadas, jovobeli bevetelek es kiadasok datum szerint.</p>
+                <a class="btn-link" href="monthly_budget.html" data-i18n="openButton">Megnyitas</a>
+            </article>
+        </section>
+    </main>
+
+    <footer class="footer-content">
+        <p>@ 2026 made by: Anasztazia, Budgeting App.</p>
+        <p data-i18n="footerText">Minden jog fenntartva.</p>
+    </footer>
+
+    <script>
+        const USERS_KEY = "budgetAppUsers";
+        const SESSION_KEY = "budgetAppSession";
+        const LANGUAGE_KEY = "budgetAppLanguage";
+        const GUEST_SESSION_VALUE = "__guest__";
+        const GUEST_DATA_KEY = "budgetAppGuestData";
+
+        const dictionary = {
+            hu: {
+                pageTitle: "Budgeting App",
+                heroTitle: "Budgeting App",
+                heroText: "Jelentkezz be, regisztralj vagy folytasd vendegkent.",
+                languageLabel: "Nyelv",
+                registerTitle: "Regisztracio",
+                loginTitle: "Bejelentkezes",
+                usernameLabel: "Felhasznalonev",
+                emailLabel: "Email cim",
+                emailConfirmLabel: "Email cim megerositese",
+                passwordLabel: "Jelszo",
+                passwordConfirmLabel: "Jelszo megerositese",
+                registerButton: "Regisztralok",
+                loginButton: "Belepes",
+                guestButton: "Folytatas vendegkent",
+                logoutButton: "Kijelentkezes",
+                budgetTitle: "Koltsegterv",
+                budgetText: "Bevetel es kiadas rogzites, szerkesztes, torles, CSV export es felhasznalo kezeles.",
+                monthlyTitle: "Havi osszegzes",
+                monthlyText: "Havi osszegzes, mai napig kiadas, jovobeli bevetelek es kiadasok datum szerint.",
+                openButton: "Megnyitas",
+                loggedOut: "Nincs bejelentkezett felhasznalo.",
+                loggedIn: "Bejelentkezve:",
+                guestUser: "Vendeg",
+                emailMismatch: "Az email cimek nem egyeznek.",
+                passwordMismatch: "A jelszavak nem egyeznek.",
+                usernameTaken: "Ez a felhasznalonev mar foglalt.",
+                registerSuccess: "Sikeres regisztracio.",
+                loginSuccess: "Sikeres bejelentkezes.",
+                guestSuccess: "Vendeg mod aktiv.",
+                logoutSuccess: "Sikeres kijelentkezes.",
+                invalidLogin: "Hibas felhasznalonev vagy jelszo.",
+                footerText: "Minden jog fenntartva."
+            },
+            en: {
+                pageTitle: "Budgeting App",
+                heroTitle: "Budgeting App",
+                heroText: "Sign in, register, or continue as a guest.",
+                languageLabel: "Language",
+                registerTitle: "Register",
+                loginTitle: "Sign in",
+                usernameLabel: "Username",
+                emailLabel: "Email address",
+                emailConfirmLabel: "Confirm email address",
+                passwordLabel: "Password",
+                passwordConfirmLabel: "Confirm password",
+                registerButton: "Create account",
+                loginButton: "Sign in",
+                guestButton: "Continue as guest",
+                logoutButton: "Sign out",
+                budgetTitle: "Budget",
+                budgetText: "Income and expense capture, edit/delete, CSV export, and user management.",
+                monthlyTitle: "Monthly Budget",
+                monthlyText: "Monthly summary, spending to date, and upcoming dated income and expenses.",
+                openButton: "Open",
+                loggedOut: "No user is signed in.",
+                loggedIn: "Signed in as:",
+                guestUser: "Guest",
+                emailMismatch: "Email addresses do not match.",
+                passwordMismatch: "Passwords do not match.",
+                usernameTaken: "This username is already taken.",
+                registerSuccess: "Registration successful.",
+                loginSuccess: "Signed in successfully.",
+                guestSuccess: "Guest mode enabled.",
+                logoutSuccess: "Signed out successfully.",
+                invalidLogin: "Invalid username or password.",
+                footerText: "All rights reserved."
+            }
+        };
+
+        const users = loadUsers();
+        const registerForm = document.getElementById("register-form");
+        const loginForm = document.getElementById("login-form");
+        const guestButton = document.getElementById("guest-button");
+        const logoutButton = document.getElementById("logout-button");
+        const sessionInfo = document.getElementById("session-info");
+        const authMessage = document.getElementById("auth-message");
+        const appLinks = document.getElementById("app-links");
+        const languageSelect = document.getElementById("app-language");
+        let currentUser = loadSession(users);
+        let appLanguage = localStorage.getItem(LANGUAGE_KEY) === "en" ? "en" : "hu";
+
+        initializePage();
+
+        languageSelect.addEventListener("change", () => {
+            appLanguage = languageSelect.value;
+            localStorage.setItem(LANGUAGE_KEY, appLanguage);
+            applyTranslations();
+        });
+
+        registerForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const username = document.getElementById("register-username").value.trim();
+            const email = document.getElementById("register-email").value.trim();
+            const emailConfirm = document.getElementById("register-email-confirm").value.trim();
+            const password = document.getElementById("register-password").value;
+            const passwordConfirm = document.getElementById("register-password-confirm").value;
+
+            if (email !== emailConfirm) {
+                showMessage(t("emailMismatch"), true);
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showMessage(t("passwordMismatch"), true);
+                return;
+            }
+
+            if (users[username]) {
+                showMessage(t("usernameTaken"), true);
+                return;
+            }
+
+            const salt = createSalt();
+            const hashedPassword = await hashPassword(password, salt);
+            users[username] = {
+                email,
+                salt,
+                hashedPassword,
+                data: { incomes: [], expenses: [] }
+            };
+            saveUsers();
+            loginUser(username);
+            registerForm.reset();
+            showMessage(t("registerSuccess"), false);
+        });
+
+        loginForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const username = document.getElementById("login-username").value.trim();
+            const password = document.getElementById("login-password").value;
+            const userRecord = users[username];
+
+            if (!userRecord) {
+                showMessage(t("invalidLogin"), true);
+                return;
+            }
+
+            const valid = await verifyPassword(userRecord, password);
+            if (!valid) {
+                showMessage(t("invalidLogin"), true);
+                return;
+            }
+
+            loginUser(username);
+            loginForm.reset();
+            showMessage(t("loginSuccess"), false);
+        });
+
+        guestButton.addEventListener("click", () => {
+            loginUser(GUEST_SESSION_VALUE);
+            ensureGuestData();
+            showMessage(t("guestSuccess"), false);
+        });
+
+        logoutButton.addEventListener("click", () => {
+            currentUser = "";
+            localStorage.removeItem(SESSION_KEY);
+            updateAccessUI();
+            showMessage(t("logoutSuccess"), false);
+        });
+
+        function initializePage() {
+            ensureGuestData();
+            languageSelect.value = appLanguage;
+            applyTranslations();
+            updateAccessUI();
+        }
+
+        function applyTranslations() {
+            document.documentElement.lang = appLanguage;
+            document.title = dictionary[appLanguage].pageTitle;
+            document.querySelectorAll("[data-i18n]").forEach((element) => {
+                element.textContent = dictionary[appLanguage][element.dataset.i18n];
+            });
+            updateSessionLabel();
+        }
+
+        function updateAccessUI() {
+            const loggedIn = Boolean(currentUser);
+            appLinks.classList.toggle("hidden", !loggedIn);
+            logoutButton.disabled = !loggedIn;
+            updateSessionLabel();
+        }
+
+        function updateSessionLabel() {
+            if (!currentUser) {
+                sessionInfo.textContent = t("loggedOut");
+                return;
+            }
+
+            const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
+            sessionInfo.textContent = `${t("loggedIn")} ${name}`;
+        }
+
+        function showMessage(message, isError) {
+            authMessage.textContent = message;
+            authMessage.classList.toggle("error", isError);
+            authMessage.classList.toggle("ok", !isError);
+        }
+
+        function loginUser(username) {
+            currentUser = username;
+            if (username !== GUEST_SESSION_VALUE) {
+                ensureUserData(username);
+            }
+            localStorage.setItem(SESSION_KEY, username);
+            updateAccessUI();
+        }
+
+        function t(key) {
+            return (dictionary[appLanguage] && dictionary[appLanguage][key]) || key;
+        }
+
+        function createSalt() {
+            if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+                const values = new Uint8Array(16);
+                window.crypto.getRandomValues(values);
+                return Array.from(values, (value) => value.toString(16).padStart(2, "0")).join("");
+            }
+
+            return `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`;
+        }
+
+        async function hashPassword(password, salt) {
+            const source = `${salt}:${password}`;
+            if (window.crypto && window.crypto.subtle && typeof TextEncoder !== "undefined") {
+                const data = new TextEncoder().encode(source);
+                const digest = await window.crypto.subtle.digest("SHA-256", data);
+                return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+            }
+
+            let hash = 2166136261;
+            for (let index = 0; index < source.length; index += 1) {
+                hash ^= source.charCodeAt(index);
+                hash = Math.imul(hash, 16777619);
+            }
+
+            return `fallback-${(hash >>> 0).toString(16)}`;
+        }
+
+        async function verifyPassword(userRecord, password) {
+            if (userRecord.hashedPassword && userRecord.salt) {
+                const candidateHash = await hashPassword(password, userRecord.salt);
+                return candidateHash === userRecord.hashedPassword;
+            }
+
+            if (userRecord.password && userRecord.password === password) {
+                const salt = createSalt();
+                userRecord.salt = salt;
+                userRecord.hashedPassword = await hashPassword(password, salt);
+                delete userRecord.password;
+                saveUsers();
+                return true;
+            }
+
+            return false;
+        }
+
+        function loadUsers() {
+            try {
+                const raw = localStorage.getItem(USERS_KEY);
+                if (!raw) {
+                    return {};
+                }
+                const parsed = JSON.parse(raw);
+                return typeof parsed === "object" && parsed ? parsed : {};
+            } catch (_error) {
+                return {};
+            }
+        }
+
+        function saveUsers() {
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+
+        function ensureUserData(username) {
+            if (!users[username]) {
+                return;
+            }
+
+            const data = users[username].data || {};
+            users[username].data = {
+                incomes: Array.isArray(data.incomes) ? data.incomes : [],
+                expenses: Array.isArray(data.expenses) ? data.expenses : []
+            };
+            saveUsers();
+        }
+
+        function ensureGuestData() {
+            try {
+                const raw = localStorage.getItem(GUEST_DATA_KEY);
+                if (!raw) {
+                    localStorage.setItem(GUEST_DATA_KEY, JSON.stringify({ incomes: [], expenses: [] }));
+                    return;
+                }
+                const parsed = JSON.parse(raw);
+                if (!parsed || !Array.isArray(parsed.incomes) || !Array.isArray(parsed.expenses)) {
+                    localStorage.setItem(GUEST_DATA_KEY, JSON.stringify({ incomes: [], expenses: [] }));
+                }
+            } catch (_error) {
+                localStorage.setItem(GUEST_DATA_KEY, JSON.stringify({ incomes: [], expenses: [] }));
+            }
+        }
+
+        function loadSession(userMap) {
+            const saved = localStorage.getItem(SESSION_KEY);
+            if (saved === GUEST_SESSION_VALUE) {
+                return saved;
+            }
+            if (saved && userMap[saved]) {
+                return saved;
+            }
+            return "";
+        }
+    </script>
+</body>
+</html>
