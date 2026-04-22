@@ -1,6 +1,7 @@
 const USERS_KEY = "budgetAppUsers";
         const SESSION_KEY = "budgetAppSession";
         const LANGUAGE_KEY = "budgetAppLanguage";
+        const THEME_KEY = "budgetAppTheme";
         const INSTALL_STATUS_KEY = "budgetAppInstalled";
         const GUEST_SESSION_VALUE = "__guest__";
         const GUEST_DATA_KEY = "budgetAppGuestData";
@@ -15,6 +16,9 @@ const USERS_KEY = "budgetAppUsers";
                 homeLink: "Kezdőlap",
                 budgetLink: "Költségvetés",
                 monthlyLink: "Havi összegzés",
+                themeModeLabel: "Téma",
+                themeModeLight: "Világos",
+                themeModeDark: "Sötét",
                 backAction: "Vissza",
                 languageLabel: "Nyelv",
                 appName: "Költségvetési app",
@@ -60,6 +64,9 @@ const USERS_KEY = "budgetAppUsers";
                 homeLink: "Home",
                 budgetLink: "Budget",
                 monthlyLink: "Monthly Budget",
+                themeModeLabel: "Theme",
+                themeModeLight: "Light",
+                themeModeDark: "Dark",
                 backAction: "Back",
                 languageLabel: "Language",
                 appName: "Budgeting App",
@@ -113,6 +120,8 @@ const USERS_KEY = "budgetAppUsers";
         const loginForm = document.getElementById("login-form");
         const guestButton = document.getElementById("guest-button");
         const installAppButton = document.getElementById("install-app-button");
+        const themeLightButton = document.getElementById("theme-light-button");
+        const themeDarkButton = document.getElementById("theme-dark-button");
         const logoutButton = document.getElementById("logout-button");
         const sessionInfo = document.getElementById("session-info");
         const authMessage = document.getElementById("auth-message");
@@ -121,6 +130,7 @@ const USERS_KEY = "budgetAppUsers";
         let deferredInstallPrompt = null;
         let currentUser = loadSession(users);
         let appLanguage = localStorage.getItem(LANGUAGE_KEY) === "en" ? "en" : "hu";
+        let appTheme = loadTheme();
 
         initializePage();
 
@@ -139,11 +149,32 @@ const USERS_KEY = "budgetAppUsers";
             showMessage(t("logoutSuccess"), false);
         });
 
+        if (themeLightButton) {
+            themeLightButton.addEventListener("click", () => {
+                setTheme("light");
+            });
+        }
+
+        if (themeDarkButton) {
+            themeDarkButton.addEventListener("click", () => {
+                setTheme("dark");
+            });
+        }
+
         document.addEventListener("click", (event) => {
             if (!event.target.closest(".menu-wrap")) {
                 menuPanel.classList.remove("is-open");
                 menuToggle.classList.remove("is-open");
                 menuToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
+                menuPanel.classList.remove("is-open");
+                menuToggle.classList.remove("is-open");
+                menuToggle.setAttribute("aria-expanded", "false");
+                menuToggle.focus();
             }
         });
 
@@ -283,6 +314,8 @@ const USERS_KEY = "budgetAppUsers";
 
         function initializePage() {
             ensureGuestData();
+            applyTheme();
+            syncThemeButtons();
             languageSelect.value = appLanguage;
             applyTranslations();
             updateAccessUI();
@@ -295,6 +328,7 @@ const USERS_KEY = "budgetAppUsers";
             document.querySelectorAll("[data-i18n]").forEach((element) => {
                 element.textContent = dictionary[appLanguage][element.dataset.i18n];
             });
+            menuToggle.setAttribute("aria-label", t("menuButton"));
             updateSessionLabel();
         }
 
@@ -342,6 +376,35 @@ const USERS_KEY = "budgetAppUsers";
 
         function t(key) {
             return (dictionary[appLanguage] && dictionary[appLanguage][key]) || key;
+        }
+
+        function loadTheme() {
+            const saved = localStorage.getItem(THEME_KEY);
+            return saved === "dark" ? "dark" : "light";
+        }
+
+        function applyTheme() {
+            document.documentElement.setAttribute("data-theme", appTheme);
+        }
+
+        function setTheme(mode) {
+            appTheme = mode === "dark" ? "dark" : "light";
+            localStorage.setItem(THEME_KEY, appTheme);
+            applyTheme();
+            syncThemeButtons();
+        }
+
+        function syncThemeButtons() {
+            if (themeLightButton) {
+                const isLight = appTheme === "light";
+                themeLightButton.classList.toggle("is-active", isLight);
+                themeLightButton.setAttribute("aria-pressed", String(isLight));
+            }
+            if (themeDarkButton) {
+                const isDark = appTheme === "dark";
+                themeDarkButton.classList.toggle("is-active", isDark);
+                themeDarkButton.setAttribute("aria-pressed", String(isDark));
+            }
         }
 
         function isAppInstalled() {

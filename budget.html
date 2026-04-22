@@ -10,7 +10,8 @@
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-	<main class="app-shell">
+	<a class="skip-link" href="#main-content">Ugrás a tartalomra</a>
+	<main id="main-content" class="app-shell" tabindex="-1">
 		<header class="hero">
 			<div class="hero-toolbar">
 				<div class="language-corner">
@@ -28,6 +29,16 @@
 						<span class="hamburger-line"></span>
 						<span class="hamburger-line"></span>
 					</button>
+					<div class="theme-switch-inline" role="group" aria-label="Theme switch">
+						<button id="theme-light-button" type="button" class="theme-switch-btn">
+							<span class="theme-switch-btn-icon" aria-hidden="true">☀</span>
+							<span class="theme-switch-btn-label" data-i18n="themeModeLight">Világos</span>
+						</button>
+						<button id="theme-dark-button" type="button" class="theme-switch-btn">
+							<span class="theme-switch-btn-icon" aria-hidden="true">☾</span>
+							<span class="theme-switch-btn-label" data-i18n="themeModeDark">Sötét</span>
+						</button>
+					</div>
 					<div id="menu-panel" class="menu-panel">
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
 						<div class="menu-group">
@@ -38,6 +49,7 @@
 								<a href="monthly_budget.html" data-i18n="summaryLink">Havi összegzés</a>
 							</div>
 						</div>
+					</div>
 				</nav>
 			</div>
 			<h1 data-i18n="heroTitle">Költségvetés</h1>
@@ -65,53 +77,7 @@
 				</div>
 			</div>
 		</section>
-
-		<section class="grid auth-grid hidden always-hidden" id="auth-section">
-			<article class="card">
-				<h2 data-i18n="registerTitle">Regisztráció</h2>
-				<form id="register-form" class="stack">
-					<label for="register-username" data-i18n="usernameLabel">Felhasználónév</label>
-					<input type="text" id="register-username" minlength="5" required>
-
-					<label for="register-email-address" data-i18n="emailLabel">Email cím</label>
-					<input type="email" id="register-email-address" required>
-
-					<label for="register-email-address-confirm" data-i18n="emailConfirmLabel">Email cím megerősítése</label>
-					<input type="email" id="register-email-address-confirm" required>
-
-					<label for="register-password" data-i18n="passwordLabel">Jelszó</label>
-					<input type="password" id="register-password" minlength="6" required>
-
-					<label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszó megerősítése</label>
-					<input type="password" id="register-password-confirm" minlength="6" required>
-
-					<button type="submit" data-i18n="registerButton">Regisztrálok</button>
-				</form>
-			</article>
-
-			<article class="card">
-				<h2 data-i18n="loginTitle">Bejelentkezés</h2>
-				<form id="login-form" class="stack">
-					<label for="login-username" data-i18n="usernameLabel">Felhasználónév</label>
-					<input type="text" id="login-username" required>
-
-					<label for="login-password" data-i18n="passwordLabel">Jelszó</label>
-					<input type="password" id="login-password" required>
-
-					<button type="submit" data-i18n="loginButton">Belépés</button>
-				</form>
-			</article>
-		</section>
-
-		<section class="card session-card">
-			<p id="session-info">Nincs bejelentkezett felhasználó.</p>
-			<p id="auth-message" class="auth-message" aria-live="polite"></p>
-		</section>
-
-		<section id="locked-message" class="card hidden always-hidden">
-			<p data-i18n="loginRequired">A rögzítéshez jelentkezz be vagy regisztrálj.</p>
-		</section>
-
+ 
 		<section id="budget-content">
 			<section class="grid forms-grid">
 				<article class="card">
@@ -197,32 +163,6 @@
 					<h3 data-i18n="spentToDateTitle">Kiadás mai napig</h3>
 					<p id="spent-to-date">0</p>
 				</article>
-			</section>
-
-			<section id="forecast-planner" class="card hidden always-hidden">
-				<h2 data-i18n="forecastTitle">Költségvetési előrejelző</h2>
-				<div class="grid forecast-grid">
-					<div>
-						<label for="forecast-target-date" data-i18n="forecastTargetDateLabel">Elemzés dátuma</label>
-						<input type="date" id="forecast-target-date">
-					</div>
-					<div>
-						<label for="forecast-whatif-date" data-i18n="forecastWhatIfDateLabel">Mi lenne ha vásárlás dátuma</label>
-						<input type="date" id="forecast-whatif-date">
-					</div>
-					<div>
-						<label for="forecast-whatif-amount" data-i18n="forecastWhatIfAmountLabel">Mi lenne ha összeg</label>
-						<input type="number" id="forecast-whatif-amount" min="0" step="1" value="0">
-					</div>
-				</div>
-				<p class="forecast-hint" data-i18n="forecastDateQuickPickLabel">Kattints egy dátumra gyors elemzéshez:</p>
-				<div id="forecast-date-picks" class="forecast-date-picks"></div>
-				<div class="forecast-results">
-					<p><strong data-i18n="forecastBaseUntilLabel">Kiadás eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
-					<p><strong data-i18n="forecastWithPurchaseLabel">Kiadás ezzel a vásárlással:</strong> <span id="forecast-with-purchase">0</span></p>
-					<p><strong data-i18n="forecastDifferenceLabel">Különbség:</strong> <span id="forecast-difference">0</span></p>
-					<p><strong data-i18n="forecastMonthEndImpactLabel">Hóvégi egyenleg új állapotban:</strong> <span id="forecast-month-end">0</span></p>
-				</div>
 			</section>
 
 			<section class="grid summary-grid">

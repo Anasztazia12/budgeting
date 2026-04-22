@@ -1,6 +1,7 @@
 const USERS_KEY = "budgetAppUsers";
 		const SESSION_KEY = "budgetAppSession";
 		const LANGUAGE_KEY = "budgetAppLanguage";
+		const THEME_KEY = "budgetAppTheme";
 		const CURRENCY_KEY = "budgetAppCurrency";
 		const INSTALL_STATUS_KEY = "budgetAppInstalled";
 		const GUEST_SESSION_VALUE = "__guest__";
@@ -15,6 +16,9 @@ const USERS_KEY = "budgetAppUsers";
 				homeLink: "Kezdőlap",
 				budgetLink: "Költségvetés",
 				summaryLink: "Havi összegzés",
+				themeModeLabel: "Téma",
+				themeModeLight: "Világos",
+				themeModeDark: "Sötét",
 				backAction: "Vissza",
 				downloadAppButton: "App letöltése",
 				languageLabel: "Nyelv",
@@ -125,6 +129,9 @@ const USERS_KEY = "budgetAppUsers";
 				homeLink: "Home",
 				budgetLink: "Budget",
 				summaryLink: "Monthly Budget",
+				themeModeLabel: "Theme",
+				themeModeLight: "Light",
+				themeModeDark: "Dark",
 				backAction: "Back",
 				downloadAppButton: "Download App",
 				languageLabel: "Language",
@@ -234,11 +241,10 @@ const USERS_KEY = "budgetAppUsers";
 		const users = loadUsers();
 		let currentUser = loadSession(users);
 		let appLanguage = loadLanguage();
+		let appTheme = loadTheme();
 		let appCurrency = loadCurrency();
 		let appState = getCurrentUserState();
 
-		const registerForm = document.getElementById("register-form");
-		const loginForm = document.getElementById("login-form");
 		const incomeForm = document.getElementById("income-form");
 		const expenseForm = document.getElementById("expense-form");
 		const forecastToggleButton = document.getElementById("forecast-toggle-button");
@@ -246,12 +252,11 @@ const USERS_KEY = "budgetAppUsers";
 		const menuPanel = document.getElementById("menu-panel");
 		const menuBackButton = document.getElementById("menu-back-button");
 		const installAppButton = document.getElementById("install-app-button");
+		const themeLightButton = document.getElementById("theme-light-button");
+		const themeDarkButton = document.getElementById("theme-dark-button");
 		const menuLogoutButton = document.getElementById("menu-logout-button");
 		const authMessage = document.getElementById("auth-message");
-		const sessionInfo = document.getElementById("session-info");
-		const authSection = document.getElementById("auth-section");
 		const budgetContent = document.getElementById("budget-content");
-		const lockedMessage = document.getElementById("locked-message");
 		const activeMonthInput = document.getElementById("active-month");
 		const languageSelect = document.getElementById("app-language");
 		const currencySelect = document.getElementById("app-currency");
@@ -312,35 +317,56 @@ const USERS_KEY = "budgetAppUsers";
 			}
 			renderForecastPlanner();
 		});
-		menuBackButton.addEventListener("click", () => {
-			window.history.back();
-		});
-		installAppButton.addEventListener("click", async () => {
-			if (isAppInstalled() && !deferredInstallPrompt) {
-				showMessage(t("appDownloaded"), false);
-				return;
-			}
+		if (menuBackButton) {
+			menuBackButton.addEventListener("click", () => {
+				window.history.back();
+			});
+		}
+		if (installAppButton) {
+			installAppButton.addEventListener("click", async () => {
+				if (isAppInstalled() && !deferredInstallPrompt) {
+					showMessage(t("appDownloaded"), false);
+					return;
+				}
 
-			if (!deferredInstallPrompt) {
-				showMessage(t("appInstallUnavailable"), true);
-				return;
-			}
+				if (!deferredInstallPrompt) {
+					showMessage(t("appInstallUnavailable"), true);
+					return;
+				}
 
-			menuPanel.classList.remove("is-open");
-			menuToggle.classList.remove("is-open");
-			menuToggle.setAttribute("aria-expanded", "false");
-			deferredInstallPrompt.prompt();
-			const choice = await deferredInstallPrompt.userChoice;
-			if (choice.outcome === "accepted") {
-				localStorage.setItem(INSTALL_STATUS_KEY, "1");
-				showMessage(t("appDownloaded"), false);
-			}
-			deferredInstallPrompt = null;
-			updateInstallButtonState();
-		});
-		menuLogoutButton.addEventListener("click", handleLogout);
-		incomeCancelEdit.addEventListener("click", resetIncomeForm);
-		expenseCancelEdit.addEventListener("click", resetExpenseForm);
+				menuPanel.classList.remove("is-open");
+				menuToggle.classList.remove("is-open");
+				menuToggle.setAttribute("aria-expanded", "false");
+				deferredInstallPrompt.prompt();
+				const choice = await deferredInstallPrompt.userChoice;
+				if (choice.outcome === "accepted") {
+					localStorage.setItem(INSTALL_STATUS_KEY, "1");
+					showMessage(t("appDownloaded"), false);
+				}
+				deferredInstallPrompt = null;
+				updateInstallButtonState();
+			});
+		}
+		if (menuLogoutButton) {
+			menuLogoutButton.addEventListener("click", handleLogout);
+		}
+		if (themeLightButton) {
+			themeLightButton.addEventListener("click", () => {
+				setTheme("light");
+			});
+		}
+
+		if (themeDarkButton) {
+			themeDarkButton.addEventListener("click", () => {
+				setTheme("dark");
+			});
+		}
+		if (incomeCancelEdit) {
+			incomeCancelEdit.addEventListener("click", resetIncomeForm);
+		}
+		if (expenseCancelEdit) {
+			expenseCancelEdit.addEventListener("click", resetExpenseForm);
+		}
 
 		menuToggle.addEventListener("click", () => {
 			const isOpen = menuPanel.classList.toggle("is-open");
@@ -353,6 +379,15 @@ const USERS_KEY = "budgetAppUsers";
 				menuPanel.classList.remove("is-open");
 				menuToggle.classList.remove("is-open");
 				menuToggle.setAttribute("aria-expanded", "false");
+			}
+		});
+
+		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
+				menuPanel.classList.remove("is-open");
+				menuToggle.classList.remove("is-open");
+				menuToggle.setAttribute("aria-expanded", "false");
+				menuToggle.focus();
 			}
 		});
 
@@ -377,67 +412,6 @@ const USERS_KEY = "budgetAppUsers";
 				});
 			});
 		}
-
-		registerForm.addEventListener("submit", async (event) => {
-			event.preventDefault();
-			const username = document.getElementById("register-username").value.trim();
-			const email = document.getElementById("register-email-address").value.trim();
-			const emailConfirm = document.getElementById("register-email-address-confirm").value.trim();
-			const password = document.getElementById("register-password").value;
-			const passwordConfirm = document.getElementById("register-password-confirm").value;
-
-			if (email !== emailConfirm) {
-				showMessage(t("emailMismatch"), true);
-				return;
-			}
-
-			if (password !== passwordConfirm) {
-				showMessage(t("passwordMismatch"), true);
-				return;
-			}
-
-			if (users[username]) {
-				showMessage(t("usernameTaken"), true);
-				return;
-			}
-
-			const salt = createSalt();
-			const hashedPassword = await hashPassword(password, salt);
-
-			users[username] = {
-				email,
-				salt,
-				hashedPassword,
-				data: { incomes: [], expenses: [] }
-			};
-
-			saveUsers();
-			loginUser(username);
-			registerForm.reset();
-			showMessage(t("registerSuccess"), false);
-		});
-
-		loginForm.addEventListener("submit", async (event) => {
-			event.preventDefault();
-			const username = document.getElementById("login-username").value.trim();
-			const password = document.getElementById("login-password").value;
-			const userRecord = users[username];
-
-			if (!userRecord) {
-				showMessage(t("invalidLogin"), true);
-				return;
-			}
-
-			const valid = await verifyPassword(userRecord, password);
-			if (!valid) {
-				showMessage(t("invalidLogin"), true);
-				return;
-			}
-
-			loginUser(username);
-			loginForm.reset();
-			showMessage(t("loginSuccess"), false);
-		});
 
 		incomeForm.addEventListener("submit", (event) => {
 			event.preventDefault();
@@ -497,6 +471,8 @@ const USERS_KEY = "budgetAppUsers";
 				return;
 			}
 
+			applyTheme();
+			syncThemeButtons();
 			const queryMonth = pageParams.get("month");
 			activeMonthInput.value = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : toMonthInput(today);
 			languageSelect.value = appLanguage;
@@ -517,12 +493,12 @@ const USERS_KEY = "budgetAppUsers";
 			document.querySelectorAll("[data-i18n]").forEach((element) => {
 				element.textContent = t(element.dataset.i18n);
 			});
+			menuToggle.setAttribute("aria-label", t("menuButton"));
 
 			document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
 				option.textContent = translateCategory(option.value);
 			});
 
-			updateSessionLabel();
 			updateFormButtonLabels();
 			refreshWhatIfRowLabels();
 		}
@@ -807,43 +783,14 @@ const USERS_KEY = "budgetAppUsers";
 		}
 
 		function updateAccessUI() {
-			authSection.classList.add("hidden");
-			lockedMessage.classList.add("hidden");
-			budgetContent.classList.remove("hidden");
+			if (budgetContent) {
+				budgetContent.classList.remove("hidden");
+			}
 			menuToggle.disabled = false;
-			updateSessionLabel();
-		}
-
-		function updateSessionLabel() {
-			if (!currentUser) {
-				sessionInfo.textContent = t("loggedOut");
-				return;
-			}
-
-			const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
-			sessionInfo.textContent = `${t("loggedIn")} ${name}`;
-		}
-
-		function loginUser(username) {
-			currentUser = username;
-			if (username !== GUEST_SESSION_VALUE) {
-				ensureUserData(username);
-			}
-			appState = getCurrentUserState();
-			localStorage.setItem(SESSION_KEY, username);
-			resetIncomeForm();
-			resetExpenseForm();
-			updateAccessUI();
-			render();
 		}
 
 		function requireLogin() {
-			if (currentUser) {
-				return true;
-			}
-
-			showMessage(t("loginFirst"), true);
-			return false;
+			return Boolean(currentUser);
 		}
 
 		function monthEntries(entries, activeMonth) {
@@ -867,7 +814,39 @@ const USERS_KEY = "budgetAppUsers";
 			return current || key;
 		}
 
+		function loadTheme() {
+			const saved = localStorage.getItem(THEME_KEY);
+			return saved === "dark" ? "dark" : "light";
+		}
+
+		function applyTheme() {
+			document.documentElement.setAttribute("data-theme", appTheme);
+		}
+
+		function setTheme(mode) {
+			appTheme = mode === "dark" ? "dark" : "light";
+			localStorage.setItem(THEME_KEY, appTheme);
+			applyTheme();
+			syncThemeButtons();
+		}
+
+		function syncThemeButtons() {
+			if (themeLightButton) {
+				const isLight = appTheme === "light";
+				themeLightButton.classList.toggle("is-active", isLight);
+				themeLightButton.setAttribute("aria-pressed", String(isLight));
+			}
+			if (themeDarkButton) {
+				const isDark = appTheme === "dark";
+				themeDarkButton.classList.toggle("is-active", isDark);
+				themeDarkButton.setAttribute("aria-pressed", String(isDark));
+			}
+		}
+
 		function showMessage(message, isError) {
+			if (!authMessage) {
+				return;
+			}
 			authMessage.textContent = message;
 			authMessage.classList.toggle("error", isError);
 			authMessage.classList.toggle("ok", !isError);
@@ -911,6 +890,9 @@ const USERS_KEY = "budgetAppUsers";
 		}
 
 		function updateInstallButtonState() {
+			if (!installAppButton) {
+				return;
+			}
 			const installed = isAppInstalled();
 			if (installed && !deferredInstallPrompt) {
 				installAppButton.textContent = t("appDownloaded");

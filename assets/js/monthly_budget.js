@@ -1,6 +1,7 @@
 const USERS_KEY = "budgetAppUsers";
 		const SESSION_KEY = "budgetAppSession";
 		const LANGUAGE_KEY = "budgetAppLanguage";
+		const THEME_KEY = "budgetAppTheme";
 		const CURRENCY_KEY = "budgetAppCurrency";
 		const INSTALL_STATUS_KEY = "budgetAppInstalled";
 		const GUEST_SESSION_VALUE = "__guest__";
@@ -15,6 +16,9 @@ const USERS_KEY = "budgetAppUsers";
 				homeLink: "Kezdőlap",
 				budgetLink: "Költségvetés",
 				monthlyLink: "Havi összegzés",
+				themeModeLabel: "Téma",
+				themeModeLight: "Világos",
+				themeModeDark: "Sötét",
 				backAction: "Vissza",
 				downloadAppButton: "App letöltése",
 				logoutAction: "Kijelentkezés",
@@ -72,6 +76,9 @@ const USERS_KEY = "budgetAppUsers";
 				homeLink: "Home",
 				budgetLink: "Budget",
 				monthlyLink: "Monthly Budget",
+				themeModeLabel: "Theme",
+				themeModeLight: "Light",
+				themeModeDark: "Dark",
 				backAction: "Back",
 				downloadAppButton: "Download App",
 				logoutAction: "Sign out",
@@ -127,6 +134,7 @@ const USERS_KEY = "budgetAppUsers";
 		const users = loadUsers();
 		const currentUser = loadSession(users);
 		let appLanguage = loadLanguage();
+		let appTheme = loadTheme();
 		let appCurrency = loadCurrency();
 		const state = getCurrentUserState();
 
@@ -134,6 +142,8 @@ const USERS_KEY = "budgetAppUsers";
 		const menuPanel = document.getElementById("menu-panel");
 		const menuBackButton = document.getElementById("menu-back-button");
 		const installAppButton = document.getElementById("install-app-button");
+		const themeLightButton = document.getElementById("theme-light-button");
+		const themeDarkButton = document.getElementById("theme-dark-button");
 		const menuLogoutButton = document.getElementById("menu-logout-button");
 		const languageSelect = document.getElementById("app-language");
 		const currencySelect = document.getElementById("app-currency");
@@ -171,6 +181,18 @@ const USERS_KEY = "budgetAppUsers";
 			menuToggle.setAttribute("aria-expanded", String(isOpen));
 		});
 
+		if (themeLightButton) {
+			themeLightButton.addEventListener("click", () => {
+				setTheme("light");
+			});
+		}
+
+		if (themeDarkButton) {
+			themeDarkButton.addEventListener("click", () => {
+				setTheme("dark");
+			});
+		}
+
 		menuLogoutButton.addEventListener("click", handleLogout);
 		menuBackButton.addEventListener("click", () => {
 			window.history.back();
@@ -207,6 +229,15 @@ const USERS_KEY = "budgetAppUsers";
 			}
 		});
 
+		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
+				menuPanel.classList.remove("is-open");
+				menuToggle.classList.remove("is-open");
+				menuToggle.setAttribute("aria-expanded", "false");
+				menuToggle.focus();
+			}
+		});
+
 		window.addEventListener("beforeinstallprompt", (event) => {
 			event.preventDefault();
 			deferredInstallPrompt = event;
@@ -237,6 +268,8 @@ const USERS_KEY = "budgetAppUsers";
 				return;
 			}
 
+			applyTheme();
+			syncThemeButtons();
 			languageSelect.value = appLanguage;
 			currencySelect.value = appCurrency;
 			activeMonthInput.value = toMonthInput(today);
@@ -252,6 +285,7 @@ const USERS_KEY = "budgetAppUsers";
 			document.querySelectorAll("[data-i18n]").forEach((element) => {
 				element.textContent = t(element.dataset.i18n);
 			});
+			menuToggle.setAttribute("aria-label", t("menuButton"));
 			if (!currentUser) {
 				projectionTextEl.textContent = t("noData");
 			}
@@ -350,6 +384,35 @@ const USERS_KEY = "budgetAppUsers";
 				current = current ? current[part] : undefined;
 			}
 			return current || key;
+		}
+
+		function loadTheme() {
+			const saved = localStorage.getItem(THEME_KEY);
+			return saved === "dark" ? "dark" : "light";
+		}
+
+		function applyTheme() {
+			document.documentElement.setAttribute("data-theme", appTheme);
+		}
+
+		function setTheme(mode) {
+			appTheme = mode === "dark" ? "dark" : "light";
+			localStorage.setItem(THEME_KEY, appTheme);
+			applyTheme();
+			syncThemeButtons();
+		}
+
+		function syncThemeButtons() {
+			if (themeLightButton) {
+				const isLight = appTheme === "light";
+				themeLightButton.classList.toggle("is-active", isLight);
+				themeLightButton.setAttribute("aria-pressed", String(isLight));
+			}
+			if (themeDarkButton) {
+				const isDark = appTheme === "dark";
+				themeDarkButton.classList.toggle("is-active", isDark);
+				themeDarkButton.setAttribute("aria-pressed", String(isDark));
+			}
 		}
 
 		function formatCurrency(amount) {

@@ -10,7 +10,8 @@
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-	<main class="app-shell">
+	<a class="skip-link" href="#main-content">Ugrás a tartalomra</a>
+	<main id="main-content" class="app-shell" tabindex="-1">
 		<header class="hero">
 			<div class="hero-toolbar">
 				<div class="language-corner">
@@ -28,6 +29,16 @@
 						<span class="hamburger-line"></span>
 						<span class="hamburger-line"></span>
 					</button>
+					<div class="theme-switch-inline" role="group" aria-label="Theme switch">
+						<button id="theme-light-button" type="button" class="theme-switch-btn">
+							<span class="theme-switch-btn-icon" aria-hidden="true">☀</span>
+							<span class="theme-switch-btn-label" data-i18n="themeModeLight">Világos</span>
+						</button>
+						<button id="theme-dark-button" type="button" class="theme-switch-btn">
+							<span class="theme-switch-btn-icon" aria-hidden="true">☾</span>
+							<span class="theme-switch-btn-label" data-i18n="themeModeDark">Sötét</span>
+						</button>
+					</div>
 					<div id="menu-panel" class="menu-panel">
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
 						<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
