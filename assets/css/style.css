@@ -6,7 +6,7 @@
 	--muted: #46608a;
 	--accent: #2452b8;
 	--accent-strong: #5d8dff;
-	--good: #2f7be8;
+	--good: #01070f;
 	--danger: #4d63de;
 	--line: #c8d7f0;
 }
@@ -348,6 +348,37 @@ button:hover::after {
 	margin-top: 1rem;
 }
 
+.forecast-grid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	margin-top: 0.65rem;
+}
+
+.forecast-hint {
+	margin: 0.95rem 0 0.45rem;
+	color: var(--muted);
+	font-weight: 600;
+}
+
+.forecast-date-picks {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.45rem;
+	margin-bottom: 0.85rem;
+}
+
+.forecast-results {
+	border: 1px solid #c4d5f2;
+	border-radius: 12px;
+	padding: 0.8rem 0.9rem;
+	background: #eef4ff;
+	display: grid;
+	gap: 0.4rem;
+}
+
+.forecast-results p {
+	margin: 0;
+}
+
 .stats-grid {
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 	margin-top: 1rem;
@@ -519,6 +550,23 @@ button:disabled {
 	font-weight: 800;
 }
 
+.stat:has(#monthly-expense) {
+	background: linear-gradient(155deg, #e6efff, #d6e4ff 70%);
+	border-color: #8faee6;
+	box-shadow: 0 12px 24px rgba(25, 61, 130, 0.18);
+}
+
+.stat:has(#monthly-expense) h3 {
+	color: #34558f;
+	font-weight: 700;
+}
+
+.stat:has(#monthly-expense) #monthly-expense {
+	color: #204db4;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+	font-size: clamp(1.2rem, 1.35vw + 0.82rem, 1.64rem);
+}
+
 #monthly-income {
 	color: var(--good);
 }
@@ -528,8 +576,26 @@ button:disabled {
 	color: var(--danger);
 }
 
+#spent-to-date {
+	color: #2d334e;
+}
+
 #month-end-left {
-	color: #2c58c9;
+	color: #1f4fbf;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+h3[data-i18n="monthEndTitle"] {
+	color: #3f629a;
+}
+
+h2[data-i18n="projectionTitle"] {
+	color: #3f629a;
+}
+
+#projection-text {
+	color: #2a57b5;
+	font-weight: 700;
 }
 
 .entry-list {
@@ -622,6 +688,10 @@ button:disabled {
 	.lists-grid {
 		grid-template-columns: 1fr;
 	}
+
+	.forecast-grid {
+		grid-template-columns: 1fr 1fr;
+	}
 }
 
 @media (max-width: 560px) {
@@ -673,6 +743,10 @@ button:disabled {
 	}
 
 	.auth-action-bar {
+		grid-template-columns: 1fr;
+	}
+
+	.forecast-grid {
 		grid-template-columns: 1fr;
 	}
 

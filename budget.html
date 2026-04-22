@@ -3,7 +3,10 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#2452b8">
 	<title>Budget</title>
+	<link rel="manifest" href="manifest.webmanifest">
+	<link rel="icon" type="image/png" href="assets/images/budget-icon.png">
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -30,7 +33,10 @@
 			</button>
 			<div id="menu-panel" class="menu-panel">
 				<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
+				<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
 				<a href="monthly_budget.html" data-i18n="summaryLink">Monthly Budget</a>
+				<button id="menu-back-button" type="button" data-i18n="backAction">Vissza</button>
+				<button id="install-app-button" type="button" data-i18n="downloadAppButton">App letöltése</button>
 				<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
 			</div>
 		</nav>
@@ -40,8 +46,17 @@
 				<label for="active-month" data-i18n="monthLabel">Választott hónap</label>
 				<input type="month" id="active-month">
 			</div>
+			<div>
+				<label for="app-currency" data-i18n="currencyLabel">Pénznem</label>
+				<select id="app-currency" aria-label="Currency selector">
+					<option value="HUF" data-i18n="currencyHuf">HUF (forint)</option>
+					<option value="GBP" data-i18n="currencyGbp">GBP (font)</option>
+					<option value="USD" data-i18n="currencyUsd">USD (dollar)</option>
+					<option value="EUR" data-i18n="currencyEur">EUR (euro)</option>
+				</select>
+			</div>
 			<div class="control-action">
-				<button id="export-csv-button" type="button" data-i18n="exportButton">CSV export a hónapra</button>
+				<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Budget Forecast Planner</button>
 			</div>
 		</section>
 
@@ -103,7 +118,7 @@
 							<option value="egyeb">Egyeb</option>
 						</select>
 
-						<label for="income-amount" data-i18n="amountLabel">Osszeg (Ft)</label>
+						<label for="income-amount" data-i18n="amountLabel">Osszeg</label>
 						<input type="number" id="income-amount" min="1" step="1" required>
 
 						<label for="income-date" data-i18n="incomeDateLabel">Mikor varhato? (datum)</label>
@@ -141,7 +156,7 @@
 							<option value="egyeb kiadas">Egyeb kiadas</option>
 						</select>
 
-						<label for="expense-amount" data-i18n="amountLabel">Osszeg (Ft)</label>
+						<label for="expense-amount" data-i18n="amountLabel">Osszeg</label>
 						<input type="number" id="expense-amount" min="1" step="1" required>
 
 						<label for="expense-date" data-i18n="expenseDateLabel">Mikor lesz levonas? (datum)</label>
@@ -158,23 +173,49 @@
 			<section class="grid stats-grid">
 				<article class="card stat">
 					<h3 data-i18n="monthlyIncomeTitle">Osszes havi bevetel</h3>
-					<p id="monthly-income">0 Ft</p>
-				</article>
-
-				<article class="card stat">
-					<h3 data-i18n="monthlyExpenseTitle">Osszes havi kiadas</h3>
-					<p id="monthly-expense">0 Ft</p>
-				</article>
-
-				<article class="card stat">
-					<h3 data-i18n="spentToDateTitle">Koltseg mai napig</h3>
-					<p id="spent-to-date">0 Ft</p>
+					<p id="monthly-income">0</p>
 				</article>
 
 				<article class="card stat">
 					<h3 data-i18n="monthEndTitle">Hovegi varhato egyenleg</h3>
-					<p id="month-end-left">0 Ft</p>
+					<p id="month-end-left">0</p>
 				</article>
+
+				<article class="card stat">
+					<h3 data-i18n="monthlyExpenseTitle">Osszes havi kiadas</h3>
+					<p id="monthly-expense">0</p>
+				</article>
+
+				<article class="card stat">
+					<h3 data-i18n="spentToDateTitle">Koltseg mai napig</h3>
+					<p id="spent-to-date">0</p>
+				</article>
+			</section>
+
+			<section id="forecast-planner" class="card hidden">
+				<h2 data-i18n="forecastTitle">Budget Forecast Planner</h2>
+				<div class="grid forecast-grid">
+					<div>
+						<label for="forecast-target-date" data-i18n="forecastTargetDateLabel">Elemzés dátuma</label>
+						<input type="date" id="forecast-target-date">
+					</div>
+					<div>
+						<label for="forecast-whatif-date" data-i18n="forecastWhatIfDateLabel">Mi lenne ha vásárlás dátuma</label>
+						<input type="date" id="forecast-whatif-date">
+					</div>
+					<div>
+						<label for="forecast-whatif-amount" data-i18n="forecastWhatIfAmountLabel">Mi lenne ha összeg</label>
+						<input type="number" id="forecast-whatif-amount" min="0" step="1" value="0">
+					</div>
+				</div>
+				<p class="forecast-hint" data-i18n="forecastDateQuickPickLabel">Kattints egy dátumra gyors elemzéshez:</p>
+				<div id="forecast-date-picks" class="forecast-date-picks"></div>
+				<div class="forecast-results">
+					<p><strong data-i18n="forecastBaseUntilLabel">Kiadás eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
+					<p><strong data-i18n="forecastWithPurchaseLabel">Kiadás ezzel a vásárlással:</strong> <span id="forecast-with-purchase">0</span></p>
+					<p><strong data-i18n="forecastDifferenceLabel">Különbség:</strong> <span id="forecast-difference">0</span></p>
+					<p><strong data-i18n="forecastMonthEndImpactLabel">Hóvégi egyenleg új állapotban:</strong> <span id="forecast-month-end">0</span></p>
+				</div>
 			</section>
 
 			<section class="grid summary-grid">
@@ -195,6 +236,8 @@
 		const USERS_KEY = "budgetAppUsers";
 		const SESSION_KEY = "budgetAppSession";
 		const LANGUAGE_KEY = "budgetAppLanguage";
+		const CURRENCY_KEY = "budgetAppCurrency";
+		const INSTALL_STATUS_KEY = "budgetAppInstalled";
 		const GUEST_SESSION_VALUE = "__guest__";
 		const GUEST_DATA_KEY = "budgetAppGuestData";
 
@@ -205,10 +248,27 @@
 				heroText: "Rögzítsd a várható bevételeket és kiadásokat dátum szerint.",
 				menuButton: "Menü",
 				homeLink: "Kezdőlap",
+				budgetLink: "Költségvetés",
 				summaryLink: "Havi összegzés",
+				backAction: "Vissza",
+				downloadAppButton: "App letöltése",
 				languageLabel: "Nyelv",
+				currencyLabel: "Pénznem",
+				currencyHuf: "HUF (forint)",
+				currencyGbp: "GBP (font)",
+				currencyUsd: "USD (dollár)",
+				currencyEur: "EUR (euró)",
 				monthLabel: "Választott hónap",
-				exportButton: "CSV export a hónapra",
+				forecastButton: "Budget Forecast Planner",
+				forecastTitle: "Budget Forecast Planner",
+				forecastTargetDateLabel: "Elemzés dátuma",
+				forecastWhatIfDateLabel: "Mi lenne ha vásárlás dátuma",
+				forecastWhatIfAmountLabel: "Mi lenne ha összeg",
+				forecastDateQuickPickLabel: "Kattints egy dátumra gyors elemzéshez:",
+				forecastBaseUntilLabel: "Kiadás eddig a dátumig:",
+				forecastWithPurchaseLabel: "Kiadás ezzel a vásárlással:",
+				forecastDifferenceLabel: "Különbség:",
+				forecastMonthEndImpactLabel: "Hóvégi egyenleg új állapotban:",
 				registerTitle: "Regisztráció",
 				loginTitle: "Bejelentkezés",
 				usernameLabel: "Felhasználónév",
@@ -223,7 +283,7 @@
 				incomeFormTitle: "Bevétel hozzáadása",
 				expenseFormTitle: "Kiadás hozzáadása",
 				categoryLabel: "Kategória",
-				amountLabel: "Összeg (Ft)",
+				amountLabel: "Összeg",
 				incomeDateLabel: "Mikor várható? (dátum)",
 				expenseDateLabel: "Mikor lesz levonás? (dátum)",
 				saveIncomeButton: "Bevétel mentése",
@@ -247,6 +307,8 @@
 				loginSuccess: "Sikeres bejelentkezés.",
 				logoutSuccess: "Sikeres kijelentkezés.",
 				invalidLogin: "Hibás felhasználónév vagy jelszó.",
+				appDownloaded: "Az app letöltve.",
+				appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
 				loginFirst: "Először jelentkezz be.",
 				entrySaved: "A tétel elmentve.",
 				entryUpdated: "A tétel frissítve.",
@@ -255,7 +317,6 @@
 				emptyEntries: "Nincs rögzített tétel erre a hónapra.",
 				exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
 				exportDone: "A havi CSV export letöltése elindult.",
-				currency: "Ft",
 				editAction: "Szerkesztés",
 				deleteAction: "Törlés",
 				csvType: "Típus",
@@ -292,10 +353,27 @@
 				heroText: "Save expected income and expenses with exact dates.",
 				menuButton: "Menu",
 				homeLink: "Home",
+				budgetLink: "Budget",
 				summaryLink: "Monthly Budget",
+				backAction: "Back",
+				downloadAppButton: "Download App",
 				languageLabel: "Language",
+				currencyLabel: "Currency",
+				currencyHuf: "HUF (forint)",
+				currencyGbp: "GBP (pound)",
+				currencyUsd: "USD (dollar)",
+				currencyEur: "EUR (euro)",
 				monthLabel: "Selected month",
-				exportButton: "Export month as CSV",
+				forecastButton: "Budget Forecast Planner",
+				forecastTitle: "Budget Forecast Planner",
+				forecastTargetDateLabel: "Analyze up to date",
+				forecastWhatIfDateLabel: "What-if purchase date",
+				forecastWhatIfAmountLabel: "What-if amount",
+				forecastDateQuickPickLabel: "Click a date for quick analysis:",
+				forecastBaseUntilLabel: "Spending until that date:",
+				forecastWithPurchaseLabel: "Spending with this purchase:",
+				forecastDifferenceLabel: "Difference:",
+				forecastMonthEndImpactLabel: "Updated month-end balance:",
 				registerTitle: "Register",
 				loginTitle: "Sign in",
 				usernameLabel: "Username",
@@ -310,7 +388,7 @@
 				incomeFormTitle: "Add income",
 				expenseFormTitle: "Add expense",
 				categoryLabel: "Category",
-				amountLabel: "Amount (HUF)",
+				amountLabel: "Amount",
 				incomeDateLabel: "Expected date",
 				expenseDateLabel: "Deduction date",
 				saveIncomeButton: "Save income",
@@ -334,6 +412,8 @@
 				loginSuccess: "Signed in successfully.",
 				logoutSuccess: "Signed out successfully.",
 				invalidLogin: "Invalid username or password.",
+				appDownloaded: "App downloaded.",
+				appInstallUnavailable: "App install is not available on this device right now.",
 				loginFirst: "Please sign in first.",
 				entrySaved: "Entry saved.",
 				entryUpdated: "Entry updated.",
@@ -342,7 +422,6 @@
 				emptyEntries: "No saved entries for this month.",
 				exportEmpty: "There are no entries to export for this month.",
 				exportDone: "Monthly CSV export started.",
-				currency: "HUF",
 				editAction: "Edit",
 				deleteAction: "Delete",
 				csvType: "Type",
@@ -379,15 +458,18 @@
 		const users = loadUsers();
 		let currentUser = loadSession(users);
 		let appLanguage = loadLanguage();
+		let appCurrency = loadCurrency();
 		let appState = getCurrentUserState();
 
 		const registerForm = document.getElementById("register-form");
 		const loginForm = document.getElementById("login-form");
 		const incomeForm = document.getElementById("income-form");
 		const expenseForm = document.getElementById("expense-form");
-		const exportCsvButton = document.getElementById("export-csv-button");
+		const forecastToggleButton = document.getElementById("forecast-toggle-button");
 		const menuToggle = document.getElementById("menu-toggle");
 		const menuPanel = document.getElementById("menu-panel");
+		const menuBackButton = document.getElementById("menu-back-button");
+		const installAppButton = document.getElementById("install-app-button");
 		const menuLogoutButton = document.getElementById("menu-logout-button");
 		const authMessage = document.getElementById("auth-message");
 		const sessionInfo = document.getElementById("session-info");
@@ -396,6 +478,7 @@
 		const lockedMessage = document.getElementById("locked-message");
 		const activeMonthInput = document.getElementById("active-month");
 		const languageSelect = document.getElementById("app-language");
+		const currencySelect = document.getElementById("app-currency");
 		const monthlyIncomeEl = document.getElementById("monthly-income");
 		const monthlyExpenseEl = document.getElementById("monthly-expense");
 		const spentToDateEl = document.getElementById("spent-to-date");
@@ -406,6 +489,16 @@
 		const expenseSubmitButton = document.getElementById("expense-submit-button");
 		const incomeCancelEdit = document.getElementById("income-cancel-edit");
 		const expenseCancelEdit = document.getElementById("expense-cancel-edit");
+		const forecastPlanner = document.getElementById("forecast-planner");
+		const forecastTargetDateInput = document.getElementById("forecast-target-date");
+		const forecastWhatIfDateInput = document.getElementById("forecast-whatif-date");
+		const forecastWhatIfAmountInput = document.getElementById("forecast-whatif-amount");
+		const forecastDatePicks = document.getElementById("forecast-date-picks");
+		const forecastBaseUntilEl = document.getElementById("forecast-base-until");
+		const forecastWithPurchaseEl = document.getElementById("forecast-with-purchase");
+		const forecastDifferenceEl = document.getElementById("forecast-difference");
+		const forecastMonthEndEl = document.getElementById("forecast-month-end");
+		let deferredInstallPrompt = null;
 
 		initializePage();
 
@@ -416,8 +509,54 @@
 			render();
 		});
 
+		currencySelect.addEventListener("change", () => {
+			appCurrency = currencySelect.value;
+			saveCurrency();
+			render();
+		});
+
 		activeMonthInput.addEventListener("change", render);
-		exportCsvButton.addEventListener("click", exportMonthCsv);
+		forecastToggleButton.addEventListener("click", () => {
+			forecastPlanner.classList.toggle("hidden");
+			renderForecastPlanner();
+		});
+		forecastTargetDateInput.addEventListener("change", renderForecastPlanner);
+		forecastWhatIfDateInput.addEventListener("change", renderForecastPlanner);
+		forecastWhatIfAmountInput.addEventListener("input", renderForecastPlanner);
+		forecastDatePicks.addEventListener("click", (event) => {
+			const button = event.target.closest("button[data-date]");
+			if (!button) {
+				return;
+			}
+			forecastTargetDateInput.value = button.dataset.date;
+			renderForecastPlanner();
+		});
+		menuBackButton.addEventListener("click", () => {
+			window.history.back();
+		});
+		installAppButton.addEventListener("click", async () => {
+			if (isAppInstalled() && !deferredInstallPrompt) {
+				showMessage(t("appDownloaded"), false);
+				return;
+			}
+
+			if (!deferredInstallPrompt) {
+				showMessage(t("appInstallUnavailable"), true);
+				return;
+			}
+
+			menuPanel.classList.remove("is-open");
+			menuToggle.classList.remove("is-open");
+			menuToggle.setAttribute("aria-expanded", "false");
+			deferredInstallPrompt.prompt();
+			const choice = await deferredInstallPrompt.userChoice;
+			if (choice.outcome === "accepted") {
+				localStorage.setItem(INSTALL_STATUS_KEY, "1");
+				showMessage(t("appDownloaded"), false);
+			}
+			deferredInstallPrompt = null;
+			updateInstallButtonState();
+		});
 		menuLogoutButton.addEventListener("click", handleLogout);
 		incomeCancelEdit.addEventListener("click", resetIncomeForm);
 		expenseCancelEdit.addEventListener("click", resetExpenseForm);
@@ -435,6 +574,28 @@
 				menuToggle.setAttribute("aria-expanded", "false");
 			}
 		});
+
+		window.addEventListener("beforeinstallprompt", (event) => {
+			event.preventDefault();
+			deferredInstallPrompt = event;
+			localStorage.setItem(INSTALL_STATUS_KEY, "0");
+			updateInstallButtonState();
+		});
+
+		window.addEventListener("appinstalled", () => {
+			localStorage.setItem(INSTALL_STATUS_KEY, "1");
+			deferredInstallPrompt = null;
+			showMessage(t("appDownloaded"), false);
+			updateInstallButtonState();
+		});
+
+		if ("serviceWorker" in navigator) {
+			window.addEventListener("load", () => {
+				navigator.serviceWorker.register("sw.js").catch(() => {
+					// Service worker errors should not block usage.
+				});
+			});
+		}
 
 		registerForm.addEventListener("submit", async (event) => {
 			event.preventDefault();
@@ -557,10 +718,13 @@
 
 			activeMonthInput.value = toMonthInput(today);
 			languageSelect.value = appLanguage;
+			currencySelect.value = appCurrency;
 			resetIncomeForm();
 			resetExpenseForm();
+			setDefaultForecastDates();
 			applyTranslations();
 			updateAccessUI();
+			updateInstallButtonState();
 			render();
 		}
 
@@ -602,6 +766,59 @@
 
 			paintList(incomeList, incomes, "incomes");
 			paintList(expenseList, expenses, "expenses");
+			renderForecastPlanner();
+		}
+
+		function setDefaultForecastDates() {
+			const monthValue = activeMonthInput.value || toMonthInput(today);
+			forecastTargetDateInput.value = getMonthEndDate(monthValue);
+			forecastWhatIfDateInput.value = toDateInput(today);
+			forecastWhatIfAmountInput.value = "0";
+		}
+
+		function renderForecastPlanner() {
+			if (!currentUser) {
+				forecastBaseUntilEl.textContent = formatCurrency(0);
+				forecastWithPurchaseEl.textContent = formatCurrency(0);
+				forecastDifferenceEl.textContent = formatCurrency(0);
+				forecastMonthEndEl.textContent = formatCurrency(0);
+				forecastDatePicks.innerHTML = "";
+				return;
+			}
+
+			const activeMonth = activeMonthInput.value;
+			const incomes = monthEntries(appState.incomes, activeMonth);
+			const expenses = monthEntries(appState.expenses, activeMonth);
+			const targetDate = forecastTargetDateInput.value || getMonthEndDate(activeMonth);
+			const whatIfDate = forecastWhatIfDateInput.value;
+			const whatIfAmount = Number(forecastWhatIfAmountInput.value || 0);
+
+			const baseUntil = sumEntries(expenses.filter((item) => item.date <= targetDate));
+			const includeWhatIf = whatIfAmount > 0 && Boolean(whatIfDate) && whatIfDate <= targetDate && whatIfDate.startsWith(activeMonth);
+			const simulatedUntil = baseUntil + (includeWhatIf ? whatIfAmount : 0);
+			const difference = simulatedUntil - baseUntil;
+
+			const monthIncomeTotal = sumEntries(incomes);
+			const monthExpenseTotal = sumEntries(expenses);
+			const monthEndWithWhatIf = monthIncomeTotal - monthExpenseTotal - (whatIfAmount > 0 && whatIfDate.startsWith(activeMonth) ? whatIfAmount : 0);
+
+			forecastBaseUntilEl.textContent = formatCurrency(baseUntil);
+			forecastWithPurchaseEl.textContent = formatCurrency(simulatedUntil);
+			forecastDifferenceEl.textContent = formatCurrency(difference);
+			forecastMonthEndEl.textContent = formatCurrency(monthEndWithWhatIf);
+
+			renderForecastDatePicks(expenses, targetDate, activeMonth);
+		}
+
+		function renderForecastDatePicks(expenses, selectedDate, activeMonth) {
+			const dateSet = new Set(expenses.map((item) => item.date));
+			dateSet.add(toDateInput(today));
+			dateSet.add(getMonthEndDate(activeMonth));
+
+			const sorted = Array.from(dateSet).filter((date) => date.startsWith(activeMonth)).sort();
+			forecastDatePicks.innerHTML = sorted
+				.map((date) => `<button type="button" class="inline-button ${date === selectedDate ? "secondary" : ""}" data-date="${date}">${formatDisplayDate(date)}</button>`)
+				.join("");
 		}
 
 		function paintList(target, entries, listType) {
@@ -623,7 +840,7 @@
 					li.className = "entry-row";
 					li.innerHTML = `
 						<div>
-							<span>${entry.date}</span>
+							<span>${formatDisplayDate(entry.date)}</span>
 							<strong>${translateCategory(entry.category)}</strong>
 						</div>
 						<span>${formatCurrency(entry.amount)}</span>
@@ -847,7 +1064,60 @@
 
 		function formatCurrency(amount) {
 			const locale = appLanguage === "en" ? "en-US" : "hu-HU";
-			return `${Math.round(amount).toLocaleString(locale)} ${t("currency")}`;
+			return new Intl.NumberFormat(locale, {
+				style: "currency",
+				currency: appCurrency,
+				maximumFractionDigits: 0
+			}).format(amount);
+		}
+
+		function formatDisplayDate(isoDate) {
+			if (!isoDate) {
+				return "";
+			}
+
+			const dateObj = new Date(`${isoDate}T00:00:00`);
+			if (Number.isNaN(dateObj.getTime())) {
+				return isoDate;
+			}
+
+			if (appLanguage === "en") {
+				return dateObj.toLocaleDateString("en-US", {
+					year: "numeric",
+					month: "long",
+					day: "numeric"
+				});
+			}
+
+			return dateObj.toLocaleDateString("hu-HU");
+		}
+
+		function isAppInstalled() {
+			const standaloneMode = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
+			const iosStandalone = window.navigator.standalone === true;
+			const stored = localStorage.getItem(INSTALL_STATUS_KEY) === "1";
+			return standaloneMode || iosStandalone || stored;
+		}
+
+		function updateInstallButtonState() {
+			const installed = isAppInstalled();
+			if (installed && !deferredInstallPrompt) {
+				installAppButton.textContent = t("appDownloaded");
+				installAppButton.disabled = true;
+				return;
+			}
+
+			installAppButton.textContent = t("downloadAppButton");
+			installAppButton.disabled = false;
+		}
+
+		function loadCurrency() {
+			const saved = localStorage.getItem(CURRENCY_KEY);
+			return ["HUF", "GBP", "USD", "EUR"].includes(saved) ? saved : "HUF";
+		}
+
+		function saveCurrency() {
+			localStorage.setItem(CURRENCY_KEY, appCurrency);
 		}
 
 		function toMonthInput(dateObj) {

@@ -31,7 +31,12 @@
                         <span class="hamburger-line"></span>
                     </button>
                     <div id="menu-panel" class="menu-panel">
-                        <button type="button" id="install-app-button" class="hidden" data-i18n="downloadAppButton">App letöltése</button>
+                        <a href="index.html" data-i18n="homeLink">Kezdőlap</a>
+                        <a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
+                        <a href="monthly_budget.html" data-i18n="monthlyLink">Havi összegzés</a>
+                        <button type="button" id="menu-back-button" data-i18n="backAction">Vissza</button>
+                        <button type="button" id="install-app-button" data-i18n="downloadAppButton">App letöltése</button>
+                        <button type="button" id="menu-logout-button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
                     </div>
                 </nav>
             </div>
@@ -107,6 +112,7 @@
         const USERS_KEY = "budgetAppUsers";
         const SESSION_KEY = "budgetAppSession";
         const LANGUAGE_KEY = "budgetAppLanguage";
+        const INSTALL_STATUS_KEY = "budgetAppInstalled";
         const GUEST_SESSION_VALUE = "__guest__";
         const GUEST_DATA_KEY = "budgetAppGuestData";
 
@@ -117,6 +123,10 @@
                 heroText: "Jelentkezz be, regisztrálj vagy folytasd vendégként.",
                 versionLabel: "Verzió",
                 menuButton: "Menü",
+                homeLink: "Kezdőlap",
+                budgetLink: "Költségvetés",
+                monthlyLink: "Havi összegzés",
+                backAction: "Vissza",
                 languageLabel: "Nyelv",
                 registerTitle: "Regisztráció",
                 loginTitle: "Bejelentkezés",
@@ -147,6 +157,8 @@
                 logoutSuccess: "Sikeres kijelentkezés.",
                 invalidLogin: "Hibás felhasználónév vagy jelszó.",
                 appInstalled: "Az app telepítve.",
+                appDownloaded: "Az app letöltve.",
+                appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
                 footerText: "Minden jog fenntartva."
             },
             en: {
@@ -155,6 +167,10 @@
                 heroText: "Sign in, register, or continue as a guest.",
                 versionLabel: "Version",
                 menuButton: "Menu",
+                homeLink: "Home",
+                budgetLink: "Budget",
+                monthlyLink: "Monthly Budget",
+                backAction: "Back",
                 languageLabel: "Language",
                 registerTitle: "Register",
                 loginTitle: "Sign in",
@@ -185,6 +201,8 @@
                 logoutSuccess: "Signed out successfully.",
                 invalidLogin: "Invalid username or password.",
                 appInstalled: "App installed.",
+                appDownloaded: "App downloaded.",
+                appInstallUnavailable: "App install is not available on this device right now.",
                 footerText: "All rights reserved."
             }
         };
@@ -192,6 +210,8 @@
         const users = loadUsers();
         const menuToggle = document.getElementById("menu-toggle");
         const menuPanel = document.getElementById("menu-panel");
+        const menuBackButton = document.getElementById("menu-back-button");
+        const menuLogoutButton = document.getElementById("menu-logout-button");
         const authActions = document.getElementById("auth-actions");
         const authOptions = document.getElementById("auth-options");
         const showRegisterButton = document.getElementById("show-register-button");
@@ -217,6 +237,15 @@
             const isOpen = menuPanel.classList.toggle("is-open");
             menuToggle.classList.toggle("is-open", isOpen);
             menuToggle.setAttribute("aria-expanded", String(isOpen));
+        });
+
+        menuBackButton.addEventListener("click", () => {
+            window.history.back();
+        });
+
+        menuLogoutButton.addEventListener("click", () => {
+            performLogout();
+            showMessage(t("logoutSuccess"), false);
         });
 
         document.addEventListener("click", (event) => {
@@ -311,14 +340,18 @@
         });
 
         logoutButton.addEventListener("click", () => {
-            currentUser = "";
-            localStorage.removeItem(SESSION_KEY);
-            updateAccessUI();
+            performLogout();
             showMessage(t("logoutSuccess"), false);
         });
 
         installAppButton.addEventListener("click", async () => {
+            if (isAppInstalled() && !deferredInstallPrompt) {
+                showMessage(t("appDownloaded"), false);
+                return;
+            }
+
             if (!deferredInstallPrompt) {
+                showMessage(t("appInstallUnavailable"), true);
                 return;
             }
 
@@ -328,21 +361,25 @@
             deferredInstallPrompt.prompt();
             const choice = await deferredInstallPrompt.userChoice;
             if (choice.outcome === "accepted") {
-                installAppButton.classList.add("hidden");
+                localStorage.setItem(INSTALL_STATUS_KEY, "1");
+                showMessage(t("appDownloaded"), false);
             }
             deferredInstallPrompt = null;
+            updateInstallButtonState();
         });
 
         window.addEventListener("beforeinstallprompt", (event) => {
             event.preventDefault();
             deferredInstallPrompt = event;
-            installAppButton.classList.remove("hidden");
+            localStorage.setItem(INSTALL_STATUS_KEY, "0");
+            updateInstallButtonState();
         });
 
         window.addEventListener("appinstalled", () => {
-            installAppButton.classList.add("hidden");
+            localStorage.setItem(INSTALL_STATUS_KEY, "1");
             deferredInstallPrompt = null;
             showMessage(t("appInstalled"), false);
+            updateInstallButtonState();
         });
 
         if ("serviceWorker" in navigator) {
@@ -358,6 +395,7 @@
             languageSelect.value = appLanguage;
             applyTranslations();
             updateAccessUI();
+            updateInstallButtonState();
         }
 
         function applyTranslations() {
@@ -396,6 +434,12 @@
             authMessage.classList.toggle("ok", !isError);
         }
 
+        function performLogout() {
+            currentUser = "";
+            localStorage.removeItem(SESSION_KEY);
+            updateAccessUI();
+        }
+
         function loginUser(username) {
             currentUser = username;
             if (username !== GUEST_SESSION_VALUE) {
@@ -407,6 +451,25 @@
 
         function t(key) {
             return (dictionary[appLanguage] && dictionary[appLanguage][key]) || key;
+        }
+
+        function isAppInstalled() {
+            const standaloneMode = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
+            const iosStandalone = window.navigator.standalone === true;
+            const stored = localStorage.getItem(INSTALL_STATUS_KEY) === "1";
+            return standaloneMode || iosStandalone || stored;
+        }
+
+        function updateInstallButtonState() {
+            const installed = isAppInstalled();
+            if (installed && !deferredInstallPrompt) {
+                installAppButton.textContent = t("appDownloaded");
+                installAppButton.disabled = true;
+                return;
+            }
+
+            installAppButton.textContent = t("downloadAppButton");
+            installAppButton.disabled = false;
         }
 
         function createSalt() {
