@@ -1,10 +1,13 @@
-const USERS_KEY = "budgetAppUsers";
-        const SESSION_KEY = "budgetAppSession";
-        const LANGUAGE_KEY = "budgetAppLanguage";
-        const THEME_KEY = "budgetAppTheme";
-        const INSTALL_STATUS_KEY = "budgetAppInstalled";
-        const GUEST_SESSION_VALUE = "__guest__";
-        const GUEST_DATA_KEY = "budgetAppGuestData";
+const shared = window.BudgetAppShared;
+    const {
+        USERS_KEY,
+        SESSION_KEY,
+        LANGUAGE_KEY,
+        THEME_KEY,
+        INSTALL_STATUS_KEY,
+        GUEST_DATA_KEY
+    } = shared.KEYS;
+    const { GUEST_SESSION_VALUE } = shared;
 
         const dictionary = {
             hu: {
@@ -129,7 +132,7 @@ const USERS_KEY = "budgetAppUsers";
         const languageSelect = document.getElementById("app-language");
         let deferredInstallPrompt = null;
         let currentUser = loadSession(users);
-        let appLanguage = localStorage.getItem(LANGUAGE_KEY) === "en" ? "en" : "hu";
+        let appLanguage = shared.loadLanguage();
         let appTheme = loadTheme();
 
         initializePage();
@@ -413,8 +416,7 @@ const USERS_KEY = "budgetAppUsers";
         }
 
         function loadTheme() {
-            const saved = localStorage.getItem(THEME_KEY);
-            return saved === "dark" ? "dark" : "light";
+            return shared.loadTheme();
         }
 
         function applyTheme() {
@@ -423,7 +425,7 @@ const USERS_KEY = "budgetAppUsers";
 
         function setTheme(mode) {
             appTheme = mode === "dark" ? "dark" : "light";
-            localStorage.setItem(THEME_KEY, appTheme);
+            shared.saveTheme(appTheme);
             applyTheme();
             syncThemeButtons();
         }
@@ -442,10 +444,7 @@ const USERS_KEY = "budgetAppUsers";
         }
 
         function isAppInstalled() {
-            const standaloneMode = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
-            const iosStandalone = window.navigator.standalone === true;
-            const stored = localStorage.getItem(INSTALL_STATUS_KEY) === "1";
-            return standaloneMode || iosStandalone || stored;
+            return shared.isAppInstalled();
         }
 
         function updateInstallButtonState() {
@@ -509,20 +508,11 @@ const USERS_KEY = "budgetAppUsers";
         }
 
         function loadUsers() {
-            try {
-                const raw = localStorage.getItem(USERS_KEY);
-                if (!raw) {
-                    return {};
-                }
-                const parsed = JSON.parse(raw);
-                return typeof parsed === "object" && parsed ? parsed : {};
-            } catch (_error) {
-                return {};
-            }
+            return shared.loadUsers();
         }
 
         function saveUsers() {
-            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            shared.saveUsers(users);
         }
 
         function ensureUserData(username) {
@@ -539,28 +529,9 @@ const USERS_KEY = "budgetAppUsers";
         }
 
         function ensureGuestData() {
-            try {
-                const raw = localStorage.getItem(GUEST_DATA_KEY);
-                if (!raw) {
-                    localStorage.setItem(GUEST_DATA_KEY, JSON.stringify({ incomes: [], expenses: [] }));
-                    return;
-                }
-                const parsed = JSON.parse(raw);
-                if (!parsed || !Array.isArray(parsed.incomes) || !Array.isArray(parsed.expenses)) {
-                    localStorage.setItem(GUEST_DATA_KEY, JSON.stringify({ incomes: [], expenses: [] }));
-                }
-            } catch (_error) {
-                localStorage.setItem(GUEST_DATA_KEY, JSON.stringify({ incomes: [], expenses: [] }));
-            }
+            shared.saveGuestData(shared.loadGuestData());
         }
 
         function loadSession(userMap) {
-            const saved = localStorage.getItem(SESSION_KEY);
-            if (saved === GUEST_SESSION_VALUE) {
-                return saved;
-            }
-            if (saved && userMap[saved]) {
-                return saved;
-            }
-            return "";
+            return shared.loadSession(userMap);
         }

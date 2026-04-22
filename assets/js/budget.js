@@ -1,11 +1,14 @@
-const USERS_KEY = "budgetAppUsers";
-		const SESSION_KEY = "budgetAppSession";
-		const LANGUAGE_KEY = "budgetAppLanguage";
-		const THEME_KEY = "budgetAppTheme";
-		const CURRENCY_KEY = "budgetAppCurrency";
-		const INSTALL_STATUS_KEY = "budgetAppInstalled";
-		const GUEST_SESSION_VALUE = "__guest__";
-		const GUEST_DATA_KEY = "budgetAppGuestData";
+const shared = window.BudgetAppShared;
+		const {
+			USERS_KEY,
+			SESSION_KEY,
+			LANGUAGE_KEY,
+			THEME_KEY,
+			CURRENCY_KEY,
+			INSTALL_STATUS_KEY,
+			GUEST_DATA_KEY
+		} = shared.KEYS;
+		const { GUEST_SESSION_VALUE } = shared;
 
 		const dictionary = {
 			hu: {
@@ -246,9 +249,9 @@ const USERS_KEY = "budgetAppUsers";
 		const expenseList = document.getElementById("expense-list");
 		const incomeSubmitButton = document.getElementById("income-submit-button");
 		const expenseSubmitButton = document.getElementById("expense-submit-button");
-		const incomeCancelEdit = document.getElementById("income-cancel-edit") || document.getElementById("income-edit");
-		const incomeDeleteButton = document.getElementById("income-cancel");
-		const expenseCancelEdit = document.getElementById("expense-cancel-edit");
+		const incomeCancelEdit = document.getElementById("income-edit");
+		const incomeDeleteButton = document.getElementById("income-delete");
+		const expenseCancelEdit = document.getElementById("expense-edit");
 		const expenseDeleteButton = document.getElementById("expense-delete");
 		let deferredInstallPrompt = null;
 
@@ -272,10 +275,12 @@ const USERS_KEY = "budgetAppUsers";
 			const monthParam = encodeURIComponent(activeMonthInput.value || toMonthInput(today));
 			window.location.href = `budget-forecast.html?month=${monthParam}`;
 		});
-		saveStateButton.addEventListener("click", () => {
-			saveState();
-			showMessage(t("saveAllDone"), false);
-		});
+		if (saveStateButton) {
+			saveStateButton.addEventListener("click", () => {
+				saveState();
+				showMessage(t("saveAllDone"), false);
+			});
+		}
 		if (menuBackButton) {
 			menuBackButton.addEventListener("click", () => {
 				window.history.back();
@@ -686,8 +691,7 @@ const USERS_KEY = "budgetAppUsers";
 		}
 
 		function loadTheme() {
-			const saved = localStorage.getItem(THEME_KEY);
-			return saved === "dark" ? "dark" : "light";
+			return shared.loadTheme();
 		}
 
 		function applyTheme() {
@@ -696,7 +700,7 @@ const USERS_KEY = "budgetAppUsers";
 
 		function setTheme(mode) {
 			appTheme = mode === "dark" ? "dark" : "light";
-			localStorage.setItem(THEME_KEY, appTheme);
+			shared.saveTheme(appTheme);
 			applyTheme();
 			syncThemeButtons();
 		}
@@ -754,10 +758,7 @@ const USERS_KEY = "budgetAppUsers";
 		}
 
 		function isAppInstalled() {
-			const standaloneMode = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
-			const iosStandalone = window.navigator.standalone === true;
-			const stored = localStorage.getItem(INSTALL_STATUS_KEY) === "1";
-			return standaloneMode || iosStandalone || stored;
+			return shared.isAppInstalled();
 		}
 
 		function updateInstallButtonState() {
@@ -776,41 +777,27 @@ const USERS_KEY = "budgetAppUsers";
 		}
 
 		function loadCurrency() {
-			const saved = localStorage.getItem(CURRENCY_KEY);
-			return ["HUF", "GBP", "USD", "EUR"].includes(saved) ? saved : "HUF";
+			return shared.loadCurrency();
 		}
 
 		function saveCurrency() {
-			localStorage.setItem(CURRENCY_KEY, appCurrency);
+			shared.saveCurrency(appCurrency);
 		}
 
 		function toMonthInput(dateObj) {
-			const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-			return `${dateObj.getFullYear()}-${month}`;
+			return shared.toMonthInput(dateObj);
 		}
 
 		function toDateInput(dateObj) {
-			const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-			const day = String(dateObj.getDate()).padStart(2, "0");
-			return `${dateObj.getFullYear()}-${month}-${day}`;
+			return shared.toDateInput(dateObj);
 		}
 
 		function getMonthEndDate(monthValue) {
-			const [year, month] = monthValue.split("-").map(Number);
-			if (!year || !month) {
-				return toDateInput(today);
-			}
-
-			const day = new Date(year, month, 0).getDate();
-			return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+			return shared.getMonthEndDate(monthValue, today);
 		}
 
 		function createEntryId() {
-			if (window.crypto && typeof window.crypto.randomUUID === "function") {
-				return window.crypto.randomUUID();
-			}
-
-			return `entry-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+			return shared.createEntryId();
 		}
 
 		function createSalt() {
@@ -859,20 +846,11 @@ const USERS_KEY = "budgetAppUsers";
 		}
 
 		function loadUsers() {
-			try {
-				const raw = localStorage.getItem(USERS_KEY);
-				if (!raw) {
-					return {};
-				}
-				const parsed = JSON.parse(raw);
-				return typeof parsed === "object" && parsed ? parsed : {};
-			} catch (_error) {
-				return {};
-			}
+			return shared.loadUsers();
 		}
 
 		function saveUsers() {
-			localStorage.setItem(USERS_KEY, JSON.stringify(users));
+			shared.saveUsers(users);
 		}
 
 		function ensureUserData(username) {
@@ -889,30 +867,11 @@ const USERS_KEY = "budgetAppUsers";
 		}
 
 		function loadSession(userMap) {
-			const saved = localStorage.getItem(SESSION_KEY);
-			if (saved === GUEST_SESSION_VALUE) {
-				return saved;
-			}
-			if (saved && userMap[saved]) {
-				return saved;
-			}
-			return "";
+			return shared.loadSession(userMap);
 		}
 
 		function getCurrentUserState() {
-			if (currentUser === GUEST_SESSION_VALUE) {
-				return loadGuestData();
-			}
-
-			if (!currentUser || !users[currentUser]) {
-				return { incomes: [], expenses: [] };
-			}
-
-			const data = users[currentUser].data || {};
-			return {
-				incomes: Array.isArray(data.incomes) ? data.incomes : [],
-				expenses: Array.isArray(data.expenses) ? data.expenses : []
-			};
+			return shared.getCurrentUserState(currentUser, users);
 		}
 
 		function saveState() {
@@ -930,37 +889,17 @@ const USERS_KEY = "budgetAppUsers";
 		}
 
 		function loadLanguage() {
-			return localStorage.getItem(LANGUAGE_KEY) === "en" ? "en" : "hu";
+			return shared.loadLanguage();
 		}
 
 		function saveLanguage() {
-			localStorage.setItem(LANGUAGE_KEY, appLanguage);
+			shared.saveLanguage(appLanguage);
 		}
 
 		function loadGuestData() {
-			try {
-				const raw = localStorage.getItem(GUEST_DATA_KEY);
-				if (!raw) {
-					return { incomes: [], expenses: [] };
-				}
-
-				const parsed = JSON.parse(raw);
-				if (!parsed || typeof parsed !== "object") {
-					return { incomes: [], expenses: [] };
-				}
-
-				return {
-					incomes: Array.isArray(parsed.incomes) ? parsed.incomes : [],
-					expenses: Array.isArray(parsed.expenses) ? parsed.expenses : []
-				};
-			} catch (_error) {
-				return { incomes: [], expenses: [] };
-			}
+			return shared.loadGuestData();
 		}
 
 		function saveGuestData(data) {
-			localStorage.setItem(GUEST_DATA_KEY, JSON.stringify({
-				incomes: Array.isArray(data.incomes) ? data.incomes : [],
-				expenses: Array.isArray(data.expenses) ? data.expenses : []
-			}));
+			shared.saveGuestData(data);
 		}

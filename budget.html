@@ -7,8 +7,8 @@
 	<title>Budget</title>
 	<link rel="manifest" href="manifest.webmanifest">
 	<link rel="icon" type="image/png" href="assets/images/budget-icon.png">
-	<link rel="stylesheet" href="assets/css/style.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 	<a class="skip-link" href="#main-content">Ugrás a tartalomra</a>
@@ -42,14 +42,12 @@
 					</div>
 					<div id="menu-panel" class="menu-panel">
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
-						<div class="menu-group">
-							<button id="budget-menu-toggle" type="button" class="menu-parent" data-i18n="budgetMenuGroup" aria-expanded="false" aria-controls="budget-submenu">Költségvetés</button>
-							<div id="budget-submenu" class="menu-subpanel" aria-hidden="true">
-								<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
-								<a href="budget-forecast.html" data-i18n="forecastMenuLink">Költségvetési előrejelző</a>
-								<a href="monthly_budget.html" data-i18n="summaryLink">Havi összegzés</a>
-							</div>
-						</div>
+						<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
+						<a href="budget-forecast.html" data-i18n="forecastButton">Költségvetési előrejelző</a>
+						<a href="monthly_budget.html" data-i18n="summaryLink">Havi összegzés</a>
+						<button id="menu-back-button" type="button" data-i18n="backAction">Vissza</button>
+						<button id="install-app-button" type="button" data-i18n="downloadAppButton">App letöltése</button>
+						<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
 					</div>
 				</nav>
 			</div>
@@ -57,7 +55,7 @@
 			<p data-i18n="heroText">Rögzítsd a várható bevételeket és kiadásokat dátum szerint.</p>
 		</header>
 
-		<section class="card controls compact-controls">
+		<section class="card controls compact-controls budget-controls">
 			<div>
 				<label for="active-month" data-i18n="monthLabel">Választott hónap</label>
 				<input type="month" id="active-month">
@@ -74,7 +72,6 @@
 			<div class="control-action">
 				<div class="stack">
 					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Költségvetési előrejelző</button>
-					<button id="save-state-button" type="button" class="secondary" data-i18n="saveAllButton">Mentés</button>
 				</div>
 			</div>
 		</section>
@@ -100,7 +97,7 @@
 						<div class="form-actions">
 							<button type="submit" id="income-submit-button" class="btn btn-outline-info">Bevétel mentése</button>
 							<button type="button" id="income-edit" class="btn btn-outline-info">Szerkesztés</button>
-							<button type="button" id="income-cancel" class="btn btn-danger">Törlés</button>
+							<button type="button" id="income-delete" class="btn btn-danger">Törlés</button>
 						</div>
 					</form>
 				</article>
@@ -138,7 +135,7 @@
 
 						<div class="form-actions">
 							<button type="submit" id="expense-submit-button" class="btn btn-outline-info">Kiadás mentése</button>
-							<button type="button" id="expense-cancel-edit" class="btn btn-outline-info secondary hidden">Szerkesztés</button>
+							<button type="button" id="expense-edit" class="btn btn-outline-info">Szerkesztés</button>
 							<button type="button" id="expense-delete" class="btn btn-danger">Törlés</button>
 						</div>
 					</form>
@@ -181,6 +178,7 @@
 		</section>
 	</main>
 
+	<script src="assets/js/app-shared.js"></script>
 	<script src="assets/js/budget.js"></script>
 </body>
 </html>
