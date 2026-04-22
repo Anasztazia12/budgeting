@@ -8,9 +8,9 @@ const USERS_KEY = "budgetAppUsers";
 
 		const dictionary = {
 			hu: {
-				pageTitle: "Monthly Budget",
-				heroTitle: "Monthly Budget",
-				heroText: "Havi osszegzes, mai koltesek es jovobeli tetelek datum szerint.",
+				pageTitle: "Havi összegzés",
+				heroTitle: "Havi összegzés",
+				heroText: "Havi összegzés, mai költések és jövőbeli tételek dátum szerint.",
 				menuButton: "Menü",
 				homeLink: "Kezdőlap",
 				budgetLink: "Költségvetés",
@@ -32,7 +32,7 @@ const USERS_KEY = "budgetAppUsers";
 				loginRequired: "A havi összegzéshez jelentkezz be a Költségvetés oldalon.",
 				monthlyIncomeTitle: "Havi bevétel",
 				monthlyExpenseTitle: "Havi kiadás",
-				spentToDateTitle: "Mai napig kiadás",
+				spentToDateTitle: "Kiadás mai napig",
 				currentBalanceTitle: "Aktuális egyenleg",
 				upcomingExpensesTitle: "Várható kiadások dátum szerint",
 				upcomingIncomesTitle: "Várható bevételek dátum szerint",

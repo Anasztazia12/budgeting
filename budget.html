@@ -23,7 +23,7 @@
 				<div class="mobile-app-title" data-i18n="appName">Költségvetési app</div>
 				<nav class="menu-wrap hero-menu-wrap">
 					<button id="menu-toggle" type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-panel">
-						<span class="sr-only" data-i18n="menuButton">Menu</span>
+						<span class="sr-only" data-i18n="menuButton">Menü</span>
 						<span class="hamburger-line"></span>
 						<span class="hamburger-line"></span>
 						<span class="hamburger-line"></span>
@@ -31,20 +31,16 @@
 					<div id="menu-panel" class="menu-panel">
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
 						<div class="menu-group">
-							<button id="budget-menu-toggle" type="button" class="menu-parent" data-i18n="budgetMenuGroup" aria-expanded="false" aria-controls="budget-submenu">Budget</button>
+							<button id="budget-menu-toggle" type="button" class="menu-parent" data-i18n="budgetMenuGroup" aria-expanded="false" aria-controls="budget-submenu">Költségvetés</button>
 							<div id="budget-submenu" class="menu-subpanel" aria-hidden="true">
 								<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
-								<a href="budget-forecast.html" data-i18n="forecastMenuLink">Budget Forecast Planner</a>
-								<a href="monthly_budget.html" data-i18n="summaryLink">Monthly Budget</a>
+								<a href="budget-forecast.html" data-i18n="forecastMenuLink">Költségvetési előrejelző</a>
+								<a href="monthly_budget.html" data-i18n="summaryLink">Havi összegzés</a>
 							</div>
 						</div>
-						<button id="menu-back-button" type="button" data-i18n="backAction">Vissza</button>
-						<button id="install-app-button" type="button" data-i18n="downloadAppButton">App letöltése</button>
-						<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
-					</div>
 				</nav>
 			</div>
-			<h1 data-i18n="heroTitle">Budget</h1>
+			<h1 data-i18n="heroTitle">Költségvetés</h1>
 			<p data-i18n="heroText">Rögzítsd a várható bevételeket és kiadásokat dátum szerint.</p>
 		</header>
 
@@ -58,13 +54,13 @@
 				<select id="app-currency" aria-label="Currency selector">
 					<option value="HUF" data-i18n="currencyHuf">HUF (forint)</option>
 					<option value="GBP" data-i18n="currencyGbp">GBP (font)</option>
-					<option value="USD" data-i18n="currencyUsd">USD (dollar)</option>
-					<option value="EUR" data-i18n="currencyEur">EUR (euro)</option>
+					<option value="USD" data-i18n="currencyUsd">USD (dollár)</option>
+					<option value="EUR" data-i18n="currencyEur">EUR (euró)</option>
 				</select>
 			</div>
 			<div class="control-action">
 				<div class="stack">
-					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Budget Forecast Planner</button>
+					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Költségvetési előrejelző</button>
 					<button id="save-state-button" type="button" class="secondary" data-i18n="saveAllButton">Mentés</button>
 				</div>
 			</div>
@@ -72,109 +68,110 @@
 
 		<section class="grid auth-grid hidden always-hidden" id="auth-section">
 			<article class="card">
-				<h2 data-i18n="registerTitle">Regisztracio</h2>
+				<h2 data-i18n="registerTitle">Regisztráció</h2>
 				<form id="register-form" class="stack">
-					<label for="register-username" data-i18n="usernameLabel">Felhasznalonev</label>
+					<label for="register-username" data-i18n="usernameLabel">Felhasználónév</label>
 					<input type="text" id="register-username" minlength="5" required>
 
-					<label for="register-email-address" data-i18n="emailLabel">Email cim</label>
+					<label for="register-email-address" data-i18n="emailLabel">Email cím</label>
 					<input type="email" id="register-email-address" required>
 
-					<label for="register-email-address-confirm" data-i18n="emailConfirmLabel">Email cim megerositese</label>
+					<label for="register-email-address-confirm" data-i18n="emailConfirmLabel">Email cím megerősítése</label>
 					<input type="email" id="register-email-address-confirm" required>
 
-					<label for="register-password" data-i18n="passwordLabel">Jelszo</label>
+					<label for="register-password" data-i18n="passwordLabel">Jelszó</label>
 					<input type="password" id="register-password" minlength="6" required>
 
-					<label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszo megerositese</label>
+					<label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszó megerősítése</label>
 					<input type="password" id="register-password-confirm" minlength="6" required>
 
-					<button type="submit" data-i18n="registerButton">Regisztralok</button>
+					<button type="submit" data-i18n="registerButton">Regisztrálok</button>
 				</form>
 			</article>
 
 			<article class="card">
-				<h2 data-i18n="loginTitle">Bejelentkezes</h2>
+				<h2 data-i18n="loginTitle">Bejelentkezés</h2>
 				<form id="login-form" class="stack">
-					<label for="login-username" data-i18n="usernameLabel">Felhasznalonev</label>
+					<label for="login-username" data-i18n="usernameLabel">Felhasználónév</label>
 					<input type="text" id="login-username" required>
 
-					<label for="login-password" data-i18n="passwordLabel">Jelszo</label>
+					<label for="login-password" data-i18n="passwordLabel">Jelszó</label>
 					<input type="password" id="login-password" required>
 
-					<button type="submit" data-i18n="loginButton">Belepes</button>
+					<button type="submit" data-i18n="loginButton">Belépés</button>
 				</form>
 			</article>
 		</section>
 
 		<section class="card session-card">
-			<p id="session-info">Nincs bejelentkezett felhasznalo.</p>
+			<p id="session-info">Nincs bejelentkezett felhasználó.</p>
 			<p id="auth-message" class="auth-message" aria-live="polite"></p>
 		</section>
 
 		<section id="locked-message" class="card hidden always-hidden">
-			<p data-i18n="loginRequired">A rogziteshez jelentkezz be vagy regisztralj.</p>
+			<p data-i18n="loginRequired">A rögzítéshez jelentkezz be vagy regisztrálj.</p>
 		</section>
 
 		<section id="budget-content">
 			<section class="grid forms-grid">
 				<article class="card">
-					<h2 data-i18n="incomeFormTitle">Bevetel hozzaadasa</h2>
+					<h2 data-i18n="incomeFormTitle">Bevétel hozzáadása</h2>
 					<form id="income-form" class="stack">
 						<input type="hidden" id="income-edit-id">
-						<label for="income-category" data-i18n="categoryLabel">Kategoria</label>
+						<label for="income-category" data-i18n="categoryLabel">Kategória</label>
 						<select id="income-category" required>
-							<option value="fizetes">Fizetes</option>
-							<option value="egyeb">Egyeb</option>
+							<option value="fizetes">Fizetés</option>
+							<option value="egyeb">Egyéb</option>
 						</select>
 
-						<label for="income-amount" data-i18n="amountLabel">Osszeg</label>
+						<label for="income-amount" data-i18n="amountLabel">Összeg</label>
 						<input type="number" id="income-amount" min="1" step="1" required>
 
-						<label for="income-date" data-i18n="incomeDateLabel">Mikor varhato? (datum)</label>
+						<label for="income-date" data-i18n="incomeDateLabel">Mikor várható? (dátum)</label>
 						<input type="date" id="income-date" required>
 
 						<div class="form-actions">
-							<button type="submit" id="income-submit-button" data-i18n="saveIncomeButton">Bevetel mentese</button>
-							<button type="button" id="income-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztes megse</button>
+							<button type="submit" id="income-submit-button" data-i18n="saveIncomeButton">Bevétel mentése</button>
+							<button type="button" id="income-edit" class="secondary hidden" data-i18n="editButton">Szerkesztés</button>
+                            <button type="button" id="income-cancel" class="secondary hidden" data-i18n="cancelButton">Törlés</button>
 						</div>
 					</form>
 				</article>
 
 				<article class="card">
-					<h2 data-i18n="expenseFormTitle">Kiadas hozzaadasa</h2>
+					<h2 data-i18n="expenseFormTitle">Kiadás hozzáadása</h2>
 					<form id="expense-form" class="stack">
 						<input type="hidden" id="expense-edit-id">
-						<label for="expense-category" data-i18n="categoryLabel">Kategoria</label>
+						<label for="expense-category" data-i18n="categoryLabel">Kategória</label>
 						<select id="expense-category" required>
-							<option value="szamlak">Szamlak</option>
-							<option value="viz">Viz</option>
-							<option value="gaz">Gaz</option>
-							<option value="aram">Aram</option>
-							<option value="auto">Auto</option>
+							<option value="szamlak">Számlák</option>
+							<option value="viz">Víz</option>
+							<option value="gaz">Gáz</option>
+							<option value="aram">Áram</option>
+							<option value="auto">Autó</option>
 							<option value="benzin">Benzin</option>
-							<option value="elemiszer">Elemiszer</option>
-							<option value="ruhak">Ruhak</option>
-							<option value="rent">Rent</option>
-							<option value="biztositas">Biztositas</option>
-							<option value="hitelkartya">Hitelkartya</option>
+							<option value="elemiszer">Élelmiszer</option>
+							<option value="ruhak">Ruhák</option>
+							<option value="rent">Bérlés</option>
+							<option value="biztositas">Biztosítás</option>
+							<option value="hitelkartya">Hitelkártya</option>
 							<option value="zilch">Zilch</option>
 							<option value="tv">TV</option>
 							<option value="telefon">Telefon</option>
 							<option value="internet">Internet</option>
-							<option value="suli">Suli</option>
-							<option value="egyeb kiadas">Egyeb kiadas</option>
+							<option value="suli">Iskola</option>
+							<option value="egyeb kiadas">Egyéb kiadás</option>
 						</select>
 
-						<label for="expense-amount" data-i18n="amountLabel">Osszeg</label>
+						<label for="expense-amount" data-i18n="amountLabel">Összeg</label>
 						<input type="number" id="expense-amount" min="1" step="1" required>
 
-						<label for="expense-date" data-i18n="expenseDateLabel">Mikor lesz levonas? (datum)</label>
+						<label for="expense-date" data-i18n="expenseDateLabel">Mikor lesz levonás? (dátum)</label>
 						<input type="date" id="expense-date" required>
 
 						<div class="form-actions">
-							<button type="submit" id="expense-submit-button" data-i18n="saveExpenseButton">Kiadas mentese</button>
-							<button type="button" id="expense-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztes megse</button>
+							<button type="submit" id="expense-submit-button" data-i18n="saveExpenseButton">Kiadás mentése</button>
+							<button type="button" id="expense-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztés</button>
 						</div>
 					</form>
 				</article>
@@ -182,28 +179,28 @@
 
 			<section class="grid stats-grid">
 				<article class="card stat">
-					<h3 data-i18n="monthlyIncomeTitle">Osszes havi bevetel</h3>
+					<h3 data-i18n="monthlyIncomeTitle">Összes havi bevétel</h3>
 					<p id="monthly-income">0</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="monthEndTitle">Hovegi varhato egyenleg</h3>
+					<h3 data-i18n="monthEndTitle">Hóvégi várható egyenleg</h3>
 					<p id="month-end-left">0</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="monthlyExpenseTitle">Osszes havi kiadas</h3>
+					<h3 data-i18n="monthlyExpenseTitle">Összes havi kiadás</h3>
 					<p id="monthly-expense">0</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="spentToDateTitle">Koltseg mai napig</h3>
+					<h3 data-i18n="spentToDateTitle">Kiadás mai napig</h3>
 					<p id="spent-to-date">0</p>
 				</article>
 			</section>
 
 			<section id="forecast-planner" class="card hidden always-hidden">
-				<h2 data-i18n="forecastTitle">Budget Forecast Planner</h2>
+				<h2 data-i18n="forecastTitle">Költségvetési előrejelző</h2>
 				<div class="grid forecast-grid">
 					<div>
 						<label for="forecast-target-date" data-i18n="forecastTargetDateLabel">Elemzés dátuma</label>

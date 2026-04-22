@@ -4,11 +4,11 @@
 	--card: #f8fbff;
 	--ink: #0f1f3a;
 	--muted: #46608a;
-	--accent: #2452b8;
-	--accent-strong: #5d8dff;
-	--good: #01070f;
+	--accent: #023dbd;
+	--accent-strong: #022169;
+	--good: #b5c2d6;
 	--danger: #4d63de;
-	--line: #c8d7f0;
+	--line: #3071e0;
 }
 
 * {
@@ -30,7 +30,7 @@ body {
 	border: 1px solid var(--line);
 	border-radius: 12px;
 	padding: 0.35rem;
-	box-shadow: 0 10px 22px rgba(18, 47, 102, 0.14);
+	box-shadow: 0 10px 22px rgba(18, 47, 102, 0.178);
 	backdrop-filter: blur(4px);
 }
 
@@ -180,7 +180,7 @@ body {
 	width: 20px;
 	height: 2px;
 	border-radius: 99px;
-	background: #f2f7ff;
+	background: #011761;
 	transition: transform 180ms ease, opacity 160ms ease;
 }
 

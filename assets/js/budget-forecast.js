@@ -8,8 +8,8 @@ const USERS_KEY = "budgetAppUsers";
 
 		const dictionary = {
 			hu: {
-				pageTitle: "Budget Forecast Planner",
-				heroTitle: "Budget Forecast Planner",
+				pageTitle: "Költségvetési előrejelző",
+				heroTitle: "Költségvetési előrejelző",
 				heroText: "Tervezd meg előre a kiadásaidat és bevételeidet dátum alapján.",
 				menuButton: "Menü",
 				homeLink: "Kezdőlap",
@@ -26,9 +26,9 @@ const USERS_KEY = "budgetAppUsers";
 				currencyEur: "EUR (euró)",
 				monthLabel: "Választott hónap",
 				forecastButton: "Vissza a Költségvetéshez",
-				forecastTitle: "Budget Forecast Planner",
+				forecastTitle: "Költségvetési előrejelző",
 				forecastTargetDateLabel: "Elemzés dátuma",
-				forecastAddRowButton: "+ Mi lenne ha tétel hozzáadása",
+				forecastAddRowButton: "+ Mi lenne, ha tétel hozzáadása",
 				forecastRowTypeLabel: "Típus",
 				forecastRowAmountLabel: "Összeg",
 				forecastRowDateLabel: "Dátum",
@@ -63,7 +63,7 @@ const USERS_KEY = "budgetAppUsers";
 				cancelEditButton: "Szerkesztés mégse",
 				monthlyIncomeTitle: "Összes havi bevétel",
 				monthlyExpenseTitle: "Összes havi kiadás",
-				spentToDateTitle: "Költség mai napig",
+				spentToDateTitle: "Kiadás mai napig",
 				monthEndTitle: "Hóvégi várható egyenleg",
 				incomeEntriesTitle: "Bevételek ebben a hónapban",
 				expenseEntriesTitle: "Kiadások ebben a hónapban",
