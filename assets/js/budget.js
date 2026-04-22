@@ -53,7 +53,7 @@ const USERS_KEY = "budgetAppUsers";
 				saveExpenseButton: "Kiadás mentése",
 				updateIncomeButton: "Bevétel frissítése",
 				updateExpenseButton: "Kiadás frissítése",
-				cancelEditButton: "Szerkesztés mégse",
+				cancelEditButton: "Szerkesztés",
 				monthlyIncomeTitle: "Összes havi bevétel",
 				monthlyExpenseTitle: "Összes havi kiadás",
 				spentToDateTitle: "Kiadás mai napig",
@@ -155,7 +155,7 @@ const USERS_KEY = "budgetAppUsers";
 				saveExpenseButton: "Save expense",
 				updateIncomeButton: "Update income",
 				updateExpenseButton: "Update expense",
-				cancelEditButton: "Cancel edit",
+				cancelEditButton: "Edit",
 				monthlyIncomeTitle: "Total monthly income",
 				monthlyExpenseTitle: "Total monthly expense",
 				spentToDateTitle: "Spent to date",
@@ -246,8 +246,10 @@ const USERS_KEY = "budgetAppUsers";
 		const expenseList = document.getElementById("expense-list");
 		const incomeSubmitButton = document.getElementById("income-submit-button");
 		const expenseSubmitButton = document.getElementById("expense-submit-button");
-		const incomeCancelEdit = document.getElementById("income-cancel-edit") || document.getElementById("income-cancel");
+		const incomeCancelEdit = document.getElementById("income-cancel-edit");
+		const incomeDeleteButton = document.getElementById("income-cancel");
 		const expenseCancelEdit = document.getElementById("expense-cancel-edit");
+		const expenseDeleteButton = document.getElementById("expense-delete");
 		let deferredInstallPrompt = null;
 
 		initializePage();
@@ -321,8 +323,18 @@ const USERS_KEY = "budgetAppUsers";
 		if (incomeCancelEdit) {
 			incomeCancelEdit.addEventListener("click", resetIncomeForm);
 		}
+		if (incomeDeleteButton) {
+			incomeDeleteButton.addEventListener("click", () => {
+				handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm);
+			});
+		}
 		if (expenseCancelEdit) {
 			expenseCancelEdit.addEventListener("click", resetExpenseForm);
+		}
+		if (expenseDeleteButton) {
+			expenseDeleteButton.addEventListener("click", () => {
+				handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm);
+			});
 		}
 
 		menuToggle.addEventListener("click", () => {
@@ -423,6 +435,13 @@ const USERS_KEY = "budgetAppUsers";
 		});
 
 		function initializePage() {
+			const hasReferrer = Boolean(document.referrer);
+			const hasSameOriginReferrer = hasReferrer && new URL(document.referrer).origin === window.location.origin;
+			if (!hasSameOriginReferrer) {
+				window.location.href = "index.html";
+				return;
+			}
+
 			if (!currentUser) {
 				window.location.href = "index.html";
 				return;
@@ -604,6 +623,24 @@ const USERS_KEY = "budgetAppUsers";
 			}
 
 			appState[collectionName].push(entry);
+		}
+
+		function handleDeleteFromForm(collectionName, editIdField, resetForm) {
+			const editId = document.getElementById(editIdField).value;
+			if (!editId) {
+				resetForm();
+				return;
+			}
+
+			if (!window.confirm(t("confirmDelete"))) {
+				return;
+			}
+
+			appState[collectionName] = appState[collectionName].filter((item) => item.id !== editId);
+			saveState();
+			resetForm();
+			showMessage(t("entryDeleted"), false);
+			render();
 		}
 
 		function handleLogout() {

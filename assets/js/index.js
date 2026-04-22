@@ -134,20 +134,26 @@ const USERS_KEY = "budgetAppUsers";
 
         initializePage();
 
-        menuToggle.addEventListener("click", () => {
-            const isOpen = menuPanel.classList.toggle("is-open");
-            menuToggle.classList.toggle("is-open", isOpen);
-            menuToggle.setAttribute("aria-expanded", String(isOpen));
-        });
+        if (menuToggle && menuPanel) {
+            menuToggle.addEventListener("click", () => {
+                const isOpen = menuPanel.classList.toggle("is-open");
+                menuToggle.classList.toggle("is-open", isOpen);
+                menuToggle.setAttribute("aria-expanded", String(isOpen));
+            });
+        }
 
-        menuBackButton.addEventListener("click", () => {
-            window.history.back();
-        });
+        if (menuBackButton) {
+            menuBackButton.addEventListener("click", () => {
+                window.history.back();
+            });
+        }
 
-        menuLogoutButton.addEventListener("click", () => {
-            performLogout();
-            showMessage(t("logoutSuccess"), false);
-        });
+        if (menuLogoutButton) {
+            menuLogoutButton.addEventListener("click", () => {
+                performLogout();
+                showMessage(t("logoutSuccess"), false);
+            });
+        }
 
         if (themeLightButton) {
             themeLightButton.addEventListener("click", () => {
@@ -162,7 +168,7 @@ const USERS_KEY = "budgetAppUsers";
         }
 
         document.addEventListener("click", (event) => {
-            if (!event.target.closest(".menu-wrap")) {
+            if (!event.target.closest(".menu-wrap") && menuPanel && menuToggle) {
                 menuPanel.classList.remove("is-open");
                 menuToggle.classList.remove("is-open");
                 menuToggle.setAttribute("aria-expanded", "false");
@@ -170,7 +176,7 @@ const USERS_KEY = "budgetAppUsers";
         });
 
         document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
+            if (event.key === "Escape" && menuPanel && menuToggle && menuPanel.classList.contains("is-open")) {
                 menuPanel.classList.remove("is-open");
                 menuToggle.classList.remove("is-open");
                 menuToggle.setAttribute("aria-expanded", "false");
@@ -178,11 +184,13 @@ const USERS_KEY = "budgetAppUsers";
             }
         });
 
-        showRegisterButton.addEventListener("click", () => {
-            authOptions.classList.remove("hidden");
-            registerCard.classList.remove("hidden");
-            loginCard.classList.add("hidden");
-        });
+        if (showRegisterButton && registerCard) {
+            showRegisterButton.addEventListener("click", () => {
+                authOptions.classList.remove("hidden");
+                registerCard.classList.remove("hidden");
+                loginCard.classList.add("hidden");
+            });
+        }
 
         showLoginButton.addEventListener("click", () => {
             authOptions.classList.remove("hidden");
@@ -196,42 +204,44 @@ const USERS_KEY = "budgetAppUsers";
             applyTranslations();
         });
 
-        registerForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const username = document.getElementById("register-username").value.trim();
-            const email = document.getElementById("register-email").value.trim();
-            const emailConfirm = document.getElementById("register-email-confirm").value.trim();
-            const password = document.getElementById("register-password").value;
-            const passwordConfirm = document.getElementById("register-password-confirm").value;
+        if (registerForm) {
+            registerForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const username = document.getElementById("register-username").value.trim();
+                const email = document.getElementById("register-email").value.trim();
+                const emailConfirm = document.getElementById("register-email-confirm").value.trim();
+                const password = document.getElementById("register-password").value;
+                const passwordConfirm = document.getElementById("register-password-confirm").value;
 
-            if (email !== emailConfirm) {
-                showMessage(t("emailMismatch"), true);
-                return;
-            }
+                if (email !== emailConfirm) {
+                    showMessage(t("emailMismatch"), true);
+                    return;
+                }
 
-            if (password !== passwordConfirm) {
-                showMessage(t("passwordMismatch"), true);
-                return;
-            }
+                if (password !== passwordConfirm) {
+                    showMessage(t("passwordMismatch"), true);
+                    return;
+                }
 
-            if (users[username]) {
-                showMessage(t("usernameTaken"), true);
-                return;
-            }
+                if (users[username]) {
+                    showMessage(t("usernameTaken"), true);
+                    return;
+                }
 
-            const salt = createSalt();
-            const hashedPassword = await hashPassword(password, salt);
-            users[username] = {
-                email,
-                salt,
-                hashedPassword,
-                data: { incomes: [], expenses: [] }
-            };
-            saveUsers();
-            loginUser(username);
-            registerForm.reset();
-            showMessage(t("registerSuccess"), false);
-        });
+                const salt = createSalt();
+                const hashedPassword = await hashPassword(password, salt);
+                users[username] = {
+                    email,
+                    salt,
+                    hashedPassword,
+                    data: { incomes: [], expenses: [] }
+                };
+                saveUsers();
+                loginUser(username);
+                registerForm.reset();
+                showMessage(t("registerSuccess"), false);
+            });
+        }
 
         loginForm.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -268,7 +278,8 @@ const USERS_KEY = "budgetAppUsers";
             });
         }
 
-        installAppButton.addEventListener("click", async () => {
+        if (installAppButton) {
+            installAppButton.addEventListener("click", async () => {
             if (isAppInstalled() && !deferredInstallPrompt) {
                 showMessage(t("appDownloaded"), false);
                 return;
@@ -290,7 +301,8 @@ const USERS_KEY = "budgetAppUsers";
             }
             deferredInstallPrompt = null;
             updateInstallButtonState();
-        });
+            });
+        }
 
         window.addEventListener("beforeinstallprompt", (event) => {
             event.preventDefault();
@@ -316,6 +328,10 @@ const USERS_KEY = "budgetAppUsers";
 
         function initializePage() {
             ensureGuestData();
+            if (currentUser === GUEST_SESSION_VALUE) {
+                currentUser = "";
+                localStorage.removeItem(SESSION_KEY);
+            }
             applyTheme();
             syncThemeButtons();
             languageSelect.value = appLanguage;
@@ -330,7 +346,9 @@ const USERS_KEY = "budgetAppUsers";
             document.querySelectorAll("[data-i18n]").forEach((element) => {
                 element.textContent = dictionary[appLanguage][element.dataset.i18n];
             });
-            menuToggle.setAttribute("aria-label", t("menuButton"));
+            if (menuToggle) {
+                menuToggle.setAttribute("aria-label", t("menuButton"));
+            }
             updateSessionLabel();
         }
 
@@ -338,26 +356,37 @@ const USERS_KEY = "budgetAppUsers";
             const loggedIn = Boolean(currentUser);
             authActions.classList.remove("hidden");
             authOptions.classList.toggle("hidden", true);
-            registerCard.classList.add("hidden");
+            if (registerCard) {
+                registerCard.classList.add("hidden");
+            }
             loginCard.classList.add("hidden");
             if (logoutButton) {
                 logoutButton.classList.toggle("hidden", !loggedIn);
             }
-            appLinks.classList.toggle("hidden", !loggedIn);
+            if (appLinks) {
+                appLinks.classList.toggle("hidden", !loggedIn);
+            }
             updateSessionLabel();
         }
 
         function updateSessionLabel() {
             if (!currentUser) {
-                sessionInfo.textContent = t("loggedOut");
+                if (sessionInfo) {
+                    sessionInfo.textContent = t("loggedOut");
+                }
                 return;
             }
 
             const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
-            sessionInfo.textContent = `${t("loggedIn")} ${name}`;
+            if (sessionInfo) {
+                sessionInfo.textContent = `${t("loggedIn")} ${name}`;
+            }
         }
 
         function showMessage(message, isError) {
+            if (!authMessage) {
+                return;
+            }
             authMessage.textContent = message;
             authMessage.classList.toggle("error", isError);
             authMessage.classList.toggle("ok", !isError);
@@ -375,6 +404,7 @@ const USERS_KEY = "budgetAppUsers";
                 ensureUserData(username);
             }
             localStorage.setItem(SESSION_KEY, username);
+            window.location.href = "budget.html";
             updateAccessUI();
         }
 
@@ -419,6 +449,9 @@ const USERS_KEY = "budgetAppUsers";
         }
 
         function updateInstallButtonState() {
+            if (!installAppButton) {
+                return;
+            }
             const installed = isAppInstalled();
             if (installed && !deferredInstallPrompt) {
                 installAppButton.textContent = t("appDownloaded");

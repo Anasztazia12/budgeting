@@ -8,6 +8,7 @@
 	<link rel="manifest" href="manifest.webmanifest">
 	<link rel="icon" type="image/png" href="assets/images/budget-icon.png">
 	<link rel="stylesheet" href="assets/css/style.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
 	<a class="skip-link" href="#main-content">Ugrás a tartalomra</a>
@@ -50,7 +51,7 @@
 				</nav>
 			</div>
 			<h1 data-i18n="heroTitle">Költségvetési előrejelző</h1>
-			<p data-i18n="heroText">Tervezd meg előre a kiadásaidat dátum és mi lenne ha vásárlás alapján.</p>
+			<p data-i18n="heroText">Tervezd meg előre a kiadásaidat dátum és előrejelzés alapján.</p>
 		</header>
 
 		<section class="card controls compact-controls">
@@ -91,8 +92,8 @@
 						<input type="date" id="income-date" required>
 
 						<div class="form-actions">
-							<button type="submit" id="income-submit-button" data-i18n="saveIncomeButton">Bevétel mentése</button>
-							<button type="button" id="income-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztés mégse</button>
+							<button type="submit" id="income-submit-button" class="btn btn-outline-info" data-i18n="saveIncomeButton">Bevétel mentése</button>
+							<button type="button" id="income-cancel-edit" class="btn btn-outline-info secondary hidden" data-i18n="cancelEditButton">Szerkesztés mégse</button>
 						</div>
 					</form>
 				</article>
@@ -129,8 +130,9 @@
 						<input type="date" id="expense-date" required>
 
 						<div class="form-actions">
-							<button type="submit" id="expense-submit-button" data-i18n="saveExpenseButton">Kiadás mentése</button>
-							<button type="button" id="expense-cancel-edit" class="secondary hidden" data-i18n="cancelEditButton">Szerkesztés</button>
+							<button type="submit" id="expense-submit-button" class="btn btn-outline-info" >Kiadás mentése</button>
+							<button type="button" id="expense-cancel-edit" class="btn btn-outline-info secondary hidden" >Szerkesztés</button>
+							<button type="button" id="expense-delete" class="btn btn-danger" >Törlés</button>
 						</div>
 					</form>
 				</article>
@@ -166,7 +168,7 @@
 						<input type="date" id="forecast-target-date">
 					</div>
 					<div class="control-action">
-						<button id="add-whatif-row" type="button" data-i18n="forecastAddRowButton">+ Mi lenne, ha tétel hozzáadása</button>
+						<button id="add-whatif-row" type="button" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
 					</div>
 				</div>
 				<div id="whatif-rows" class="stack forecast-rows"></div>

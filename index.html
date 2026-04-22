@@ -8,6 +8,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" href="assets/images/budget-icon.png">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
     <a class="skip-link" href="#main-content">Ugrás a tartalomra</a>
@@ -57,34 +58,11 @@
         </header>
 
         <section id="auth-actions" class="card auth-action-bar">
-            <button type="button" id="show-register-button" data-i18n="registerTitle">Regisztráció</button>
             <button type="button" id="show-login-button" data-i18n="loginTitle">Bejelentkezés</button>
             <button type="button" id="guest-button" class="guest-accent" data-i18n="guestButton">Folytatás vendégként</button>
         </section>
 
         <section id="auth-options" class="grid auth-grid hidden">
-            <article class="card hidden" id="register-card">
-                <h2 data-i18n="registerTitle">Regisztráció</h2>
-                <form id="register-form" class="stack">
-                    <label for="register-username" data-i18n="usernameLabel">Felhasználónév</label>
-                    <input type="text" id="register-username" minlength="5" required>
-
-                    <label for="register-email" data-i18n="emailLabel">Email cím</label>
-                    <input type="email" id="register-email" required>
-
-                    <label for="register-email-confirm" data-i18n="emailConfirmLabel">Email cím megerősítése</label>
-                    <input type="email" id="register-email-confirm" required>
-
-                    <label for="register-password" data-i18n="passwordLabel">Jelszó</label>
-                    <input type="password" id="register-password" minlength="6" required>
-
-                    <label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszó megerősítése</label>
-                    <input type="password" id="register-password-confirm" minlength="6" required>
-
-                    <button type="submit" data-i18n="registerButton">Regisztrálok</button>
-                </form>
-            </article>
-
             <article class="card hidden" id="login-card">
                 <h2 data-i18n="loginTitle">Bejelentkezés</h2>
                 <form id="login-form" class="stack">
@@ -98,26 +76,8 @@
                 </form>
             </article>
         </section>
+	</main>
 
-        <section class="card session-card">
-            <p id="session-info" data-i18n="loggedOut">Nincs bejelentkezett felhasználó.</p>
-            <p id="auth-message" class="auth-message" aria-live="polite"></p>
-        </section>
-
-        <section class="grid landing-grid hidden" id="app-links">
-            <article class="card">
-                <h2 data-i18n="budgetTitle">Költségvetés</h2>
-                <p data-i18n="budgetText">Bevétel és kiadás rögzítés, szerkesztés, törlés, és felhasználókezelés.</p>
-                <a class="btn-link" href="budget.html" data-i18n="openButton">Megnyitás</a>
-            </article>
-
-            <article class="card">
-                <h2 data-i18n="monthlyTitle">Havi összegzés</h2>
-                <p data-i18n="monthlyText">Havi összegzés, mai napig kiadás, jövőbeli bevételek és kiadások dátum szerint.</p>
-                <a class="btn-link" href="monthly_budget.html" data-i18n="openButton">Megnyitás</a>
-            </article>
-        </section>
-    </main>
 
     <script src="assets/js/index.js"></script>
 
