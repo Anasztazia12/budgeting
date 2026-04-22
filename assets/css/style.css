@@ -426,13 +426,18 @@ button:disabled {
 }
 
 .footer-content {
-    text-align: center;
-    padding: 1.25rem 1.5rem;
-	margin-bottom: 1.2rem;
+	width: min(1080px, 92vw);
+	margin: 0 auto 1.2rem;
+	text-align: center;
+	padding: 0.9rem 1.25rem;
 	border-radius: 16px;
 	background: radial-gradient(circle at top right, #f9d8bd, #f0c49f);
 	border: 1px solid #e9b992;
 	box-shadow: 0 8px 25px rgba(89, 51, 21, 0.12);
+}
+
+.footer-content p {
+	margin: 0.2rem 0;
 }
 
 
@@ -469,6 +474,11 @@ button:disabled {
 	.app-shell {
 		width: min(1120px, 94vw);
 		padding-top: 1.25rem;
+	}
+
+	.footer-content {
+		width: min(1120px, 94vw);
+		padding: 0.8rem 1rem;
 	}
 
 	.language-corner {

@@ -18,7 +18,7 @@
 
 		<header class="hero">
 			<h1 data-i18n="heroTitle">Budget</h1>
-			<p data-i18n="heroText">Rogzitsd a varhato beveteleket es kiadasokat datum szerint.</p>
+			<p data-i18n="heroText">Rögzítsd a várható bevételeket és kiadásokat dátum szerint.</p>
 		</header>
 
 		<nav class="menu-wrap">
@@ -29,19 +29,19 @@
 				<span class="hamburger-line"></span>
 			</button>
 			<div id="menu-panel" class="menu-panel">
-				<a href="index.html" data-i18n="homeLink">Kezdolap</a>
+				<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
 				<a href="monthly_budget.html" data-i18n="summaryLink">Monthly Budget</a>
-				<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezes</button>
+				<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
 			</div>
 		</nav>
 
 		<section class="card controls compact-controls">
 			<div>
-				<label for="active-month" data-i18n="monthLabel">Valasztott honap</label>
+				<label for="active-month" data-i18n="monthLabel">Választott hónap</label>
 				<input type="month" id="active-month">
 			</div>
 			<div class="control-action">
-				<button id="export-csv-button" type="button" data-i18n="exportButton">CSV export a honapra</button>
+				<button id="export-csv-button" type="button" data-i18n="exportButton">CSV export a hónapra</button>
 			</div>
 		</section>
 
@@ -200,10 +200,10 @@
 
 		const dictionary = {
 			hu: {
-				pageTitle: "Budget",
-				heroTitle: "Budget",
-				heroText: "Rögzitsd a várható bevételeket es kiadásokat dátum szerint.",
-				menuButton: "Menu",
+				pageTitle: "Költségvetés",
+				heroTitle: "Költségvetés",
+				heroText: "Rögzítsd a várható bevételeket és kiadásokat dátum szerint.",
+				menuButton: "Menü",
 				homeLink: "Kezdőlap",
 				summaryLink: "Havi összegzés",
 				languageLabel: "Nyelv",
@@ -211,79 +211,79 @@
 				exportButton: "CSV export a hónapra",
 				registerTitle: "Regisztráció",
 				loginTitle: "Bejelentkezés",
-				usernameLabel: "Felhasznélonév",
-				emailLabel: "Email cim",
+				usernameLabel: "Felhasználónév",
+				emailLabel: "Email cím",
 				emailConfirmLabel: "Email cím megerősítése",
 				passwordLabel: "Jelszó",
-				passwordConfirmLabel: "Jelszó megerösitse",
-				registerButton: "Regisztralok",
-				loginButton: "Belepes",
+				passwordConfirmLabel: "Jelszó megerősítése",
+				registerButton: "Regisztrálok",
+				loginButton: "Belépés",
 				logoutButton: "Kijelentkezés",
-				loginRequired: "A rogziteshez jelentkezz be vagy regisztralj.",
-				incomeFormTitle: "Bevetel hozzaadasa",
-				expenseFormTitle: "Kiadas hozzaadasa",
-				categoryLabel: "Kategoria",
-				amountLabel: "Osszeg (Ft)",
-				incomeDateLabel: "Mikor varhato? (datum)",
-				expenseDateLabel: "Mikor lesz levonas? (datum)",
-				saveIncomeButton: "Bevetel mentese",
-				saveExpenseButton: "Kiadas mentese",
-				updateIncomeButton: "Bevetel frissitese",
-				updateExpenseButton: "Kiadas frissitese",
-				cancelEditButton: "Szerkesztes megse",
-				monthlyIncomeTitle: "Osszes havi bevetel",
-				monthlyExpenseTitle: "Osszes havi kiadas",
-				spentToDateTitle: "Koltseg mai napig",
-				monthEndTitle: "Hovegi varhato egyenleg",
-				incomeEntriesTitle: "Bevetelek ebben a honapban",
-				expenseEntriesTitle: "Kiadasok ebben a honapban",
-				loggedOut: "Nincs bejelentkezett felhasznalo.",
+				loginRequired: "A rögzítéshez jelentkezz be vagy regisztrálj.",
+				incomeFormTitle: "Bevétel hozzáadása",
+				expenseFormTitle: "Kiadás hozzáadása",
+				categoryLabel: "Kategória",
+				amountLabel: "Összeg (Ft)",
+				incomeDateLabel: "Mikor várható? (dátum)",
+				expenseDateLabel: "Mikor lesz levonás? (dátum)",
+				saveIncomeButton: "Bevétel mentése",
+				saveExpenseButton: "Kiadás mentése",
+				updateIncomeButton: "Bevétel frissítése",
+				updateExpenseButton: "Kiadás frissítése",
+				cancelEditButton: "Szerkesztés mégse",
+				monthlyIncomeTitle: "Összes havi bevétel",
+				monthlyExpenseTitle: "Összes havi kiadás",
+				spentToDateTitle: "Költség mai napig",
+				monthEndTitle: "Hóvégi várható egyenleg",
+				incomeEntriesTitle: "Bevételek ebben a hónapban",
+				expenseEntriesTitle: "Kiadások ebben a hónapban",
+				loggedOut: "Nincs bejelentkezett felhasználó.",
 				loggedIn: "Bejelentkezve:",
-				guestUser: "Vendeg",
-				emailMismatch: "Az email cimek nem egyeznek.",
+				guestUser: "Vendég",
+				emailMismatch: "Az email címek nem egyeznek.",
 				passwordMismatch: "A jelszavak nem egyeznek.",
-				usernameTaken: "Ez a felhasznalonev mar foglalt.",
-				registerSuccess: "Sikeres regisztracio.",
-				loginSuccess: "Sikeres bejelentkezes.",
-				logoutSuccess: "Sikeres kijelentkezes.",
-				invalidLogin: "Hibas felhasznalonev vagy jelszo.",
-				loginFirst: "Eloszor jelentkezz be.",
-				entrySaved: "A tetel elmentve.",
-				entryUpdated: "A tetel frissitve.",
-				entryDeleted: "A tetel torolve.",
-				confirmDelete: "Biztosan torolni szeretned ezt a tetelt?",
-				emptyEntries: "Nincs rogzitett tetel erre a honapra.",
-				exportEmpty: "Nincs exportalhato tetel ebben a honapban.",
-				exportDone: "A havi CSV export letoltese elindult.",
+				usernameTaken: "Ez a felhasználónév már foglalt.",
+				registerSuccess: "Sikeres regisztráció.",
+				loginSuccess: "Sikeres bejelentkezés.",
+				logoutSuccess: "Sikeres kijelentkezés.",
+				invalidLogin: "Hibás felhasználónév vagy jelszó.",
+				loginFirst: "Először jelentkezz be.",
+				entrySaved: "A tétel elmentve.",
+				entryUpdated: "A tétel frissítve.",
+				entryDeleted: "A tétel törölve.",
+				confirmDelete: "Biztosan törölni szeretnéd ezt a tételt?",
+				emptyEntries: "Nincs rögzített tétel erre a hónapra.",
+				exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
+				exportDone: "A havi CSV export letöltése elindult.",
 				currency: "Ft",
-				editAction: "Szerkesztes",
-				deleteAction: "Torles",
-				csvType: "Tipus",
-				csvCategory: "Kategoria",
-				csvAmount: "Osszeg",
-				csvDate: "Datum",
-				typeIncome: "Bevetel",
-				typeExpense: "Kiadas",
+				editAction: "Szerkesztés",
+				deleteAction: "Törlés",
+				csvType: "Típus",
+				csvCategory: "Kategória",
+				csvAmount: "Összeg",
+				csvDate: "Dátum",
+				typeIncome: "Bevétel",
+				typeExpense: "Kiadás",
 				categories: {
-					fizetes: "Fizetes",
-					egyeb: "Egyeb",
-					szamlak: "Szamlak",
-					viz: "Viz",
-					gaz: "Gaz",
-					aram: "Aram",
-					auto: "Auto",
+					fizetes: "Fizetés",
+					egyeb: "Egyéb",
+					szamlak: "Számlák",
+					viz: "Víz",
+					gaz: "Gáz",
+					aram: "Áram",
+					auto: "Autó",
 					benzin: "Benzin",
-					elemiszer: "Elemiszer",
-					ruhak: "Ruhak",
+					elemiszer: "Élelmiszer",
+					ruhak: "Ruhák",
 					rent: "Rent",
-					biztositas: "Biztositas",
-					"hitelkartya 3": "Hitelkartya 3",
+					biztositas: "Biztosítás",
+					"hitelkartya 3": "Hitelkártya 3",
 					zilch: "Zilch",
 					tv: "TV",
 					telefon: "Telefon",
 					internet: "Internet",
 					suli: "Suli",
-					"egyeb kiadas": "Egyeb kiadas"
+					"egyeb kiadas": "Egyéb kiadás"
 				}
 			},
 			en: {

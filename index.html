@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budgeting App</title>
+    <meta name="theme-color" content="#d45f2c">
+    <title>Költségvetési app</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" href="assets/images/budget-icon.png">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -17,73 +20,80 @@
         </div>
 
         <header class="hero">
-            <h1 data-i18n="heroTitle">Budgeting App</h1>
-            <p data-i18n="heroText">Jelentkezz be, regisztralj vagy folytasd vendegkent.</p>
+            <h1 data-i18n="heroTitle">Költségvetési app</h1>
+            <p data-i18n="heroText">Jelentkezz be, regisztrálj vagy folytasd vendégként.</p>
         </header>
+
+        <nav class="menu-wrap">
+            <button id="menu-toggle" type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-panel">
+                <span class="sr-only" data-i18n="menuButton">Menü</span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <div id="menu-panel" class="menu-panel">
+                <button type="button" id="install-app-button" class="hidden" data-i18n="downloadAppButton">App letöltése</button>
+            </div>
+        </nav>
 
         <section id="auth-options" class="grid auth-grid">
             <article class="card">
-                <h2 data-i18n="registerTitle">Regisztracio</h2>
+                <h2 data-i18n="registerTitle">Regisztráció</h2>
                 <form id="register-form" class="stack">
-                    <label for="register-username" data-i18n="usernameLabel">Felhasznalonev</label>
+                    <label for="register-username" data-i18n="usernameLabel">Felhasználónév</label>
                     <input type="text" id="register-username" minlength="5" required>
 
-                    <label for="register-email" data-i18n="emailLabel">Email cim</label>
+                    <label for="register-email" data-i18n="emailLabel">Email cím</label>
                     <input type="email" id="register-email" required>
 
-                    <label for="register-email-confirm" data-i18n="emailConfirmLabel">Email cim megerositese</label>
+                    <label for="register-email-confirm" data-i18n="emailConfirmLabel">Email cím megerősítése</label>
                     <input type="email" id="register-email-confirm" required>
 
-                    <label for="register-password" data-i18n="passwordLabel">Jelszo</label>
+                    <label for="register-password" data-i18n="passwordLabel">Jelszó</label>
                     <input type="password" id="register-password" minlength="6" required>
 
-                    <label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszo megerositese</label>
+                    <label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszó megerősítése</label>
                     <input type="password" id="register-password-confirm" minlength="6" required>
 
-                    <button type="submit" data-i18n="registerButton">Regisztralok</button>
+                    <button type="submit" data-i18n="registerButton">Regisztrálok</button>
                 </form>
             </article>
 
             <article class="card">
-                <h2 data-i18n="loginTitle">Bejelentkezes</h2>
+                <h2 data-i18n="loginTitle">Bejelentkezés</h2>
                 <form id="login-form" class="stack">
-                    <label for="login-username" data-i18n="usernameLabel">Felhasznalonev</label>
+                    <label for="login-username" data-i18n="usernameLabel">Felhasználónév</label>
                     <input type="text" id="login-username" required>
 
-                    <label for="login-password" data-i18n="passwordLabel">Jelszo</label>
+                    <label for="login-password" data-i18n="passwordLabel">Jelszó</label>
                     <input type="password" id="login-password" required>
 
-                    <button type="submit" data-i18n="loginButton">Belepes</button>
+                    <button type="submit" data-i18n="loginButton">Belépés</button>
                 </form>
             </article>
         </section>
 
         <section class="card session-card">
-            <p id="session-info" data-i18n="loggedOut">Nincs bejelentkezett felhasznalo.</p>
-            <button type="button" id="guest-button" class="secondary" data-i18n="guestButton">Folytatas vendegkent</button>
-            <button type="button" id="logout-button" class="secondary hidden" data-i18n="logoutButton">Kijelentkezes</button>
+            <p id="session-info" data-i18n="loggedOut">Nincs bejelentkezett felhasználó.</p>
+            <button type="button" id="guest-button" class="secondary" data-i18n="guestButton">Folytatás vendégként</button>
+            <button type="button" id="logout-button" class="secondary hidden" data-i18n="logoutButton">Kijelentkezés</button>
             <p id="auth-message" class="auth-message" aria-live="polite"></p>
         </section>
 
         <section class="grid landing-grid hidden" id="app-links">
             <article class="card">
-                <h2 data-i18n="budgetTitle">Koltsegterv</h2>
-                <p data-i18n="budgetText">Bevetel es kiadas rogzites, szerkesztes, torles, CSV export es felhasznalo kezeles.</p>
-                <a class="btn-link" href="budget.html" data-i18n="openButton">Megnyitas</a>
+                <h2 data-i18n="budgetTitle">Költségvetés</h2>
+                <p data-i18n="budgetText">Bevétel és kiadás rögzítés, szerkesztés, törlés, CSV export és felhasználókezelés.</p>
+                <a class="btn-link" href="budget.html" data-i18n="openButton">Megnyitás</a>
             </article>
 
             <article class="card">
-                <h2 data-i18n="monthlyTitle">Havi osszegzes</h2>
-                <p data-i18n="monthlyText">Havi osszegzes, mai napig kiadas, jovobeli bevetelek es kiadasok datum szerint.</p>
-                <a class="btn-link" href="monthly_budget.html" data-i18n="openButton">Megnyitas</a>
+                <h2 data-i18n="monthlyTitle">Havi összegzés</h2>
+                <p data-i18n="monthlyText">Havi összegzés, mai napig kiadás, jövőbeli bevételek és kiadások dátum szerint.</p>
+                <a class="btn-link" href="monthly_budget.html" data-i18n="openButton">Megnyitás</a>
             </article>
         </section>
     </main>
-
-    <footer class="footer-content">
-        <p>@ 2026 made by: Anasztazia, Budgeting App.</p>
-        <p data-i18n="footerText">Minden jog fenntartva.</p>
-    </footer>
 
     <script>
         const USERS_KEY = "budgetAppUsers";
@@ -94,43 +104,47 @@
 
         const dictionary = {
             hu: {
-                pageTitle: "Budgeting App",
-                heroTitle: "Budgeting App",
-                heroText: "Jelentkezz be, regisztralj vagy folytasd vendegkent.",
+                pageTitle: "Költségvetési app",
+                heroTitle: "Költségvetési app",
+                heroText: "Jelentkezz be, regisztrálj vagy folytasd vendégként.",
+                menuButton: "Menü",
                 languageLabel: "Nyelv",
-                registerTitle: "Regisztracio",
-                loginTitle: "Bejelentkezes",
-                usernameLabel: "Felhasznalonev",
-                emailLabel: "Email cim",
-                emailConfirmLabel: "Email cim megerositese",
-                passwordLabel: "Jelszo",
-                passwordConfirmLabel: "Jelszo megerositese",
-                registerButton: "Regisztralok",
-                loginButton: "Belepes",
-                guestButton: "Folytatas vendegkent",
-                logoutButton: "Kijelentkezes",
-                budgetTitle: "Koltsegterv",
-                budgetText: "Bevetel es kiadas rogzites, szerkesztes, torles, CSV export es felhasznalo kezeles.",
-                monthlyTitle: "Havi osszegzes",
-                monthlyText: "Havi osszegzes, mai napig kiadas, jovobeli bevetelek es kiadasok datum szerint.",
-                openButton: "Megnyitas",
-                loggedOut: "Nincs bejelentkezett felhasznalo.",
+                registerTitle: "Regisztráció",
+                loginTitle: "Bejelentkezés",
+                usernameLabel: "Felhasználónév",
+                emailLabel: "Email cím",
+                emailConfirmLabel: "Email cím megerősítése",
+                passwordLabel: "Jelszó",
+                passwordConfirmLabel: "Jelszó megerősítése",
+                registerButton: "Regisztrálok",
+                loginButton: "Belépés",
+                guestButton: "Folytatás vendégként",
+                downloadAppButton: "App letöltése",
+                logoutButton: "Kijelentkezés",
+                budgetTitle: "Költségvetés",
+                budgetText: "Bevétel és kiadás rögzítés, szerkesztés, törlés, CSV export és felhasználókezelés.",
+                monthlyTitle: "Havi összegzés",
+                monthlyText: "Havi összegzés, mai napig kiadás, jövőbeli bevételek és kiadások dátum szerint.",
+                openButton: "Megnyitás",
+                loggedOut: "Nincs bejelentkezett felhasználó.",
                 loggedIn: "Bejelentkezve:",
-                guestUser: "Vendeg",
-                emailMismatch: "Az email cimek nem egyeznek.",
+                guestUser: "Vendég",
+                emailMismatch: "Az email címek nem egyeznek.",
                 passwordMismatch: "A jelszavak nem egyeznek.",
-                usernameTaken: "Ez a felhasznalonev mar foglalt.",
-                registerSuccess: "Sikeres regisztracio.",
-                loginSuccess: "Sikeres bejelentkezes.",
-                guestSuccess: "Vendeg mod aktiv.",
-                logoutSuccess: "Sikeres kijelentkezes.",
-                invalidLogin: "Hibas felhasznalonev vagy jelszo.",
+                usernameTaken: "Ez a felhasználónév már foglalt.",
+                registerSuccess: "Sikeres regisztráció.",
+                loginSuccess: "Sikeres bejelentkezés.",
+                guestSuccess: "Vendég mód aktív.",
+                logoutSuccess: "Sikeres kijelentkezés.",
+                invalidLogin: "Hibás felhasználónév vagy jelszó.",
+                appInstalled: "Az app telepítve.",
                 footerText: "Minden jog fenntartva."
             },
             en: {
                 pageTitle: "Budgeting App",
                 heroTitle: "Budgeting App",
                 heroText: "Sign in, register, or continue as a guest.",
+                menuButton: "Menu",
                 languageLabel: "Language",
                 registerTitle: "Register",
                 loginTitle: "Sign in",
@@ -142,6 +156,7 @@
                 registerButton: "Create account",
                 loginButton: "Sign in",
                 guestButton: "Continue as guest",
+                downloadAppButton: "Download App",
                 logoutButton: "Sign out",
                 budgetTitle: "Budget",
                 budgetText: "Income and expense capture, edit/delete, CSV export, and user management.",
@@ -159,24 +174,43 @@
                 guestSuccess: "Guest mode enabled.",
                 logoutSuccess: "Signed out successfully.",
                 invalidLogin: "Invalid username or password.",
+                appInstalled: "App installed.",
                 footerText: "All rights reserved."
             }
         };
 
         const users = loadUsers();
+        const menuToggle = document.getElementById("menu-toggle");
+        const menuPanel = document.getElementById("menu-panel");
         const authOptions = document.getElementById("auth-options");
         const registerForm = document.getElementById("register-form");
         const loginForm = document.getElementById("login-form");
         const guestButton = document.getElementById("guest-button");
+        const installAppButton = document.getElementById("install-app-button");
         const logoutButton = document.getElementById("logout-button");
         const sessionInfo = document.getElementById("session-info");
         const authMessage = document.getElementById("auth-message");
         const appLinks = document.getElementById("app-links");
         const languageSelect = document.getElementById("app-language");
+        let deferredInstallPrompt = null;
         let currentUser = loadSession(users);
         let appLanguage = localStorage.getItem(LANGUAGE_KEY) === "en" ? "en" : "hu";
 
         initializePage();
+
+        menuToggle.addEventListener("click", () => {
+            const isOpen = menuPanel.classList.toggle("is-open");
+            menuToggle.classList.toggle("is-open", isOpen);
+            menuToggle.setAttribute("aria-expanded", String(isOpen));
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".menu-wrap")) {
+                menuPanel.classList.remove("is-open");
+                menuToggle.classList.remove("is-open");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
+        });
 
         languageSelect.addEventListener("change", () => {
             appLanguage = languageSelect.value;
@@ -255,6 +289,42 @@
             updateAccessUI();
             showMessage(t("logoutSuccess"), false);
         });
+
+        installAppButton.addEventListener("click", async () => {
+            if (!deferredInstallPrompt) {
+                return;
+            }
+
+            menuPanel.classList.remove("is-open");
+            menuToggle.classList.remove("is-open");
+            menuToggle.setAttribute("aria-expanded", "false");
+            deferredInstallPrompt.prompt();
+            const choice = await deferredInstallPrompt.userChoice;
+            if (choice.outcome === "accepted") {
+                installAppButton.classList.add("hidden");
+            }
+            deferredInstallPrompt = null;
+        });
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault();
+            deferredInstallPrompt = event;
+            installAppButton.classList.remove("hidden");
+        });
+
+        window.addEventListener("appinstalled", () => {
+            installAppButton.classList.add("hidden");
+            deferredInstallPrompt = null;
+            showMessage(t("appInstalled"), false);
+        });
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("sw.js").catch(() => {
+                    // Registration failures should not block app usage.
+                });
+            });
+        }
 
         function initializePage() {
             ensureGuestData();
@@ -412,5 +482,10 @@
             return "";
         }
     </script>
+
+    <footer class="footer-content">
+        <p>@ 2026 Amethyst Nexalune.</p>
+        <p data-i18n="footerText">Minden jog fenntartva.</p>
+    </footer>
 </body>
 </html>

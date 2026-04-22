@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Monthly Budget</title>
+	<title>Havi összegzés</title>
 	<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -17,8 +17,8 @@
 		</div>
 
 		<header class="hero">
-			<h1 data-i18n="heroTitle">Monthly Budget</h1>
-			<p data-i18n="heroText">Havi osszegzes, mai koltesek es jovobeli tetelek datum szerint.</p>
+			<h1 data-i18n="heroTitle">Havi összegzés</h1>
+			<p data-i18n="heroText">Havi összegzés, mai költések és jövőbeli tételek dátum szerint.</p>
 		</header>
 
 		<nav class="menu-wrap">
@@ -29,64 +29,64 @@
 				<span class="hamburger-line"></span>
 			</button>
 			<div id="menu-panel" class="menu-panel">
-				<a href="index.html" data-i18n="homeLink">Kezdolap</a>
-				<a href="monthly_budget.html" data-i18n="monthlyLink">Monthly Budget</a>
-				<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutAction">Kijelentkezes</button>
+				<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
+				<a href="monthly_budget.html" data-i18n="monthlyLink">Havi összegzés</a>
+				<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutAction">Kijelentkezés</button>
 			</div>
 		</nav>
 
 		<section class="card controls compact-controls">
 			<div>
-				<label for="active-month" data-i18n="monthLabel">Valasztott honap</label>
+				<label for="active-month" data-i18n="monthLabel">Választott hónap</label>
 				<input type="month" id="active-month">
 			</div>
 		</section>
 
 		<section class="card session-card">
-			<p id="session-info">Nincs bejelentkezett felhasznalo.</p>
+			<p id="session-info">Nincs bejelentkezett felhasználó.</p>
 		</section>
 
 		<section id="locked-message" class="card">
-			<p data-i18n="loginRequired">A havi osszegzeshez jelentkezz be a Budget oldalon.</p>
+			<p data-i18n="loginRequired">A havi összegzéshez jelentkezz be a Költségvetés oldalon.</p>
 		</section>
 
 		<section id="summary-content" class="hidden">
 			<section class="grid stats-grid">
 				<article class="card stat">
-					<h3 data-i18n="monthlyIncomeTitle">Havi bevetel</h3>
+					<h3 data-i18n="monthlyIncomeTitle">Havi bevétel</h3>
 					<p id="monthly-income">0 Ft</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="monthlyExpenseTitle">Havi kiadas</h3>
+					<h3 data-i18n="monthlyExpenseTitle">Havi kiadás</h3>
 					<p id="monthly-expense">0 Ft</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="spentToDateTitle">Mai napig kiadas</h3>
+					<h3 data-i18n="spentToDateTitle">Mai napig kiadás</h3>
 					<p id="spent-to-date">0 Ft</p>
 				</article>
 
 				<article class="card stat">
-					<h3 data-i18n="currentBalanceTitle">Aktualis egyenleg</h3>
+					<h3 data-i18n="currentBalanceTitle">Aktuális egyenleg</h3>
 					<p id="current-balance">0 Ft</p>
 				</article>
 			</section>
 
 			<section class="grid summary-grid">
 				<article class="card">
-					<h2 data-i18n="upcomingExpensesTitle">Varhato kiadasok datum szerint</h2>
+					<h2 data-i18n="upcomingExpensesTitle">Várható kiadások dátum szerint</h2>
 					<ul id="upcoming-expenses" class="entry-list"></ul>
 				</article>
 
 				<article class="card">
-					<h2 data-i18n="upcomingIncomesTitle">Varhato bevetelek datum szerint</h2>
+					<h2 data-i18n="upcomingIncomesTitle">Várható bevételek dátum szerint</h2>
 					<ul id="upcoming-incomes" class="entry-list"></ul>
 				</article>
 			</section>
 
 			<section class="card">
-				<h2 data-i18n="projectionTitle">Honap vegei becsles</h2>
+				<h2 data-i18n="projectionTitle">Hónap végi becslés</h2>
 				<p id="projection-text">Nincs adat.</p>
 			</section>
 		</section>
@@ -104,47 +104,47 @@
 				pageTitle: "Monthly Budget",
 				heroTitle: "Monthly Budget",
 				heroText: "Havi osszegzes, mai koltesek es jovobeli tetelek datum szerint.",
-				menuButton: "Menu",
-				homeLink: "Kezdolap",
-				monthlyLink: "Havi osszegzes",
-				logoutAction: "Kijelentkezes",
+				menuButton: "Menü",
+				homeLink: "Kezdőlap",
+				monthlyLink: "Havi összegzés",
+				logoutAction: "Kijelentkezés",
 				languageLabel: "Nyelv",
-				monthLabel: "Valasztott honap",
-				loggedOut: "Nincs bejelentkezett felhasznalo.",
+				monthLabel: "Választott hónap",
+				loggedOut: "Nincs bejelentkezett felhasználó.",
 				loggedIn: "Bejelentkezve:",
-				guestUser: "Vendeg",
-				loginRequired: "A havi osszegzeshez jelentkezz be a Budget oldalon.",
-				monthlyIncomeTitle: "Havi bevetel",
-				monthlyExpenseTitle: "Havi kiadas",
-				spentToDateTitle: "Mai napig kiadas",
-				currentBalanceTitle: "Aktualis egyenleg",
-				upcomingExpensesTitle: "Varhato kiadasok datum szerint",
-				upcomingIncomesTitle: "Varhato bevetelek datum szerint",
-				projectionTitle: "Honap vegei becsles",
+				guestUser: "Vendég",
+				loginRequired: "A havi összegzéshez jelentkezz be a Költségvetés oldalon.",
+				monthlyIncomeTitle: "Havi bevétel",
+				monthlyExpenseTitle: "Havi kiadás",
+				spentToDateTitle: "Mai napig kiadás",
+				currentBalanceTitle: "Aktuális egyenleg",
+				upcomingExpensesTitle: "Várható kiadások dátum szerint",
+				upcomingIncomesTitle: "Várható bevételek dátum szerint",
+				projectionTitle: "Hónap végi becslés",
 				noData: "Nincs adat.",
-				emptyEntries: "Nincs varhato tetel a honap tovabbi reszere.",
-				projectionText: "Varhato egyenleg {date} datumra: {amount}.",
+				emptyEntries: "Nincs várható tétel a hónap további részére.",
+				projectionText: "Várható egyenleg {date} dátumra: {amount}.",
 				currency: "Ft",
 				categories: {
-					fizetes: "Fizetes",
-					egyeb: "Egyeb",
-					szamlak: "Szamlak",
-					viz: "Viz",
-					gaz: "Gaz",
-					aram: "Aram",
-					auto: "Auto",
+					fizetes: "Fizetés",
+					egyeb: "Egyéb",
+					szamlak: "Számlák",
+					viz: "Víz",
+					gaz: "Gáz",
+					aram: "Áram",
+					auto: "Autó",
 					benzin: "Benzin",
-					elemiszer: "Elemiszer",
-					ruhak: "Ruhak",
+					elemiszer: "Élelmiszer",
+					ruhak: "Ruhák",
 					rent: "Rent",
-					biztositas: "Biztositas",
-					"hitelkartya 3": "Hitelkartya 3",
+					biztositas: "Biztosítás",
+					"hitelkartya 3": "Hitelkártya 3",
 					zilch: "Zilch",
 					tv: "TV",
 					telefon: "Telefon",
 					internet: "Internet",
 					suli: "Suli",
-					"egyeb kiadas": "Egyeb kiadas"
+					"egyeb kiadas": "Egyéb kiadás"
 				}
 			},
 			en: {
