@@ -215,7 +215,16 @@
             ? window.BUDGET_APP_EMAIL_ENDPOINT
             : "";
         const storedEndpoint = localStorage.getItem(KEYS.EMAIL_ENDPOINT_KEY) || "";
-        return String(runtimeEndpoint || storedEndpoint).trim();
+        const configured = String(runtimeEndpoint || storedEndpoint).trim();
+        if (configured) {
+            return configured;
+        }
+
+        if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+            return `${window.location.origin}/api/send-email`;
+        }
+
+        return "";
     }
 
     async function sendEmailViaEndpoint(to, subject, body) {
