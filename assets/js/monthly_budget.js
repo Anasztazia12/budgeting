@@ -207,7 +207,7 @@ const shared = window.BudgetAppShared;
 			}
 
 			if (!deferredInstallPrompt) {
-				sessionInfo.textContent = t("appInstallUnavailable");
+				sessionInfo.textContent = shared.getInstallUnavailableMessage(appLanguage);
 				return;
 			}
 

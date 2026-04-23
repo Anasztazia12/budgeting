@@ -50,6 +50,8 @@
                         <button type="button" id="menu-back-button" data-i18n="backAction">Vissza</button>
                         <button type="button" id="install-app-button" data-i18n="downloadAppButton">App letöltése</button>
                         <button type="button" id="menu-logout-button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
+                        <hr>
+						<button type="button" class="btn btn-danger w-100" id="delete-account-button">Regisztráció törlése</button>
                     </div>
                 </nav>
             </div>
@@ -61,6 +63,10 @@
             <button type="button" id="show-register-button" data-i18n="registerTitle">Regisztráció</button>
             <button type="button" id="show-login-button" data-i18n="loginTitle">Bejelentkezés</button>
             <button type="button" id="guest-button" class="guest-accent" data-i18n="guestButton">Folytatás vendégként</button>
+        </section>
+
+        <section class="card session-card">
+            <p id="auth-message" class="auth-message hidden" aria-live="polite"></p>
         </section>
 
         <section id="auth-options" class="grid auth-grid hidden">

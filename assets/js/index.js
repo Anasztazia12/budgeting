@@ -53,6 +53,7 @@ const shared = window.BudgetAppShared;
                 guestSuccess: "Vendég mód aktív.",
                 logoutSuccess: "Sikeres kijelentkezés.",
                 invalidLogin: "Hibás felhasználónév vagy jelszó.",
+                welcomeRegistered: "Welcome, {username}! A regisztráció sikeres.",
                 appInstalled: "Az app telepítve.",
                 appDownloaded: "Az app letöltve.",
                 appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
@@ -101,6 +102,7 @@ const shared = window.BudgetAppShared;
                 guestSuccess: "Guest mode enabled.",
                 logoutSuccess: "Signed out successfully.",
                 invalidLogin: "Invalid username or password.",
+                welcomeRegistered: "Welcome, {username}! Registration successful.",
                 appInstalled: "App installed.",
                 appDownloaded: "App downloaded.",
                 appInstallUnavailable: "App install is not available on this device right now.",
@@ -237,9 +239,15 @@ const shared = window.BudgetAppShared;
                     email,
                     salt,
                     hashedPassword,
+                    profile: {
+                        username,
+                        email,
+                        registeredAt: new Date().toISOString()
+                    },
                     data: { incomes: [], expenses: [] }
                 };
                 saveUsers();
+                shared.setFlashMessage(formatText(t("welcomeRegistered"), { username }), false);
                 loginUser(username);
                 registerForm.reset();
                 showMessage(t("registerSuccess"), false);
@@ -289,7 +297,7 @@ const shared = window.BudgetAppShared;
             }
 
             if (!deferredInstallPrompt) {
-                showMessage(t("appInstallUnavailable"), true);
+                showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
                 return;
             }
 
@@ -391,8 +399,13 @@ const shared = window.BudgetAppShared;
                 return;
             }
             authMessage.textContent = message;
+            authMessage.classList.toggle("hidden", !message);
             authMessage.classList.toggle("error", isError);
             authMessage.classList.toggle("ok", !isError);
+        }
+
+        function formatText(template, values) {
+            return String(template || "").replace(/\{(\w+)\}/g, (_match, key) => values[key] ?? "");
         }
 
         function performLogout() {
@@ -520,6 +533,11 @@ const shared = window.BudgetAppShared;
                 return;
             }
 
+            users[username].profile = {
+                username,
+                email: users[username].email || (users[username].profile && users[username].profile.email) || "",
+                registeredAt: (users[username].profile && users[username].profile.registeredAt) || new Date().toISOString()
+            };
             const data = users[username].data || {};
             users[username].data = {
                 incomes: Array.isArray(data.incomes) ? data.incomes : [],

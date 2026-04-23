@@ -6,7 +6,8 @@
         THEME_KEY: "budgetAppTheme",
         CURRENCY_KEY: "budgetAppCurrency",
         INSTALL_STATUS_KEY: "budgetAppInstalled",
-        GUEST_DATA_KEY: "budgetAppGuestData"
+        GUEST_DATA_KEY: "budgetAppGuestData",
+        FLASH_MESSAGE_KEY: "budgetAppFlashMessage"
     };
 
     const GUEST_SESSION_VALUE = "__guest__";
@@ -123,6 +124,51 @@
         return standaloneMode || iosStandalone || stored;
     }
 
+    function getInstallPlatform() {
+        const userAgent = (window.navigator.userAgent || "").toLowerCase();
+        const vendor = (window.navigator.vendor || "").toLowerCase();
+        const isIPhone = /iphone|ipad|ipod/.test(userAgent);
+        const isAndroid = /android/.test(userAgent);
+        const isSamsung = /samsungbrowser/.test(userAgent) || vendor.includes("samsung");
+
+        if (isIPhone) {
+            return "ios";
+        }
+
+        if (isAndroid || isSamsung) {
+            return "android";
+        }
+
+        return "other";
+    }
+
+    function getInstallUnavailableMessage(language) {
+        const locale = language === "en" ? "en" : "hu";
+        const platform = getInstallPlatform();
+
+        if (locale === "en") {
+            if (platform === "ios") {
+                return "Install is not available here. iPhone: Safari Share -> Add to Home Screen.";
+            }
+
+            if (platform === "android") {
+                return "Install is not available here. Android/Samsung: browser menu -> Add to Home screen.";
+            }
+
+            return "Install is not available here. iPhone: Safari Share -> Add to Home Screen. Android/Samsung: browser menu -> Add to Home screen.";
+        }
+
+        if (platform === "ios") {
+            return "Az app innen nem telepíthető. iPhone: Safari Megosztás -> Hozzáadás a Főképernyőhöz.";
+        }
+
+        if (platform === "android") {
+            return "Az app innen nem telepíthető. Android/Samsung: böngésző menü -> Hozzáadás a kezdőképernyőhöz.";
+        }
+
+        return "Az app innen nem telepíthető. iPhone: Safari Megosztás -> Hozzáadás a Főképernyőhöz. Android/Samsung: böngésző menü -> Hozzáadás a kezdőképernyőhöz.";
+    }
+
     function loadGuestData() {
         const parsed = safeParseObject(localStorage.getItem(KEYS.GUEST_DATA_KEY));
         return normalizeEntriesData(parsed);
@@ -144,6 +190,42 @@
         return normalizeEntriesData(users[currentUser].data || {});
     }
 
+    function setFlashMessage(message, isError) {
+        try {
+            sessionStorage.setItem(
+                KEYS.FLASH_MESSAGE_KEY,
+                JSON.stringify({
+                    message: String(message || ""),
+                    isError: Boolean(isError)
+                })
+            );
+        } catch (_error) {
+            // Flash messages are optional enhancements.
+        }
+    }
+
+    function consumeFlashMessage() {
+        try {
+            const raw = sessionStorage.getItem(KEYS.FLASH_MESSAGE_KEY);
+            if (!raw) {
+                return null;
+            }
+
+            sessionStorage.removeItem(KEYS.FLASH_MESSAGE_KEY);
+            const parsed = safeParseObject(raw);
+            if (!parsed || typeof parsed.message !== "string") {
+                return null;
+            }
+
+            return {
+                message: parsed.message,
+                isError: Boolean(parsed.isError)
+            };
+        } catch (_error) {
+            return null;
+        }
+    }
+
     window.BudgetAppShared = {
         KEYS,
         GUEST_SESSION_VALUE,
@@ -163,8 +245,11 @@
         sumEntries,
         createEntryId,
         isAppInstalled,
+        getInstallUnavailableMessage,
         loadGuestData,
         saveGuestData,
-        getCurrentUserState
+        getCurrentUserState,
+        setFlashMessage,
+        consumeFlashMessage
     };
 })();

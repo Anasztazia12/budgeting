@@ -73,6 +73,7 @@ const shared = window.BudgetAppShared;
 				loginSuccess: "Sikeres bejelentkezés.",
 				logoutSuccess: "Sikeres kijelentkezés.",
 				invalidLogin: "Hibás felhasználónév vagy jelszó.",
+				welcomeRegistered: "Welcome, {username}!",
 				appDownloaded: "Az app letöltve.",
 				appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
 				loginFirst: "Először jelentkezz be.",
@@ -175,6 +176,7 @@ const shared = window.BudgetAppShared;
 				loginSuccess: "Signed in successfully.",
 				logoutSuccess: "Signed out successfully.",
 				invalidLogin: "Invalid username or password.",
+				welcomeRegistered: "Welcome, {username}!",
 				appDownloaded: "App downloaded.",
 				appInstallUnavailable: "App install is not available on this device right now.",
 				loginFirst: "Please sign in first.",
@@ -294,7 +296,7 @@ const shared = window.BudgetAppShared;
 				}
 
 				if (!deferredInstallPrompt) {
-					showMessage(t("appInstallUnavailable"), true);
+					showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
 					return;
 				}
 
@@ -463,6 +465,10 @@ const shared = window.BudgetAppShared;
 			updateAccessUI();
 			updateInstallButtonState();
 			render();
+			const flashMessage = shared.consumeFlashMessage();
+			if (flashMessage) {
+				showMessage(flashMessage.message, flashMessage.isError);
+			}
 		}
 
 		function applyTranslations() {
@@ -723,6 +729,7 @@ const shared = window.BudgetAppShared;
 				return;
 			}
 			authMessage.textContent = message;
+			authMessage.classList.toggle("hidden", !message);
 			authMessage.classList.toggle("error", isError);
 			authMessage.classList.toggle("ok", !isError);
 		}
