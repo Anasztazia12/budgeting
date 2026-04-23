@@ -619,19 +619,19 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 
 .budget-columns {
 	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-rows: auto auto;
 	margin-top: 1rem;
-	align-items: stretch;
 }
 
 .budget-column {
 	display: grid;
-	grid-template-rows: minmax(0, 1fr) auto;
-	gap: 1rem;
-	align-content: start;
+	grid-row: span 2;
+	grid-template-rows: subgrid;
+	min-width: 0;
 }
 
 .budget-column > .card {
-	height: 100%;
+	align-self: stretch;
 }
 
 .budget-stat-pair {
