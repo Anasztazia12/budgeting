@@ -190,6 +190,82 @@
         return normalizeEntriesData(users[currentUser].data || {});
     }
 
+    function buildMailtoUrl(to, subject, body) {
+        const recipient = encodeURIComponent(String(to || "").trim());
+        const params = new URLSearchParams({
+            subject: String(subject || ""),
+            body: String(body || "")
+        });
+        return `mailto:${recipient}?${params.toString()}`;
+    }
+
+    function openEmailDraft(to, subject, body) {
+        const address = String(to || "").trim();
+        if (!address) {
+            return false;
+        }
+
+        window.location.href = buildMailtoUrl(address, subject, body);
+        return true;
+    }
+
+    function sendRegistrationEmail(language, email, username) {
+        const locale = language === "en" ? "en" : "hu";
+        const name = username || "";
+        if (locale === "en") {
+            return openEmailDraft(
+                email,
+                "Thanks for registering",
+                `Hello ${name},\n\nThank you for registering.\nRegistration successful with this username: ${name}.\n\nBudgeting App`
+            );
+        }
+
+        return openEmailDraft(
+            email,
+            "Koszonjuk a regisztraciot",
+            `Szia ${name}!\n\nKoszonjuk, hogy regisztraltal.\nSikeres regisztracio ezzel a felhasznalonevvel: ${name}.\n\nBudgeting App`
+        );
+    }
+
+    function sendAccountDeletionEmail(language, email, username) {
+        const locale = language === "en" ? "en" : "hu";
+        const name = username || "";
+        if (locale === "en") {
+            return openEmailDraft(
+                email,
+                "Account deleted",
+                `Hello ${name},\n\nYour account has been deleted successfully.\n\nBudgeting App`
+            );
+        }
+
+        return openEmailDraft(
+            email,
+            "Account torolve",
+            `Szia ${name}!\n\nAz accountod sikeresen torolve lett.\n\nBudgeting App`
+        );
+    }
+
+    function getDeleteAccountConfirmMessage(language, username) {
+        const locale = language === "en" ? "en" : "hu";
+        if (locale === "en") {
+            return `Are you sure you want to delete this account (${username})?`;
+        }
+
+        return `Biztosan torolni szeretned ezt az accountot (${username})?`;
+    }
+
+    function getDeleteAccountNoSessionMessage(language) {
+        return language === "en"
+            ? "Please sign in with a registered account first."
+            : "Eloszor jelentkezz be regisztralt fiokkal.";
+    }
+
+    function getDeleteAccountSuccessMessage(language) {
+        return language === "en"
+            ? "Account deleted successfully."
+            : "Az account sikeresen torolve.";
+    }
+
     function setFlashMessage(message, isError) {
         try {
             sessionStorage.setItem(
@@ -250,6 +326,11 @@
         saveGuestData,
         getCurrentUserState,
         setFlashMessage,
-        consumeFlashMessage
+        consumeFlashMessage,
+        sendRegistrationEmail,
+        sendAccountDeletionEmail,
+        getDeleteAccountConfirmMessage,
+        getDeleteAccountNoSessionMessage,
+        getDeleteAccountSuccessMessage
     };
 })();

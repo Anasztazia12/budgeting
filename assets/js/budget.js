@@ -235,6 +235,7 @@ const shared = window.BudgetAppShared;
 		const menuPanel = document.getElementById("menu-panel");
 		const menuBackButton = document.getElementById("menu-back-button");
 		const installAppButton = document.getElementById("install-app-button");
+		const deleteAccountButton = document.getElementById("delete-account-button");
 		const themeLightButton = document.getElementById("theme-light-button");
 		const themeDarkButton = document.getElementById("theme-dark-button");
 		const menuLogoutButton = document.getElementById("menu-logout-button");
@@ -315,6 +316,9 @@ const shared = window.BudgetAppShared;
 		}
 		if (menuLogoutButton) {
 			menuLogoutButton.addEventListener("click", handleLogout);
+		}
+		if (deleteAccountButton) {
+			deleteAccountButton.addEventListener("click", handleAccountDelete);
 		}
 		if (themeLightButton) {
 			themeLightButton.addEventListener("click", () => {
@@ -660,6 +664,26 @@ const shared = window.BudgetAppShared;
 			menuToggle.setAttribute("aria-expanded", "false");
 			currentUser = "";
 			appState = { incomes: [], expenses: [] };
+			localStorage.removeItem(SESSION_KEY);
+			window.location.href = "index.html";
+		}
+
+		function handleAccountDelete() {
+			if (!currentUser || currentUser === GUEST_SESSION_VALUE || !users[currentUser]) {
+				showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage), true);
+				return;
+			}
+
+			if (!window.confirm(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser))) {
+				return;
+			}
+
+			const userRecord = users[currentUser] || {};
+			const email = userRecord.email || (userRecord.profile && userRecord.profile.email) || "";
+			shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+			delete users[currentUser];
+			saveUsers();
+			shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
 			localStorage.removeItem(SESSION_KEY);
 			window.location.href = "index.html";
 		}

@@ -125,6 +125,7 @@ const shared = window.BudgetAppShared;
         const loginForm = document.getElementById("login-form");
         const guestButton = document.getElementById("guest-button");
         const installAppButton = document.getElementById("install-app-button");
+        const deleteAccountButton = document.getElementById("delete-account-button");
         const themeLightButton = document.getElementById("theme-light-button");
         const themeDarkButton = document.getElementById("theme-dark-button");
         const logoutButton = document.getElementById("logout-button");
@@ -247,6 +248,7 @@ const shared = window.BudgetAppShared;
                     data: { incomes: [], expenses: [] }
                 };
                 saveUsers();
+                shared.sendRegistrationEmail(appLanguage, email, username);
                 shared.setFlashMessage(formatText(t("welcomeRegistered"), { username }), false);
                 loginUser(username);
                 registerForm.reset();
@@ -313,6 +315,10 @@ const shared = window.BudgetAppShared;
             deferredInstallPrompt = null;
             updateInstallButtonState();
             });
+        }
+
+        if (deleteAccountButton) {
+            deleteAccountButton.addEventListener("click", handleAccountDelete);
         }
 
         window.addEventListener("beforeinstallprompt", (event) => {
@@ -411,6 +417,30 @@ const shared = window.BudgetAppShared;
         function performLogout() {
             currentUser = "";
             localStorage.removeItem(SESSION_KEY);
+            updateAccessUI();
+        }
+
+        function handleAccountDelete() {
+            if (!currentUser || currentUser === GUEST_SESSION_VALUE || !users[currentUser]) {
+                showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage), true);
+                return;
+            }
+
+            if (!window.confirm(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser))) {
+                return;
+            }
+
+            const userRecord = users[currentUser] || {};
+            const email = userRecord.email || (userRecord.profile && userRecord.profile.email) || "";
+            shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+            delete users[currentUser];
+            saveUsers();
+            currentUser = "";
+            localStorage.removeItem(SESSION_KEY);
+            showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+            menuPanel.classList.remove("is-open");
+            menuToggle.classList.remove("is-open");
+            menuToggle.setAttribute("aria-expanded", "false");
             updateAccessUI();
         }
 

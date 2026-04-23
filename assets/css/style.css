@@ -503,6 +503,40 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 	background: linear-gradient(125deg, #4769c6, #2f4fa7);
 }
 
+.menu-panel .menu-divider {
+	margin: 0.3rem 0 0.1rem;
+	border: 0;
+	border-top: 1px solid #d66883;
+	opacity: 1;
+}
+
+.menu-panel .menu-danger-action,
+.menu-panel .menu-danger-action.btn,
+.menu-panel .menu-danger-action.btn-danger {
+	text-align: center;
+	color: #fff;
+	background: linear-gradient(125deg, #c63e5e, #972d48);
+	border: 1px solid #e58aa0;
+	font-weight: 800;
+}
+
+.menu-panel .menu-danger-action:hover,
+.menu-panel .menu-danger-action:focus-visible {
+	filter: brightness(1.08);
+	box-shadow: 0 12px 24px rgba(151, 45, 72, 0.3);
+}
+
+[data-theme="dark"] .menu-panel .menu-divider {
+	border-top-color: #8f3f56;
+}
+
+[data-theme="dark"] .menu-panel .menu-danger-action,
+[data-theme="dark"] .menu-panel .menu-danger-action.btn,
+[data-theme="dark"] .menu-panel .menu-danger-action.btn-danger {
+	background: linear-gradient(125deg, #9e324d, #7b263c);
+	border-color: #c87a91;
+}
+
 .top-nav a,
 .btn-link {
 	display: inline-block;
