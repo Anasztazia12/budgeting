@@ -208,6 +208,14 @@ body {
 	align-items: end;
 }
 
+.compact-controls > div,
+.control-action,
+.budget-column,
+.budget-stat-pair,
+.budget-stat-pair > .card {
+	min-width: 0;
+}
+
 .budget-controls {
 	grid-template-columns: minmax(210px, 1fr) minmax(210px, 1fr) minmax(280px, 1fr);
 	align-items: center;
@@ -612,17 +620,27 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 .budget-columns {
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	margin-top: 1rem;
-	align-items: start;
+	align-items: stretch;
 }
 
 .budget-column {
 	display: grid;
+	grid-template-rows: minmax(0, 1fr) auto;
 	gap: 1rem;
 	align-content: start;
 }
 
+.budget-column > .card {
+	height: 100%;
+}
+
 .budget-stat-pair {
 	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: stretch;
+}
+
+.budget-stat-pair > .stat {
+	height: 100%;
 }
 
 .forecast-grid {
@@ -821,6 +839,7 @@ input,
 select,
 button {
 	width: 100%;
+	max-width: 100%;
 	padding: 0.65rem 0.7rem;
 	border-radius: 10px;
 	border: 1px solid #bdd0f1;
@@ -1201,6 +1220,7 @@ select:focus-visible {
 	.compact-controls > div:not(.control-action) input,
 	.compact-controls > div:not(.control-action) select {
 		width: 100%;
+		min-width: 0;
 	}
 
 	.compact-controls .control-action .stack {
