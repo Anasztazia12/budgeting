@@ -298,14 +298,15 @@ body {
 	justify-content: center;
 	gap: 0.24rem;
 	flex-direction: column;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
 .menu-toggle:hover,
 .menu-toggle:focus-visible {
 	filter: brightness(1.08);
 	box-shadow: 0 12px 22px rgba(22, 56, 121, 0.28);
-	display: grid;
-	gap: 0.45rem;
+}
+
+.hamburger-line {
 	width: 20px;
 	height: 2px;
 	border-radius: 99px;
@@ -337,12 +338,12 @@ body {
 }
 
 [data-theme="dark"] .theme-switch-inline {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+	background: #172b4e;
 	border-color: #4a65a5;
 	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
 }
 
-		grid-template-columns: 1fr;
+.theme-switch-btn {
 	width: auto;
 	margin: 0;
 	padding: 0.42rem 0.62rem;
@@ -374,10 +375,13 @@ body {
 }
 
 [data-theme="dark"] .theme-switch-btn {
-	color: #cbdcff;
+	color: #eef4ff;
+	background: #223960;
+	border-color: #5f7fbe;
 }
 
 [data-theme="dark"] .theme-switch-btn.is-active {
+	color: #ffffff;
 	background: linear-gradient(125deg, #507eea, #355fbf);
 	border-color: #6f92dd;
 }
@@ -385,6 +389,7 @@ body {
 .theme-switch-btn-icon {
 	font-size: 0.95rem;
 	line-height: 1;
+	color: inherit;
 }
 
 .theme-switch-btn-label {
