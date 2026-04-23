@@ -7,7 +7,8 @@
         CURRENCY_KEY: "budgetAppCurrency",
         INSTALL_STATUS_KEY: "budgetAppInstalled",
         GUEST_DATA_KEY: "budgetAppGuestData",
-        FLASH_MESSAGE_KEY: "budgetAppFlashMessage"
+        FLASH_MESSAGE_KEY: "budgetAppFlashMessage",
+        EMAIL_ENDPOINT_KEY: "budgetAppEmailEndpoint"
     };
 
     const GUEST_SESSION_VALUE = "__guest__";
@@ -209,40 +210,61 @@
         return true;
     }
 
-    function sendRegistrationEmail(language, email, username) {
-        const locale = language === "en" ? "en" : "hu";
-        const name = username || "";
-        if (locale === "en") {
-            return openEmailDraft(
-                email,
-                "Thanks for registering",
-                `Hello ${name},\n\nThank you for registering.\nRegistration successful with this username: ${name}.\n\nBudgeting App`
-            );
-        }
-
-        return openEmailDraft(
-            email,
-            "Koszonjuk a regisztraciot",
-            `Szia ${name}!\n\nKoszonjuk, hogy regisztraltal.\nSikeres regisztracio ezzel a felhasznalonevvel: ${name}.\n\nBudgeting App`
-        );
+    function getEmailEndpoint() {
+        const runtimeEndpoint = typeof window.BUDGET_APP_EMAIL_ENDPOINT === "string"
+            ? window.BUDGET_APP_EMAIL_ENDPOINT
+            : "";
+        const storedEndpoint = localStorage.getItem(KEYS.EMAIL_ENDPOINT_KEY) || "";
+        return String(runtimeEndpoint || storedEndpoint).trim();
     }
 
-    function sendAccountDeletionEmail(language, email, username) {
-        const locale = language === "en" ? "en" : "hu";
-        const name = username || "";
-        if (locale === "en") {
-            return openEmailDraft(
-                email,
-                "Account deleted",
-                `Hello ${name},\n\nYour account has been deleted successfully.\n\nBudgeting App`
-            );
+    async function sendEmailViaEndpoint(to, subject, body) {
+        const endpoint = getEmailEndpoint();
+        if (!endpoint || !to) {
+            return false;
         }
 
-        return openEmailDraft(
-            email,
-            "Account torolve",
-            `Szia ${name}!\n\nAz accountod sikeresen torolve lett.\n\nBudgeting App`
-        );
+        try {
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    to,
+                    subject,
+                    body
+                })
+            });
+
+            return response.ok;
+        } catch (_error) {
+            return false;
+        }
+    }
+
+    async function sendRegistrationEmail(_language, email, username) {
+        const name = username || "";
+        const subject = "Thanks for registering";
+        const body = `Hello ${name},\n\nThank you for registering.\nRegistration successful with this username: ${name}.\n\nBudgeting App`;
+        const sent = await sendEmailViaEndpoint(email, subject, body);
+        if (sent) {
+            return true;
+        }
+
+        return openEmailDraft(email, subject, body);
+    }
+
+    async function sendAccountDeletionEmail(_language, email, username) {
+        const name = username || "";
+        const subject = "Account deleted";
+        const body = `Hello ${name},\n\nYour account has been deleted successfully.\n\nBudgeting App`;
+        const sent = await sendEmailViaEndpoint(email, subject, body);
+        if (sent) {
+            return true;
+        }
+
+        return openEmailDraft(email, subject, body);
     }
 
     function getDeleteAccountConfirmMessage(language, username) {

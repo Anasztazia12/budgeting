@@ -24,6 +24,7 @@ const shared = window.BudgetAppShared;
 				themeModeDark: "Sötét",
 				backAction: "Vissza",
 				downloadAppButton: "App letöltése",
+				deleteAccountButton: "Regisztráció törlése",
 				languageLabel: "Nyelv",
 				appName: "Költségvetési app",
 				currencyLabel: "Pénznem",
@@ -127,6 +128,7 @@ const shared = window.BudgetAppShared;
 				themeModeDark: "Dark",
 				backAction: "Back",
 				downloadAppButton: "Download App",
+				deleteAccountButton: "Delete account",
 				languageLabel: "Language",
 				appName: "Budgeting App",
 				currencyLabel: "Currency",
@@ -668,7 +670,7 @@ const shared = window.BudgetAppShared;
 			window.location.href = "index.html";
 		}
 
-		function handleAccountDelete() {
+		async function handleAccountDelete() {
 			if (!currentUser || currentUser === GUEST_SESSION_VALUE || !users[currentUser]) {
 				showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage), true);
 				return;
@@ -680,7 +682,7 @@ const shared = window.BudgetAppShared;
 
 			const userRecord = users[currentUser] || {};
 			const email = userRecord.email || (userRecord.profile && userRecord.profile.email) || "";
-			shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+			await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
 			delete users[currentUser];
 			saveUsers();
 			shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);

@@ -36,6 +36,7 @@ const shared = window.BudgetAppShared;
                 loginButton: "Belépés",
                 guestButton: "Folytatás vendégként",
                 downloadAppButton: "App letöltése",
+                deleteAccountButton: "Regisztráció törlése",
                 logoutButton: "Kijelentkezés",
                 budgetTitle: "Költségvetés",
                 budgetText: "Bevétel és kiadás rögzítés, szerkesztés, törlés, CSV export és felhasználókezelés.",
@@ -85,6 +86,7 @@ const shared = window.BudgetAppShared;
                 loginButton: "Sign in",
                 guestButton: "Continue as guest",
                 downloadAppButton: "Download App",
+                deleteAccountButton: "Delete account",
                 logoutButton: "Sign out",
                 budgetTitle: "Budget",
                 budgetText: "Income and expense capture, edit/delete, CSV export, and user management.",
@@ -248,7 +250,7 @@ const shared = window.BudgetAppShared;
                     data: { incomes: [], expenses: [] }
                 };
                 saveUsers();
-                shared.sendRegistrationEmail(appLanguage, email, username);
+                await shared.sendRegistrationEmail(appLanguage, email, username);
                 shared.setFlashMessage(formatText(t("welcomeRegistered"), { username }), false);
                 loginUser(username);
                 registerForm.reset();
@@ -420,7 +422,7 @@ const shared = window.BudgetAppShared;
             updateAccessUI();
         }
 
-        function handleAccountDelete() {
+        async function handleAccountDelete() {
             if (!currentUser || currentUser === GUEST_SESSION_VALUE || !users[currentUser]) {
                 showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage), true);
                 return;
@@ -432,7 +434,7 @@ const shared = window.BudgetAppShared;
 
             const userRecord = users[currentUser] || {};
             const email = userRecord.email || (userRecord.profile && userRecord.profile.email) || "";
-            shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+            await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
             delete users[currentUser];
             saveUsers();
             currentUser = "";
