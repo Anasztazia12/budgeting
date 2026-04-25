@@ -857,7 +857,10 @@ button {
 
 input[type="date"],
 input[type="month"] {
+	width: 100%;
+	inline-size: 100%;
 	min-width: 0;
+	min-inline-size: 0;
 	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -1132,7 +1135,11 @@ select:focus-visible {
 
 @media (max-width: 760px) {
 	.compact-controls {
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.compact-controls .control-action {
+		grid-column: 1 / -1;
 	}
 
 	.budget-controls > div:not(.control-action) {
@@ -1233,9 +1240,16 @@ select:focus-visible {
 	.budget-stat-pair {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
-	.compact-controls,
+	.compact-controls {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.landing-controls {
 		grid-template-columns: 1fr;
+	}
+
+	.compact-controls .control-action {
+		grid-column: 1 / -1;
 	}
 
 	.compact-controls > div {
@@ -1246,6 +1260,13 @@ select:focus-visible {
 	.compact-controls > div:not(.control-action) input,
 	.compact-controls > div:not(.control-action) select {
 		width: 100%;
+		min-width: 0;
+	}
+
+	input[type="date"],
+	input[type="month"] {
+		width: 100%;
+		max-width: 100%;
 		min-width: 0;
 	}
 
