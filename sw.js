@@ -1,4 +1,4 @@
-const CACHE_NAME = "budgeting-app-v1";
+const CACHE_NAME = "budgeting-app-v2";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -6,6 +6,10 @@ const ASSETS_TO_CACHE = [
   "./monthly_budget.html",
   "./assets/css/style.css",
   "./assets/images/budget-icon.png",
+  "./assets/images/budget-icon-any-192.png",
+  "./assets/images/budget-icon-any-512.png",
+  "./assets/images/budget-icon-maskable-192.png",
+  "./assets/images/budget-icon-maskable-512.png",
   "./manifest.webmanifest"
 ];
 

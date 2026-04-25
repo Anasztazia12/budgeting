@@ -133,6 +133,7 @@ const shared = window.BudgetAppShared;
         const logoutButton = document.getElementById("logout-button");
         const sessionInfo = document.getElementById("session-info");
         const authMessage = document.getElementById("auth-message");
+        const authMessageCard = authMessage ? authMessage.closest(".session-card") : null;
         const appLinks = document.getElementById("app-links");
         const languageSelect = document.getElementById("app-language");
         let deferredInstallPrompt = null;
@@ -357,6 +358,7 @@ const shared = window.BudgetAppShared;
             applyTranslations();
             updateAccessUI();
             updateInstallButtonState();
+            showMessage("", false);
         }
 
         function applyTranslations() {
@@ -408,6 +410,9 @@ const shared = window.BudgetAppShared;
             }
             authMessage.textContent = message;
             authMessage.classList.toggle("hidden", !message);
+            if (authMessageCard) {
+                authMessageCard.classList.toggle("hidden", !message);
+            }
             authMessage.classList.toggle("error", isError);
             authMessage.classList.toggle("ok", !isError);
         }
