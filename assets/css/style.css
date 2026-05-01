@@ -1397,13 +1397,13 @@ select:focus-visible {
 		grid-column: 1 / -1;
 	}
 
-	.fo.forms-grid {
-	grid-template-columns: 1fr 1fr;
-}
+	.forms-grid {
+		grid-template-columns: 1fr 1fr;
+	}
 
-.lists-grid {
-	grid-template-columns: 1fr 1fr;
-}
+	.lists-grid {
+		grid-template-columns: 1fr 1fr;
+	}
 
 	.forecast-grid {
 		grid-template-columns: 1fr 1fr;
@@ -1416,6 +1416,12 @@ select:focus-visible {
 }
 
 @media (max-width: 760px) {
+	.budget-columns,
+	.forms-grid,
+	.lists-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.compact-controls {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
@@ -1517,6 +1523,11 @@ select:focus-visible {
 	.budget-columns {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
+
+	.forms-grid,
+	.lists-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
 	
 	.stats-grid {
 	grid-template-columns: repeat(2, minmax(140px, 1fr));
@@ -1597,9 +1608,14 @@ select:focus-visible {
 		grid-template-columns: 1fr !important;
 	}
 
-	.form-actions,
 	.row-actions {
 		flex-direction: column;
+	}
+
+	.row-menu-list {
+		left: 0;
+		right: auto;
+		min-width: min(220px, 86vw);
 	}
 
 	.menu-wrap {
