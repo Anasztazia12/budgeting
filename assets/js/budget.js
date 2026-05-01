@@ -57,13 +57,17 @@ const shared = window.BudgetAppShared;
 				saveExpenseButton: "Kiadás mentése",
 				updateIncomeButton: "Bevétel frissítése",
 				updateExpenseButton: "Kiadás frissítése",
+				noteLabel: "Megjegyzés (opcionális)",
+				notePlaceholder: "Rövid megjegyzés",
+				listFromDateLabel: "Ettől",
+				listToDateLabel: "Eddig",
 				cancelEditButton: "Szerkesztés",
 				monthlyIncomeTitle: "Összes havi bevétel",
 				monthlyExpenseTitle: "Összes havi kiadás",
 				spentToDateTitle: "Kiadás mai napig",
 				monthEndTitle: "Hóvégi várható egyenleg",
-				incomeEntriesTitle: "Bevételek ebben a hónapban",
-				expenseEntriesTitle: "Kiadások ebben a hónapban",
+				incomeEntriesTitle: "Bevételek listája",
+				expenseEntriesTitle: "Kiadások listája",
 				loggedOut: "Nincs bejelentkezett felhasználó.",
 				loggedIn: "Bejelentkezve:",
 				guestUser: "Vendég",
@@ -81,12 +85,20 @@ const shared = window.BudgetAppShared;
 				entrySaved: "A tétel elmentve.",
 				entryUpdated: "A tétel frissítve.",
 				entryDeleted: "A tétel törölve.",
+				invalidAmount: "Adj meg 0-nál nagyobb összeget.",
 				confirmDelete: "Biztosan törölni szeretnéd ezt a tételt?",
-				emptyEntries: "Nincs rögzített tétel erre a hónapra.",
+				confirmDeleteRecurringPrompt: "Ismétlődő tétel törlése:\n1 = Törlés minden hónapból\n2 = Törlés csak ebből a hónapból\nÍrd be: 1 vagy 2",
+				deleteRecurringAllOption: "1",
+				deleteRecurringThisMonthOption: "2",
+				emptyEntries: "Nincs rögzített tétel a megadott időszakra.",
 				exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
 				exportDone: "A havi CSV export letöltése elindult.",
 				editAction: "Szerkesztés",
 				deleteAction: "Törlés",
+				repeatMonthlyAction: "Megjelenít minden hónapban",
+				stopRepeatMonthlyAction: "Ismétlés kikapcsolása",
+				repeatMonthlyBadge: "Havi ismétlés",
+				moreActionsLabel: "További műveletek",
 				csvType: "Típus",
 				csvCategory: "Kategória",
 				csvAmount: "Összeg",
@@ -106,7 +118,9 @@ const shared = window.BudgetAppShared;
 					ruhak: "Ruhák",
 					rent: "Rent",
 					biztositas: "Biztosítás",
-					"hitelkartya 3": "Hitelkártya 3",
+					hitelkartya: "Hitelkártya",
+					"hitelkartya 3": "Hitelkártya",
+					onkormanyzat: "Önkormányzat",
 					zilch: "Zilch",
 					tv: "TV",
 					telefon: "Telefon",
@@ -161,13 +175,17 @@ const shared = window.BudgetAppShared;
 				saveExpenseButton: "Save expense",
 				updateIncomeButton: "Update income",
 				updateExpenseButton: "Update expense",
+				noteLabel: "Note (optional)",
+				notePlaceholder: "Short note",
+				listFromDateLabel: "From",
+				listToDateLabel: "To",
 				cancelEditButton: "Edit",
 				monthlyIncomeTitle: "Total monthly income",
 				monthlyExpenseTitle: "Total monthly expense",
 				spentToDateTitle: "Spent to date",
 				monthEndTitle: "Expected month-end balance",
-				incomeEntriesTitle: "Income entries this month",
-				expenseEntriesTitle: "Expense entries this month",
+				incomeEntriesTitle: "Income entries",
+				expenseEntriesTitle: "Expense entries",
 				loggedOut: "No user is signed in.",
 				loggedIn: "Signed in as:",
 				guestUser: "Guest",
@@ -185,12 +203,20 @@ const shared = window.BudgetAppShared;
 				entrySaved: "Entry saved.",
 				entryUpdated: "Entry updated.",
 				entryDeleted: "Entry deleted.",
+				invalidAmount: "Enter an amount greater than 0.",
 				confirmDelete: "Delete this entry?",
-				emptyEntries: "No saved entries for this month.",
+				confirmDeleteRecurringPrompt: "Delete repeating entry:\n1 = Delete from all months\n2 = Delete only from this month\nType: 1 or 2",
+				deleteRecurringAllOption: "1",
+				deleteRecurringThisMonthOption: "2",
+				emptyEntries: "No saved entries for the selected period.",
 				exportEmpty: "There are no entries to export for this month.",
 				exportDone: "Monthly CSV export started.",
 				editAction: "Edit",
 				deleteAction: "Delete",
+				repeatMonthlyAction: "Show every month",
+				stopRepeatMonthlyAction: "Stop monthly repeat",
+				repeatMonthlyBadge: "Monthly repeat",
+				moreActionsLabel: "More actions",
 				csvType: "Type",
 				csvCategory: "Category",
 				csvAmount: "Amount",
@@ -210,7 +236,9 @@ const shared = window.BudgetAppShared;
 					ruhak: "Clothes",
 					rent: "Rent",
 					biztositas: "Insurance",
-					"hitelkartya 3": "Credit card 3",
+					hitelkartya: "Credit card",
+					"hitelkartya 3": "Credit card",
+					onkormanyzat: "Municipality",
 					zilch: "Zilch",
 					tv: "TV",
 					telefon: "Phone",
@@ -258,6 +286,10 @@ const shared = window.BudgetAppShared;
 		const incomeDeleteButton = document.getElementById("income-delete");
 		const expenseCancelEdit = document.getElementById("expense-edit");
 		const expenseDeleteButton = document.getElementById("expense-delete");
+		const incomeFilterStart = document.getElementById("income-filter-start");
+		const incomeFilterEnd = document.getElementById("income-filter-end");
+		const expenseFilterStart = document.getElementById("expense-filter-start");
+		const expenseFilterEnd = document.getElementById("expense-filter-end");
 		let deferredInstallPrompt = null;
 
 		initializePage();
@@ -275,7 +307,16 @@ const shared = window.BudgetAppShared;
 			render();
 		});
 
-		activeMonthInput.addEventListener("change", render);
+		activeMonthInput.addEventListener("change", () => {
+			setDefaultListDateFilters(activeMonthInput.value);
+			render();
+		});
+		[incomeFilterStart, incomeFilterEnd, expenseFilterStart, expenseFilterEnd].forEach((input) => {
+			if (!input) {
+				return;
+			}
+			input.addEventListener("change", render);
+		});
 		forecastToggleButton.addEventListener("click", () => {
 			const monthParam = encodeURIComponent(activeMonthInput.value || toMonthInput(today));
 			window.location.href = `budget-forecast.html?month=${monthParam}`;
@@ -402,10 +443,15 @@ const shared = window.BudgetAppShared;
 			}
 
 			const entry = buildEntryFromForm("income");
+			if (!entry.amount) {
+				showMessage(t("invalidAmount"), true);
+				return;
+			}
 			const editId = document.getElementById("income-edit-id").value;
 
 			if (editId) {
-				upsertEntry("incomes", { ...entry, id: editId });
+				const existingEntry = appState.incomes.find((item) => item.id === editId);
+				upsertEntry("incomes", { ...entry, id: editId, repeatMonthly: Boolean(existingEntry?.repeatMonthly) });
 				showMessage(t("entryUpdated"), false);
 			} else {
 				upsertEntry("incomes", { ...entry, id: createEntryId() });
@@ -424,10 +470,15 @@ const shared = window.BudgetAppShared;
 			}
 
 			const entry = buildEntryFromForm("expense");
+			if (!entry.amount) {
+				showMessage(t("invalidAmount"), true);
+				return;
+			}
 			const editId = document.getElementById("expense-edit-id").value;
 
 			if (editId) {
-				upsertEntry("expenses", { ...entry, id: editId });
+				const existingEntry = appState.expenses.find((item) => item.id === editId);
+				upsertEntry("expenses", { ...entry, id: editId, repeatMonthly: Boolean(existingEntry?.repeatMonthly) });
 				showMessage(t("entryUpdated"), false);
 			} else {
 				upsertEntry("expenses", { ...entry, id: createEntryId() });
@@ -463,6 +514,7 @@ const shared = window.BudgetAppShared;
 			applyTheme();
 			syncThemeButtons();
 			activeMonthInput.value = toMonthInput(today);
+			setDefaultListDateFilters(activeMonthInput.value);
 			languageSelect.value = appLanguage;
 			currencySelect.value = appCurrency;
 			resetIncomeForm();
@@ -484,6 +536,9 @@ const shared = window.BudgetAppShared;
 				element.textContent = t(element.dataset.i18n);
 			});
 			menuToggle.setAttribute("aria-label", t("menuButton"));
+			document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+				element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
+			});
 
 			document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
 				option.textContent = translateCategory(option.value);
@@ -507,14 +562,18 @@ const shared = window.BudgetAppShared;
 			const todayText = toDateInput(new Date());
 			const incomes = monthEntries(appState.incomes, activeMonth);
 			const expenses = monthEntries(appState.expenses, activeMonth);
+			const incomeRange = getDateRange(incomeFilterStart?.value, incomeFilterEnd?.value);
+			const expenseRange = getDateRange(expenseFilterStart?.value, expenseFilterEnd?.value);
+			const filteredIncomes = entriesForListByDateRange(appState.incomes, incomeRange.start, incomeRange.end, activeMonth);
+			const filteredExpenses = entriesForListByDateRange(appState.expenses, expenseRange.start, expenseRange.end, activeMonth);
 
 			monthlyIncomeEl.textContent = formatCurrency(sumEntries(incomes));
 			monthlyExpenseEl.textContent = formatCurrency(sumEntries(expenses));
 			spentToDateEl.textContent = formatCurrency(sumEntries(expenses.filter((item) => item.date <= todayText)));
 			monthEndLeftEl.textContent = formatCurrency(sumEntries(incomes) - sumEntries(expenses));
 
-			paintList(incomeList, incomes, "incomes");
-			paintList(expenseList, expenses, "expenses");
+			paintList(incomeList, filteredIncomes, "incomes");
+			paintList(expenseList, filteredExpenses, "expenses");
 		}
 
 		function paintList(target, entries, listType) {
@@ -534,15 +593,26 @@ const shared = window.BudgetAppShared;
 				.forEach((entry) => {
 					const li = document.createElement("li");
 					li.className = "entry-row";
+					const noteText = entry.note ? `<p class="entry-note">${escapeHtml(entry.note)}</p>` : "";
+					const recurringBadge = entry.repeatMonthly ? `<span class="entry-repeat-badge">${t("repeatMonthlyBadge")}</span>` : "";
+					const repeatActionLabel = entry.repeatMonthly ? t("stopRepeatMonthlyAction") : t("repeatMonthlyAction");
 					li.innerHTML = `
 						<div>
 							<span>${formatDisplayDate(entry.date)}</span>
 							<strong>${translateCategory(entry.category)}</strong>
+							${recurringBadge}
+							${noteText}
 						</div>
 						<span>${formatCurrency(entry.amount)}</span>
 						<div class="row-actions">
-							<button type="button" class="inline-button" data-action="edit" data-id="${entry.id}">${t("editAction")}</button>
-							<button type="button" class="inline-button danger" data-action="delete" data-id="${entry.id}">${t("deleteAction")}</button>
+							<details class="row-menu">
+								<summary aria-label="${t("moreActionsLabel")}">▾</summary>
+								<div class="row-menu-list">
+									<button type="button" class="inline-button" data-action="edit" data-id="${entry.id}">${t("editAction")}</button>
+									<button type="button" class="inline-button danger" data-action="delete" data-id="${entry.id}" data-date="${entry.date}">${t("deleteAction")}</button>
+									<button type="button" class="inline-button" data-action="toggle-repeat-monthly" data-id="${entry.id}" data-date="${entry.date}">${repeatActionLabel}</button>
+								</div>
+							</details>
 						</div>
 					`;
 					target.appendChild(li);
@@ -556,6 +626,7 @@ const shared = window.BudgetAppShared;
 			}
 
 			const entryId = button.dataset.id;
+			const clickedDate = button.dataset.date || "";
 			const action = button.dataset.action;
 			const entry = appState[listType].find((item) => item.id === entryId);
 
@@ -568,9 +639,20 @@ const shared = window.BudgetAppShared;
 				return;
 			}
 
-			if (action === "delete" && window.confirm(t("confirmDelete"))) {
-				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
+			if (action === "toggle-repeat-monthly") {
+				entry.repeatMonthly = !entry.repeatMonthly;
+				if (entry.repeatMonthly) {
+					entry.excludedMonths = [];
+				}
 				saveState();
+				render();
+				return;
+			}
+
+			if (action === "delete") {
+				if (!handleEntryDelete(listType, entryId, clickedDate)) {
+					return;
+				}
 				if (listType === "incomes") {
 					resetIncomeForm();
 				} else {
@@ -581,12 +663,56 @@ const shared = window.BudgetAppShared;
 			}
 		}
 
+		function handleEntryDelete(listType, entryId, clickedDate) {
+			const entry = appState[listType].find((item) => item.id === entryId);
+			if (!entry) {
+				return false;
+			}
+
+			if (!entry.repeatMonthly) {
+				if (!window.confirm(t("confirmDelete"))) {
+					return false;
+				}
+				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
+				saveState();
+				return true;
+			}
+
+			const answer = window.prompt(t("confirmDeleteRecurringPrompt"), t("deleteRecurringThisMonthOption"));
+			if (answer === null) {
+				return false;
+			}
+
+			const normalizedAnswer = String(answer).trim();
+			if (normalizedAnswer === t("deleteRecurringAllOption")) {
+				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
+				saveState();
+				return true;
+			}
+
+			if (normalizedAnswer === t("deleteRecurringThisMonthOption")) {
+				const monthToExclude = (clickedDate || entry.date || "").slice(0, 7);
+				if (/^\d{4}-\d{2}$/.test(monthToExclude)) {
+					const excludedMonths = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
+					if (!excludedMonths.includes(monthToExclude)) {
+						excludedMonths.push(monthToExclude);
+					}
+					entry.excludedMonths = excludedMonths;
+					saveState();
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		function populateFormForEdit(listType, entry) {
 			if (listType === "incomes") {
 				document.getElementById("income-edit-id").value = entry.id;
 				document.getElementById("income-category").value = entry.category;
 				document.getElementById("income-amount").value = entry.amount;
 				document.getElementById("income-date").value = entry.date;
+				document.getElementById("income-note").value = entry.note || "";
 				if (incomeCancelEdit) {
 					incomeCancelEdit.classList.remove("hidden");
 				}
@@ -595,6 +721,7 @@ const shared = window.BudgetAppShared;
 				document.getElementById("expense-category").value = entry.category;
 				document.getElementById("expense-amount").value = entry.amount;
 				document.getElementById("expense-date").value = entry.date;
+				document.getElementById("expense-note").value = entry.note || "";
 				expenseCancelEdit.classList.remove("hidden");
 			}
 
@@ -605,6 +732,7 @@ const shared = window.BudgetAppShared;
 			incomeForm.reset();
 			document.getElementById("income-edit-id").value = "";
 			document.getElementById("income-date").value = toDateInput(today);
+			document.getElementById("income-note").value = "";
 			if (incomeCancelEdit) {
 				incomeCancelEdit.classList.add("hidden");
 			}
@@ -615,6 +743,7 @@ const shared = window.BudgetAppShared;
 			expenseForm.reset();
 			document.getElementById("expense-edit-id").value = "";
 			document.getElementById("expense-date").value = toDateInput(today);
+			document.getElementById("expense-note").value = "";
 			expenseCancelEdit.classList.add("hidden");
 			updateFormButtonLabels();
 		}
@@ -625,11 +754,147 @@ const shared = window.BudgetAppShared;
 		}
 
 		function buildEntryFromForm(prefix) {
+			const parsedAmount = parseAmountValue(document.getElementById(`${prefix}-amount`).value);
 			return {
 				category: document.getElementById(`${prefix}-category`).value,
-				amount: Number(document.getElementById(`${prefix}-amount`).value),
-				date: document.getElementById(`${prefix}-date`).value
+				amount: parsedAmount,
+				date: document.getElementById(`${prefix}-date`).value,
+				note: document.getElementById(`${prefix}-note`).value.trim(),
+				repeatMonthly: false
 			};
+		}
+
+		function parseAmountValue(rawValue) {
+			const normalized = String(rawValue || "").replace(",", ".").trim();
+			const amount = Number(normalized);
+			if (!Number.isFinite(amount) || amount <= 0) {
+				return 0;
+			}
+			return Math.round(amount * 100) / 100;
+		}
+
+		function getDateRange(startDate, endDate) {
+			if (!startDate || !endDate || startDate <= endDate) {
+				return { start: startDate, end: endDate };
+			}
+			return { start: endDate, end: startDate };
+		}
+
+		function filterEntriesByRange(entries, startDate, endDate) {
+			return entries.filter((entry) => {
+				if (startDate && entry.date < startDate) {
+					return false;
+				}
+				if (endDate && entry.date > endDate) {
+					return false;
+				}
+				return true;
+			});
+		}
+
+		function entriesForListByDateRange(entries, startDate, endDate, activeMonth) {
+			const fallbackStart = `${activeMonth}-01`;
+			const fallbackEnd = getMonthEndDate(activeMonth);
+			const range = getDateRange(startDate || fallbackStart, endDate || fallbackEnd);
+
+			const expandedEntries = entries.flatMap((entry) => {
+				const normalizedEntry = {
+					...entry,
+					note: entry.note || "",
+					repeatMonthly: Boolean(entry.repeatMonthly),
+					excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
+				};
+
+				if (!normalizedEntry.repeatMonthly) {
+					return [normalizedEntry];
+				}
+
+				return expandRecurringEntries(normalizedEntry, range.start, range.end);
+			});
+
+			return filterEntriesByRange(expandedEntries, range.start, range.end)
+				.sort((left, right) => left.date.localeCompare(right.date));
+		}
+
+		function expandRecurringEntries(entry, startDate, endDate) {
+			if (!startDate || !endDate) {
+				return [entry];
+			}
+
+			const sourceMonth = (entry.date || "").slice(0, 7);
+			if (!/^\d{4}-\d{2}$/.test(sourceMonth)) {
+				return [entry];
+			}
+
+			const rangeStartMonth = startDate.slice(0, 7);
+			const rangeEndMonth = endDate.slice(0, 7);
+			let cursorMonth = rangeStartMonth < sourceMonth ? sourceMonth : rangeStartMonth;
+			const expanded = [];
+
+			while (cursorMonth <= rangeEndMonth) {
+				const dateInMonth = alignDateToMonth(entry.date, cursorMonth);
+				if (
+					dateInMonth >= startDate &&
+					dateInMonth <= endDate &&
+					dateInMonth >= entry.date &&
+					!entry.excludedMonths.includes(cursorMonth)
+				) {
+					expanded.push({ ...entry, date: dateInMonth });
+				}
+				cursorMonth = getNextMonth(cursorMonth);
+			}
+
+			return expanded;
+		}
+
+		function getNextMonth(monthValue) {
+			const [yearText, monthText] = monthValue.split("-");
+			let year = Number(yearText);
+			let month = Number(monthText);
+			if (!Number.isFinite(year) || !Number.isFinite(month)) {
+				return monthValue;
+			}
+			month += 1;
+			if (month > 12) {
+				year += 1;
+				month = 1;
+			}
+			return `${year}-${String(month).padStart(2, "0")}`;
+		}
+
+		function setDefaultListDateFilters(monthValue) {
+			const month = /^\d{4}-\d{2}$/.test(monthValue) ? monthValue : toMonthInput(today);
+			const start = `${month}-01`;
+			const end = getMonthEndDate(month);
+			if (incomeFilterStart) {
+				incomeFilterStart.value = start;
+			}
+			if (incomeFilterEnd) {
+				incomeFilterEnd.value = end;
+			}
+			if (expenseFilterStart) {
+				expenseFilterStart.value = start;
+			}
+			if (expenseFilterEnd) {
+				expenseFilterEnd.value = end;
+			}
+		}
+
+		function alignDateToMonth(sourceDate, targetMonth) {
+			const dayPart = Number((sourceDate || "").split("-")[2]);
+			const safeDay = Number.isFinite(dayPart) && dayPart > 0 ? dayPart : 1;
+			const monthEndDay = Number(getMonthEndDate(targetMonth).split("-")[2]);
+			const day = Math.min(safeDay, monthEndDay);
+			return `${targetMonth}-${String(day).padStart(2, "0")}`;
+		}
+
+		function escapeHtml(text) {
+			return String(text || "")
+				.replaceAll("&", "&amp;")
+				.replaceAll("<", "&lt;")
+				.replaceAll(">", "&gt;")
+				.replaceAll('"', "&quot;")
+				.replaceAll("'", "&#39;");
 		}
 
 		function upsertEntry(collectionName, entry) {
@@ -702,7 +967,24 @@ const shared = window.BudgetAppShared;
 		}
 
 		function monthEntries(entries, activeMonth) {
-			return entries.filter((item) => item.date.startsWith(activeMonth));
+			return entries.flatMap((item) => {
+				const excludedMonths = normalizeExcludedMonths(item.excludedMonths);
+				if (item.date.startsWith(activeMonth)) {
+					if (excludedMonths.includes(activeMonth)) {
+						return [];
+					}
+					return [{ ...item, repeatMonthly: Boolean(item.repeatMonthly), note: item.note || "", excludedMonths }];
+				}
+
+				if (item.repeatMonthly) {
+					const recurringDate = alignDateToMonth(item.date, activeMonth);
+					if (recurringDate >= item.date && !excludedMonths.includes(activeMonth)) {
+						return [{ ...item, date: recurringDate, repeatMonthly: true, note: item.note || "", excludedMonths }];
+					}
+				}
+
+				return [];
+			});
 		}
 
 		function sumEntries(entries) {
@@ -710,7 +992,8 @@ const shared = window.BudgetAppShared;
 		}
 
 		function translateCategory(value) {
-			return t(`categories.${value}`) || value;
+			const normalizedValue = value === "hitelkartya 3" ? "hitelkartya" : value;
+			return t(`categories.${normalizedValue}`) || normalizedValue;
 		}
 
 		function t(key) {
@@ -765,7 +1048,9 @@ const shared = window.BudgetAppShared;
 			return new Intl.NumberFormat(locale, {
 				style: "currency",
 				currency: appCurrency,
-				maximumFractionDigits: 0
+				currencyDisplay: "narrowSymbol",
+				minimumFractionDigits: 0,
+				maximumFractionDigits: 2
 			}).format(amount);
 		}
 
@@ -893,10 +1178,33 @@ const shared = window.BudgetAppShared;
 
 			const data = users[username].data || {};
 			users[username].data = {
-				incomes: Array.isArray(data.incomes) ? data.incomes : [],
-				expenses: Array.isArray(data.expenses) ? data.expenses : []
+				incomes: normalizeEntries(data.incomes),
+				expenses: normalizeEntries(data.expenses)
 			};
 			saveUsers();
+		}
+
+		function normalizeEntries(entries) {
+			if (!Array.isArray(entries)) {
+				return [];
+			}
+
+			return entries
+				.filter((entry) => entry && entry.id && entry.category && entry.date)
+				.map((entry) => ({
+					...entry,
+					amount: parseAmountValue(entry.amount),
+					note: typeof entry.note === "string" ? entry.note : "",
+					repeatMonthly: Boolean(entry.repeatMonthly),
+					excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
+				}));
+		}
+
+		function normalizeExcludedMonths(value) {
+			if (!Array.isArray(value)) {
+				return [];
+			}
+			return value.filter((monthText) => typeof monthText === "string" && /^\d{4}-\d{2}$/.test(monthText));
 		}
 
 		function loadSession(userMap) {

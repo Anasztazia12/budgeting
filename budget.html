@@ -97,10 +97,13 @@
 							</select>
 
 							<label for="income-amount" data-i18n="amountLabel">Összeg</label>
-							<input type="number" id="income-amount" min="1" step="1" required>
+							<input type="number" id="income-amount" min="0" step="0.01" inputmode="decimal" required>
 
 							<label for="income-date" data-i18n="incomeDateLabel">Mikor várható a bevétel? (dátum)</label>
 							<input type="date" id="income-date" required>
+
+							<label for="income-note" data-i18n="noteLabel">Megjegyzés (opcionális)</label>
+							<textarea id="income-note" rows="2" maxlength="280" data-i18n-placeholder="notePlaceholder" placeholder="Rövid megjegyzés"></textarea>
 
 							<div class="form-actions">
 								<button type="submit" id="income-submit-button" class="btn btn-outline-info">Bevétel mentése</button>
@@ -141,6 +144,7 @@
 								<option value="rent">Bérlés</option>
 								<option value="biztositas">Biztosítás</option>
 								<option value="hitelkartya">Hitelkártya</option>
+								<option value="onkormanyzat">Önkormányzat</option>
 								<option value="zilch">Zilch</option>
 								<option value="tv">TV</option>
 								<option value="telefon">Telefon</option>
@@ -150,10 +154,13 @@
 							</select>
 
 							<label for="expense-amount" data-i18n="amountLabel">Összeg</label>
-							<input type="number" id="expense-amount" min="1" step="1" required>
+							<input type="number" id="expense-amount" min="0" step="0.01" inputmode="decimal" required>
 
 							<label for="expense-date" data-i18n="expenseDateLabel">Mikor várható a levonás? (dátum)</label>
 							<input type="date" id="expense-date" required>
+
+							<label for="expense-note" data-i18n="noteLabel">Megjegyzés (opcionális)</label>
+							<textarea id="expense-note" rows="2" maxlength="280" data-i18n-placeholder="notePlaceholder" placeholder="Rövid megjegyzés"></textarea>
 
 							<div class="form-actions">
 								<button type="submit" id="expense-submit-button" class="btn btn-outline-info">Kiadás mentése</button>
@@ -179,12 +186,24 @@
 
 			<section class="grid summary-grid">
 				<article class="card">
-					<h2 data-i18n="incomeEntriesTitle">Bevételek ebben a hónapban</h2>
+					<h2 data-i18n="incomeEntriesTitle">Bevételek listája</h2>
+					<div class="entry-filters" aria-label="income date filters">
+						<label for="income-filter-start" data-i18n="listFromDateLabel">Ettől</label>
+						<input type="date" id="income-filter-start">
+						<label for="income-filter-end" data-i18n="listToDateLabel">Eddig</label>
+						<input type="date" id="income-filter-end">
+					</div>
 					<ul id="income-list" class="entry-list action-list"></ul>
 				</article>
 
 				<article class="card">
-					<h2 data-i18n="expenseEntriesTitle">Kiadások ebben a hónapban</h2>
+					<h2 data-i18n="expenseEntriesTitle">Kiadások listája</h2>
+					<div class="entry-filters" aria-label="expense date filters">
+						<label for="expense-filter-start" data-i18n="listFromDateLabel">Ettől</label>
+						<input type="date" id="expense-filter-start">
+						<label for="expense-filter-end" data-i18n="listToDateLabel">Eddig</label>
+						<input type="date" id="expense-filter-end">
+					</div>
 					<ul id="expense-list" class="entry-list action-list"></ul>
 				</article>
 			</section>

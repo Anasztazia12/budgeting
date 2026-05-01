@@ -64,6 +64,7 @@ const shared = window.BudgetAppShared;
 					rent: "Rent",
 					biztositas: "Biztosítás",
 					"hitelkartya 3": "Hitelkártya 3",
+					onkormanyzat: "Önkormányzat",
 					zilch: "Zilch",
 					tv: "TV",
 					telefon: "Telefon",
@@ -125,6 +126,7 @@ const shared = window.BudgetAppShared;
 					rent: "Rent",
 					biztositas: "Insurance",
 					"hitelkartya 3": "Credit card 3",
+					onkormanyzat: "Municipality",
 					zilch: "Zilch",
 					tv: "TV",
 					telefon: "Phone",
@@ -448,6 +450,7 @@ const shared = window.BudgetAppShared;
 			return new Intl.NumberFormat(locale, {
 				style: "currency",
 				currency: appCurrency,
+				currencyDisplay: "narrowSymbol",
 				maximumFractionDigits: 0
 			}).format(amount);
 		}
