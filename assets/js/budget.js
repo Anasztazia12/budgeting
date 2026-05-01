@@ -26,6 +26,11 @@ const shared = window.BudgetAppShared;
 				downloadAppButton: "App letöltése",
 				deleteAccountButton: "Regisztráció törlése",
 				languageLabel: "Nyelv",
+				languageSelectorAria: "Nyelv választó",
+				themeSwitchAria: "Téma váltó",
+				currencySelectorAria: "Pénznem választó",
+				incomeFiltersAria: "Bevétel dátumszűrők",
+				expenseFiltersAria: "Kiadás dátumszűrők",
 				appName: "Költségvetési app",
 				currencyLabel: "Pénznem",
 				currencyHuf: "HUF (forint)",
@@ -33,6 +38,9 @@ const shared = window.BudgetAppShared;
 				currencyUsd: "USD (dollár)",
 				currencyEur: "EUR (euró)",
 				monthLabel: "Választott hónap",
+				periodLabel: "Választott időszak",
+				periodFromLabel: "-tól",
+				periodToLabel: "-ig",
 				forecastButton: "Költségvetési előrejelző",
 				saveAllButton: "Mentés",
 				saveAllDone: "A módosítások mentve.",
@@ -125,7 +133,8 @@ const shared = window.BudgetAppShared;
 					tv: "TV",
 					telefon: "Telefon",
 					internet: "Internet",
-					suli: "Suli",
+					iskola: "Iskola",
+					suli: "Iskola",
 					"egyeb kiadas": "Egyéb kiadás"
 				}
 			},
@@ -144,6 +153,11 @@ const shared = window.BudgetAppShared;
 				downloadAppButton: "Download App",
 				deleteAccountButton: "Delete account",
 				languageLabel: "Language",
+				languageSelectorAria: "Language selector",
+				themeSwitchAria: "Theme switch",
+				currencySelectorAria: "Currency selector",
+				incomeFiltersAria: "Income date filters",
+				expenseFiltersAria: "Expense date filters",
 				appName: "Budgeting App",
 				currencyLabel: "Currency",
 				currencyHuf: "HUF (forint)",
@@ -151,6 +165,9 @@ const shared = window.BudgetAppShared;
 				currencyUsd: "USD (dollar)",
 				currencyEur: "EUR (euro)",
 				monthLabel: "Selected month",
+				periodLabel: "Selected period",
+				periodFromLabel: "from",
+				periodToLabel: "to",
 				forecastButton: "Budget Forecast Planner",
 				saveAllButton: "Save",
 				saveAllDone: "Changes saved.",
@@ -243,6 +260,7 @@ const shared = window.BudgetAppShared;
 					tv: "TV",
 					telefon: "Phone",
 					internet: "Internet",
+					iskola: "School",
 					suli: "School",
 					"egyeb kiadas": "Other expense"
 				}
@@ -271,7 +289,8 @@ const shared = window.BudgetAppShared;
 		const menuLogoutButton = document.getElementById("menu-logout-button");
 		const authMessage = document.getElementById("auth-message");
 		const budgetContent = document.getElementById("budget-content");
-		const activeMonthInput = document.getElementById("active-month");
+		const periodStartInput = document.getElementById("period-start");
+		const periodEndInput = document.getElementById("period-end");
 		const languageSelect = document.getElementById("app-language");
 		const currencySelect = document.getElementById("app-currency");
 		const monthlyIncomeEl = document.getElementById("monthly-income");
@@ -307,20 +326,28 @@ const shared = window.BudgetAppShared;
 			render();
 		});
 
-		activeMonthInput.addEventListener("change", () => {
-			setDefaultListDateFilters(activeMonthInput.value);
-			render();
-		});
+		[periodStartInput, periodEndInput].forEach((input) => {
+			if (!input) {
+				return;
+			}
+			input.addEventListener("change", () => {
+				syncPeriodInputOrder();
+				setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
+				render();
+			});
+ 		});
 		[incomeFilterStart, incomeFilterEnd, expenseFilterStart, expenseFilterEnd].forEach((input) => {
 			if (!input) {
 				return;
 			}
 			input.addEventListener("change", render);
-		});
+ 		});
 		forecastToggleButton.addEventListener("click", () => {
-			const monthParam = encodeURIComponent(activeMonthInput.value || toMonthInput(today));
+			const periodStart = periodStartInput?.value || toDateInput(today);
+			const monthParam = encodeURIComponent(periodStart.slice(0, 7));
 			window.location.href = `budget-forecast.html?month=${monthParam}`;
 		});
+
 		if (saveStateButton) {
 			saveStateButton.addEventListener("click", () => {
 				saveState();
@@ -513,8 +540,8 @@ const shared = window.BudgetAppShared;
 
 			applyTheme();
 			syncThemeButtons();
-			activeMonthInput.value = toMonthInput(today);
-			setDefaultListDateFilters(activeMonthInput.value);
+			setDefaultPeriodRange();
+			setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
 			languageSelect.value = appLanguage;
 			currencySelect.value = appCurrency;
 			resetIncomeForm();
@@ -539,6 +566,9 @@ const shared = window.BudgetAppShared;
 			document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
 				element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
 			});
+			document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+				element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+			});
 
 			document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
 				option.textContent = translateCategory(option.value);
@@ -558,14 +588,15 @@ const shared = window.BudgetAppShared;
 				return;
 			}
 
-			const activeMonth = activeMonthInput.value;
+			const selectedPeriod = getDateRange(periodStartInput?.value, periodEndInput?.value);
 			const todayText = toDateInput(new Date());
-			const incomes = monthEntries(appState.incomes, activeMonth);
-			const expenses = monthEntries(appState.expenses, activeMonth);
+			const anchorMonth = (selectedPeriod.start || selectedPeriod.end || toDateInput(today)).slice(0, 7);
+			const incomes = entriesForListByDateRange(appState.incomes, selectedPeriod.start, selectedPeriod.end, anchorMonth);
+			const expenses = entriesForListByDateRange(appState.expenses, selectedPeriod.start, selectedPeriod.end, anchorMonth);
 			const incomeRange = getDateRange(incomeFilterStart?.value, incomeFilterEnd?.value);
 			const expenseRange = getDateRange(expenseFilterStart?.value, expenseFilterEnd?.value);
-			const filteredIncomes = entriesForListByDateRange(appState.incomes, incomeRange.start, incomeRange.end, activeMonth);
-			const filteredExpenses = entriesForListByDateRange(appState.expenses, expenseRange.start, expenseRange.end, activeMonth);
+			const filteredIncomes = entriesForListByDateRange(appState.incomes, incomeRange.start, incomeRange.end, anchorMonth);
+			const filteredExpenses = entriesForListByDateRange(appState.expenses, expenseRange.start, expenseRange.end, anchorMonth);
 
 			monthlyIncomeEl.textContent = formatCurrency(sumEntries(incomes));
 			monthlyExpenseEl.textContent = formatCurrency(sumEntries(expenses));
@@ -756,7 +787,7 @@ const shared = window.BudgetAppShared;
 		function buildEntryFromForm(prefix) {
 			const parsedAmount = parseAmountValue(document.getElementById(`${prefix}-amount`).value);
 			return {
-				category: document.getElementById(`${prefix}-category`).value,
+				category: normalizeCategory(document.getElementById(`${prefix}-category`).value),
 				amount: parsedAmount,
 				date: document.getElementById(`${prefix}-date`).value,
 				note: document.getElementById(`${prefix}-note`).value.trim(),
@@ -862,10 +893,10 @@ const shared = window.BudgetAppShared;
 			return `${year}-${String(month).padStart(2, "0")}`;
 		}
 
-		function setDefaultListDateFilters(monthValue) {
-			const month = /^\d{4}-\d{2}$/.test(monthValue) ? monthValue : toMonthInput(today);
-			const start = `${month}-01`;
-			const end = getMonthEndDate(month);
+		function setDefaultListDateFilters(startDate, endDate) {
+			const range = getDateRange(startDate, endDate);
+			const start = range.start || toDateInput(today);
+			const end = range.end || start;
 			if (incomeFilterStart) {
 				incomeFilterStart.value = start;
 			}
@@ -877,6 +908,28 @@ const shared = window.BudgetAppShared;
 			}
 			if (expenseFilterEnd) {
 				expenseFilterEnd.value = end;
+			}
+		}
+
+		function setDefaultPeriodRange() {
+			const month = toMonthInput(today);
+			const start = `${month}-01`;
+			const end = getMonthEndDate(month);
+			if (periodStartInput) {
+				periodStartInput.value = start;
+			}
+			if (periodEndInput) {
+				periodEndInput.value = end;
+			}
+		}
+
+		function syncPeriodInputOrder() {
+			const range = getDateRange(periodStartInput?.value, periodEndInput?.value);
+			if (periodStartInput && range.start) {
+				periodStartInput.value = range.start;
+			}
+			if (periodEndInput && range.end) {
+				periodEndInput.value = range.end;
 			}
 		}
 
@@ -992,8 +1045,18 @@ const shared = window.BudgetAppShared;
 		}
 
 		function translateCategory(value) {
-			const normalizedValue = value === "hitelkartya 3" ? "hitelkartya" : value;
+			const normalizedValue = normalizeCategory(value);
 			return t(`categories.${normalizedValue}`) || normalizedValue;
+		}
+
+		function normalizeCategory(value) {
+			if (value === "hitelkartya 3") {
+				return "hitelkartya";
+			}
+			if (value === "suli") {
+				return "iskola";
+			}
+			return value;
 		}
 
 		function t(key) {
@@ -1193,6 +1256,7 @@ const shared = window.BudgetAppShared;
 				.filter((entry) => entry && entry.id && entry.category && entry.date)
 				.map((entry) => ({
 					...entry,
+					category: normalizeCategory(entry.category),
 					amount: parseAmountValue(entry.amount),
 					note: typeof entry.note === "string" ? entry.note : "",
 					repeatMonthly: Boolean(entry.repeatMonthly),

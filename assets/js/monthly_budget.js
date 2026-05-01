@@ -12,13 +12,13 @@ const shared = window.BudgetAppShared;
 
 		const dictionary = {
 			hu: {
-				pageTitle: "Havi összegzés",
-				heroTitle: "Havi összegzés",
-				heroText: "Havi összegzés, mai költések és jövőbeli tételek dátum szerint.",
+				pageTitle: "Összesítés",
+				heroTitle: "Összesítés",
+				heroText: "Bevételek és kiadások összesítése választott időszakra.",
 				menuButton: "Menü",
 				homeLink: "Kezdőlap",
 				budgetLink: "Költségvetés",
-				monthlyLink: "Havi összegzés",
+				monthlyLink: "Összesítés",
 				themeModeLabel: "Téma",
 				themeModeLight: "Világos",
 				themeModeDark: "Sötét",
@@ -27,28 +27,33 @@ const shared = window.BudgetAppShared;
 				deleteAccountButton: "Regisztráció törlése",
 				logoutAction: "Kijelentkezés",
 				languageLabel: "Nyelv",
+				languageSelectorAria: "Nyelv választó",
+				themeSwitchAria: "Téma váltó",
+				currencySelectorAria: "Pénznem választó",
 				appName: "Költségvetési app",
 				currencyLabel: "Pénznem",
 				currencyHuf: "HUF (forint)",
 				currencyGbp: "GBP (font)",
 				currencyUsd: "USD (dollár)",
 				currencyEur: "EUR (euró)",
-				monthLabel: "Választott hónap",
+				periodLabel: "Választott időszak",
+				periodFromLabel: "-tól",
+				periodToLabel: "-ig",
 				loggedOut: "Nincs bejelentkezett felhasználó.",
 				loggedIn: "Bejelentkezve:",
 				guestUser: "Vendég",
-				loginRequired: "A havi összegzéshez jelentkezz be a Költségvetés oldalon.",
-				monthlyIncomeTitle: "Havi bevétel",
-				monthlyExpenseTitle: "Havi kiadás",
-				spentToDateTitle: "Kiadás mai napig",
-				currentBalanceTitle: "Aktuális egyenleg",
-				upcomingExpensesTitle: "Várható kiadások dátum szerint",
-				upcomingIncomesTitle: "Várható bevételek dátum szerint",
-				projectionTitle: "Hónap végi becslés",
+				loginRequired: "Az összesítéshez jelentkezz be a Költségvetés oldalon.",
+				monthlyIncomeTitle: "Bevétel összesen",
+				monthlyExpenseTitle: "Kiadás összesen",
+				spentToDateTitle: "Kiadás a mai napig",
+				currentBalanceTitle: "Egyenleg az időszakban",
+				upcomingExpensesTitle: "Kiadások dátum szerint",
+				upcomingIncomesTitle: "Bevételek dátum szerint",
+				projectionTitle: "Időszak végi becslés",
 				noData: "Nincs adat.",
 				appDownloaded: "Az app letöltve.",
 				appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
-				emptyEntries: "Nincs várható tétel a hónap további részére.",
+				emptyEntries: "Nincs tétel a kiválasztott időszakban.",
 				projectionText: "Várható egyenleg {date} dátumra: {amount}.",
 				categories: {
 					fizetes: "Fizetés",
@@ -69,18 +74,19 @@ const shared = window.BudgetAppShared;
 					tv: "TV",
 					telefon: "Telefon",
 					internet: "Internet",
-					suli: "Suli",
+					iskola: "Iskola",
+					suli: "Iskola",
 					"egyeb kiadas": "Egyéb kiadás"
 				}
 			},
 			en: {
-				pageTitle: "Monthly Budget",
-				heroTitle: "Monthly Budget",
-				heroText: "Monthly summary, current spending, and upcoming dated entries.",
+				pageTitle: "Summary",
+				heroTitle: "Summary",
+				heroText: "Income and expense summary for a selected date range.",
 				menuButton: "Menu",
 				homeLink: "Home",
 				budgetLink: "Budget",
-				monthlyLink: "Monthly Budget",
+				monthlyLink: "Summary",
 				themeModeLabel: "Theme",
 				themeModeLight: "Light",
 				themeModeDark: "Dark",
@@ -89,28 +95,33 @@ const shared = window.BudgetAppShared;
 				deleteAccountButton: "Delete account",
 				logoutAction: "Sign out",
 				languageLabel: "Language",
+				languageSelectorAria: "Language selector",
+				themeSwitchAria: "Theme switch",
+				currencySelectorAria: "Currency selector",
 				appName: "Budgeting App",
 				currencyLabel: "Currency",
 				currencyHuf: "HUF (forint)",
 				currencyGbp: "GBP (pound)",
 				currencyUsd: "USD (dollar)",
 				currencyEur: "EUR (euro)",
-				monthLabel: "Selected month",
+				periodLabel: "Selected period",
+				periodFromLabel: "from",
+				periodToLabel: "to",
 				loggedOut: "No user is signed in.",
 				loggedIn: "Signed in as:",
 				guestUser: "Guest",
 				loginRequired: "Please sign in on the Budget page first.",
-				monthlyIncomeTitle: "Monthly income",
-				monthlyExpenseTitle: "Monthly expense",
+				monthlyIncomeTitle: "Total income",
+				monthlyExpenseTitle: "Total expense",
 				spentToDateTitle: "Spent to date",
-				currentBalanceTitle: "Current balance",
-				upcomingExpensesTitle: "Upcoming expenses by date",
-				upcomingIncomesTitle: "Upcoming income by date",
-				projectionTitle: "Month-end projection",
+				currentBalanceTitle: "Balance in period",
+				upcomingExpensesTitle: "Expenses by date",
+				upcomingIncomesTitle: "Income by date",
+				projectionTitle: "End-of-period projection",
 				noData: "No data.",
 				appDownloaded: "App downloaded.",
 				appInstallUnavailable: "App install is not available on this device right now.",
-				emptyEntries: "No upcoming entries for the rest of this month.",
+				emptyEntries: "No entries in the selected period.",
 				projectionText: "Projected balance for {date}: {amount}.",
 				categories: {
 					fizetes: "Salary",
@@ -131,6 +142,7 @@ const shared = window.BudgetAppShared;
 					tv: "TV",
 					telefon: "Phone",
 					internet: "Internet",
+					iskola: "School",
 					suli: "School",
 					"egyeb kiadas": "Other expense"
 				}
@@ -155,7 +167,8 @@ const shared = window.BudgetAppShared;
 		const menuLogoutButton = document.getElementById("menu-logout-button");
 		const languageSelect = document.getElementById("app-language");
 		const currencySelect = document.getElementById("app-currency");
-		const activeMonthInput = document.getElementById("active-month");
+		const periodStartInput = document.getElementById("period-start");
+		const periodEndInput = document.getElementById("period-end");
 		const sessionInfo = document.getElementById("session-info");
 		const lockedMessage = document.getElementById("locked-message");
 		const summaryContent = document.getElementById("summary-content");
@@ -297,6 +310,9 @@ const shared = window.BudgetAppShared;
 				element.textContent = t(element.dataset.i18n);
 			});
 			menuToggle.setAttribute("aria-label", t("menuButton"));
+			document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+				element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+			});
 			if (!currentUser) {
 				projectionTextEl.textContent = t("noData");
 			}

@@ -24,6 +24,8 @@ const shared = window.BudgetAppShared;
                 themeModeDark: "Sötét",
                 backAction: "Vissza",
                 languageLabel: "Nyelv",
+                languageSelectorAria: "Nyelv választó",
+                themeSwitchAria: "Téma váltó",
                 appName: "Költségvetési app",
                 registerTitle: "Regisztráció",
                 loginTitle: "Bejelentkezés",
@@ -74,6 +76,8 @@ const shared = window.BudgetAppShared;
                 themeModeDark: "Dark",
                 backAction: "Back",
                 languageLabel: "Language",
+                languageSelectorAria: "Language selector",
+                themeSwitchAria: "Theme switch",
                 appName: "Budgeting App",
                 registerTitle: "Register",
                 loginTitle: "Sign in",
@@ -370,6 +374,9 @@ const shared = window.BudgetAppShared;
             if (menuToggle) {
                 menuToggle.setAttribute("aria-label", t("menuButton"));
             }
+            document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+                element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+            });
             updateSessionLabel();
         }
 

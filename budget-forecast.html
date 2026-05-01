@@ -17,14 +17,14 @@
 			<div class="hero-toolbar">
 				<div class="language-corner">
 					<label for="app-language" class="sr-only" data-i18n="languageLabel">Nyelv</label>
-					<select id="app-language" aria-label="Language selector">
+					<select id="app-language" data-i18n-aria-label="languageSelectorAria" aria-label="Nyelv választó">
 						<option value="hu">HU</option>
 						<option value="en">EN</option>
 					</select>
 				</div>
 				<div class="mobile-app-title" data-i18n="appName">Költségvetési app</div>
 				<nav class="menu-wrap hero-menu-wrap">
-					<div class="theme-switch-inline" role="group" aria-label="Theme switch">
+					<div class="theme-switch-inline" role="group" data-i18n-aria-label="themeSwitchAria" aria-label="Téma váltó">
 						<button id="theme-light-button" type="button" class="theme-switch-btn">
 							<span class="theme-switch-btn-icon" aria-hidden="true">☀</span>
 							<span class="theme-switch-btn-label" data-i18n="themeModeLight">Világos</span>
@@ -56,14 +56,19 @@
 			<p data-i18n="heroText">Tervezd meg előre a kiadásaidat dátum és előrejelzés alapján.</p>
 		</header>
 
-		<section class="card controls compact-controls">
-			<div>
-				<label for="active-month" data-i18n="monthLabel">Választott hónap</label>
-				<input type="month" id="active-month">
+		<section class="card controls compact-controls budget-controls">
+			<div class="period-control">
+				<label for="period-start" data-i18n="periodLabel">Választott időszak</label>
+				<div class="period-range-inputs">
+					<label for="period-start" data-i18n="periodFromLabel">-tól</label>
+					<input type="date" id="period-start" class="small-date-input">
+					<label for="period-end" data-i18n="periodToLabel">-ig</label>
+					<input type="date" id="period-end" class="small-date-input">
+				</div>
 			</div>
-			<div>
+			<div class="currency-control">
 				<label for="app-currency" data-i18n="currencyLabel">Pénznem</label>
-				<select id="app-currency" aria-label="Currency selector">
+				<select id="app-currency" data-i18n-aria-label="currencySelectorAria" aria-label="Pénznem választó">
 					<option value="HUF" data-i18n="currencyHuf">HUF (forint)</option>
 					<option value="GBP" data-i18n="currencyGbp">GBP (font)</option>
 					<option value="USD" data-i18n="currencyUsd">USD (dollár)</option>
@@ -123,7 +128,7 @@
 							<option value="tv">TV</option>
 							<option value="telefon">Telefon</option>
 							<option value="internet">Internet</option>
-							<option value="suli">Iskola</option>
+							<option value="iskola">Iskola</option>
 							<option value="egyeb kiadas">Egyéb kiadás</option>
 						</select>
 

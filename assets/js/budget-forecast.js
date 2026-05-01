@@ -26,13 +26,18 @@ const shared = window.BudgetAppShared;
 				downloadAppButton: "App letöltése",
 				deleteAccountButton: "Regisztráció törlése",
 				languageLabel: "Nyelv",
+				languageSelectorAria: "Nyelv választó",
+				themeSwitchAria: "Téma váltó",
+				currencySelectorAria: "Pénznem választó",
 				appName: "Költségvetési app",
 				currencyLabel: "Pénznem",
 				currencyHuf: "HUF (forint)",
 				currencyGbp: "GBP (font)",
 				currencyUsd: "USD (dollár)",
 				currencyEur: "EUR (euró)",
-				monthLabel: "Választott hónap",
+				periodLabel: "Választott időszak",
+				periodFromLabel: "-tól",
+				periodToLabel: "-ig",
 				forecastButton: "Vissza a Költségvetéshez",
 				forecastTitle: "Költségvetési előrejelző",
 				forecastTargetDateLabel: "Elemzés dátuma",
@@ -122,7 +127,8 @@ const shared = window.BudgetAppShared;
 					tv: "TV",
 					telefon: "Telefon",
 					internet: "Internet",
-					suli: "Suli",
+					iskola: "Iskola",
+					suli: "Iskola",
 					"egyeb kiadas": "Egyéb kiadás"
 				}
 			},
@@ -141,13 +147,18 @@ const shared = window.BudgetAppShared;
 				downloadAppButton: "Download App",
 				deleteAccountButton: "Delete account",
 				languageLabel: "Language",
+				languageSelectorAria: "Language selector",
+				themeSwitchAria: "Theme switch",
+				currencySelectorAria: "Currency selector",
 				appName: "Budgeting App",
 				currencyLabel: "Currency",
 				currencyHuf: "HUF (forint)",
 				currencyGbp: "GBP (pound)",
 				currencyUsd: "USD (dollar)",
 				currencyEur: "EUR (euro)",
-				monthLabel: "Selected month",
+				periodLabel: "Selected period",
+				periodFromLabel: "from",
+				periodToLabel: "to",
 				forecastButton: "Back to Budget",
 				forecastTitle: "Budget Forecast Planner",
 				forecastTargetDateLabel: "Analyze up to date",
@@ -237,6 +248,7 @@ const shared = window.BudgetAppShared;
 					tv: "TV",
 					telefon: "Phone",
 					internet: "Internet",
+					iskola: "School",
 					suli: "School",
 					"egyeb kiadas": "Other expense"
 				}
@@ -265,7 +277,8 @@ const shared = window.BudgetAppShared;
 		const menuLogoutButton = document.getElementById("menu-logout-button");
 		const authMessage = document.getElementById("auth-message");
 		const budgetContent = document.getElementById("budget-content");
-		const activeMonthInput = document.getElementById("active-month");
+		const periodStartInput = document.getElementById("period-start");
+		const periodEndInput = document.getElementById("period-end");
 		const languageSelect = document.getElementById("app-language");
 		const currencySelect = document.getElementById("app-currency");
 		const monthlyIncomeEl = document.getElementById("monthly-income");
@@ -305,7 +318,15 @@ const shared = window.BudgetAppShared;
 			render();
 		});
 
-		activeMonthInput.addEventListener("change", render);
+		[periodStartInput, periodEndInput].forEach((input) => {
+			if (!input) {
+				return;
+			}
+			input.addEventListener("change", () => {
+				normalizePeriodInputs();
+				render();
+			});
+		});
 		forecastToggleButton.addEventListener("click", () => {
 			window.location.href = "budget.html";
 		});
@@ -497,7 +518,7 @@ const shared = window.BudgetAppShared;
 			applyTheme();
 			syncThemeButtons();
 			const queryMonth = pageParams.get("month");
-			activeMonthInput.value = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : toMonthInput(today);
+			setDefaultPeriodRange(queryMonth);
 			languageSelect.value = appLanguage;
 			currencySelect.value = appCurrency;
 			resetIncomeForm();
@@ -517,6 +538,9 @@ const shared = window.BudgetAppShared;
 				element.textContent = t(element.dataset.i18n);
 			});
 			menuToggle.setAttribute("aria-label", t("menuButton"));
+			document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+				element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+			});
 
 			document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
 				option.textContent = translateCategory(option.value);
@@ -537,10 +561,10 @@ const shared = window.BudgetAppShared;
 				return;
 			}
 
-			const activeMonth = activeMonthInput.value;
+			const period = getSelectedPeriod();
 			const todayText = toDateInput(new Date());
-			const incomes = monthEntries(appState.incomes, activeMonth);
-			const expenses = monthEntries(appState.expenses, activeMonth);
+			const incomes = periodEntries(appState.incomes, period.start, period.end);
+			const expenses = periodEntries(appState.expenses, period.start, period.end);
 
 			monthlyIncomeEl.textContent = formatCurrency(sumEntries(incomes));
 			monthlyExpenseEl.textContent = formatCurrency(sumEntries(expenses));
@@ -553,8 +577,8 @@ const shared = window.BudgetAppShared;
 		}
 
 		function setDefaultForecastDates() {
-			const monthValue = activeMonthInput.value || toMonthInput(today);
-			forecastTargetDateInput.value = getMonthEndDate(monthValue);
+			const period = getSelectedPeriod();
+			forecastTargetDateInput.value = period.end;
 		}
 
 		function setDefaultWhatIfRows() {
@@ -621,7 +645,7 @@ const shared = window.BudgetAppShared;
 			});
 		}
 
-		function collectWhatIfRows(activeMonth) {
+		function collectWhatIfRows(periodStart, periodEnd) {
 			return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => {
 				const type = row.querySelector(".forecast-whatif-type")?.value || "expense";
 				const amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
@@ -630,7 +654,7 @@ const shared = window.BudgetAppShared;
 					type,
 					amount,
 					date,
-					valid: amount > 0 && Boolean(date) && date.startsWith(activeMonth)
+					valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd
 				};
 			});
 		}
@@ -644,16 +668,14 @@ const shared = window.BudgetAppShared;
 				return;
 			}
 
-			const activeMonth = activeMonthInput.value;
-			const incomes = monthEntries(appState.incomes, activeMonth);
-			const expenses = monthEntries(appState.expenses, activeMonth);
-			let targetDate = forecastTargetDateInput.value || getMonthEndDate(activeMonth);
-			if (!targetDate.startsWith(activeMonth)) {
-				targetDate = getMonthEndDate(activeMonth);
-				forecastTargetDateInput.value = targetDate;
-			}
+			const period = getSelectedPeriod();
+			const incomes = periodEntries(appState.incomes, period.start, period.end);
+			const expenses = periodEntries(appState.expenses, period.start, period.end);
+			let targetDate = forecastTargetDateInput.value || period.end;
+			targetDate = clampDateToRange(targetDate, period.start, period.end);
+			forecastTargetDateInput.value = targetDate;
 
-			const whatIfRows = collectWhatIfRows(activeMonth);
+			const whatIfRows = collectWhatIfRows(period.start, period.end);
 			const baseUntil = sumEntries(incomes.filter((item) => item.date <= targetDate)) - sumEntries(expenses.filter((item) => item.date <= targetDate));
 			const adjustmentsUntilTarget = whatIfRows
 				.filter((item) => item.valid && item.date <= targetDate)
@@ -663,10 +685,10 @@ const shared = window.BudgetAppShared;
 
 			const monthIncomeTotal = sumEntries(incomes);
 			const monthExpenseTotal = sumEntries(expenses);
-			const allAdjustmentsInMonth = whatIfRows
+			const allAdjustmentsInPeriod = whatIfRows
 				.filter((item) => item.valid)
 				.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
-			const monthEndWithWhatIf = monthIncomeTotal - monthExpenseTotal + allAdjustmentsInMonth;
+			const monthEndWithWhatIf = monthIncomeTotal - monthExpenseTotal + allAdjustmentsInPeriod;
 
 			forecastBaseUntilEl.textContent = formatCurrency(baseUntil);
 			forecastWithPurchaseEl.textContent = formatCurrency(simulatedUntil);
@@ -854,8 +876,58 @@ const shared = window.BudgetAppShared;
 			return Boolean(currentUser);
 		}
 
-		function monthEntries(entries, activeMonth) {
-			return shared.monthEntries(entries, activeMonth);
+		function periodEntries(entries, startDate, endDate) {
+			return entries.filter((item) => item.date >= startDate && item.date <= endDate);
+		}
+
+		function getDateRange(startDate, endDate) {
+			if (!startDate || !endDate || startDate <= endDate) {
+				return { start: startDate, end: endDate };
+			}
+			return { start: endDate, end: startDate };
+		}
+
+		function getSelectedPeriod() {
+			normalizePeriodInputs();
+			const fallback = toDateInput(today);
+			const start = periodStartInput?.value || fallback;
+			const end = periodEndInput?.value || start;
+			return getDateRange(start, end);
+		}
+
+		function normalizePeriodInputs() {
+			if (!periodStartInput || !periodEndInput) {
+				return;
+			}
+			const range = getDateRange(periodStartInput.value, periodEndInput.value);
+			if (range.start) {
+				periodStartInput.value = range.start;
+			}
+			if (range.end) {
+				periodEndInput.value = range.end;
+			}
+		}
+
+		function setDefaultPeriodRange(queryMonth) {
+			const monthValue = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : toMonthInput(today);
+			const start = `${monthValue}-01`;
+			const end = getMonthEndDate(monthValue);
+			if (periodStartInput) {
+				periodStartInput.value = start;
+			}
+			if (periodEndInput) {
+				periodEndInput.value = end;
+			}
+		}
+
+		function clampDateToRange(dateText, startDate, endDate) {
+			if (!dateText || dateText < startDate) {
+				return startDate;
+			}
+			if (dateText > endDate) {
+				return endDate;
+			}
+			return dateText;
 		}
 
 		function sumEntries(entries) {

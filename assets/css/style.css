@@ -224,10 +224,26 @@ body {
 	align-items: center;
 }
 
+.budget-controls > div {
+	align-self: stretch;
+}
+
 .budget-controls > div:not(.control-action) {
 	display: flex;
 	align-items: center;
 	gap: 0.6rem;
+}
+
+.budget-controls .period-control {
+	display: grid;
+	align-content: start;
+	gap: 0.45rem;
+}
+
+.budget-controls .currency-control {
+	display: grid;
+	align-content: start;
+	gap: 0.45rem;
 }
 
 .budget-controls > div:not(.control-action) label {
@@ -236,11 +252,39 @@ body {
 	font-size: 0.9rem;
 }
 
+.budget-controls .period-control > label,
+.budget-controls .currency-control > label {
+	white-space: normal;
+}
+
 .budget-controls > div:not(.control-action) input,
 .budget-controls > div:not(.control-action) select {
 	width: auto;
 	flex: 1 1 auto;
 	min-width: 0;
+}
+
+.budget-controls .currency-control select {
+	width: 100%;
+}
+
+.period-range-inputs {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.35rem;
+	max-width: 220px;
+	width: 100%;
+}
+
+.period-range-inputs label {
+	font-size: 0.82rem;
+	font-weight: 600;
+	margin: 0;
+}
+
+.period-range-inputs .small-date-input {
+	padding: 0.65rem 0.7rem;
+	font-size: inherit;
 }
 
 .budget-controls .control-action .stack {
