@@ -67,6 +67,7 @@ const shared = window.BudgetAppShared;
 				updateExpenseButton: "Kiadás frissítése",
 				noteLabel: "Megjegyzés (opcionális)",
 				notePlaceholder: "Rövid megjegyzés",
+				repeatInEveryMonthLabel: "Megjelenítés minden hónapban",
 				listFromDateLabel: "Ettől",
 				listToDateLabel: "Eddig",
 				cancelEditButton: "Szerkesztés",
@@ -95,9 +96,13 @@ const shared = window.BudgetAppShared;
 				entryDeleted: "A tétel törölve.",
 				invalidAmount: "Adj meg 0-nál nagyobb összeget.",
 				confirmDelete: "Biztosan törölni szeretnéd ezt a tételt?",
-				confirmDeleteRecurringPrompt: "Ismétlődő tétel törlése:\n1 = Törlés minden hónapból\n2 = Törlés csak ebből a hónapból\nÍrd be: 1 vagy 2",
-				deleteRecurringAllOption: "1",
-				deleteRecurringThisMonthOption: "2",
+				deleteScopeTitle: "Ismétlődő tétel törlése",
+				deleteScopeMessage: "Válaszd ki, honnan töröljük a tételt.",
+				deleteOnlyThisMonthButton: "Törlés csak ebből a hónapból",
+				deleteAllMonthsButton: "Törlés minden hónapból",
+				cancelModalButton: "Mégse",
+				confirmDeleteAllMonths: "Biztos törlöd minden hónapból?",
+				confirmDeleteThisMonth: "Biztos törlöd ebből a hónapból?",
 				emptyEntries: "Nincs rögzített tétel a megadott időszakra.",
 				exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
 				exportDone: "A havi CSV export letöltése elindult.",
@@ -194,6 +199,7 @@ const shared = window.BudgetAppShared;
 				updateExpenseButton: "Update expense",
 				noteLabel: "Note (optional)",
 				notePlaceholder: "Short note",
+				repeatInEveryMonthLabel: "Show in every month",
 				listFromDateLabel: "From",
 				listToDateLabel: "To",
 				cancelEditButton: "Edit",
@@ -222,9 +228,13 @@ const shared = window.BudgetAppShared;
 				entryDeleted: "Entry deleted.",
 				invalidAmount: "Enter an amount greater than 0.",
 				confirmDelete: "Delete this entry?",
-				confirmDeleteRecurringPrompt: "Delete repeating entry:\n1 = Delete from all months\n2 = Delete only from this month\nType: 1 or 2",
-				deleteRecurringAllOption: "1",
-				deleteRecurringThisMonthOption: "2",
+				deleteScopeTitle: "Delete recurring entry",
+				deleteScopeMessage: "Choose where to delete this entry.",
+				deleteOnlyThisMonthButton: "Delete only from this month",
+				deleteAllMonthsButton: "Delete from all months",
+				cancelModalButton: "Cancel",
+				confirmDeleteAllMonths: "Are you sure you want to delete from all months?",
+				confirmDeleteThisMonth: "Are you sure you want to delete only from this month?",
 				emptyEntries: "No saved entries for the selected period.",
 				exportEmpty: "There are no entries to export for this month.",
 				exportDone: "Monthly CSV export started.",
@@ -309,6 +319,13 @@ const shared = window.BudgetAppShared;
 		const incomeFilterEnd = document.getElementById("income-filter-end");
 		const expenseFilterStart = document.getElementById("expense-filter-start");
 		const expenseFilterEnd = document.getElementById("expense-filter-end");
+		const incomeRepeatMonthlyCheckbox = document.getElementById("income-repeat-monthly");
+		const expenseRepeatMonthlyCheckbox = document.getElementById("expense-repeat-monthly");
+		const deleteScopeModal = document.getElementById("delete-scope-modal");
+		const deleteThisMonthButton = document.getElementById("delete-this-month-btn");
+		const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
+		const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
+		let deleteScopeResolver = null;
 		let deferredInstallPrompt = null;
 
 		initializePage();
@@ -405,16 +422,38 @@ const shared = window.BudgetAppShared;
 			incomeCancelEdit.addEventListener("click", resetIncomeForm);
 		}
 		if (incomeDeleteButton) {
-			incomeDeleteButton.addEventListener("click", () => {
-				handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm);
+			incomeDeleteButton.addEventListener("click", async () => {
+				await handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm);
 			});
 		}
 		if (expenseCancelEdit) {
 			expenseCancelEdit.addEventListener("click", resetExpenseForm);
 		}
 		if (expenseDeleteButton) {
-			expenseDeleteButton.addEventListener("click", () => {
-				handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm);
+			expenseDeleteButton.addEventListener("click", async () => {
+				await handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm);
+			});
+		}
+		if (deleteThisMonthButton) {
+			deleteThisMonthButton.addEventListener("click", () => {
+				closeDeleteScopeModal("month");
+			});
+		}
+		if (deleteAllMonthsButton) {
+			deleteAllMonthsButton.addEventListener("click", () => {
+				closeDeleteScopeModal("all");
+			});
+		}
+		if (deleteScopeCancelButton) {
+			deleteScopeCancelButton.addEventListener("click", () => {
+				closeDeleteScopeModal(null);
+			});
+		}
+ 		if (deleteScopeModal) {
+			deleteScopeModal.addEventListener("click", (event) => {
+				if (event.target === deleteScopeModal) {
+					closeDeleteScopeModal(null);
+				}
 			});
 		}
 
@@ -433,6 +472,11 @@ const shared = window.BudgetAppShared;
 		});
 
 		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape" && deleteScopeModal && !deleteScopeModal.classList.contains("hidden")) {
+				closeDeleteScopeModal(null);
+				return;
+			}
+
 			if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
 				menuPanel.classList.remove("is-open");
 				menuToggle.classList.remove("is-open");
@@ -478,10 +522,20 @@ const shared = window.BudgetAppShared;
 
 			if (editId) {
 				const existingEntry = appState.incomes.find((item) => item.id === editId);
-				upsertEntry("incomes", { ...entry, id: editId, repeatMonthly: Boolean(existingEntry?.repeatMonthly) });
+				upsertEntry("incomes", {
+					...entry,
+					id: editId,
+					repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
+					excludedMonths: Boolean(incomeRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
+				});
 				showMessage(t("entryUpdated"), false);
 			} else {
-				upsertEntry("incomes", { ...entry, id: createEntryId() });
+				upsertEntry("incomes", {
+					...entry,
+					id: createEntryId(),
+					repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
+					excludedMonths: []
+				});
 				showMessage(t("entrySaved"), false);
 			}
 
@@ -505,10 +559,20 @@ const shared = window.BudgetAppShared;
 
 			if (editId) {
 				const existingEntry = appState.expenses.find((item) => item.id === editId);
-				upsertEntry("expenses", { ...entry, id: editId, repeatMonthly: Boolean(existingEntry?.repeatMonthly) });
+				upsertEntry("expenses", {
+					...entry,
+					id: editId,
+					repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
+					excludedMonths: Boolean(expenseRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
+				});
 				showMessage(t("entryUpdated"), false);
 			} else {
-				upsertEntry("expenses", { ...entry, id: createEntryId() });
+				upsertEntry("expenses", {
+					...entry,
+					id: createEntryId(),
+					repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
+					excludedMonths: []
+				});
 				showMessage(t("entrySaved"), false);
 			}
 
@@ -517,12 +581,12 @@ const shared = window.BudgetAppShared;
 			render();
 		});
 
-		incomeList.addEventListener("click", (event) => {
-			handleEntryAction(event, "incomes");
+		incomeList.addEventListener("click", async (event) => {
+			await handleEntryAction(event, "incomes");
 		});
 
-		expenseList.addEventListener("click", (event) => {
-			handleEntryAction(event, "expenses");
+		expenseList.addEventListener("click", async (event) => {
+			await handleEntryAction(event, "expenses");
 		});
 
 		function initializePage() {
@@ -650,7 +714,7 @@ const shared = window.BudgetAppShared;
 				});
 		}
 
-		function handleEntryAction(event, listType) {
+		async function handleEntryAction(event, listType) {
 			const button = event.target.closest("button[data-action]");
 			if (!button) {
 				return;
@@ -681,7 +745,7 @@ const shared = window.BudgetAppShared;
 			}
 
 			if (action === "delete") {
-				if (!handleEntryDelete(listType, entryId, clickedDate)) {
+				if (!(await handleEntryDelete(listType, entryId, clickedDate))) {
 					return;
 				}
 				if (listType === "incomes") {
@@ -694,7 +758,7 @@ const shared = window.BudgetAppShared;
 			}
 		}
 
-		function handleEntryDelete(listType, entryId, clickedDate) {
+		async function handleEntryDelete(listType, entryId, clickedDate) {
 			const entry = appState[listType].find((item) => item.id === entryId);
 			if (!entry) {
 				return false;
@@ -709,19 +773,24 @@ const shared = window.BudgetAppShared;
 				return true;
 			}
 
-			const answer = window.prompt(t("confirmDeleteRecurringPrompt"), t("deleteRecurringThisMonthOption"));
-			if (answer === null) {
+			const scope = await openDeleteScopeModal();
+			if (!scope) {
 				return false;
 			}
 
-			const normalizedAnswer = String(answer).trim();
-			if (normalizedAnswer === t("deleteRecurringAllOption")) {
+			if (scope === "all") {
+				if (!window.confirm(t("confirmDeleteAllMonths"))) {
+					return false;
+				}
 				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
 				saveState();
 				return true;
 			}
 
-			if (normalizedAnswer === t("deleteRecurringThisMonthOption")) {
+			if (scope === "month") {
+				if (!window.confirm(t("confirmDeleteThisMonth"))) {
+					return false;
+				}
 				const monthToExclude = (clickedDate || entry.date || "").slice(0, 7);
 				if (/^\d{4}-\d{2}$/.test(monthToExclude)) {
 					const excludedMonths = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
@@ -737,6 +806,32 @@ const shared = window.BudgetAppShared;
 			return false;
 		}
 
+		function openDeleteScopeModal() {
+			if (!deleteScopeModal) {
+				return Promise.resolve(null);
+			}
+
+			deleteScopeModal.classList.remove("hidden");
+			if (deleteThisMonthButton) {
+				deleteThisMonthButton.focus();
+			}
+
+			return new Promise((resolve) => {
+				deleteScopeResolver = resolve;
+			});
+		}
+
+		function closeDeleteScopeModal(choice) {
+			if (deleteScopeModal) {
+				deleteScopeModal.classList.add("hidden");
+			}
+			if (deleteScopeResolver) {
+				const resolver = deleteScopeResolver;
+				deleteScopeResolver = null;
+				resolver(choice);
+			}
+		}
+
 		function populateFormForEdit(listType, entry) {
 			if (listType === "incomes") {
 				document.getElementById("income-edit-id").value = entry.id;
@@ -744,6 +839,9 @@ const shared = window.BudgetAppShared;
 				document.getElementById("income-amount").value = entry.amount;
 				document.getElementById("income-date").value = entry.date;
 				document.getElementById("income-note").value = entry.note || "";
+				if (incomeRepeatMonthlyCheckbox) {
+					incomeRepeatMonthlyCheckbox.checked = Boolean(entry.repeatMonthly);
+				}
 				if (incomeCancelEdit) {
 					incomeCancelEdit.classList.remove("hidden");
 				}
@@ -753,6 +851,9 @@ const shared = window.BudgetAppShared;
 				document.getElementById("expense-amount").value = entry.amount;
 				document.getElementById("expense-date").value = entry.date;
 				document.getElementById("expense-note").value = entry.note || "";
+				if (expenseRepeatMonthlyCheckbox) {
+					expenseRepeatMonthlyCheckbox.checked = Boolean(entry.repeatMonthly);
+				}
 				expenseCancelEdit.classList.remove("hidden");
 			}
 
@@ -764,6 +865,9 @@ const shared = window.BudgetAppShared;
 			document.getElementById("income-edit-id").value = "";
 			document.getElementById("income-date").value = toDateInput(today);
 			document.getElementById("income-note").value = "";
+			if (incomeRepeatMonthlyCheckbox) {
+				incomeRepeatMonthlyCheckbox.checked = false;
+			}
 			if (incomeCancelEdit) {
 				incomeCancelEdit.classList.add("hidden");
 			}
@@ -775,6 +879,9 @@ const shared = window.BudgetAppShared;
 			document.getElementById("expense-edit-id").value = "";
 			document.getElementById("expense-date").value = toDateInput(today);
 			document.getElementById("expense-note").value = "";
+			if (expenseRepeatMonthlyCheckbox) {
+				expenseRepeatMonthlyCheckbox.checked = false;
+			}
 			expenseCancelEdit.classList.add("hidden");
 			updateFormButtonLabels();
 		}
@@ -960,19 +1067,19 @@ const shared = window.BudgetAppShared;
 			appState[collectionName].push(entry);
 		}
 
-		function handleDeleteFromForm(collectionName, editIdField, resetForm) {
+		async function handleDeleteFromForm(collectionName, editIdField, resetForm) {
 			const editId = document.getElementById(editIdField).value;
 			if (!editId) {
 				resetForm();
 				return;
 			}
 
-			if (!window.confirm(t("confirmDelete"))) {
+			const sourceDateField = collectionName === "incomes" ? "income-date" : "expense-date";
+			const sourceDate = document.getElementById(sourceDateField)?.value || "";
+			if (!(await handleEntryDelete(collectionName, editId, sourceDate))) {
 				return;
 			}
 
-			appState[collectionName] = appState[collectionName].filter((item) => item.id !== editId);
-			saveState();
 			resetForm();
 			showMessage(t("entryDeleted"), false);
 			render();

@@ -110,6 +110,11 @@
 							<label for="income-note" data-i18n="noteLabel">Megjegyzés (opcionális)</label>
 							<textarea id="income-note" rows="2" maxlength="280" data-i18n-placeholder="notePlaceholder" placeholder="Rövid megjegyzés"></textarea>
 
+							<label for="income-repeat-monthly" class="inline-check">
+								<input type="checkbox" id="income-repeat-monthly">
+								<span data-i18n="repeatInEveryMonthLabel">Megjelenítés minden hónapban</span>
+							</label>
+
 							<div class="form-actions">
 								<button type="submit" id="income-submit-button" class="btn btn-outline-info">Bevétel mentése</button>
 								<button type="button" id="income-edit" class="btn btn-outline-info">Szerkesztés</button>
@@ -167,8 +172,13 @@
 							<label for="expense-note" data-i18n="noteLabel">Megjegyzés (opcionális)</label>
 							<textarea id="expense-note" rows="2" maxlength="280" data-i18n-placeholder="notePlaceholder" placeholder="Rövid megjegyzés"></textarea>
 
+							<label for="expense-repeat-monthly" class="inline-check">
+								<input type="checkbox" id="expense-repeat-monthly">
+								<span data-i18n="repeatInEveryMonthLabel">Megjelenítés minden hónapban</span>
+							</label>
+
 							<div class="form-actions">
-								<button type="submit" id="expense-submit-button" class="btn btn-outline-info">Kiadás mentése</button>
+								<button type="submit" id="expense-submit-button" class="btn btn-outline-info compact-save-button">Kiadás mentése</button>
 								<button type="button" id="expense-edit" class="btn btn-outline-info">Szerkesztés</button>
 								<button type="button" id="expense-delete" class="btn btn-danger">Törlés</button>
 							</div>
@@ -214,6 +224,18 @@
 			</section>
 		</section>
 	</main>
+
+	<div id="delete-scope-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="delete-scope-title">
+		<div class="modal-card">
+			<h3 id="delete-scope-title" data-i18n="deleteScopeTitle">Ismétlődő tétel törlése</h3>
+			<p data-i18n="deleteScopeMessage">Válaszd ki, honnan töröljük a tételt.</p>
+			<div class="modal-actions-split">
+				<button type="button" id="delete-this-month-btn" class="btn btn-outline-info" data-i18n="deleteOnlyThisMonthButton">Törlés csak ebből a hónapból</button>
+				<button type="button" id="delete-all-months-btn" class="btn btn-danger" data-i18n="deleteAllMonthsButton">Törlés minden hónapból</button>
+			</div>
+			<button type="button" id="delete-scope-cancel" class="btn btn-outline-info" data-i18n="cancelModalButton">Mégse</button>
+		</div>
+	</div>
 
 	<script src="assets/js/app-shared.js"></script>
 	<script src="assets/js/budget.js"></script>
