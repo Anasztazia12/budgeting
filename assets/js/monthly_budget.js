@@ -66,7 +66,7 @@ const shared = window.BudgetAppShared;
 					benzin: "Benzin",
 					elemiszer: "Élelmiszer",
 					ruhak: "Ruhák",
-					rent: "Rent",
+					rent: "Albérlet",
 					biztositas: "Biztosítás",
 					"hitelkartya 3": "Hitelkártya 3",
 					onkormanyzat: "Önkormányzat",

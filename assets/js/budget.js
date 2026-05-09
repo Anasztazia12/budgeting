@@ -129,11 +129,13 @@ const shared = window.BudgetAppShared;
 					benzin: "Benzin",
 					elemiszer: "Élelmiszer",
 					ruhak: "Ruhák",
-					rent: "Rent",
+					rent: "Albérlet",
 					biztositas: "Biztosítás",
 					hitelkartya: "Hitelkártya",
 					"hitelkartya 3": "Hitelkártya",
+					council: "Önkormányzat",
 					onkormanyzat: "Önkormányzat",
+					travel: "Travel",
 					zilch: "Zilch",
 					tv: "TV",
 					telefon: "Telefon",
@@ -265,7 +267,9 @@ const shared = window.BudgetAppShared;
 					biztositas: "Insurance",
 					hitelkartya: "Credit card",
 					"hitelkartya 3": "Credit card",
+					council: "Council",
 					onkormanyzat: "Municipality",
+					travel: "Travel",
 					zilch: "Zilch",
 					tv: "TV",
 					telefon: "Phone",
@@ -635,10 +639,53 @@ const shared = window.BudgetAppShared;
 			});
 
 			document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
+				if (option.value === "__separator__") {
+					return;
+				}
 				option.textContent = translateCategory(option.value);
 			});
 
+			sortExpenseCategoryOptions();
+
 			updateFormButtonLabels();
+		}
+
+		function sortExpenseCategoryOptions() {
+			const expenseCategorySelect = document.getElementById("expense-category");
+			if (!expenseCategorySelect) {
+				return;
+			}
+
+			const selectedValue = expenseCategorySelect.value;
+			const options = Array.from(expenseCategorySelect.options);
+			const regularOptions = options
+				.filter((option) => option.value !== "egyeb kiadas" && option.value !== "__separator__")
+				.sort((left, right) => {
+				const leftLabel = translateCategory(left.value);
+				const rightLabel = translateCategory(right.value);
+				return leftLabel.localeCompare(rightLabel, appLanguage, { sensitivity: "base" });
+			});
+			const otherExpenseOption = options.find((option) => option.value === "egyeb kiadas") || null;
+			const separatorOption = options.find((option) => option.value === "__separator__") || null;
+
+			expenseCategorySelect.innerHTML = "";
+			regularOptions.forEach((option) => {
+				expenseCategorySelect.appendChild(option);
+			});
+
+			if (otherExpenseOption) {
+				const divider = separatorOption || document.createElement("option");
+				divider.value = "__separator__";
+				divider.disabled = true;
+				divider.textContent = "──────────";
+				expenseCategorySelect.appendChild(divider);
+				expenseCategorySelect.appendChild(otherExpenseOption);
+			}
+
+			expenseCategorySelect.value = selectedValue;
+			if (expenseCategorySelect.value === "__separator__") {
+				expenseCategorySelect.selectedIndex = 0;
+			}
 		}
 
 		function render() {
