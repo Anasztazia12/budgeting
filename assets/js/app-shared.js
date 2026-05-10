@@ -7,8 +7,7 @@
         CURRENCY_KEY: "budgetAppCurrency",
         INSTALL_STATUS_KEY: "budgetAppInstalled",
         GUEST_DATA_KEY: "budgetAppGuestData",
-        FLASH_MESSAGE_KEY: "budgetAppFlashMessage",
-        EMAIL_ENDPOINT_KEY: "budgetAppEmailEndpoint"
+        FLASH_MESSAGE_KEY: "budgetAppFlashMessage"
     };
 
     const GUEST_SESSION_VALUE = "__guest__";
@@ -210,57 +209,10 @@
         return true;
     }
 
-    function getEmailEndpoint() {
-        const runtimeEndpoint = typeof window.BUDGET_APP_EMAIL_ENDPOINT === "string"
-            ? window.BUDGET_APP_EMAIL_ENDPOINT
-            : "";
-        const storedEndpoint = localStorage.getItem(KEYS.EMAIL_ENDPOINT_KEY) || "";
-        const configured = String(runtimeEndpoint || storedEndpoint).trim();
-        if (configured) {
-            return configured;
-        }
-
-        if (window.location.protocol === "http:" || window.location.protocol === "https:") {
-            return `${window.location.origin}/api/send-email`;
-        }
-
-        return "";
-    }
-
-    async function sendEmailViaEndpoint(to, subject, body) {
-        const endpoint = getEmailEndpoint();
-        if (!endpoint || !to) {
-            return false;
-        }
-
-        try {
-            const response = await fetch(endpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    to,
-                    subject,
-                    body
-                })
-            });
-
-            return response.ok;
-        } catch (_error) {
-            return false;
-        }
-    }
-
     async function sendRegistrationEmail(_language, email, username) {
         const name = username || "";
         const subject = "Thanks for registering";
         const body = `Hello ${name},\n\nThank you for registering.\nRegistration successful with this username: ${name}.\n\nBudgeting App`;
-        const sent = await sendEmailViaEndpoint(email, subject, body);
-        if (sent) {
-            return true;
-        }
-
         return openEmailDraft(email, subject, body);
     }
 
@@ -268,11 +220,6 @@
         const name = username || "";
         const subject = "Account deleted";
         const body = `Hello ${name},\n\nYour account has been deleted successfully.\n\nBudgeting App`;
-        const sent = await sendEmailViaEndpoint(email, subject, body);
-        if (sent) {
-            return true;
-        }
-
         return openEmailDraft(email, subject, body);
     }
 

@@ -180,9 +180,11 @@ UX principles:
 
 ## Quick Start
 
-1. Open index.html in a browser.
-2. Register, sign in, or continue as guest.
-3. Open Budget or Monthly Budget and start tracking.
+1. Install Node.js (if not installed).
+2. Run `npm start`.
+3. Open `http://localhost:3000`
+4. Register, sign in, or continue as guest.
+5. Open Budget or Monthly Budget and start tracking.
 
 ### Manual testing
 
@@ -204,41 +206,4 @@ Dark mode
 
 This is a client-side prototype. For production use, add a backend service, secure server-side sessions, and database storage.
 
-## Automatic Email Setup
-
-This project now includes an optional email API backend for automatic email sending on:
-
-- Registration success
-- Account deletion
-
-### 1) Install backend dependencies
-
-```bash
-npm install
-```
-
-### 2) Configure environment
-
-Copy `.env.example` to `.env` and fill your SMTP values.
-
-### 3) Start email API
-
-```bash
-npm start
-```
-
-By default the API runs at `http://localhost:3001` and exposes:
-
-- `GET /api/health`
-- `POST /api/send-email`
-
-### 4) Frontend endpoint
-
-Frontend auto-detects `window.location.origin + /api/send-email` when served over HTTP(S).
-
-If your email API runs elsewhere, set one of these:
-
-- `window.BUDGET_APP_EMAIL_ENDPOINT`
-- `localStorage.setItem("budgetAppEmailEndpoint", "https://your-domain/api/send-email")`
-
-Thank you for checking out my project
+Registration/account delete email actions open the default mail app using a `mailto:` draft.
