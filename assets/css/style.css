@@ -302,8 +302,10 @@ body {
 	max-width: 100%;
 	flex: 0 0 auto;
 	min-width: 0;
-	padding: 0.65rem 0.7rem;
-	font-size: inherit;
+	min-height: 2rem;
+	padding: 0.42rem 0.56rem;
+	font-size: 0.88rem;
+	line-height: 1.1;
 	white-space: nowrap;
 }
 
@@ -714,6 +716,9 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 
 .budget-stat-pair > .stat {
 	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
 }
 
 .forecast-grid {
@@ -1132,16 +1137,16 @@ button:disabled {
 
 #monthly-expense,
 #spent-to-date {
-	color: var(--danger);
+	color: #c63e5e;
 }
 
 #spent-to-date {
-	color: #2d334e;
+	color: #111111;
 }
 
 #month-end-left {
-	color: #1f4fbf;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+	color: #111111;
+	text-shadow: none;
 }
 
 h3[data-i18n="monthEndTitle"] {
@@ -1158,11 +1163,11 @@ h2[data-i18n="projectionTitle"] {
 }
 
 [data-theme="dark"] #spent-to-date {
-	color: #dce7ff;
+	color: #111111;
 }
 
 [data-theme="dark"] #month-end-left {
-	color: #9ec2ff;
+	color: #111111;
 	text-shadow: none;
 }
 
@@ -1615,9 +1620,10 @@ select:focus-visible {
 		width: fit-content;
 		max-width: 100%;
 		flex: 0 0 auto;
-		min-height: unset;
-		padding: 0.38rem 0.5rem;
-		font-size: 0.8rem;
+		min-height: 1.88rem;
+		padding: 0.3rem 0.46rem;
+		font-size: 0.76rem;
+		line-height: 1.05;
 	}
 
 	.budget-controls .period-range-inputs .small-date-input {
@@ -1688,6 +1694,27 @@ select:focus-visible {
 	.entry-filters {
 		grid-template-columns: 1fr;
 		gap: 0.3rem;
+		justify-items: start;
+	}
+
+	.entry-filters label {
+		font-size: 0.8rem;
+	}
+
+	.entry-filters input[type="date"] {
+		width: min(100%, 155px);
+		inline-size: min(100%, 155px);
+		max-width: 100%;
+		max-inline-size: 100%;
+		min-width: 0;
+		min-inline-size: 0;
+		min-height: 1.76rem;
+		padding: 0.24rem 0.38rem;
+		font-size: 0.72rem;
+		line-height: 1.05;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		justify-self: start;
 	}
 
 	.entry-row {

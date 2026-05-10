@@ -474,13 +474,19 @@ const shared = window.BudgetAppShared;
 		}
 
 		function formatCurrency(amount) {
-			const locale = appLanguage === "en" ? "en-US" : "hu-HU";
-			return new Intl.NumberFormat(locale, {
-				style: "currency",
-				currency: appCurrency,
-				currencyDisplay: "narrowSymbol",
+			const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
+			const symbols = {
+				HUF: "Ft",
+				GBP: "£",
+				USD: "$",
+				EUR: "€"
+			};
+			const numericAmount = Number(amount) || 0;
+			const valueText = new Intl.NumberFormat(locale, {
+				minimumFractionDigits: 0,
 				maximumFractionDigits: 0
-			}).format(amount);
+			}).format(numericAmount);
+			return `${valueText} ${symbols[appCurrency] || appCurrency}`;
 		}
 
 		function formatDisplayDate(isoDate) {
