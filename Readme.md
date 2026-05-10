@@ -1,209 +1,112 @@
 # Budgeting App
 
+A lightweight, browser-based budgeting app with HU/EN UI, local accounts, and monthly planning tools.
+
 ## Overview
 
-### Why this project was created
+Budgeting App is designed for people who want a practical monthly finance workflow without spreadsheets or complex setup. The app focuses on daily usability: quick entry creation, clear status indicators, and short-term projection support. Instead of forcing long onboarding, it allows immediate use through either registered accounts or guest mode.
 
-Managing monthly income and expenses is often fragmented: people track data in notes, messages, spreadsheets, or memory. This project was created to provide a simple, focused budgeting flow in one place with minimal setup.
+The product emphasizes clarity and speed:
 
-### What problem it solves
+- One place for income and expense tracking
+- Fast visibility of monthly totals and balance trends
+- Forecasting support for expected end-of-period outcome
+- Responsive usage across laptop and phone screens
+- Bilingual UI (Hungarian and English) with consistent terminology
 
-- Lack of one clear monthly budgeting workflow.
-- No quick way to compare monthly income vs. monthly expenses.
-- Difficulty seeing spent-to-date and expected month-end balance.
-- Poor visibility of upcoming dated entries.
-- Need for lightweight account separation without backend complexity.
+Because the project is client-side, users can run it locally and keep control over their own data environment. This also means the current version is optimized for single-device usage, with no backend dependency.
 
-### Main value and benefits
+## What it does
 
-- Fast entry and editing of financial records.
-- Immediate monthly summary metrics.
-- Better short-term planning with projected balance.
-- CSV export for reporting or offline analysis.
-- Bilingual interface (HU/EN) for wider usability.
+- Register / sign in / guest mode
+- Income and expense tracking
+- Monthly summary cards (income, expense, spent-to-date, balance)
+- Forecast view and period-based projection
+- CSV export
+- Responsive UI with PWA support
 
-## 1. Strategy
+## Project scope
 
-The strategy is to deliver a practical browser-based budgeting app with strong day-to-day usability first, then scale to a production architecture later.
+This project is client-side only.
 
-## NVP Table
+- Data is stored in localStorage.
+- No backend API, no database, no cloud sync.
+- Email actions use `mailto:` drafts in the user's default mail app.
 
-| Need | Value | Proof in this project |
-| --- | --- | --- |
-| Users need one place for monthly money tracking. | Clear and focused budgeting workflow. | Dedicated pages for login, budgeting, forecast, and monthly summary. |
-| Users need quick visibility of financial status. | Fast decision support for day-to-day spending. | Total income, total expense, spent-to-date, and month-end balance cards. |
-| Users need low-friction usage on any device. | Better adoption and repeat usage. | Responsive layout, mobile hamburger navigation, and simple forms. |
-| Users need basic account separation without backend setup. | Personal data isolation for local use. | Registered users, guest mode, and session-based local data handling. |
-| Users need understandable planning, not only raw records. | Better short-term forecasting confidence. | Forecast planner and upcoming dated entries on summary pages. |
+## Main pages
 
-Core strategic goals:
+- `index.html` - auth entry (register, login, guest)
+- `budget.html` - daily budgeting workspace
+- `budget-forecast.html` - forecast planner
+- `monthly_budget.html` - summary and projection
 
-- Keep interaction simple and task-oriented.
-- Preserve user-level data separation.
-- Support two access modes: registered user and guest.
-- Offer bilingual UI and responsive design.
-- Start client-side, then evolve toward backend-based security and sync.
+## User Experience
 
-## 2. Scope
+### Core user flow
 
-In scope:
+1. User opens the app and selects register, sign in, or guest mode.
+2. User adds income and expense records with date and category.
+3. User monitors monthly cards (income, expense, spent-to-date, balance).
+4. User checks forecast and summary pages for planning decisions.
+5. User exports data to CSV when needed.
 
-- Registration, sign in, sign out.
-- Salted password hashing (no plain-text password storage).
-- Guest mode with separate guest data.
-- Income/expense CRUD operations.
-- Monthly totals and month-end projection.
-- Monthly CSV export.
-- HU/EN language switching.
-- Hamburger menu navigation for authenticated usage.
+### UX decisions and fixes
 
-Out of scope for current version:
+| Issue | Fixed in app |
+| --- | --- |
+| Controls felt crowded on smaller screens | Responsive control layout and compact mobile grouping |
+| Currency/date controls appeared oversized | Content-fit sizing and refined spacing in control rows |
+| Inconsistent menu labels across pages/languages | Unified i18n labels and aligned navigation naming |
+| Projection text showed date automatically | Date appears only when user explicitly selects end date |
+| Empty visual card sections caused confusion | Redundant empty card blocks removed from budget flow |
 
-- Multi-device cloud sync.
-- Server-issued auth tokens and role model.
-- Password reset by email.
-- Advanced analytics dashboards.
+## UX 5 Planes (Jesse James Garrett)
 
-## 3. Structure
+### 1. Strategy Plane
 
-### Page structure
+- User goals: track money quickly, avoid overspending, see short-term outlook.
+- Product goals: low-friction budgeting flow, bilingual usability, mobile-friendly interaction.
 
-- index.html: login gateway (register, sign in, guest) and entry to modules.
-- budget.html: budgeting workspace (entry CRUD, stats, export).
-- monthly_budget.html: summary view and upcoming dated entries.
+### 2. Scope Plane
 
-### Data structure (LocalStorage)
+- Functional scope: auth flow, CRUD entries, summaries, forecast, CSV export.
+- Content scope: clear labels, actionable metrics, concise feedback messages.
 
-- budgetAppUsers: registered users and account-specific data.
-- budgetAppSession: current active user/guest session.
-- budgetAppLanguage: selected interface language.
-- budgetAppGuestData: guest-mode entries.
+### 3. Structure Plane
 
-### Domain model
+- Interaction design: linear flow from auth -> budget -> summary/forecast.
+- Information architecture: three main work areas (Budget, Forecast, Summary) with hamburger menu navigation.
 
-User profile fields (plain explanation):
+### 4. Skeleton Plane
 
-- email: the user's email address.
-- passwordSecurityKey (stored internally as `salt`): a random unique security key used to protect the password.
-- passwordFingerprint (stored internally as `hashedPassword`): a one-way encrypted fingerprint of the password (the real password is not stored).
-- incomes: the user's saved income items.
-- expenses: the user's saved expense items.
+- Interface design: card-based layout, grouped controls, clear form hierarchy.
+- Navigation design: top hero toolbar + menu panel for cross-page movement.
+- Information design: KPI-first display, lists ordered by date relevance.
 
-Entry fields:
+### 5. Surface Plane
 
-- id
-- category
-- amount
-- date
+- Visual design: light/dark themes, consistent accent palette, strong contrast.
+- Responsive behavior: compact controls on small screens, touch-friendly actions.
+- Language polish: HU/EN switching with mirrored terminology.
 
-## 4. Skeleton
+## Local run
 
-### File skeleton
-
-```text
-budgeting/
-  index.html
-  budget.html
-  monthly_budget.html
-  assets/
-    css/
-      style.css
-    images/
-```
-
-### Technical skeleton
-
-- HTML: page composition
-- CSS: responsive styles and component visuals
-- Vanilla JavaScript: state, interactions, logic
-- LocalStorage: persistence layer (client-side)
-
-## 5. Surface
-
-### UI/UX
-
-UI principles:
-
-- Clear hierarchy: entry actions and summary numbers are easy to scan.
-- Minimal friction: add/edit/delete operations are direct.
-- Consistent controls: reusable cards, forms, buttons, and menu patterns.
-- Language clarity: immediate HU/EN translation updates.
-
-UX principles:
-
-- Guided entry flow from login to budgeting pages.
-- Immediate feedback on actions (save, update, delete, auth events).
-- Session-aware UI (hide irrelevant options after login).
-- Mobile-first readability and touch-friendly interactions.
-
-### User Experience (End-to-End)
-
-1. User opens the index page.
-2. User chooses register, sign in, or guest mode.
-3. User navigates to Budget page and enters monthly items.
-4. User reviews KPIs and exports monthly CSV if needed.
-5. User opens Monthly Budget to see upcoming entries and projection.
-6. User logs out from the hamburger menu.
-
-## MoSCoW Requirements
-
-### Must Have
-
-- Register, sign in, sign out.
-- Salted password hashing.
-- Session-based access.
-- Income/expense CRUD.
-- Monthly totals, spent-to-date, and month-end projection.
-- Monthly CSV export.
-- HU/EN language switching.
-
-### Should Have
-
-- Guest mode with isolated data.
-- Responsive layout across desktop and mobile.
-- Inline validation and clear action messages.
-- Navigation via hamburger menu for logged-in state.
-
-### Could Have
-
-- Custom user-defined categories.
-- Basic data visualization (bar/pie trends).
-- Import from CSV.
-- Optional dark theme.
-
-### Won't Have (Current Release)
-
-- Full backend API and database.
-- OAuth/social login.
-- Multi-user collaboration.
-- Real-time sync across devices.
-
-## Quick Start
-
-1. Install Node.js (if not installed).
+1. Install Node.js.
 2. Run `npm start`.
-3. Open `http://localhost:3000`
-4. Register, sign in, or continue as guest.
-5. Open Budget or Monthly Budget and start tracking.
+3. Open `http://localhost:3000`.
 
-### Manual testing
+If Node is unavailable on your machine, fallback local server:
 
-screenshot on laptop device and on Laptop dev tool phone view
+`py -m http.server 3000`
+
+## Screenshots
 
 ![screenshot1](assets/images/screenshot1.png)
-
 ![screenshot2](assets/images/screenshot2.png)
-
-light mode
-
 ![screenshot3 - light mode](assets/images/screenshot3.png)
-
-Dark mode
-
 ![screenshot4 - dark mode](assets/images/screenshot4.png)
 
-## Note
+## Notes
 
-This is a client-side prototype. For production use, add a backend service, secure server-side sessions, and database storage.
-
-Registration/account delete email actions open the default mail app using a `mailto:` draft.
+- Data remains on the same browser/device profile.
+- Clearing browser storage or removing the app can remove saved data.
