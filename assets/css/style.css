@@ -240,10 +240,11 @@ body {
 	gap: 0.45rem;
 }
 
-.budget-controls .currency-control {
+.budget-controls > div.currency-control {
 	display: grid;
 	align-content: start;
 	gap: 0.45rem;
+	min-width: 0;
 }
 
 .budget-controls > div:not(.control-action) label {
@@ -264,8 +265,22 @@ body {
 	min-width: 0;
 }
 
-.budget-controls .currency-control select {
-	width: 100%;
+
+.budget-controls > div.currency-control > label {
+	display: block;
+	white-space: nowrap;
+	max-width: none;
+	line-height: 1.2;
+}
+
+.budget-controls > div.currency-control select {
+	width: fit-content;
+	max-width: 100%;
+	flex: 0 0 auto;
+	min-width: 0;
+	min-height: unset;
+	line-height: 1.2;
+	white-space: nowrap;
 }
 
 .period-range-inputs {
@@ -283,8 +298,13 @@ body {
 }
 
 .period-range-inputs .small-date-input {
+	width: fit-content;
+	max-width: 100%;
+	flex: 0 0 auto;
+	min-width: 0;
 	padding: 0.65rem 0.7rem;
 	font-size: inherit;
+	white-space: nowrap;
 }
 
 .budget-controls .control-action .stack {
@@ -1558,12 +1578,54 @@ select:focus-visible {
 	}
 
 	.budget-controls {
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(120px, 0.72fr);
 		align-items: start;
+		row-gap: 0.75rem;
+		column-gap: 0.65rem;
 	}
 
+	.budget-controls .period-control,
 	.budget-controls .currency-control {
-		padding-top: 1.5rem;
+		min-width: 0;
+		padding-top: 0;
+	}
+
+	.budget-controls .period-control {
+		grid-column: 1;
+	}
+
+	.budget-controls > div.currency-control {
+		grid-column: 2;
+		align-content: start;
+	}
+
+	.budget-controls > div.currency-control > label {
+		white-space: pre-line;
+		max-width: 62px;
+		font-size: 0.82rem;
+	}
+
+	.budget-controls .period-range-inputs {
+		max-width: none;
+		gap: 0.28rem;
+	}
+
+	.budget-controls .period-range-inputs .small-date-input,
+	.budget-controls > div.currency-control select {
+		width: fit-content;
+		max-width: 100%;
+		flex: 0 0 auto;
+		min-height: unset;
+		padding: 0.38rem 0.5rem;
+		font-size: 0.8rem;
+	}
+
+	.budget-controls .period-range-inputs .small-date-input {
+		max-width: 100%;
+	}
+
+	.budget-controls .control-action {
+		grid-column: 1 / -1;
 	}
 
 	.landing-controls {
