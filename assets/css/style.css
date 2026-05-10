@@ -1114,25 +1114,49 @@ button:disabled {
 	font-weight: 800;
 }
 
+.budget-stat-pair > .stat,
+.budget-stat-pair > .stat h3,
+.budget-stat-pair > .stat p {
+	text-align: right;
+}
+
 .stat:has(#monthly-expense) {
-	background: linear-gradient(155deg, #e6efff, #d6e4ff 70%);
-	border-color: #8faee6;
-	box-shadow: 0 12px 24px rgba(25, 61, 130, 0.18);
+	background: linear-gradient(155deg, #fff1f3, #ffe3e8 70%);
+	border-color: #e69aae;
+	box-shadow: 0 12px 24px rgba(150, 33, 66, 0.18);
 }
 
 .stat:has(#monthly-expense) h3 {
-	color: #34558f;
+	color: #aa1f47;
 	font-weight: 700;
 }
 
 .stat:has(#monthly-expense) #monthly-expense {
-	color: #204db4;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+	color: #c63e5e;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
 	font-size: clamp(1.2rem, 1.35vw + 0.82rem, 1.64rem);
 }
 
+.stat:has(#spent-to-date) h3,
+.stat:has(#spent-to-date) #spent-to-date {
+	color: #111111;
+}
+
+.stat:has(#month-end-left) h3,
+.stat:has(#month-end-left) #month-end-left {
+	color: #111111;
+}
+
+.stat:has(#monthly-income) h3 {
+	color: #1f8f62;
+}
+
 #monthly-income {
-	color: var(--good);
+	color: #1f8f62;
+}
+
+[data-theme="dark"] #monthly-income {
+	color: #79e3b3;
 }
 
 #monthly-expense,
@@ -1150,7 +1174,7 @@ button:disabled {
 }
 
 h3[data-i18n="monthEndTitle"] {
-	color: #3f629a;
+	color: #111111;
 }
 
 h2[data-i18n="projectionTitle"] {
@@ -1173,7 +1197,7 @@ h2[data-i18n="projectionTitle"] {
 
 [data-theme="dark"] h3[data-i18n="monthEndTitle"],
 [data-theme="dark"] h2[data-i18n="projectionTitle"] {
-	color: #c8dbff;
+	color: #111111;
 }
 
 [data-theme="dark"] #projection-text {
@@ -1181,18 +1205,29 @@ h2[data-i18n="projectionTitle"] {
 }
 
 [data-theme="dark"] .stat:has(#monthly-expense) {
-	background: linear-gradient(155deg, #1a2a4e, #15213d 70%);
-	border-color: #465f98;
+	background: linear-gradient(155deg, #3b1623, #2e111b 70%);
+	border-color: #a54563;
 	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
 }
 
 [data-theme="dark"] .stat:has(#monthly-expense) h3 {
-	color: #d3e2ff;
+	color: #ffb0c4;
 }
 
 [data-theme="dark"] .stat:has(#monthly-expense) #monthly-expense {
-	color: #ffb7cb;
+	color: #c63e5e;
 	text-shadow: none;
+}
+
+[data-theme="dark"] .stat:has(#spent-to-date) h3,
+[data-theme="dark"] .stat:has(#spent-to-date) #spent-to-date,
+[data-theme="dark"] .stat:has(#month-end-left) h3,
+[data-theme="dark"] .stat:has(#month-end-left) #month-end-left {
+	color: #111111;
+}
+
+[data-theme="dark"] .stat:has(#monthly-income) h3 {
+	color: #79e3b3;
 }
 
 .entry-list {
@@ -1437,6 +1472,9 @@ select:focus-visible {
 	#forecast-planner #add-whatif-row {
 		white-space: normal;
 		width: 100%;
+		padding: 0.5rem 0.58rem;
+		font-size: 0.86rem;
+		line-height: 1.12;
 	}
 }
 
@@ -1606,8 +1644,8 @@ select:focus-visible {
 
 	.budget-controls > div.currency-control > label {
 		white-space: pre-line;
-		max-width: 62px;
-		font-size: 0.82rem;
+		max-width: 68px;
+		font-size: 0.86rem;
 	}
 
 	.budget-controls .period-range-inputs {
@@ -1620,10 +1658,10 @@ select:focus-visible {
 		width: fit-content;
 		max-width: 100%;
 		flex: 0 0 auto;
-		min-height: 1.88rem;
-		padding: 0.3rem 0.46rem;
-		font-size: 0.76rem;
-		line-height: 1.05;
+		min-height: 2.04rem;
+		padding: 0.36rem 0.52rem;
+		font-size: 0.8rem;
+		line-height: 1.1;
 	}
 
 	.budget-controls .period-range-inputs .small-date-input {
@@ -1665,9 +1703,25 @@ select:focus-visible {
 	.budget-columns .stack input[type="month"],
 	.forms-grid .stack input[type="date"],
 	.forms-grid .stack input[type="month"] {
+		width: 100%;
+		inline-size: 100%;
 		min-width: 0;
+		min-inline-size: 0;
 		max-width: 100%;
+		max-inline-size: 100%;
 		font-size: 0.9rem;
+		box-sizing: border-box;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	#income-date,
+	#expense-date {
+		width: 100%;
+		inline-size: 100%;
+		min-inline-size: 0;
+		max-inline-size: 100%;
+		justify-self: stretch;
 	}
 
 	.compact-controls .control-action .stack {
