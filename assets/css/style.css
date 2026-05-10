@@ -1536,10 +1536,34 @@ select:focus-visible {
 	.budget-stat-pair {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
+
+	.budget-stat-pair .stat {
+		padding: 0.85rem;
+	}
+
+	.budget-stat-pair .stat h3 {
+		font-size: 0.8rem;
+		line-height: 1.25;
+		text-wrap: balance;
+	}
+
+	.budget-stat-pair .stat p {
+		font-size: clamp(0.98rem, 2.2vw + 0.55rem, 1.22rem);
+		line-height: 1.1;
+	}
 	.compact-controls {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		column-gap: 0.75rem;
 		row-gap: 0.75rem;
+	}
+
+	.budget-controls {
+		grid-template-columns: 1fr 1fr;
+		align-items: start;
+	}
+
+	.budget-controls .currency-control {
+		padding-top: 1.5rem;
 	}
 
 	.landing-controls {

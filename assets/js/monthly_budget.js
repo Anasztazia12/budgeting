@@ -66,17 +66,15 @@ const shared = window.BudgetAppShared;
 					benzin: "Benzin",
 					elemiszer: "Élelmiszer",
 					ruhak: "Ruhák",
-					rent: "Albérlet",
+					alberlet: "Albérlet",
 					biztositas: "Biztosítás",
-					"hitelkartya 3": "Hitelkártya 3",
-					onkormanyzat: "Önkormányzat",
-					zilch: "Zilch",
+					hitelkartya: "Hitelkártya",
+					onkormanyzati_ado: "Önkormányzati adó",
 					tv: "TV",
 					telefon: "Telefon",
 					internet: "Internet",
 					iskola: "Iskola",
-					suli: "Iskola",
-					"egyeb kiadas": "Egyéb kiadás"
+					egyeb_kiadas: "Egyéb kiadás"
 				}
 			},
 			en: {
@@ -134,17 +132,15 @@ const shared = window.BudgetAppShared;
 					benzin: "Fuel",
 					elemiszer: "Groceries",
 					ruhak: "Clothes",
-					rent: "Rent",
+					alberlet: "Rent",
 					biztositas: "Insurance",
-					"hitelkartya 3": "Credit card 3",
-					onkormanyzat: "Municipality",
-					zilch: "Zilch",
+					hitelkartya: "Credit card",
+					onkormanyzati_ado: "Council tax",
 					tv: "TV",
 					telefon: "Phone",
 					internet: "Internet",
 					iskola: "School",
-					suli: "School",
-					"egyeb kiadas": "Other expense"
+					egyeb_kiadas: "Other expense"
 				}
 			}
 		};
@@ -155,7 +151,7 @@ const shared = window.BudgetAppShared;
 		let appLanguage = loadLanguage();
 		let appTheme = loadTheme();
 		let appCurrency = loadCurrency();
-		const state = getCurrentUserState();
+		let appState = getCurrentUserState();
 
 		const menuToggle = document.getElementById("menu-toggle");
 		const menuPanel = document.getElementById("menu-panel");
@@ -284,8 +280,6 @@ const shared = window.BudgetAppShared;
 			});
 		}
 
-		activeMonthInput.addEventListener("change", render);
-
 		function initializePage() {
 			if (!currentUser) {
 				window.location.href = "index.html";
@@ -296,7 +290,6 @@ const shared = window.BudgetAppShared;
 			syncThemeButtons();
 			languageSelect.value = appLanguage;
 			currencySelect.value = appCurrency;
-			activeMonthInput.value = toMonthInput(today);
 			applyTranslations();
 			updateAccessUI();
 			updateInstallButtonState();
@@ -347,10 +340,10 @@ const shared = window.BudgetAppShared;
 				return;
 			}
 
-			const selectedMonth = activeMonthInput.value;
+			const selectedMonth = (periodStartInput?.value || toDateInput(today)).slice(0, 7);
 			const todayIso = toDateInput(today);
-			const monthIncomes = monthEntries(state.incomes, selectedMonth);
-			const monthExpenses = monthEntries(state.expenses, selectedMonth);
+			const monthIncomes = monthEntries(appState.incomes, selectedMonth);
+			const monthExpenses = monthEntries(appState.expenses, selectedMonth);
 
 			monthlyIncomeEl.textContent = formatCurrency(sumEntries(monthIncomes));
 			monthlyExpenseEl.textContent = formatCurrency(sumEntries(monthExpenses));
