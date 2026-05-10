@@ -18,7 +18,7 @@ const shared = window.BudgetAppShared;
 				menuButton: "Menü",
 				homeLink: "Kezdőlap",
 				budgetLink: "Költségvetés",
-				summaryLink: "Havi összegzés",
+				summaryLink: "Összesítés",
 				themeModeLabel: "Téma",
 				themeModeLight: "Világos",
 				themeModeDark: "Sötét",

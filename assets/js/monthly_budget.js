@@ -18,6 +18,7 @@ const shared = window.BudgetAppShared;
 				menuButton: "Menü",
 				homeLink: "Kezdőlap",
 				budgetLink: "Költségvetés",
+				forecastButton: "Költségvetési előrejelző",
 				monthlyLink: "Összesítés",
 				themeModeLabel: "Téma",
 				themeModeLight: "Világos",
@@ -55,6 +56,7 @@ const shared = window.BudgetAppShared;
 				appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
 				emptyEntries: "Nincs tétel a kiválasztott időszakban.",
 				projectionText: "Várható egyenleg {date} dátumra: {amount}.",
+				projectionTextNoDate: "Várható egyenleg: {amount}.",
 				categories: {
 					fizetes: "Fizetés",
 					egyeb: "Egyéb",
@@ -84,6 +86,7 @@ const shared = window.BudgetAppShared;
 				menuButton: "Menu",
 				homeLink: "Home",
 				budgetLink: "Budget",
+				forecastButton: "Budget Forecast Planner",
 				monthlyLink: "Summary",
 				themeModeLabel: "Theme",
 				themeModeLight: "Light",
@@ -121,6 +124,7 @@ const shared = window.BudgetAppShared;
 				appInstallUnavailable: "App install is not available on this device right now.",
 				emptyEntries: "No entries in the selected period.",
 				projectionText: "Projected balance for {date}: {amount}.",
+				projectionTextNoDate: "Projected balance: {amount}.",
 				categories: {
 					fizetes: "Salary",
 					egyeb: "Other",
@@ -191,6 +195,14 @@ const shared = window.BudgetAppShared;
 			localStorage.setItem(CURRENCY_KEY, appCurrency);
 			render();
 		});
+
+		if (periodStartInput) {
+			periodStartInput.addEventListener("change", render);
+		}
+
+		if (periodEndInput) {
+			periodEndInput.addEventListener("change", render);
+		}
 
 		menuToggle.addEventListener("click", () => {
 			const isOpen = menuPanel.classList.toggle("is-open");
@@ -356,8 +368,13 @@ const shared = window.BudgetAppShared;
 			paintList(upcomingExpensesEl, upcomingExpenses);
 			paintList(upcomingIncomesEl, upcomingIncomes);
 
-			const monthEndDate = getMonthEndDate(selectedMonth);
-			projectionTextEl.textContent = t("projectionText").replace("{date}", formatDisplayDate(monthEndDate)).replace("{amount}", formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses)));
+			const projectionAmount = formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses));
+			const selectedEndDate = periodEndInput?.value;
+			if (selectedEndDate) {
+				projectionTextEl.textContent = t("projectionText").replace("{date}", formatDisplayDate(selectedEndDate)).replace("{amount}", projectionAmount);
+			} else {
+				projectionTextEl.textContent = t("projectionTextNoDate").replace("{amount}", projectionAmount);
+			}
 		}
 
 		function handleLogout() {
