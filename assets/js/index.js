@@ -251,6 +251,7 @@ const shared = window.BudgetAppShared;
                     salt,
                     hashedPassword,
                     profile: {
+                        nickname: username,
                         username,
                         email,
                         registeredAt: new Date().toISOString()
@@ -281,6 +282,16 @@ const shared = window.BudgetAppShared;
             if (!valid) {
                 showMessage(t("invalidLogin"), true);
                 return;
+            }
+
+            // Backfill legacy accounts so nickname is always available after login.
+            if (!userRecord.profile || typeof userRecord.profile !== "object") {
+                userRecord.profile = {};
+            }
+            if (!userRecord.profile.nickname) {
+                userRecord.profile.nickname = userRecord.profile.username || username;
+                users[username] = userRecord;
+                saveUsers();
             }
 
             loginUser(username);
@@ -410,7 +421,7 @@ const shared = window.BudgetAppShared;
                 return;
             }
 
-            const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
+            const name = getSignedInDisplayName();
             if (sessionInfo) {
                 sessionInfo.textContent = `${t("loggedIn")} ${name}`;
             }
@@ -426,8 +437,20 @@ const shared = window.BudgetAppShared;
                 return;
             }
 
-            const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
+            const name = getSignedInDisplayName();
             menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
+        }
+
+        function getSignedInDisplayName() {
+            if (!currentUser) {
+                return t("guestUser");
+            }
+            if (currentUser === GUEST_SESSION_VALUE) {
+                return t("guestUser");
+            }
+
+            const profile = users[currentUser] && users[currentUser].profile ? users[currentUser].profile : null;
+            return profile?.nickname || profile?.username || currentUser;
         }
 
         function showMessage(message, isError) {

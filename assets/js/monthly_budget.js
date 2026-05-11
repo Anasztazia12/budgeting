@@ -358,8 +358,20 @@ const shared = window.BudgetAppShared;
 				return;
 			}
 
-			const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
+			const name = getSignedInDisplayName();
 			menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
+		}
+
+		function getSignedInDisplayName() {
+			if (!currentUser) {
+				return t("guestUser");
+			}
+			if (currentUser === GUEST_SESSION_VALUE) {
+				return t("guestUser");
+			}
+
+			const profile = users[currentUser] && users[currentUser].profile ? users[currentUser].profile : null;
+			return profile?.nickname || profile?.username || currentUser;
 		}
 
 		function setMenuInfoMessage(message) {
