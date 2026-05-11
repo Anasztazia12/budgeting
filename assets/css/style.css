@@ -1218,17 +1218,17 @@ h2[data-i18n="projectionTitle"] {
 }
 
 [data-theme="dark"] #spent-to-date {
-	color: #111111;
+	color: #e8efff;
 }
 
 [data-theme="dark"] #month-end-left {
-	color: #111111;
+	color: #e8efff;
 	text-shadow: none;
 }
 
 [data-theme="dark"] h3[data-i18n="monthEndTitle"],
 [data-theme="dark"] h2[data-i18n="projectionTitle"] {
-	color: #111111;
+	color: #e8efff;
 }
 
 [data-theme="dark"] #projection-text {
@@ -1254,7 +1254,7 @@ h2[data-i18n="projectionTitle"] {
 [data-theme="dark"] .stat:has(#spent-to-date) #spent-to-date,
 [data-theme="dark"] .stat:has(#month-end-left) h3,
 [data-theme="dark"] .stat:has(#month-end-left) #month-end-left {
-	color: #111111;
+	color: #e8efff;
 }
 
 [data-theme="dark"] .stat:has(#monthly-income) h3 {
