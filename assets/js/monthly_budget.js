@@ -164,14 +164,15 @@ const shared = window.BudgetAppShared;
 		const menuBackButton = document.getElementById("menu-back-button");
 		const installAppButton = document.getElementById("install-app-button");
 		const deleteAccountButton = document.getElementById("delete-account-button");
+		const forecastToggleButton = document.getElementById("forecast-toggle-button");
 		const themeLightButton = document.getElementById("theme-light-button");
 		const themeDarkButton = document.getElementById("theme-dark-button");
 		const menuLogoutButton = document.getElementById("menu-logout-button");
+		const menuSessionInfo = document.getElementById("menu-session-info");
 		const languageSelect = document.getElementById("app-language");
 		const currencySelect = document.getElementById("app-currency");
 		const periodStartInput = document.getElementById("period-start");
 		const periodEndInput = document.getElementById("period-end");
-		const sessionInfo = document.getElementById("session-info");
 		const lockedMessage = document.getElementById("locked-message");
 		const summaryContent = document.getElementById("summary-content");
 		const monthlyIncomeEl = document.getElementById("monthly-income");
@@ -206,6 +207,14 @@ const shared = window.BudgetAppShared;
 			periodEndInput.addEventListener("change", render);
 		}
 
+		if (forecastToggleButton) {
+			forecastToggleButton.addEventListener("click", () => {
+				const periodStart = periodStartInput?.value || toDateInput(today);
+				const monthParam = encodeURIComponent(periodStart.slice(0, 7));
+				window.location.href = `budget-forecast.html?month=${monthParam}`;
+			});
+		}
+
 		menuToggle.addEventListener("click", () => {
 			const isOpen = menuPanel.classList.toggle("is-open");
 			menuToggle.classList.toggle("is-open", isOpen);
@@ -233,12 +242,12 @@ const shared = window.BudgetAppShared;
 		});
 		installAppButton.addEventListener("click", async () => {
 			if (isAppInstalled() && !deferredInstallPrompt) {
-				sessionInfo.textContent = t("appDownloaded");
+				setMenuInfoMessage(t("appDownloaded"));
 				return;
 			}
 
 			if (!deferredInstallPrompt) {
-				sessionInfo.textContent = shared.getInstallUnavailableMessage(appLanguage);
+				setMenuInfoMessage(shared.getInstallUnavailableMessage(appLanguage));
 				return;
 			}
 
@@ -249,7 +258,7 @@ const shared = window.BudgetAppShared;
 			const choice = await deferredInstallPrompt.userChoice;
 			if (choice.outcome === "accepted") {
 				localStorage.setItem(INSTALL_STATUS_KEY, "1");
-				sessionInfo.textContent = t("appDownloaded");
+				setMenuInfoMessage(t("appDownloaded"));
 			}
 			deferredInstallPrompt = null;
 			updateInstallButtonState();
@@ -282,7 +291,7 @@ const shared = window.BudgetAppShared;
 		window.addEventListener("appinstalled", () => {
 			localStorage.setItem(INSTALL_STATUS_KEY, "1");
 			deferredInstallPrompt = null;
-			sessionInfo.textContent = t("appDownloaded");
+			setMenuInfoMessage(t("appDownloaded"));
 			updateInstallButtonState();
 		});
 
@@ -323,30 +332,41 @@ const shared = window.BudgetAppShared;
 			if (!currentUser) {
 				projectionTextEl.textContent = t("noData");
 			}
-			updateSessionLabel();
+			updateMenuSessionLabel();
 		}
 
 		function updateAccessUI() {
 			if (!currentUser) {
 				lockedMessage.classList.remove("hidden");
 				summaryContent.classList.add("hidden");
-				updateSessionLabel();
+				updateMenuSessionLabel();
 				return;
 			}
 
 			lockedMessage.classList.add("hidden");
 			summaryContent.classList.remove("hidden");
-			updateSessionLabel();
+			updateMenuSessionLabel();
 		}
 
-		function updateSessionLabel() {
+		function updateMenuSessionLabel() {
+			if (!menuSessionInfo) {
+				return;
+			}
+
 			if (!currentUser) {
-				sessionInfo.textContent = t("loggedOut");
+				menuSessionInfo.textContent = t("loggedOut");
 				return;
 			}
 
 			const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
-			sessionInfo.textContent = `${t("loggedIn")} ${name}`;
+			menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
+		}
+
+		function setMenuInfoMessage(message) {
+			if (!menuSessionInfo) {
+				return;
+			}
+			menuSessionInfo.textContent = message;
 		}
 
 		function render() {
@@ -389,7 +409,7 @@ const shared = window.BudgetAppShared;
 
 		async function handleAccountDelete() {
 			if (!currentUser || currentUser === GUEST_SESSION_VALUE || !users[currentUser]) {
-				sessionInfo.textContent = shared.getDeleteAccountNoSessionMessage(appLanguage);
+				setMenuInfoMessage(shared.getDeleteAccountNoSessionMessage(appLanguage));
 				return;
 			}
 

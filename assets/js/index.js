@@ -18,6 +18,7 @@ const shared = window.BudgetAppShared;
                 menuButton: "Menü",
                 homeLink: "Kezdőlap",
                 budgetLink: "Költségvetés",
+                forecastLink: "Költségvetési előrejelző",
                 monthlyLink: "Összesítés",
                 themeModeLabel: "Téma",
                 themeModeLight: "Világos",
@@ -29,7 +30,7 @@ const shared = window.BudgetAppShared;
                 appName: "Költségvetési app",
                 registerTitle: "Regisztráció",
                 loginTitle: "Bejelentkezés",
-                usernameLabel: "Felhasználónév",
+                usernameLabel: "Becenév",
                 emailLabel: "Email cím",
                 emailConfirmLabel: "Email cím megerősítése",
                 passwordLabel: "Jelszó",
@@ -50,12 +51,12 @@ const shared = window.BudgetAppShared;
                 guestUser: "Vendég",
                 emailMismatch: "Az email címek nem egyeznek.",
                 passwordMismatch: "A jelszavak nem egyeznek.",
-                usernameTaken: "Ez a felhasználónév már foglalt.",
+                usernameTaken: "Ez a becenév már foglalt.",
                 registerSuccess: "Sikeres regisztráció.",
                 loginSuccess: "Sikeres bejelentkezés.",
                 guestSuccess: "Vendég mód aktív.",
                 logoutSuccess: "Sikeres kijelentkezés.",
-                invalidLogin: "Hibás felhasználónév vagy jelszó.",
+                invalidLogin: "Hibás becenév vagy jelszó.",
                 welcomeRegistered: "Welcome, {username}! A regisztráció sikeres.",
                 appInstalled: "Az app telepítve.",
                 appDownloaded: "Az app letöltve.",
@@ -70,6 +71,7 @@ const shared = window.BudgetAppShared;
                 menuButton: "Menu",
                 homeLink: "Home",
                 budgetLink: "Budget",
+                forecastLink: "Budget Forecast Planner",
                 monthlyLink: "Summary",
                 themeModeLabel: "Theme",
                 themeModeLight: "Light",
@@ -81,7 +83,7 @@ const shared = window.BudgetAppShared;
                 appName: "Budgeting App",
                 registerTitle: "Register",
                 loginTitle: "Sign in",
-                usernameLabel: "Username",
+                usernameLabel: "Nickname",
                 emailLabel: "Email address",
                 emailConfirmLabel: "Confirm email address",
                 passwordLabel: "Password",
@@ -102,12 +104,12 @@ const shared = window.BudgetAppShared;
                 guestUser: "Guest",
                 emailMismatch: "Email addresses do not match.",
                 passwordMismatch: "Passwords do not match.",
-                usernameTaken: "This username is already taken.",
+                usernameTaken: "This nickname is already taken.",
                 registerSuccess: "Registration successful.",
                 loginSuccess: "Signed in successfully.",
                 guestSuccess: "Guest mode enabled.",
                 logoutSuccess: "Signed out successfully.",
-                invalidLogin: "Invalid username or password.",
+                invalidLogin: "Invalid nickname or password.",
                 welcomeRegistered: "Welcome, {username}! Registration successful.",
                 appInstalled: "App installed.",
                 appDownloaded: "App downloaded.",
@@ -136,6 +138,7 @@ const shared = window.BudgetAppShared;
         const themeDarkButton = document.getElementById("theme-dark-button");
         const logoutButton = document.getElementById("logout-button");
         const sessionInfo = document.getElementById("session-info");
+        const menuSessionInfo = document.getElementById("menu-session-info");
         const authMessage = document.getElementById("auth-message");
         const authMessageCard = authMessage ? authMessage.closest(".session-card") : null;
         const appLinks = document.getElementById("app-links");
@@ -378,6 +381,7 @@ const shared = window.BudgetAppShared;
                 element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
             });
             updateSessionLabel();
+            updateMenuSessionLabel();
         }
 
         function updateAccessUI() {
@@ -395,6 +399,7 @@ const shared = window.BudgetAppShared;
                 appLinks.classList.toggle("hidden", !loggedIn);
             }
             updateSessionLabel();
+            updateMenuSessionLabel();
         }
 
         function updateSessionLabel() {
@@ -409,6 +414,20 @@ const shared = window.BudgetAppShared;
             if (sessionInfo) {
                 sessionInfo.textContent = `${t("loggedIn")} ${name}`;
             }
+        }
+
+        function updateMenuSessionLabel() {
+            if (!menuSessionInfo) {
+                return;
+            }
+
+            if (!currentUser) {
+                menuSessionInfo.textContent = t("loggedOut");
+                return;
+            }
+
+            const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
+            menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
         }
 
         function showMessage(message, isError) {

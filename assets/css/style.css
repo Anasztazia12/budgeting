@@ -517,10 +517,29 @@ body {
 	transition: opacity 180ms ease, transform 200ms ease, visibility 180ms ease;
 }
 
+.menu-session-info {
+	margin: 0;
+	padding: 0.35rem 0.55rem;
+	border-radius: 9px;
+	font-size: 0.8rem;
+	font-weight: 700;
+	line-height: 1.2;
+	color: #22477f;
+	background: #e9f2ff;
+	border: 1px solid #b5cdef;
+	word-break: break-word;
+}
+
 [data-theme="dark"] .menu-panel {
 	background: #172542;
 	border-color: #4a65a5;
 	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.38);
+}
+
+[data-theme="dark"] .menu-session-info {
+	color: #e6eeff;
+	background: #22375f;
+	border-color: #5775b4;
 }
 
 .menu-panel.is-open {

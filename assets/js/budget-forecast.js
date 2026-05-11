@@ -271,6 +271,7 @@ const shared = window.BudgetAppShared;
 		const forecastToggleButton = document.getElementById("forecast-toggle-button");
 		const menuToggle = document.getElementById("menu-toggle");
 		const menuPanel = document.getElementById("menu-panel");
+		const menuSessionInfo = document.getElementById("menu-session-info");
 		const menuBackButton = document.getElementById("menu-back-button");
 		const installAppButton = document.getElementById("install-app-button");
 		const deleteAccountButton = document.getElementById("delete-account-button");
@@ -550,6 +551,21 @@ const shared = window.BudgetAppShared;
 
 			updateFormButtonLabels();
 			refreshWhatIfRowLabels();
+			updateMenuSessionLabel();
+		}
+
+		function updateMenuSessionLabel() {
+			if (!menuSessionInfo) {
+				return;
+			}
+
+			if (!currentUser) {
+				menuSessionInfo.textContent = t("loggedOut");
+				return;
+			}
+
+			const name = currentUser === GUEST_SESSION_VALUE ? t("guestUser") : currentUser;
+			menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
 		}
 
 		function render() {

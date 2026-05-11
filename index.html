@@ -44,8 +44,10 @@
                         <span class="hamburger-line"></span>
                     </button>
                     <div id="menu-panel" class="menu-panel">
+                        <p id="menu-session-info" class="menu-session-info" aria-live="polite"></p>
                         <a href="index.html" data-i18n="homeLink">Kezdőlap</a>
                         <a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
+                        <a href="budget-forecast.html" data-i18n="forecastLink">Költségvetési előrejelző</a>
                         <a href="monthly_budget.html" data-i18n="monthlyLink">Havi összegzés</a>
                         <button type="button" id="menu-back-button" data-i18n="backAction">Vissza</button>
                         <button type="button" id="install-app-button" data-i18n="downloadAppButton">App letöltése</button>
@@ -73,7 +75,7 @@
             <article class="card hidden" id="register-card">
                 <h2 data-i18n="registerTitle">Regisztráció</h2>
                 <form id="register-form" class="stack">
-                    <label for="register-username" data-i18n="usernameLabel">Felhasználónév</label>
+                    <label for="register-username" data-i18n="usernameLabel">Becenév</label>
                     <input type="text" id="register-username" required>
 
                     <label for="register-email" data-i18n="emailLabel">Email cím</label>
@@ -95,7 +97,7 @@
             <article class="card hidden" id="login-card">
                 <h2 data-i18n="loginTitle">Bejelentkezés</h2>
                 <form id="login-form" class="stack">
-                    <label for="login-username" data-i18n="usernameLabel">Felhasználónév</label>
+                    <label for="login-username" data-i18n="usernameLabel">Becenév</label>
                     <input type="text" id="login-username" required>
 
                     <label for="login-password" data-i18n="passwordLabel">Jelszó</label>
