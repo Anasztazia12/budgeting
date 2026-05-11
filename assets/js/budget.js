@@ -737,18 +737,20 @@ const shared = window.BudgetAppShared;
 				.forEach((entry) => {
 					const li = document.createElement("li");
 					li.className = "entry-row";
-					const noteText = entry.note ? `<p class="entry-note">${escapeHtml(entry.note)}</p>` : "";
+					const inlineNoteText = entry.note ? `<span class="entry-note-inline">(${escapeHtml(entry.note)})</span>` : "";
 					const recurringBadge = entry.repeatMonthly ? `<span class="entry-repeat-badge">${t("repeatMonthlyBadge")}</span>` : "";
 					const repeatActionLabel = entry.repeatMonthly ? t("stopRepeatMonthlyAction") : t("repeatMonthlyAction");
 					li.innerHTML = `
-						<div>
-							<span>${formatDisplayDate(entry.date)}</span>
-							<strong>${translateCategory(entry.category)}</strong>
+						<div class="entry-main-row entry-main-row-top">
+							<div class="entry-heading">
+								<strong>${translateCategory(entry.category)}</strong>
+								<span class="entry-date">${formatDisplayDate(entry.date)}</span>
+							</div>
 							${recurringBadge}
-							${noteText}
 						</div>
-						<span>${formatCurrency(entry.amount)}</span>
-						<div class="row-actions">
+						<div class="entry-main-row entry-main-row-bottom">
+							<span class="entry-amount">${formatCurrency(entry.amount)} ${inlineNoteText}</span>
+							<div class="row-actions">
 							<details class="row-menu">
 								<summary aria-label="${t("moreActionsLabel")}">▾</summary>
 								<div class="row-menu-list">
@@ -757,6 +759,7 @@ const shared = window.BudgetAppShared;
 									<button type="button" class="inline-button" data-action="toggle-repeat-monthly" data-id="${entry.id}" data-date="${entry.date}">${repeatActionLabel}</button>
 								</div>
 							</details>
+							</div>
 						</div>
 					`;
 					target.appendChild(li);
