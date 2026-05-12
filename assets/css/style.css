@@ -320,16 +320,17 @@ body {
 .budget-controls .control-action .stack {
 	display: flex;
 	gap: 0.7rem;
-	width: 100%;
-	flex-wrap: nowrap;
+	width: auto;
+	flex-wrap: wrap;
+	justify-content: flex-start;
 }
 
 .budget-controls .control-action .stack > button {
-	flex: 1 1 0;
+	flex: 0 1 auto;
 	margin: 0;
-	padding: 0.45rem 0.55rem;
-	font-size: 0.84rem;
-	line-height: 1.15;
+	width: auto;
+	max-width: 100%;
+	white-space: nowrap;
 }
 
 .btn.btn-primary {
@@ -1645,8 +1646,9 @@ select:focus-visible {
 	}
 
 	.budget-controls .control-action .stack {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		display: flex;
+		grid-template-columns: none;
+		justify-content: flex-start;
 	}
 
 	.budget-stat-pair .stat p {
@@ -1887,7 +1889,9 @@ select:focus-visible {
 	}
 
 	.compact-controls .control-action .stack {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: none;
+		display: flex;
+		justify-content: flex-start;
 	}
 
 	.auth-grid {
