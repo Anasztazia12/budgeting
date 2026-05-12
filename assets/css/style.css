@@ -220,8 +220,10 @@ body {
 }
 
 .budget-controls {
-	grid-template-columns: 1fr;
-	align-items: center;
+	grid-template-columns: auto auto;
+	justify-content: center;
+	align-items: end;
+	column-gap: 1.1rem;
 }
 
 .budget-controls > div {
@@ -238,6 +240,13 @@ body {
 	display: grid;
 	align-content: start;
 	gap: 0.45rem;
+	justify-items: center;
+}
+
+.budget-controls .control-action {
+	grid-column: 1 / -1;
+	display: flex;
+	justify-content: center;
 }
 
 .budget-controls > div.currency-control {
@@ -245,6 +254,7 @@ body {
 	align-content: start;
 	gap: 0.45rem;
 	min-width: 0;
+	justify-items: center;
 }
 
 .budget-controls > div:not(.control-action) label {
@@ -278,9 +288,9 @@ body {
 	max-width: 100%;
 	flex: 0 0 auto;
 	min-width: 0;
-	min-height: 2.08rem;
-	padding: 0.36rem 0.56rem;
-	font-size: 0.84rem;
+	min-height: 2.24rem;
+	padding: 0.42rem 0.62rem;
+	font-size: 1rem;
 	line-height: 1.15;
 	white-space: nowrap;
 }
@@ -289,8 +299,8 @@ body {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 0.45rem;
-	max-width: none;
-	width: 100%;
+	max-width: 100%;
+	width: fit-content;
 }
 
 .period-range-item {
@@ -300,19 +310,19 @@ body {
 }
 
 .period-range-inputs label {
-	font-size: 0.82rem;
+	font-size: 0.94rem;
 	font-weight: 600;
 	margin: 0;
 }
 
 .period-range-inputs .small-date-input {
-	width: 100%;
-	max-width: 100%;
+	width: 9rem;
+	max-width: min(40vw, 9rem);
 	flex: 1 1 auto;
 	min-width: 0;
-	min-height: 1.9rem;
-	padding: 0.3rem 0.45rem;
-	font-size: 0.8rem;
+	min-height: 2.24rem;
+	padding: 0.42rem 0.55rem;
+	font-size: 1rem;
 	line-height: 1.1;
 	white-space: normal;
 }
@@ -321,8 +331,8 @@ body {
 	display: flex;
 	gap: 0.7rem;
 	width: auto;
-	flex-wrap: wrap;
-	justify-content: flex-start;
+	flex-wrap: nowrap;
+	justify-content: center;
 }
 
 .budget-controls .control-action .stack > button {
@@ -330,7 +340,17 @@ body {
 	margin: 0;
 	width: auto;
 	max-width: 100%;
-	white-space: nowrap;
+	white-space: normal;
+	padding: 0.56rem 0.84rem;
+	font-size: 1rem;
+	line-height: 1.2;
+	font-weight: 700;
+}
+
+#summary-toggle-button,
+#forecast-toggle-button {
+	font-size: 1rem;
+	font-weight: 700;
 }
 
 .btn.btn-primary {
@@ -1165,7 +1185,7 @@ button.secondary:focus-visible {
 	background: linear-gradient(125deg, #1b9d8f, #167f73);
 	border: 1px solid #1b7c71;
 	color: #ffffff;
-	font-weight: 800;
+	font-weight: 700;
 }
 
 #forecast-toggle-button:hover,
@@ -1649,6 +1669,7 @@ select:focus-visible {
 		display: flex;
 		grid-template-columns: none;
 		justify-content: flex-start;
+		flex-wrap: nowrap;
 	}
 
 	.budget-stat-pair .stat p {
@@ -1808,13 +1829,18 @@ select:focus-visible {
 
 	.budget-controls .period-range-inputs .small-date-input,
 	.budget-controls > div.currency-control select {
-		width: 100%;
+		width: auto;
 		max-width: 100%;
 		flex: 1 1 auto;
-		min-height: 1.9rem;
-		padding: 0.26rem 0.4rem;
-		font-size: 0.76rem;
+		min-height: 2.08rem;
+		padding: 0.32rem 0.48rem;
+		font-size: 0.9rem;
 		line-height: 1.1;
+	}
+
+	.budget-controls .period-range-inputs .small-date-input {
+		width: 7.8rem;
+		max-width: min(42vw, 7.8rem);
 	}
 
 	.budget-controls > div.currency-control select {
@@ -1868,12 +1894,12 @@ select:focus-visible {
 		min-inline-size: 0;
 		max-width: 100%;
 		max-inline-size: 100%;
-		font-size: 0.74rem;
-		line-height: 1.05;
-		padding-top: 0.24rem;
-		padding-bottom: 0.24rem;
-		padding-left: 0.38rem;
-		padding-right: 0.38rem;
+		font-size: 0.9rem;
+		line-height: 1.1;
+		padding-top: 0.3rem;
+		padding-bottom: 0.3rem;
+		padding-left: 0.46rem;
+		padding-right: 0.46rem;
 		box-sizing: border-box;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -1892,6 +1918,7 @@ select:focus-visible {
 		grid-template-columns: none;
 		display: flex;
 		justify-content: flex-start;
+		flex-wrap: nowrap;
 	}
 
 	.auth-grid {
