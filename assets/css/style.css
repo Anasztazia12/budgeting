@@ -10,6 +10,20 @@
 	--good: #2c9a8f;
 	--danger: #305ad4;
 	--line: #8fb2ec;
+	--radius-sm: 10px;
+	--radius-md: 12px;
+	--radius-lg: 14px;
+	--radius-xl: 16px;
+	--radius-pill: 999px;
+	--control-radius: var(--radius-sm);
+	--panel-radius: var(--radius-md);
+	--card-radius: var(--radius-lg);
+	--control-min-height: 2.24rem;
+	--control-padding-y: 0.42rem;
+	--control-padding-x: 0.62rem;
+	--btn-padding-y: 0.56rem;
+	--btn-padding-x: 0.84rem;
+	--btn-font-size: 1rem;
 }
 
 [data-theme="dark"] {
@@ -50,7 +64,7 @@ body {
 	left: 0.75rem;
 	top: 0.55rem;
 	padding: 0.5rem 0.8rem;
-	border-radius: 10px;
+	border-radius: var(--control-radius);
 	background: var(--accent);
 	color: #fff;
 	text-decoration: none;
@@ -68,7 +82,7 @@ body {
 	align-items: center;
 	background: rgba(242, 247, 255, 0.96);
 	border: 1px solid var(--line);
-	border-radius: 12px;
+	border-radius: var(--panel-radius);
 	padding: 0.35rem;
 	box-shadow: 0 10px 22px rgba(18, 47, 102, 0.178);
 	backdrop-filter: blur(4px);
@@ -121,7 +135,7 @@ body {
     text-align: center;
 	padding: 1rem 1rem;
 	margin-bottom: 1.2rem;
-	border-radius: 16px;
+	border-radius: var(--radius-xl);
 	background: radial-gradient(circle at top right, #f3f8ff, #d8e6ff 72%);
 	border: 1px solid #9fbaf0;
 	box-shadow: 0 12px 28px rgba(22, 61, 132, 0.2);
@@ -179,7 +193,7 @@ body {
 	align-items: center;
 	gap: 0.35rem;
 	padding: 0.32rem 0.7rem;
-	border-radius: 999px;
+	border-radius: var(--radius-pill);
 	background: #e6f0ff;
 	border: 1px solid #b9cff6;
 	font-size: 0.84rem;
@@ -351,20 +365,21 @@ body {
 	width: auto;
 	max-width: 100%;
 	white-space: normal;
-	padding: 0.56rem 0.84rem;
-	font-size: 1rem;
+	padding: var(--btn-padding-y) var(--btn-padding-x);
+	font-size: var(--btn-font-size);
 	line-height: 1.2;
 	font-weight: 700;
 }
 
 #summary-toggle-button,
 #forecast-toggle-button {
-	padding: 0.56rem 0.84rem;
+	padding: var(--btn-padding-y) var(--btn-padding-x);
 	min-height: 2.32rem;
-	font-size: 1rem;
+	font-size: var(--btn-font-size);
 	line-height: 1.2;
 	font-weight: 700;
-	border-radius: 10px;
+	border-radius: var(--control-radius);
+	border-width: 1px;
 }
 
 .btn.btn-primary {
@@ -494,7 +509,7 @@ body {
 	gap: 0.3rem;
 	padding: 0.2rem;
 	border: 1px solid #9cbaf1;
-	border-radius: 12px;
+	border-radius: var(--panel-radius);
 	background: #edf4ff;
 	box-shadow: 0 8px 18px rgba(26, 63, 132, 0.16);
 	flex: 0 0 auto;
@@ -516,7 +531,7 @@ body {
 	align-items: center;
 	justify-content: center;
 	gap: 0.35rem;
-	border-radius: 9px;
+	border-radius: var(--control-radius);
 	border: 1px solid transparent;
 	font-size: 0.8rem;
 	font-weight: 700;
@@ -575,7 +590,7 @@ body {
 	min-width: 220px;
 	padding: 0.45rem;
 	border: 1px solid var(--line);
-	border-radius: 12px;
+	border-radius: var(--panel-radius);
 	background: #f6faff;
 	box-shadow: 0 12px 26px rgba(20, 52, 112, 0.16);
 	display: grid;
@@ -592,7 +607,7 @@ body {
 .menu-session-info {
 	margin: 0;
 	padding: 0.35rem 0.55rem;
-	border-radius: 9px;
+	border-radius: var(--control-radius);
 	font-size: 0.8rem;
 	font-weight: 700;
 	line-height: 1.2;
@@ -629,7 +644,7 @@ body {
 	text-decoration: none;
 	color: #fff;
 	padding: 0.55rem 0.7rem;
-	border-radius: 10px;
+	border-radius: var(--control-radius);
 	background: linear-gradient(125deg, var(--accent), var(--accent-strong));
 	border: none;
 	font-weight: 700;
@@ -723,7 +738,7 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 .btn-link {
 	display: inline-block;
 	padding: 0.58rem 0.95rem;
-	border-radius: 10px;
+	border-radius: var(--control-radius);
 	text-decoration: none;
 	font-weight: 700;
 	color: #fff;
@@ -833,7 +848,7 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 
 .forecast-results {
 	border: 1px solid #c4d5f2;
-	border-radius: 12px;
+	border-radius: var(--panel-radius);
 	padding: 0.8rem 0.9rem;
 	background: #eef4ff;
 	display: grid;
@@ -858,7 +873,7 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 .card {
 	background: var(--card);
 	border: 1px solid var(--line);
-	border-radius: 14px;
+	border-radius: var(--card-radius);
 	padding: 1rem;
 	box-shadow: 0 8px 20px rgba(22, 56, 121, 0.1);
 	animation: rise 320ms ease;
@@ -993,8 +1008,9 @@ label {
 .compact-save-button {
 	width: auto;
 	justify-self: start;
-	padding: 0.5rem 0.72rem;
-	font-size: 0.9rem;
+	padding: var(--btn-padding-y) var(--btn-padding-x);
+	font-size: var(--btn-font-size);
+	border-radius: var(--control-radius);
 }
 
 [data-theme="dark"] .inline-check {
@@ -1020,7 +1036,7 @@ label {
 	width: min(460px, 100%);
 	background: var(--card);
 	border: 1px solid var(--line);
-	border-radius: 14px;
+	border-radius: var(--card-radius);
 	padding: 1rem;
 	display: grid;
 	gap: 0.85rem;
@@ -1128,8 +1144,8 @@ select,
 button {
 	width: 100%;
 	max-width: 100%;
-	padding: 0.65rem 0.7rem;
-	border-radius: 10px;
+	padding: var(--control-padding-y) var(--control-padding-x);
+	border-radius: var(--control-radius);
 	border: 1px solid #bdd0f1;
 	font: inherit;
 }
@@ -1216,8 +1232,9 @@ button.secondary:focus-visible {
 .inline-button {
 	width: auto;
 	margin: 0;
-	padding: 0.45rem 0.7rem;
-	font-size: 0.88rem;
+	padding: var(--btn-padding-y) var(--btn-padding-x);
+	font-size: var(--btn-font-size);
+	border-radius: var(--control-radius);
 }
 
 .inline-button.danger {
@@ -1376,7 +1393,7 @@ h2[data-i18n="projectionTitle"] {
 	gap: 0.5rem;
 	align-items: center;
 	border: 1px solid #d5e2f8;
-	border-radius: 10px;
+	border-radius: var(--control-radius);
 	padding: 0.6rem 0.65rem;
 	background: #fdfefe;
 }
@@ -1515,7 +1532,7 @@ h2[data-i18n="projectionTitle"] {
 	justify-content: center;
 	width: 2rem;
 	height: 2rem;
-	border-radius: 10px;
+	border-radius: var(--control-radius);
 	cursor: pointer;
 	font-size: 1rem;
 	font-weight: 700;
@@ -1543,7 +1560,7 @@ h2[data-i18n="projectionTitle"] {
 	display: grid;
 	gap: 0.45rem;
 	padding: 0.45rem;
-	border-radius: 10px;
+	border-radius: var(--panel-radius);
 	border: 1px solid #a3bced;
 	background: #ffffff;
 	box-shadow: 0 10px 24px rgba(22, 56, 121, 0.18);
@@ -1576,7 +1593,7 @@ h2[data-i18n="projectionTitle"] {
 	margin: 0 auto 1.2rem;
 	text-align: center;
 	padding: 0.9rem 1.25rem;
-	border-radius: 16px;
+	border-radius: var(--radius-xl);
 	background: radial-gradient(circle at top right, #eef5ff, #d7e6ff 72%);
 	border: 1px solid #a7c1ee;
 	box-shadow: 0 10px 24px rgba(22, 56, 121, 0.14);
@@ -1705,7 +1722,7 @@ select:focus-visible {
 		width: 100%;
 		max-width: none;
 		margin: 0 0 1.2rem;
-		border-radius: 0;
+		border-radius: var(--card-radius);
 		padding: 0.8rem 1rem;
 	}
 
@@ -2018,7 +2035,7 @@ select:focus-visible {
 	.theme-switch-inline {
 		height: 42px;
 		padding: 0.2rem;
-		border-radius: 12px;
+		border-radius: var(--panel-radius);
 	}
 
 	.menu-toggle {
