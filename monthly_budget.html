@@ -62,10 +62,14 @@
 			<div class="period-control">
 				<label for="period-start" data-i18n="periodLabel">Választott időszak</label>
 				<div class="period-range-inputs">
-					<label for="period-start" data-i18n="periodFromLabel">-tól</label>
-					<input type="date" id="period-start" class="small-date-input">
-					<label for="period-end" data-i18n="periodToLabel">-ig</label>
-					<input type="date" id="period-end" class="small-date-input">
+					<div class="period-range-item">
+						<label for="period-start" data-i18n="periodFromLabel">-tól</label>
+						<input type="date" id="period-start" class="small-date-input">
+					</div>
+					<div class="period-range-item">
+						<label for="period-end" data-i18n="periodToLabel">-ig</label>
+						<input type="date" id="period-end" class="small-date-input">
+					</div>
 				</div>
 			</div>
 			<div class="currency-control">
@@ -80,6 +84,7 @@ választó</label>
 			</div>
 			<div class="control-action">
 				<div class="stack">
+					<button id="summary-toggle-button" type="button" class="btn btn-primary" data-i18n="monthlyLink">Összesítés</button>
 					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Költségvetési előrejelző</button>
 				</div>
 			</div>

@@ -220,7 +220,7 @@ body {
 }
 
 .budget-controls {
-	grid-template-columns: minmax(210px, 1fr) minmax(210px, 1fr) minmax(280px, 1fr);
+	grid-template-columns: 1fr;
 	align-items: center;
 }
 
@@ -287,10 +287,16 @@ body {
 
 .period-range-inputs {
 	display: grid;
-	grid-template-columns: 1fr;
-	gap: 0.35rem;
-	max-width: 220px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.45rem;
+	max-width: none;
 	width: 100%;
+}
+
+.period-range-item {
+	display: grid;
+	gap: 0.3rem;
+	min-width: 0;
 }
 
 .period-range-inputs label {
@@ -300,26 +306,54 @@ body {
 }
 
 .period-range-inputs .small-date-input {
-	width: fit-content;
+	width: 100%;
 	max-width: 100%;
-	flex: 0 0 auto;
+	flex: 1 1 auto;
 	min-width: 0;
 	min-height: 2rem;
 	padding: 0.42rem 0.56rem;
 	font-size: 0.88rem;
 	line-height: 1.1;
-	white-space: nowrap;
+	white-space: normal;
 }
 
 .budget-controls .control-action .stack {
 	display: flex;
 	gap: 0.7rem;
 	width: 100%;
+	flex-wrap: nowrap;
 }
 
 .budget-controls .control-action .stack > button {
 	flex: 1 1 0;
 	margin: 0;
+}
+
+.btn.btn-primary {
+	color: #ffffff;
+	background: linear-gradient(125deg, #2f5fd0, #234eae);
+	border-color: #1f4fbf;
+}
+
+.btn.btn-primary:hover,
+.btn.btn-primary:focus-visible {
+	color: #ffffff;
+	background: linear-gradient(125deg, #3a69d8, #2b57b7);
+	border-color: #2253bf;
+	box-shadow: 0 10px 18px rgba(24, 58, 122, 0.24);
+}
+
+[data-theme="dark"] .btn.btn-primary {
+	color: #ffffff;
+	background: linear-gradient(125deg, #4f83ff, #355fbf);
+	border-color: #7aa0ef;
+}
+
+[data-theme="dark"] .btn.btn-primary:hover,
+[data-theme="dark"] .btn.btn-primary:focus-visible {
+	color: #ffffff;
+	background: linear-gradient(125deg, #5a8cff, #406acd);
+	border-color: #8eb0f3;
 }
 
 .compact-controls > div {
@@ -1550,11 +1584,7 @@ select:focus-visible {
 	}
 
 	.budget-controls {
-		grid-template-columns: 1fr 1fr;
-	}
-
-	.budget-controls .control-action {
-		grid-column: 1 / -1;
+		grid-template-columns: 1fr;
 	}
 
 	.forms-grid {
@@ -1605,7 +1635,7 @@ select:focus-visible {
 
 	.budget-controls .control-action .stack {
 		display: grid;
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
 	.budget-stat-pair .stat p {
@@ -1731,7 +1761,7 @@ select:focus-visible {
 	}
 
 	.budget-controls {
-		grid-template-columns: minmax(0, 1fr) minmax(120px, 0.72fr);
+		grid-template-columns: 1fr;
 		align-items: start;
 		row-gap: 0.75rem;
 		column-gap: 0.65rem;
@@ -1748,26 +1778,26 @@ select:focus-visible {
 	}
 
 	.budget-controls > div.currency-control {
-		grid-column: 2;
+		grid-column: 1;
 		align-content: start;
 	}
 
 	.budget-controls > div.currency-control > label {
-		white-space: pre-line;
-		max-width: 86px;
+		white-space: normal;
+		max-width: none;
 		font-size: 0.89rem;
 	}
 
 	.budget-controls .period-range-inputs {
 		max-width: none;
-		gap: 0.28rem;
+		gap: 0.4rem;
 	}
 
 	.budget-controls .period-range-inputs .small-date-input,
 	.budget-controls > div.currency-control select {
-		width: fit-content;
+		width: 100%;
 		max-width: 100%;
-		flex: 0 0 auto;
+		flex: 1 1 auto;
 		min-height: 2.22rem;
 		padding: 0.44rem 0.58rem;
 		font-size: 0.86rem;
@@ -1840,7 +1870,7 @@ select:focus-visible {
 	}
 
 	.compact-controls .control-action .stack {
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
 	.auth-grid {

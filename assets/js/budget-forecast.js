@@ -268,6 +268,7 @@ const shared = window.BudgetAppShared;
 
 		const incomeForm = document.getElementById("income-form");
 		const expenseForm = document.getElementById("expense-form");
+		const summaryToggleButton = document.getElementById("summary-toggle-button");
 		const forecastToggleButton = document.getElementById("forecast-toggle-button");
 		const menuToggle = document.getElementById("menu-toggle");
 		const menuPanel = document.getElementById("menu-panel");
@@ -333,6 +334,13 @@ const shared = window.BudgetAppShared;
 		forecastToggleButton.addEventListener("click", () => {
 			window.location.href = "budget.html";
 		});
+		if (summaryToggleButton) {
+			summaryToggleButton.addEventListener("click", () => {
+				const periodStart = periodStartInput?.value || toDateInput(today);
+				const monthParam = encodeURIComponent(periodStart.slice(0, 7));
+				window.location.href = `monthly_budget.html?month=${monthParam}`;
+			});
+		}
 		forecastTargetDateInput.addEventListener("change", renderForecastPlanner);
 		addWhatIfRowButton.addEventListener("click", () => {
 			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value });

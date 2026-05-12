@@ -164,6 +164,7 @@ const shared = window.BudgetAppShared;
 		const menuBackButton = document.getElementById("menu-back-button");
 		const installAppButton = document.getElementById("install-app-button");
 		const deleteAccountButton = document.getElementById("delete-account-button");
+		const summaryToggleButton = document.getElementById("summary-toggle-button");
 		const forecastToggleButton = document.getElementById("forecast-toggle-button");
 		const themeLightButton = document.getElementById("theme-light-button");
 		const themeDarkButton = document.getElementById("theme-dark-button");
@@ -212,6 +213,14 @@ const shared = window.BudgetAppShared;
 				const periodStart = periodStartInput?.value || toDateInput(today);
 				const monthParam = encodeURIComponent(periodStart.slice(0, 7));
 				window.location.href = `budget-forecast.html?month=${monthParam}`;
+			});
+		}
+
+		if (summaryToggleButton) {
+			summaryToggleButton.addEventListener("click", () => {
+				const periodStart = periodStartInput?.value || toDateInput(today);
+				const monthParam = encodeURIComponent(periodStart.slice(0, 7));
+				window.location.href = `monthly_budget.html?month=${monthParam}`;
 			});
 		}
 
