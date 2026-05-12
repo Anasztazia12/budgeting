@@ -327,6 +327,16 @@ body {
 	white-space: normal;
 }
 
+.budget-controls .period-range-inputs .small-date-input,
+.budget-controls > div.currency-control select {
+	height: 2.24rem;
+	min-height: 2.24rem;
+	padding-top: 0.38rem;
+	padding-bottom: 0.38rem;
+	font-size: 1rem;
+	line-height: 1.1;
+}
+
 .budget-controls .control-action .stack {
 	display: flex;
 	gap: 0.7rem;
@@ -349,8 +359,12 @@ body {
 
 #summary-toggle-button,
 #forecast-toggle-button {
+	padding: 0.56rem 0.84rem;
+	min-height: 2.32rem;
 	font-size: 1rem;
+	line-height: 1.2;
 	font-weight: 700;
+	border-radius: 10px;
 }
 
 .btn.btn-primary {
@@ -1838,6 +1852,16 @@ select:focus-visible {
 		line-height: 1.1;
 	}
 
+	.budget-controls .period-range-inputs .small-date-input,
+	.budget-controls > div.currency-control select {
+		height: 2.08rem;
+		min-height: 2.08rem;
+		padding-top: 0.32rem;
+		padding-bottom: 0.32rem;
+		font-size: 0.9rem;
+		line-height: 1.1;
+	}
+
 	.budget-controls .period-range-inputs .small-date-input {
 		width: 7.8rem;
 		max-width: min(42vw, 7.8rem);
@@ -1846,7 +1870,7 @@ select:focus-visible {
 	.budget-controls > div.currency-control select {
 		width: auto;
 		inline-size: auto;
-		max-width: min(100%, 170px);
+		max-width: min(100%, 138px);
 	}
 
 	.budget-controls .period-range-inputs .small-date-input {
