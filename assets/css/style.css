@@ -278,9 +278,9 @@ body {
 	max-width: 100%;
 	flex: 0 0 auto;
 	min-width: 0;
-	min-height: 2.28rem;
-	padding: 0.5rem 0.66rem;
-	font-size: 0.92rem;
+	min-height: 2.08rem;
+	padding: 0.36rem 0.56rem;
+	font-size: 0.84rem;
 	line-height: 1.15;
 	white-space: nowrap;
 }
@@ -310,9 +310,9 @@ body {
 	max-width: 100%;
 	flex: 1 1 auto;
 	min-width: 0;
-	min-height: 2rem;
-	padding: 0.42rem 0.56rem;
-	font-size: 0.88rem;
+	min-height: 1.9rem;
+	padding: 0.3rem 0.45rem;
+	font-size: 0.8rem;
 	line-height: 1.1;
 	white-space: normal;
 }
@@ -327,6 +327,9 @@ body {
 .budget-controls .control-action .stack > button {
 	flex: 1 1 0;
 	margin: 0;
+	padding: 0.45rem 0.55rem;
+	font-size: 0.84rem;
+	line-height: 1.15;
 }
 
 .btn.btn-primary {
@@ -1107,6 +1110,14 @@ input[type="month"] {
 	text-overflow: ellipsis;
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+	margin-left: 0.2rem;
+	padding: 0;
+	transform: scale(0.85);
+	transform-origin: center;
+}
+
 [data-theme="dark"] input,
 [data-theme="dark"] select {
 	background: #13213f;
@@ -1798,15 +1809,16 @@ select:focus-visible {
 		width: 100%;
 		max-width: 100%;
 		flex: 1 1 auto;
-		min-height: 2.22rem;
-		padding: 0.44rem 0.58rem;
-		font-size: 0.86rem;
+		min-height: 1.9rem;
+		padding: 0.26rem 0.4rem;
+		font-size: 0.76rem;
 		line-height: 1.1;
 	}
 
 	.budget-controls > div.currency-control select {
-		width: 100%;
-		inline-size: 100%;
+		width: auto;
+		inline-size: auto;
+		max-width: min(100%, 170px);
 	}
 
 	.budget-controls .period-range-inputs .small-date-input {
@@ -1854,7 +1866,12 @@ select:focus-visible {
 		min-inline-size: 0;
 		max-width: 100%;
 		max-inline-size: 100%;
-		font-size: 0.9rem;
+		font-size: 0.74rem;
+		line-height: 1.05;
+		padding-top: 0.24rem;
+		padding-bottom: 0.24rem;
+		padding-left: 0.38rem;
+		padding-right: 0.38rem;
 		box-sizing: border-box;
 		overflow: hidden;
 		text-overflow: ellipsis;
