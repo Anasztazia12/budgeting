@@ -55,29 +55,55 @@
     }
 
     function loadLanguage() {
-        return localStorage.getItem(KEYS.LANGUAGE_KEY) === "en" ? "en" : "hu";
+        if (localStorage.getItem(KEYS.LANGUAGE_KEY) === "en") {
+            return "en";
+        }
+
+        return "hu";
     }
 
     function saveLanguage(language) {
-        localStorage.setItem(KEYS.LANGUAGE_KEY, language === "en" ? "en" : "hu");
+        if (language === "en") {
+            localStorage.setItem(KEYS.LANGUAGE_KEY, "en");
+            return;
+        }
+
+        localStorage.setItem(KEYS.LANGUAGE_KEY, "hu");
     }
 
     function loadTheme() {
-        return localStorage.getItem(KEYS.THEME_KEY) === "dark" ? "dark" : "light";
+        if (localStorage.getItem(KEYS.THEME_KEY) === "dark") {
+            return "dark";
+        }
+
+        return "light";
     }
 
     function saveTheme(theme) {
-        localStorage.setItem(KEYS.THEME_KEY, theme === "dark" ? "dark" : "light");
+        if (theme === "dark") {
+            localStorage.setItem(KEYS.THEME_KEY, "dark");
+            return;
+        }
+
+        localStorage.setItem(KEYS.THEME_KEY, "light");
     }
 
     function loadCurrency() {
         const saved = localStorage.getItem(KEYS.CURRENCY_KEY);
-        return ["HUF", "GBP", "USD", "EUR"].includes(saved) ? saved : "HUF";
+        if (saved === "HUF" || saved === "GBP" || saved === "USD" || saved === "EUR") {
+            return saved;
+        }
+
+        return "HUF";
     }
 
     function saveCurrency(currency) {
-        const value = ["HUF", "GBP", "USD", "EUR"].includes(currency) ? currency : "HUF";
-        localStorage.setItem(KEYS.CURRENCY_KEY, value);
+        if (currency === "HUF" || currency === "GBP" || currency === "USD" || currency === "EUR") {
+            localStorage.setItem(KEYS.CURRENCY_KEY, currency);
+            return;
+        }
+
+        localStorage.setItem(KEYS.CURRENCY_KEY, "HUF");
     }
 
     function toMonthInput(dateObj) {
@@ -115,6 +141,53 @@
         }
 
         return `entry-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function createSalt() {
+        if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+            const values = new Uint8Array(16);
+            window.crypto.getRandomValues(values);
+            return Array.from(values, (value) => value.toString(16).padStart(2, "0")).join("");
+        }
+
+        return `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`;
+    }
+
+    async function hashPassword(password, salt) {
+        const source = `${salt}:${password}`;
+        if (window.crypto && window.crypto.subtle && typeof TextEncoder !== "undefined") {
+            const data = new TextEncoder().encode(source);
+            const digest = await window.crypto.subtle.digest("SHA-256", data);
+            return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        let hash = 2166136261;
+        for (let index = 0; index < source.length; index += 1) {
+            hash ^= source.charCodeAt(index);
+            hash = Math.imul(hash, 16777619);
+        }
+
+        return `fallback-${(hash >>> 0).toString(16)}`;
+    }
+
+    async function verifyPassword(userRecord, password, onLegacyUpgrade) {
+        if (userRecord.hashedPassword && userRecord.salt) {
+            const candidateHash = await hashPassword(password, userRecord.salt);
+            return candidateHash === userRecord.hashedPassword;
+        }
+
+        if (userRecord.password && userRecord.password === password) {
+            const salt = createSalt();
+            userRecord.salt = salt;
+            userRecord.hashedPassword = await hashPassword(password, salt);
+            delete userRecord.password;
+            if (typeof onLegacyUpgrade === "function") {
+                onLegacyUpgrade();
+            }
+            return true;
+        }
+
+        return false;
     }
 
     function isAppInstalled() {
@@ -298,6 +371,9 @@
         monthEntries,
         sumEntries,
         createEntryId,
+        createSalt,
+        hashPassword,
+        verifyPassword,
         isAppInstalled,
         getInstallUnavailableMessage,
         loadGuestData,

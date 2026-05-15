@@ -1102,51 +1102,6 @@ const shared = window.BudgetAppShared;
 			return shared.createEntryId();
 		}
 
-		function createSalt() {
-			if (window.crypto && typeof window.crypto.getRandomValues === "function") {
-				const values = new Uint8Array(16);
-				window.crypto.getRandomValues(values);
-				return Array.from(values, (value) => value.toString(16).padStart(2, "0")).join("");
-			}
-
-			return `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`;
-		}
-
-		async function hashPassword(password, salt) {
-			const source = `${salt}:${password}`;
-			if (window.crypto && window.crypto.subtle && typeof TextEncoder !== "undefined") {
-				const data = new TextEncoder().encode(source);
-				const digest = await window.crypto.subtle.digest("SHA-256", data);
-				return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-			}
-
-			let hash = 2166136261;
-			for (let index = 0; index < source.length; index += 1) {
-				hash ^= source.charCodeAt(index);
-				hash = Math.imul(hash, 16777619);
-			}
-
-			return `fallback-${(hash >>> 0).toString(16)}`;
-		}
-
-		async function verifyPassword(userRecord, password) {
-			if (userRecord.hashedPassword && userRecord.salt) {
-				const candidateHash = await hashPassword(password, userRecord.salt);
-				return candidateHash === userRecord.hashedPassword;
-			}
-
-			if (userRecord.password && userRecord.password === password) {
-				const salt = createSalt();
-				userRecord.salt = salt;
-				userRecord.hashedPassword = await hashPassword(password, salt);
-				delete userRecord.password;
-				saveUsers();
-				return true;
-			}
-
-			return false;
-		}
-
 		function loadUsers() {
 			return shared.loadUsers();
 		}
