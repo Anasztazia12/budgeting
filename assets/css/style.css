@@ -1871,7 +1871,7 @@ select:focus-visible {
 
 	.budget-controls .period-range-inputs .small-date-input,
 	.budget-controls > div.currency-control select {
-		width: auto;
+		width: cover;
 		max-width: 100%;
 		flex: 1 1 auto;
 		height: 2.08rem;
