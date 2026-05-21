@@ -1874,16 +1874,9 @@ select:focus-visible {
 		width: auto;
 		max-width: 100%;
 		flex: 1 1 auto;
-		min-height: 2.08rem;
-		padding: 0.32rem 0.48rem;
-		font-size: 0.9rem;
-		line-height: 1.1;
-	}
-
-	.budget-controls .period-range-inputs .small-date-input,
-	.budget-controls > div.currency-control select {
 		height: 2.08rem;
 		min-height: 2.08rem;
+		padding: 0.32rem 0.48rem;
 		padding-top: 0.32rem;
 		padding-bottom: 0.32rem;
 		font-size: 0.9rem;
@@ -1899,10 +1892,6 @@ select:focus-visible {
 		width: auto;
 		inline-size: auto;
 		max-width: min(100%, 138px);
-	}
-
-	.budget-controls .period-range-inputs .small-date-input {
-		max-width: 100%;
 	}
 
 	.budget-controls .control-action {
