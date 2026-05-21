@@ -1920,8 +1920,8 @@ select:focus-visible {
 
 	input[type="date"],
 	input[type="month"] {
-		width: 100%;
-		max-width: 100%;
+		width: 80%;
+		max-width: 80%;
 		min-width: 0;
 	}
 
@@ -1962,10 +1962,10 @@ select:focus-visible {
 
 	#income-date,
 	#expense-date {
-		width: 100%;
-		inline-size: 100%;
+		width: 70%;
+		inline-size: 70%;
 		min-inline-size: 0;
-		max-inline-size: 100%;
+		max-inline-size: 70%;
 		justify-self: stretch;
 	}
 

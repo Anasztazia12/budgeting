@@ -133,7 +133,6 @@ const shared = window.BudgetAppShared;
 					rent: "Albérlet",
 					biztositas: "Biztosítás",
 					hitelkartya: "Hitelkártya",
-					"hitelkartya 3": "Hitelkártya",
 					council: "Önkormányzat",
 					onkormanyzat: "Önkormányzat",
 					travel: "Travel",
