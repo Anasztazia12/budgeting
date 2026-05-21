@@ -1,103 +1,323 @@
 # Budgeting App
 
-A lightweight, browser-based budgeting app with HU/EN UI, local accounts, and monthly planning tools.
+This is a browser budgeting app project. It works in Hungarian and English, runs locally, and helps with tracking income/expenses, summary, and forecast.
+
+## Table of Contents
+
+- Overview
+- What this project is for
+- What it does and what it does not do
+- Project structure
+- Main pages
+- Data storage
+- Language handling (HU/EN)
+- PWA and offline notes
+- How to run locally
+- Error handling and troubleshooting
+- Testing
+- Manual test list
+- Release checklist
+- Accessibility and UX notes
+- Security and privacy notes
+- Known limitations
+- Future ideas
 
 ## Overview
 
-Budgeting App is designed for people who want a practical monthly finance workflow without spreadsheets or complex setup. The app focuses on daily usability: quick entry creation, clear status indicators, and short-term projection support. Instead of forcing long onboarding, it allows immediate use through either registered accounts or guest mode.
+The main idea was to make a simple budgeting workflow without backend setup.
 
-The product emphasizes clarity and speed:
+You can:
 
-- One place for income and expense tracking
-- Fast visibility of monthly totals and balance trends
-- Forecasting support for expected end-of-period outcome
-- Responsive usage across laptop and phone screens
-- Bilingual UI (Hungarian and English) with consistent terminology
+- create local account or use guest mode
+- add/edit/delete income and expense entries
+- check period summary values
+- try forecast with extra what-if rows
+- switch between light and dark mode
+- export data to CSV
 
-Because the project is client-side, users can run it locally and keep control over their own data environment. This also means the current version is optimized for single-device usage, with no backend dependency.
+Everything is client-side, so data is saved in browser storage.
 
-## What it does
+## What this project is for
 
-- Register / sign in / guest mode
-- Income and expense tracking
-- Monthly summary cards (income, expense, spent-to-date, balance)
-- Forecast view and period-based projection
-- CSV export
-- Responsive UI with PWA support
+This app is useful if you want a fast way to track money on one device.
 
-## Project scope
+Typical flow:
 
-This project is client-side only.
+1. Open app and sign in (or use guest mode).
+1. Add entries with amount, date, category.
+1. Check summary and forecast pages.
+1. Export CSV if needed.
 
-- Data is stored in localStorage.
-- No backend API, no database, no cloud sync.
-- Email actions use `mailto:` drafts in the user's default mail app.
+## What it does and what it does not do
+
+### In scope
+
+- local auth (browser only)
+- budget entry CRUD
+- period summary
+- forecast planner
+- language/theme/currency preferences
+- light/dark mode switch with saved preference
+- PWA install support
+
+### Out of scope (current version)
+
+- backend API
+- cloud sync
+- bank import/integration
+- multi-device account sync
+
+## Project structure
+
+| Layer | Used tech | Why it is here |
+| --- | --- | --- |
+| UI | HTML + CSS | Forms, cards, page layout, responsive behavior |
+| Logic | Vanilla JavaScript | State handling, CRUD logic, i18n, calculations |
+| Storage | localStorage/sessionStorage | Save users, settings, entries |
+| PWA | Service worker + manifest | Install and caching |
+| Dev server | Node HTTP server | Quick local run |
 
 ## Main pages
 
-- `index.html` - auth entry (register, login, guest)
-- `budget.html` - daily budgeting workspace
-- `budget-forecast.html` - forecast planner
-- `monthly_budget.html` - summary and projection
-
-## User Experience
-
-### Core user flow
-
-1. User opens the app and selects register, sign in, or guest mode.
-2. User adds income and expense records with date and category.
-3. User monitors monthly cards (income, expense, spent-to-date, balance).
-4. User checks forecast and summary pages for planning decisions.
-5. User exports data to CSV when needed.
-
-### UX decisions and fixes
-
-| Issue | Fixed in app |
+| Page | Purpose |
 | --- | --- |
-| Controls felt crowded on smaller screens | Responsive control layout and compact mobile grouping |
-| Currency/date controls appeared oversized | Content-fit sizing and refined spacing in control rows |
-| Inconsistent menu labels across pages/languages | Unified i18n labels and aligned navigation naming |
-| Projection text showed date automatically | Date appears only when user explicitly selects end date |
-| Empty visual card sections caused confusion | Redundant empty card blocks removed from budget flow |
+| index.html | Start page (register/login/guest) |
+| budget.html | Main budgeting page |
+| budget-forecast.html | Forecast planner page |
+| monthly_budget.html | Summary page |
 
-## UX 5 Planes (Jesse James Garrett)
+## Data storage
 
-### 1. Strategy Plane
+Data is stored with browser keys (localStorage/sessionStorage).
 
-- User goals: track money quickly, avoid overspending, see short-term outlook.
-- Product goals: low-friction budgeting flow, bilingual usability, mobile-friendly interaction.
+### Main keys
 
-### 2. Scope Plane
+| Key | Meaning |
+| --- | --- |
+| budgetAppUsers | Registered local users and their data |
+| budgetAppSession | Current active session |
+| budgetAppLanguage | Selected language |
+| budgetAppTheme | Theme mode (light/dark) |
+| budgetAppCurrency | Selected currency |
+| budgetAppInstalled | Install status flag |
+| budgetAppGuestData | Guest mode entries |
+| budgetAppFlashMessage | One-time message between pages |
 
-- Functional scope: auth flow, CRUD entries, summaries, forecast, CSV export.
-- Content scope: clear labels, actionable metrics, concise feedback messages.
+### Entry format (simplified)
 
-### 3. Structure Plane
+- id
+- type (income/expense)
+- category
+- amount
+- date
+- note (optional)
+- repeatMonthly (boolean)
+- excludedMonths (optional)
 
-- Interaction design: linear flow from auth -> budget -> summary/forecast.
-- Information architecture: three main work areas (Budget, Forecast, Summary) with hamburger menu navigation.
+## Language handling (HU/EN)
 
-### 4. Skeleton Plane
+The app uses dictionary objects in page scripts and data-i18n attributes in HTML.
 
-- Interface design: card-based layout, grouped controls, clear form hierarchy.
-- Navigation design: top hero toolbar + menu panel for cross-page movement.
-- Information design: KPI-first display, lists ordered by date relevance.
+Important rules for maintenance:
 
-### 5. Surface Plane
+- keep HU and EN keys aligned
+- menu labels should match across pages
+- fallback HTML text should not conflict with final translated labels
 
-- Visual design: light/dark themes, consistent accent palette, strong contrast.
-- Responsive behavior: compact controls on small screens, touch-friendly actions.
-- Language polish: HU/EN switching with mirrored terminology.
+### Terminology
 
-## Local run
+| Concept | HU | EN |
+| --- | --- | --- |
+| Budget | Koltsegvetes | Budget |
+| Forecast | Koltsegvetesi elorejelzo | Budget Forecast Planner |
+| Summary | Osszesites | Summary |
+| Sign out | Kijelentkezes | Sign out |
 
-1. Install Node.js.
-2. Run `npm start`.
-3. Open `http://localhost:3000`.
+## PWA and offline notes
 
-If Node is unavailable on your machine, fallback local server:
+Service worker is cache-first for GET requests:
 
-`py -m http.server 3000`
+- install: cache predefined files
+- activate: clean old cache versions
+- fetch: cache -> network -> fallback
+
+If you change UI text or static files and still see old content, increase cache version in sw.js.
+
+## How to run locally
+
+### Prerequisite
+
+- Node.js 18+ recommended
+
+### Start
+
+1. Install Node.js (if not installed).
+1. Run:
+
+```bash
+npm start
+```
+
+1. Open:
+
+- <http://localhost:3000>
+
+### Optional custom port
+
+```bash
+PORT=4200 npm start
+```
+
+PowerShell example:
+
+```powershell
+$env:PORT=4200; npm start
+```
+
+### Fallback without Node
+
+```bash
+py -m http.server 3000
+```
+
+## Error handling and troubleshooting
+
+### Common user-facing situations
+
+| Case | What user sees | Common reason |
+| --- | --- | --- |
+| Wrong login | Invalid username/password | Typo or wrong local account |
+| Email mismatch | Emails do not match | Register form mismatch |
+| Password mismatch | Passwords do not match | Register form mismatch |
+| Empty period | No entries in selected period | No records for filter range |
+| Install not available | Install unavailable message | Browser/platform limitation |
+
+### Troubleshooting table
+
+| Problem | Likely cause | Fix |
+| --- | --- | --- |
+| 404 on local assets | Server not started from project root | Start server in repo root |
+| Old UI text still visible | Service worker cache still active | Hard refresh and bump cache version |
+| Language switch half-working | Missing key in one dictionary | Compare HU and EN dictionaries |
+| Data "disappeared" | Browser storage cleared/profile changed | Check same browser profile and storage |
+| Install prompt not showing | Criteria not met by browser | Use Add to Home Screen menu path |
+
+### Quick debug steps
+
+1. Open browser console.
+1. Check localStorage/sessionStorage keys.
+1. Verify selected language key and current dictionary values.
+1. Check service worker status.
+
+## Testing
+
+At the moment this project is tested manually (no full automated suite yet).
+
+### Test types we use
+
+| Test type | What we check | When |
+| --- | --- | --- |
+| Smoke test | App opens, navigation works, no crash | Every change |
+| Functional test | CRUD, summary, forecast, export | Feature changes |
+| i18n check | HU/EN labels and menu consistency | Text/UI changes |
+| Responsive check | Mobile and desktop layout sanity | Before release |
+| Offline/PWA check | Cached startup behavior | Before release |
+
+### Browser matrix (recommended)
+
+| Browser | Desktop | Mobile |
+| --- | --- | --- |
+| Chrome | Yes | Yes |
+| Edge | Yes | Optional |
+| Firefox | Yes | Optional |
+| Safari | Optional | Yes |
+| Samsung Internet | Optional | Yes |
+
+## Manual test list
+
+### Authentication
+
+| ID | Test step | Expected |
+| --- | --- | --- |
+| AUTH-01 | Register with valid values | Success + user saved locally |
+| AUTH-02 | Register with mismatched email | Validation message |
+| AUTH-03 | Login with correct credentials | Session active |
+| AUTH-04 | Login with wrong password | Error message |
+| AUTH-05 | Continue as guest | Guest session active |
+| AUTH-06 | Logout from hamburger menu | Session cleared |
+
+### Budget CRUD and recurring
+
+| ID | Test step | Expected |
+| --- | --- | --- |
+| BUD-01 | Add income | Appears in list and affects totals |
+| BUD-02 | Add expense | Appears in list and affects totals |
+| BUD-03 | Edit entry | New values visible |
+| BUD-04 | Delete entry | Removed and totals recalculated |
+| BUD-05 | Toggle recurring | Badge/action label updates |
+| BUD-06 | Date filtering | Only matching entries shown |
+
+### Forecast and summary
+
+| ID | Test step | Expected |
+| --- | --- | --- |
+| FC-01 | Set target date | Forecast values recalc |
+| FC-02 | Add extra expense row | Simulated balance decreases |
+| FC-03 | Add extra income row | Simulated balance increases |
+| FC-04 | Remove row | Forecast updates correctly |
+| SUM-01 | Open summary | Cards show period totals |
+| SUM-02 | Change period | Summary values refresh |
+
+### Language consistency
+
+| ID | Test step | Expected |
+| --- | --- | --- |
+| I18N-01 | Switch HU -> EN on all pages | Labels translated everywhere |
+| I18N-02 | Check summary label in menu | HU: Osszesites, EN: Summary |
+| I18N-03 | Check forecast EN wording | Natural English labels |
+| I18N-04 | Check fallback text before JS loads | Same meaning as translated UI |
+
+## Release checklist
+
+- All pages open without console errors.
+- Hamburger menu works on every page.
+- Language switch works on every page.
+- Summary wording is consistent.
+- Forecast values recalculate correctly.
+- CSV export works.
+- Theme stays after navigation.
+- Service worker cache version checked.
+- Manual test list executed.
+
+## Accessibility and UX notes
+
+- Skip link exists for keyboard users.
+- ARIA labels are used for key controls.
+- Layout is responsive for smaller screens.
+- User gets feedback messages after actions.
+
+## Security and privacy notes
+
+- Data stays in browser profile.
+- No backend and no third-party API sync.
+- If browser storage is cleared, app data is removed.
+- Password handling is local, but still browser-profile based.
+
+## Known limitations
+
+- No sync between devices.
+- No change history/audit log.
+- No bank import.
+- No automated tests yet.
+- Data can be lost if browser storage is cleared.
+
+## Future ideas
+
+1. Add automated tests (unit + e2e).
+1. Add data versioning/migration.
+1. Add backup and restore JSON.
+1. Improve validation for edge cases.
+1. Optional cloud sync later.
 
 ## Screenshots
 
@@ -105,8 +325,3 @@ If Node is unavailable on your machine, fallback local server:
 ![screenshot2](assets/images/screenshot2.png)
 ![screenshot3 - light mode](assets/images/screenshot3.png)
 ![screenshot4 - dark mode](assets/images/screenshot4.png)
-
-## Notes
-
-- Data remains on the same browser/device profile.
-- Clearing browser storage or removing the app can remove saved data.
