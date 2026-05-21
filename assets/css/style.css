@@ -831,7 +831,8 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-end;
+	justify-content: flex-start;
+	gap: 0.3rem;
 }
 
 .forecast-grid {
@@ -1269,7 +1270,7 @@ button:disabled {
 .budget-stat-pair > .stat,
 .budget-stat-pair > .stat h3,
 .budget-stat-pair > .stat p {
-	text-align: right;
+	text-align: left;
 }
 
 .stat:has(#monthly-expense) {
@@ -1286,7 +1287,6 @@ button:disabled {
 .stat:has(#monthly-expense) #monthly-expense {
 	color: #c63e5e;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
-	font-size: clamp(1.2rem, 1.35vw + 0.82rem, 1.64rem);
 }
 
 .stat:has(#spent-to-date) h3,
