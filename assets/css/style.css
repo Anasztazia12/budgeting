@@ -1871,7 +1871,7 @@ select:focus-visible {
 
 	.budget-controls .period-range-inputs .small-date-input,
 	.budget-controls > div.currency-control select {
-		width: cover;
+		width: fit-content;
 		max-width: 100%;
 		flex: 1 1 auto;
 		height: 2.08rem;
@@ -1889,9 +1889,9 @@ select:focus-visible {
 	}
 
 	.budget-controls > div.currency-control select {
-		width: cover;
+		width: fit-content;
 		inline-size: auto;
-		max-width: min(100%, 138px);
+		max-width: min(100%, 96px);
 	}
 
 	.budget-controls .control-action {
@@ -1916,6 +1916,13 @@ select:focus-visible {
 		width: 100%;
 		min-width: 0;
 		max-width: 100%;
+	}
+
+	.budget-controls > div.currency-control select {
+		width: auto;
+		inline-size: auto;
+		max-width: min(100%, 96px);
+		justify-self: start;
 	}
 
 	input[type="date"],
