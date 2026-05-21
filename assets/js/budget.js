@@ -111,7 +111,7 @@ const shared = window.BudgetAppShared;
 				deleteAction: "Törlés",
 				repeatMonthlyAction: "Megjelenít minden hónapban",
 				stopRepeatMonthlyAction: "Ismétlés kikapcsolása",
-				repeatMonthlyBadge: "Havi ismétlés",
+				repeatMonthlyBadge: "Ismétlődő",
 				moreActionsLabel: "További műveletek",
 				csvType: "Típus",
 				csvCategory: "Kategória",
