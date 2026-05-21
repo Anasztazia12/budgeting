@@ -1962,10 +1962,10 @@ select:focus-visible {
 
 	#income-date,
 	#expense-date {
-		width: 70%;
-		inline-size: 70%;
+		width: 90%;
+		inline-size: 90%;
 		min-inline-size: 0;
-		max-inline-size: 70%;
+		max-inline-size: 90%;
 		justify-self: stretch;
 	}
 
