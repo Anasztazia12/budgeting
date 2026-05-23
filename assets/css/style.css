@@ -1955,12 +1955,12 @@ select:focus-visible {
 
 	#forecast-planner input[type="date"],
 	#whatif-rows input[type="date"] {
-		width: 100%;
-		inline-size: 100%;
+		width: 80%;
+		inline-size: 80%;
 		min-width: 0;
 		min-inline-size: 0;
-		max-width: 100%;
-		max-inline-size: 100%;
+		max-width: 80%;
+		max-inline-size: 80%;
 		font-size: 0.86rem;
 		padding-left: 0.44rem;
 		padding-right: 0.44rem;

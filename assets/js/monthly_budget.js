@@ -1,4 +1,11 @@
-const shared = window.BudgetAppShared;
+		import {
+			deleteCurrentAccount,
+			getFirebaseErrorMessage,
+			logoutCurrentUser,
+			restoreSession
+		} from "./firebase-service.js";
+
+		const shared = window.BudgetAppShared;
 		const {
 			USERS_KEY,
 			SESSION_KEY,
@@ -152,12 +159,13 @@ const shared = window.BudgetAppShared;
 		};
 
 		const today = new Date();
-		const users = loadUsers();
-		const currentUser = loadSession(users);
+		const users = {};
+		let currentUser = localStorage.getItem(SESSION_KEY) || "";
+		let currentProfile = null;
 		let appLanguage = loadLanguage();
 		let appTheme = loadTheme();
 		let appCurrency = loadCurrency();
-		let appState = getCurrentUserState();
+		let appState = { incomes: [], expenses: [] };
 
 		const menuToggle = document.getElementById("menu-toggle");
 		const menuPanel = document.getElementById("menu-panel");
@@ -185,7 +193,7 @@ const shared = window.BudgetAppShared;
 		const projectionTextEl = document.getElementById("projection-text");
 		let deferredInstallPrompt = null;
 
-		initializePage();
+		void initializePage();
 
 		languageSelect.addEventListener("change", () => {
 			appLanguage = languageSelect.value;
@@ -312,10 +320,18 @@ const shared = window.BudgetAppShared;
 			});
 		}
 
-		function initializePage() {
-			if (!currentUser) {
-				window.location.href = "index.html";
-				return;
+		async function initializePage() {
+			if (currentUser === GUEST_SESSION_VALUE) {
+				appState = loadGuestData();
+			} else {
+				const session = await restoreSession(currentUser);
+				if (!session) {
+					window.location.href = "index.html";
+					return;
+				}
+
+				applyAuthenticatedState(session);
+				appState = session.data || { incomes: [], expenses: [] };
 			}
 
 			applyTheme();
@@ -379,8 +395,7 @@ const shared = window.BudgetAppShared;
 				return t("guestUser");
 			}
 
-			const profile = users[currentUser] && users[currentUser].profile ? users[currentUser].profile : null;
-			return profile?.nickname || profile?.username || currentUser;
+			return currentProfile?.nickname || currentProfile?.username || currentUser;
 		}
 
 		function setMenuInfoMessage(message) {
@@ -420,10 +435,13 @@ const shared = window.BudgetAppShared;
 			}
 		}
 
-		function handleLogout() {
+		async function handleLogout() {
 			menuPanel.classList.remove("is-open");
 			menuToggle.classList.remove("is-open");
 			menuToggle.setAttribute("aria-expanded", "false");
+			if (currentUser && currentUser !== GUEST_SESSION_VALUE) {
+				await logoutCurrentUser().catch(() => null);
+			}
 			localStorage.removeItem(SESSION_KEY);
 			window.location.href = "index.html";
 		}
@@ -440,12 +458,16 @@ const shared = window.BudgetAppShared;
 
 			const userRecord = users[currentUser] || {};
 			const email = userRecord.email || (userRecord.profile && userRecord.profile.email) || "";
-			await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
-			delete users[currentUser];
-			shared.saveUsers(users);
-			shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-			localStorage.removeItem(SESSION_KEY);
-			window.location.href = "index.html";
+			try {
+				await deleteCurrentAccount();
+				await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+				delete users[currentUser];
+				shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+				localStorage.removeItem(SESSION_KEY);
+				window.location.href = "index.html";
+			} catch (error) {
+				setMenuInfoMessage(getFirebaseErrorMessage(error, appLanguage, "delete"));
+			}
 		}
 
 		function paintList(target, entries) {
@@ -571,16 +593,23 @@ const shared = window.BudgetAppShared;
 			installAppButton.disabled = false;
 		}
 
-		function loadUsers() {
-			return shared.loadUsers();
-		}
+		function applyAuthenticatedState(session) {
+			Object.keys(users).forEach((key) => {
+				delete users[key];
+			});
 
-		function loadSession(userMap) {
-			return shared.loadSession(userMap);
-		}
+			currentUser = String(session?.profile?.username || currentUser || "").trim();
+			currentProfile = session?.profile || null;
+			if (!currentUser) {
+				return;
+			}
 
-		function getCurrentUserState() {
-			return shared.getCurrentUserState(currentUser, users);
+			users[currentUser] = {
+				email: session.email || session.profile?.email || "",
+				profile: session.profile || null,
+				data: session.data || { incomes: [], expenses: [] }
+			};
+			localStorage.setItem(SESSION_KEY, currentUser);
 		}
 
 		function loadLanguage() {
