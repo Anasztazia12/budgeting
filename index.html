@@ -84,10 +84,11 @@
                     <input type="email" id="register-email-confirm" required>
 
                     <label for="register-password" data-i18n="passwordLabel">Jelszó</label>
-                    <input type="password" id="register-password" required>
+                    <input type="password" id="register-password" minlength="6" maxlength="20" required>
+                    <p id="password-strength-message" class="password-strength-message" aria-live="polite" data-i18n="passwordRuleHint">A jelszó legyen 6-20 karakter, tartalmazzon kisbetűt, nagybetűt és számot.</p>
 
                     <label for="register-password-confirm" data-i18n="passwordConfirmLabel">Jelszó megerősítése</label>
-                    <input type="password" id="register-password-confirm" required>
+                    <input type="password" id="register-password-confirm" minlength="6" maxlength="20" required>
 
                     <button type="submit" data-i18n="registerButton">Regisztrálok</button>
                 </form>

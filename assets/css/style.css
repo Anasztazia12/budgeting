@@ -124,6 +124,26 @@ body {
 	border: 0;
 }
 
+.password-strength-message {
+	margin: -0.15rem 0 0.1rem;
+	font-size: 0.88rem;
+	color: var(--muted-strong);
+}
+
+.password-strength-message.is-ok {
+	color: var(--good);
+	font-weight: 700;
+}
+
+.password-strength-message.is-error {
+	color: #c23153;
+	font-weight: 700;
+}
+
+[data-theme="dark"] .password-strength-message.is-error {
+	color: #ff9ab2;
+}
+
 .app-shell {
 	width: min(1080px, 92vw);
 	margin: 0 auto;

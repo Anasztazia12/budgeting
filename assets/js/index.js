@@ -42,6 +42,9 @@ const dictionary = {
         emailConfirmLabel: "Email cím megerősítése",
         passwordLabel: "Jelszó",
         passwordConfirmLabel: "Jelszó megerősítése",
+        passwordRuleHint: "A jelszó legyen 6-20 karakter, tartalmazzon kisbetűt, nagybetűt és számot.",
+        passwordWeak: "A jelszó túl gyenge.",
+        passwordStrong: "A jelszó elég erős.",
         registerButton: "Regisztrálok",
         loginButton: "Belépés",
         guestButton: "Folytatás vendégként",
@@ -95,6 +98,9 @@ const dictionary = {
         emailConfirmLabel: "Confirm email address",
         passwordLabel: "Password",
         passwordConfirmLabel: "Confirm password",
+        passwordRuleHint: "Password must be 6-20 chars and include lowercase, uppercase, and a number.",
+        passwordWeak: "Password is too weak.",
+        passwordStrong: "Password is strong enough.",
         registerButton: "Create account",
         loginButton: "Sign in",
         guestButton: "Continue as guest",
@@ -138,6 +144,8 @@ const registerCard = document.getElementById("register-card");
 const loginCard = document.getElementById("login-card");
 const registerForm = document.getElementById("register-form");
 const loginForm = document.getElementById("login-form");
+const registerPasswordInput = document.getElementById("register-password");
+const passwordStrengthMessage = document.getElementById("password-strength-message");
 const guestButton = document.getElementById("guest-button");
 const installAppButton = document.getElementById("install-app-button");
 const deleteAccountButton = document.getElementById("delete-account-button");
@@ -252,6 +260,12 @@ function wireEvents() {
                 return;
             }
 
+            if (!isPasswordStrong(password)) {
+                updatePasswordStrengthFeedback();
+                showMessage(t("passwordWeak"), true);
+                return;
+            }
+
             try {
                 const session = await registerWithUsername({ username, email, password });
                 shared.setFlashMessage(formatText(t("welcomeRegistered"), { username }), false);
@@ -261,6 +275,15 @@ function wireEvents() {
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error, appLanguage, "register"), true);
             }
+        });
+    }
+
+    if (registerPasswordInput) {
+        registerPasswordInput.addEventListener("input", () => {
+            updatePasswordStrengthFeedback();
+        });
+        registerPasswordInput.addEventListener("blur", () => {
+            updatePasswordStrengthFeedback();
         });
     }
 
@@ -366,6 +389,7 @@ async function initializePage() {
     syncThemeButtons();
     languageSelect.value = appLanguage;
     applyTranslations();
+    updatePasswordStrengthFeedback();
     updateAccessUI();
     updateInstallButtonState();
     showMessage("", false);
@@ -383,8 +407,55 @@ function applyTranslations() {
     document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
         element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
     });
+    updatePasswordStrengthFeedback();
     updateSessionLabel();
     updateMenuSessionLabel();
+}
+
+function evaluatePassword(password) {
+    const value = String(password || "");
+    const hasMinLength = value.length >= 6;
+    const hasMaxLength = value.length <= 20;
+    const hasLowercase = /[a-z]/.test(value);
+    const hasUppercase = /[A-Z]/.test(value);
+    const hasDigit = /\d/.test(value);
+
+    return {
+        valid: hasMinLength && hasMaxLength && hasLowercase && hasUppercase && hasDigit,
+        hasContent: value.length > 0
+    };
+}
+
+function isPasswordStrong(password) {
+    return evaluatePassword(password).valid;
+}
+
+function updatePasswordStrengthFeedback() {
+    if (!passwordStrengthMessage || !registerPasswordInput) {
+        return;
+    }
+
+    const result = evaluatePassword(registerPasswordInput.value);
+    if (!result.hasContent) {
+        passwordStrengthMessage.textContent = t("passwordRuleHint");
+        passwordStrengthMessage.classList.remove("is-ok");
+        passwordStrengthMessage.classList.remove("is-error");
+        registerPasswordInput.setCustomValidity("");
+        return;
+    }
+
+    if (result.valid) {
+        passwordStrengthMessage.textContent = t("passwordStrong");
+        passwordStrengthMessage.classList.add("is-ok");
+        passwordStrengthMessage.classList.remove("is-error");
+        registerPasswordInput.setCustomValidity("");
+        return;
+    }
+
+    passwordStrengthMessage.textContent = t("passwordWeak");
+    passwordStrengthMessage.classList.add("is-error");
+    passwordStrengthMessage.classList.remove("is-ok");
+    registerPasswordInput.setCustomValidity(t("passwordWeak"));
 }
 
 function updateAccessUI() {
