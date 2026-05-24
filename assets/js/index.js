@@ -177,7 +177,6 @@ const dictionary = {
     }
 };
 
-const users = {};
 const menuToggle = document.getElementById("menu-toggle");
 const menuPanel = document.getElementById("menu-panel");
 const menuBackButton = document.getElementById("menu-back-button");
@@ -827,7 +826,7 @@ async function performLogout() {
 }
 
 async function handleAccountDelete() {
-    if (!currentUser || currentUser === GUEST_SESSION_VALUE || !users[currentUser]) {
+    if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
         showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage), true);
         return;
     }
@@ -836,8 +835,7 @@ async function handleAccountDelete() {
         return;
     }
 
-    const userRecord = users[currentUser] || {};
-    const email = userRecord.email || (userRecord.profile && userRecord.profile.email) || "";
+    const email = currentProfile?.email || "";
 
     try {
         await deleteCurrentAccount();
@@ -870,25 +868,13 @@ function applyAuthenticatedState(session) {
         return;
     }
 
-    Object.keys(users).forEach((key) => {
-        delete users[key];
-    });
-
     currentUser = username;
     currentProfile = session.profile || null;
-    users[username] = {
-        email: session.email || session.profile?.email || "",
-        profile: session.profile || null,
-        data: session.data || { incomes: [], expenses: [] }
-    };
     localStorage.setItem(SESSION_KEY, username);
     localStorage.setItem(DISPLAY_NAME_KEY, currentProfile?.nickname || currentProfile?.username || username);
 }
 
 function clearAuthenticatedState() {
-    Object.keys(users).forEach((key) => {
-        delete users[key];
-    });
     currentUser = "";
     currentProfile = null;
     localStorage.removeItem(SESSION_KEY);

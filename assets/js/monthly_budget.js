@@ -7,14 +7,12 @@
 
 		const shared = window.BudgetAppShared;
 		const {
-			USERS_KEY,
 			SESSION_KEY,
 			DISPLAY_NAME_KEY,
 			LANGUAGE_KEY,
 			THEME_KEY,
 			CURRENCY_KEY,
-			INSTALL_STATUS_KEY,
-			GUEST_DATA_KEY
+			INSTALL_STATUS_KEY
 		} = shared.KEYS;
 		const { GUEST_SESSION_VALUE } = shared;
 
@@ -162,7 +160,6 @@
 		};
 
 		const today = new Date();
-		const users = {};
 		let currentUser = localStorage.getItem(SESSION_KEY) || "";
 		let currentProfile = null;
 		let appLanguage = loadLanguage();
@@ -457,7 +454,7 @@
 		}
 
 		async function handleAccountDelete() {
-			if (!currentUser || currentUser === GUEST_SESSION_VALUE || !users[currentUser]) {
+			if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
 				setMenuInfoMessage(shared.getDeleteAccountNoSessionMessage(appLanguage));
 				return;
 			}
@@ -466,12 +463,10 @@
 				return;
 			}
 
-			const userRecord = users[currentUser] || {};
-			const email = userRecord.email || (userRecord.profile && userRecord.profile.email) || "";
+			const email = currentProfile?.email || "";
 			try {
 				await deleteCurrentAccount();
 				await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
-				delete users[currentUser];
 				shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
 				localStorage.removeItem(SESSION_KEY);
 				window.location.href = "index.html";
@@ -604,21 +599,11 @@
 		}
 
 		function applyAuthenticatedState(session) {
-			Object.keys(users).forEach((key) => {
-				delete users[key];
-			});
-
 			currentUser = String(session?.profile?.username || currentUser || "").trim();
 			currentProfile = session?.profile || null;
 			if (!currentUser) {
 				return;
 			}
-
-			users[currentUser] = {
-				email: session.email || session.profile?.email || "",
-				profile: session.profile || null,
-				data: session.data || { incomes: [], expenses: [] }
-			};
 			localStorage.setItem(SESSION_KEY, currentUser);
 		}
 

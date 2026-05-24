@@ -1,6 +1,5 @@
 (function initializeBudgetAppShared() {
     const KEYS = {
-        USERS_KEY: "budgetAppUsers",
         SESSION_KEY: "budgetAppSession",
         DISPLAY_NAME_KEY: "budgetAppDisplayName",
         LANGUAGE_KEY: "budgetAppLanguage",
@@ -31,28 +30,6 @@
             incomes: Array.isArray(data && data.incomes) ? data.incomes : [],
             expenses: Array.isArray(data && data.expenses) ? data.expenses : []
         };
-    }
-
-    function loadUsers() {
-        const parsed = safeParseObject(localStorage.getItem(KEYS.USERS_KEY));
-        return parsed || {};
-    }
-
-    function saveUsers(users) {
-        localStorage.setItem(KEYS.USERS_KEY, JSON.stringify(users || {}));
-    }
-
-    function loadSession(userMap) {
-        const saved = localStorage.getItem(KEYS.SESSION_KEY);
-        if (saved === GUEST_SESSION_VALUE) {
-            return saved;
-        }
-
-        if (saved && userMap && userMap[saved]) {
-            return saved;
-        }
-
-        return "";
     }
 
     function loadLanguage() {
@@ -252,18 +229,6 @@
         localStorage.setItem(KEYS.GUEST_DATA_KEY, JSON.stringify(normalizeEntriesData(data)));
     }
 
-    function getCurrentUserState(currentUser, users) {
-        if (currentUser === GUEST_SESSION_VALUE) {
-            return loadGuestData();
-        }
-
-        if (!currentUser || !users || !users[currentUser]) {
-            return { incomes: [], expenses: [] };
-        }
-
-        return normalizeEntriesData(users[currentUser].data || {});
-    }
-
     function buildMailtoUrl(to, subject, body) {
         const recipient = encodeURIComponent(String(to || "").trim());
         const params = new URLSearchParams({
@@ -357,9 +322,6 @@
     window.BudgetAppShared = {
         KEYS,
         GUEST_SESSION_VALUE,
-        loadUsers,
-        saveUsers,
-        loadSession,
         loadLanguage,
         saveLanguage,
         loadTheme,
@@ -379,7 +341,6 @@
         getInstallUnavailableMessage,
         loadGuestData,
         saveGuestData,
-        getCurrentUserState,
         setFlashMessage,
         consumeFlashMessage,
         sendRegistrationEmail,
