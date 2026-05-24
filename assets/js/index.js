@@ -45,6 +45,8 @@ const dictionary = {
         emailLabel: "Email cím",
         emailConfirmLabel: "Email cím megerősítése",
         passwordLabel: "Jelszó",
+        showPassword: "Jelszó mutatása",
+        hidePassword: "Jelszó elrejtése",
         passwordConfirmLabel: "Jelszó megerősítése",
         passwordRuleHint: "A jelszó legyen 6-20 karakter, tartalmazzon kisbetűt, nagybetűt és számot.",
         passwordWeak: "A jelszó túl gyenge.",
@@ -119,6 +121,8 @@ const dictionary = {
         emailLabel: "Email address",
         emailConfirmLabel: "Confirm email address",
         passwordLabel: "Password",
+        showPassword: "Show password",
+        hidePassword: "Hide password",
         passwordConfirmLabel: "Confirm password",
         passwordRuleHint: "Password must be 6-20 chars and include lowercase, uppercase, and a number.",
         passwordWeak: "Password is too weak.",
@@ -192,6 +196,8 @@ const changePasswordForm = document.getElementById("change-password-form");
 const resetCompleteForm = document.getElementById("reset-complete-form");
 const resetIdentifierInput = document.getElementById("reset-identifier");
 const registerPasswordInput = document.getElementById("register-password");
+const loginPasswordInput = document.getElementById("login-password");
+const loginPasswordToggle = document.getElementById("login-password-toggle");
 const changeNewPasswordInput = document.getElementById("change-new-password");
 const resetNewPasswordInput = document.getElementById("reset-new-password");
 const passwordStrengthMessage = document.getElementById("password-strength-message");
@@ -305,6 +311,8 @@ function wireEvents() {
             }
         });
     }
+
+    initializeLoginPasswordToggle();
 
     languageSelect.addEventListener("change", () => {
         appLanguage = languageSelect.value;
@@ -578,9 +586,37 @@ function applyTranslations() {
         element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
     });
     updatePasswordStrengthFeedback();
+    syncLoginPasswordToggleButton();
     updateResetFormTexts();
     updateSessionLabel();
     updateMenuSessionLabel();
+}
+
+function initializeLoginPasswordToggle() {
+    if (!loginPasswordInput || !loginPasswordToggle) {
+        return;
+    }
+
+    loginPasswordToggle.addEventListener("click", () => {
+        const shouldShow = loginPasswordInput.type === "password";
+        loginPasswordInput.type = shouldShow ? "text" : "password";
+        loginPasswordToggle.setAttribute("aria-pressed", String(shouldShow));
+        syncLoginPasswordToggleButton();
+    });
+
+    syncLoginPasswordToggleButton();
+}
+
+function syncLoginPasswordToggleButton() {
+    if (!loginPasswordInput || !loginPasswordToggle) {
+        return;
+    }
+
+    const isVisible = loginPasswordInput.type === "text";
+    const label = isVisible ? t("hidePassword") : t("showPassword");
+    loginPasswordToggle.textContent = isVisible ? "🙈" : "👁";
+    loginPasswordToggle.setAttribute("aria-label", label);
+    loginPasswordToggle.setAttribute("title", label);
 }
 
 function evaluatePassword(password) {

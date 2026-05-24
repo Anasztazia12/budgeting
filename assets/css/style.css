@@ -1213,6 +1213,40 @@ input[type="month"] {
 	text-overflow: ellipsis;
 }
 
+.password-input-wrap {
+	position: relative;
+	width: 100%;
+}
+
+.password-input-wrap input {
+	padding-right: 2.4rem;
+}
+
+.password-visibility-toggle {
+	position: absolute;
+	right: 0.35rem;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 1.9rem;
+	height: 1.9rem;
+	padding: 0;
+	border-radius: 0.45rem;
+	border: 1px solid #9db8ea;
+	background: #edf4ff;
+	color: #1a4ea9;
+	font-size: 0.95rem;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+[data-theme="dark"] .password-visibility-toggle {
+	background: #294676;
+	border-color: #7fa7f3;
+	color: #e8efff;
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="month"]::-webkit-calendar-picker-indicator {
 	margin-left: 0.2rem;

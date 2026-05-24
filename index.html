@@ -102,7 +102,10 @@
                     <input type="text" id="login-username" required>
 
                     <label for="login-password" data-i18n="passwordLabel">Jelszó</label>
-                    <input type="password" id="login-password" required>
+                    <div class="password-input-wrap">
+                        <input type="password" id="login-password" required>
+                        <button type="button" id="login-password-toggle" class="password-visibility-toggle" aria-label="Jelszó mutatása" aria-pressed="false" title="Jelszó mutatása">👁</button>
+                    </div>
 
                     <button type="submit" data-i18n="loginButton">Belépés</button>
                     <button type="button" id="show-reset-button" class="secondary" data-i18n="forgotPasswordButton">Elfelejtett jelszó</button>
