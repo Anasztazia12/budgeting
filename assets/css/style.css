@@ -2248,7 +2248,7 @@ select:focus-visible {
 	.budget-controls .period-range-inputs .small-date-input,
 	.budget-controls > div.currency-control select {
 		width: fit-content;
-		max-width: 100%;
+		max-width: 100px;
 		flex: 1 1 auto;
 		height: 2.08rem;
 		min-height: 2.08rem;
@@ -2369,10 +2369,10 @@ select:focus-visible {
 
 	#income-date,
 	#expense-date {
-		width: 100%;
-		inline-size: 100%;
+		width: 80%;
+		inline-size: 80%;
 		min-inline-size: 0;
-		max-inline-size: 100%;
+		max-inline-size: 80%;
 		justify-self: stretch;
 	}
 
@@ -2411,10 +2411,10 @@ select:focus-visible {
 	}
 
 	.entry-filters input[type="date"] {
-		width: min(100%, 220px);
-		inline-size: min(100%, 220px);
-		max-width: 100%;
-		max-inline-size: 100%;
+		width: min(80%, 180px);
+		inline-size: min(80%, 180px);
+		max-width: min(80%, 180px);
+		max-inline-size: min(80%, 180px);
 		min-width: 0;
 		min-inline-size: 0;
 		min-height: 2.12rem;
