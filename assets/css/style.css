@@ -1610,6 +1610,47 @@ h2[data-i18n="projectionTitle"] {
 	align-items: center;
 }
 
+.inline-delete-confirm {
+	position: absolute;
+	z-index: 95;
+	width: min(260px, calc(100vw - 1.25rem));
+	padding: 0.55rem;
+	border-radius: 0.65rem;
+	border: 1px solid #99b6ea;
+	background: #ffffff;
+	box-shadow: 0 10px 24px rgba(12, 33, 76, 0.22);
+}
+
+.inline-delete-confirm p {
+	margin: 0;
+	font-size: 0.82rem;
+	line-height: 1.35;
+	color: var(--ink);
+}
+
+.inline-delete-confirm-actions {
+	margin-top: 0.5rem;
+	display: flex;
+	gap: 0.4rem;
+}
+
+.inline-delete-confirm-actions .btn {
+	width: auto;
+	padding: 0.32rem 0.58rem;
+	font-size: 0.8rem;
+	line-height: 1.2;
+}
+
+[data-theme="dark"] .inline-delete-confirm {
+	background: #182745;
+	border-color: #5677b3;
+	box-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
+}
+
+[data-theme="dark"] .inline-delete-confirm p {
+	color: #e8efff;
+}
+
 .inline-icon-button {
 	width: 1.9rem;
 	height: 1.9rem;

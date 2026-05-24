@@ -927,6 +927,10 @@
 				return Promise.resolve(null);
 			}
 
+			if (inlineDeleteConfirmResolver) {
+				closeInlineDeleteConfirm(false);
+			}
+
 			deleteScopeModal.classList.remove("hidden");
 			if (deleteThisMonthButton) {
 				deleteThisMonthButton.focus();
@@ -948,13 +952,92 @@
 			}
 		}
 
+		function openInlineDeleteConfirm(anchorElement, message) {
+			if (!anchorElement || !document.body) {
+				return Promise.resolve(false);
+			}
+
+			if (inlineDeleteConfirmResolver) {
+				closeInlineDeleteConfirm(false);
+			}
+
+			const popover = document.createElement("div");
+			popover.className = "inline-delete-confirm";
+			popover.setAttribute("role", "alertdialog");
+			popover.innerHTML = `
+				<p>${escapeHtml(message)}</p>
+				<div class="inline-delete-confirm-actions">
+					<button type="button" class="btn btn-danger">${escapeHtml(t("deleteAction"))}</button>
+					<button type="button" class="btn btn-outline-info">${escapeHtml(t("cancelModalButton"))}</button>
+				</div>
+			`;
+
+			document.body.appendChild(popover);
+			inlineDeleteConfirmElement = popover;
+
+			const rect = anchorElement.getBoundingClientRect();
+			const top = window.scrollY + rect.top - popover.offsetHeight - 8;
+			const preferredLeft = window.scrollX + rect.right + 10;
+			const maxLeft = window.scrollX + window.innerWidth - popover.offsetWidth - 10;
+			const safeTop = Math.max(window.scrollY + 10, top);
+			const safeLeft = Math.max(window.scrollX + 10, Math.min(preferredLeft, maxLeft));
+			popover.style.top = `${safeTop}px`;
+			popover.style.left = `${safeLeft}px`;
+
+			const buttons = popover.querySelectorAll("button");
+			const confirmButton = buttons[0];
+			const cancelButton = buttons[1];
+
+			confirmButton?.addEventListener("click", () => closeInlineDeleteConfirm(true));
+			cancelButton?.addEventListener("click", () => closeInlineDeleteConfirm(false));
+
+			inlineDeleteConfirmOutsideHandler = (event) => {
+				if (!inlineDeleteConfirmElement) {
+					return;
+				}
+				const clickedInsidePopover = inlineDeleteConfirmElement.contains(event.target);
+				const clickedAnchor = anchorElement.contains(event.target);
+				if (!clickedInsidePopover && !clickedAnchor) {
+					closeInlineDeleteConfirm(false);
+				}
+			};
+			document.addEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+
+			confirmButton?.focus();
+
+			return new Promise((resolve) => {
+				inlineDeleteConfirmResolver = resolve;
+			});
+		}
+
+		function closeInlineDeleteConfirm(confirmed) {
+			if (inlineDeleteConfirmOutsideHandler) {
+				document.removeEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+				inlineDeleteConfirmOutsideHandler = null;
+			}
+
+			if (inlineDeleteConfirmElement) {
+				inlineDeleteConfirmElement.remove();
+				inlineDeleteConfirmElement = null;
+			}
+
+			if (inlineDeleteConfirmResolver) {
+				const resolver = inlineDeleteConfirmResolver;
+				inlineDeleteConfirmResolver = null;
+				resolver(Boolean(confirmed));
+			}
+		}
+
 		function populateFormForEdit(listType, entry) {
+			let focusField = null;
+
 			if (listType === "incomes") {
 				document.getElementById("income-edit-id").value = entry.id;
 				document.getElementById("income-category").value = entry.category;
 				document.getElementById("income-amount").value = entry.amount;
 				document.getElementById("income-date").value = entry.date;
 				document.getElementById("income-note").value = entry.note || "";
+				focusField = document.getElementById("income-amount");
 				if (incomeRepeatMonthlyCheckbox) {
 					incomeRepeatMonthlyCheckbox.checked = Boolean(entry.repeatMonthly);
 				}
@@ -967,6 +1050,7 @@
 				document.getElementById("expense-amount").value = entry.amount;
 				document.getElementById("expense-date").value = entry.date;
 				document.getElementById("expense-note").value = entry.note || "";
+				focusField = document.getElementById("expense-amount");
 				if (expenseRepeatMonthlyCheckbox) {
 					expenseRepeatMonthlyCheckbox.checked = Boolean(entry.repeatMonthly);
 				}
@@ -974,6 +1058,11 @@
 			}
 
 			updateFormButtonLabels();
+			if (focusField) {
+				focusField.scrollIntoView({ behavior: "smooth", block: "center" });
+				focusField.focus({ preventScroll: true });
+				focusField.select?.();
+			}
 		}
 
 		function resetIncomeForm() {
@@ -1183,7 +1272,7 @@
 			appState[collectionName].push(entry);
 		}
 
-		async function handleDeleteFromForm(collectionName, editIdField, resetForm) {
+		async function handleDeleteFromForm(collectionName, editIdField, resetForm, triggerElement) {
 			const editId = document.getElementById(editIdField).value;
 			if (!editId) {
 				resetForm();
@@ -1192,7 +1281,7 @@
 
 			const sourceDateField = collectionName === "incomes" ? "income-date" : "expense-date";
 			const sourceDate = document.getElementById(sourceDateField)?.value || "";
-			if (!(await handleEntryDelete(collectionName, editId, sourceDate))) {
+			if (!(await handleEntryDelete(collectionName, editId, sourceDate, triggerElement))) {
 				return;
 			}
 
