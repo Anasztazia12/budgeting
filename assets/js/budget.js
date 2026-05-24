@@ -610,7 +610,15 @@
 			await handleEntryAction(event, "incomes");
 		});
 
+		incomeList.addEventListener("change", async (event) => {
+			await handleEntryAction(event, "incomes");
+		});
+
 		expenseList.addEventListener("click", async (event) => {
+			await handleEntryAction(event, "expenses");
+		});
+
+		expenseList.addEventListener("change", async (event) => {
 			await handleEntryAction(event, "expenses");
 		});
 
@@ -785,26 +793,27 @@
 					li.className = "entry-row";
 					const inlineNoteText = entry.note ? `<span class="entry-note-inline">(${escapeHtml(entry.note)})</span>` : "";
 					const recurringBadge = entry.repeatMonthly ? `<span class="entry-repeat-badge">${t("repeatMonthlyBadge")}</span>` : "";
-					const repeatActionLabel = entry.repeatMonthly ? t("stopRepeatMonthlyAction") : t("repeatMonthlyAction");
+					const repeatChecked = entry.repeatMonthly ? "checked" : "";
 					li.innerHTML = `
 						<div class="entry-main-row entry-main-row-top">
 							<div class="entry-heading">
 								<strong>${translateCategory(entry.category)}</strong>
 								<span class="entry-date">${formatDisplayDate(entry.date)}</span>
 							</div>
-							${recurringBadge}
+							<div class="entry-repeat-controls">
+								${recurringBadge}
+								<label class="entry-repeat-toggle">
+									<input type="checkbox" data-action="toggle-repeat-monthly" data-id="${entry.id}" data-date="${entry.date}" ${repeatChecked}>
+									<span>${t("repeatMonthlyAction")}</span>
+								</label>
+							</div>
 						</div>
 						<div class="entry-main-row entry-main-row-bottom">
 							<span class="entry-amount">${formatCurrency(entry.amount)} ${inlineNoteText}</span>
-							<div class="row-actions">
-							<details class="row-menu">
-								<summary aria-label="${t("moreActionsLabel")}">▾</summary>
-								<div class="row-menu-list">
-									<button type="button" class="inline-button" data-action="edit" data-id="${entry.id}">${t("editAction")}</button>
-									<button type="button" class="inline-button danger" data-action="delete" data-id="${entry.id}" data-date="${entry.date}">${t("deleteAction")}</button>
-									<button type="button" class="inline-button" data-action="toggle-repeat-monthly" data-id="${entry.id}" data-date="${entry.date}">${repeatActionLabel}</button>
-								</div>
-							</details>
+							<div class="row-actions row-actions-icons">
+								<button type="button" class="inline-icon-button" title="${t("editAction")}" aria-label="${t("editAction")}" data-action="edit" data-id="${entry.id}">✎</button>
+								<button type="button" class="inline-icon-button danger" title="${t("deleteAction")}" aria-label="${t("deleteAction")}" data-action="delete" data-id="${entry.id}" data-date="${entry.date}">✖</button>
+							</div>
 							</div>
 						</div>
 					`;
