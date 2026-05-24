@@ -1326,27 +1326,28 @@ input[type="month"] {
 	text-overflow: ellipsis;
 }
 
-.password-input-wrap {
+.password-wrapper {
+	position: relative;
 	display: flex;
 	align-items: center;
-	gap: 0.4rem;
 	width: 100%;
 }
 
-.password-input-wrap input {
-	flex: 1 1 auto;
+.password-wrapper input {
+	width: 100%;
 	min-width: 0;
-	padding-right: var(--control-padding-x);
+	padding-right: 2.75rem;
 }
 
-.password-input-wrap button.password-visibility-toggle {
-	position: static;
-	transform: none;
+.password-wrapper button.password-visibility-toggle {
+	position: absolute;
+	right: 0.3rem;
+	top: 50%;
+	transform: translateY(-50%);
 	width: 2rem;
 	height: 2rem;
-	min-width: 2rem;
-	max-width: 2rem;
-	flex: 0 0 2rem;
+	min-width: 0;
+	max-width: none;
 	margin: 0;
 	padding: 0;
 	border-radius: 999px;
@@ -1363,7 +1364,7 @@ input[type="month"] {
 	isolation: auto;
 }
 
-.password-input-wrap button.password-visibility-toggle::after {
+.password-wrapper button.password-visibility-toggle::after {
 	display: none;
 }
 
