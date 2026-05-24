@@ -860,6 +860,15 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 	margin-top: 0.65rem;
 }
 
+.whatif-row.forecast-grid {
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	align-items: end;
+}
+
+.forecast-whatif-note {
+	width: 100%;
+}
+
 #forecast-planner > .forecast-grid {
 	grid-template-columns: minmax(170px, 1fr) minmax(190px, 1fr) auto;
 	align-items: end;
@@ -1684,6 +1693,10 @@ select:focus-visible {
 	}
 
 	.forecast-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.whatif-row.forecast-grid {
 		grid-template-columns: 1fr 1fr;
 	}
 

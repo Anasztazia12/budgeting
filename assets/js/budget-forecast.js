@@ -55,6 +55,8 @@
 				forecastRowTypeLabel: "Típus",
 				forecastRowAmountLabel: "Összeg",
 				forecastRowDateLabel: "Dátum",
+				forecastRowNoteLabel: "Megjegyzés",
+				forecastRowNotePlaceholder: "Rövid megjegyzés (opcionális)",
 				forecastTypeExpense: "Extra kiadás",
 				forecastTypeIncome: "Extra bevétel",
 				forecastRemoveRow: "Sor törlése",
@@ -177,6 +179,8 @@
 				forecastRowTypeLabel: "Type",
 				forecastRowAmountLabel: "Amount",
 				forecastRowDateLabel: "Date",
+				forecastRowNoteLabel: "Note",
+				forecastRowNotePlaceholder: "Short note (optional)",
 				forecastTypeExpense: "Extra expense",
 				forecastTypeIncome: "Extra income",
 				forecastRemoveRow: "Remove row",
@@ -353,7 +357,7 @@
 		}
 		forecastTargetDateInput.addEventListener("change", renderForecastPlanner);
 		addWhatIfRowButton.addEventListener("click", () => {
-			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value });
+			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "" });
 			renderForecastPlanner();
 		});
 		whatIfRowsContainer.addEventListener("input", renderForecastPlanner);
@@ -365,7 +369,7 @@
 			}
 			removeButton.closest(".whatif-row")?.remove();
 			if (!whatIfRowsContainer.children.length) {
-				appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value });
+				appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "" });
 			}
 			renderForecastPlanner();
 		});
@@ -638,7 +642,7 @@
 
 		function setDefaultWhatIfRows() {
 			whatIfRowsContainer.innerHTML = "";
-			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || toDateInput(today) });
+			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || toDateInput(today), note: "" });
 		}
 
 		function appendWhatIfRow(row) {
@@ -660,6 +664,10 @@
 					<label>${t("forecastRowDateLabel")}</label>
 					<input type="date" class="forecast-whatif-date" value="${row.date || ""}">
 				</div>
+				<div>
+					<label>${t("forecastRowNoteLabel")}</label>
+					<input type="text" class="forecast-whatif-note" maxlength="80" placeholder="${t("forecastRowNotePlaceholder")}">
+				</div>
 				<div class="control-action">
 					<button type="button" class="secondary" data-action="remove-whatif">${t("forecastRemoveRow")}</button>
 				</div>
@@ -667,6 +675,10 @@
 
 			const typeSelect = wrapper.querySelector(".forecast-whatif-type");
 			typeSelect.value = row.type || "expense";
+			const noteInput = wrapper.querySelector(".forecast-whatif-note");
+			if (noteInput) {
+				noteInput.value = String(row.note || "").slice(0, 80);
+			}
 			whatIfRowsContainer.appendChild(wrapper);
 		}
 
@@ -681,6 +693,9 @@
 				}
 				if (labels[2]) {
 					labels[2].textContent = t("forecastRowDateLabel");
+				}
+				if (labels[3]) {
+					labels[3].textContent = t("forecastRowNoteLabel");
 				}
 
 				const typeSelect = row.querySelector(".forecast-whatif-type");
@@ -697,6 +712,11 @@
 				if (removeButton) {
 					removeButton.textContent = t("forecastRemoveRow");
 				}
+
+				const noteInput = row.querySelector(".forecast-whatif-note");
+				if (noteInput) {
+					noteInput.setAttribute("placeholder", t("forecastRowNotePlaceholder"));
+				}
 			});
 		}
 
@@ -705,10 +725,12 @@
 				const type = row.querySelector(".forecast-whatif-type")?.value || "expense";
 				const amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
 				const date = row.querySelector(".forecast-whatif-date")?.value || "";
+				const note = String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
 				return {
 					type,
 					amount,
 					date,
+					note,
 					valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd
 				};
 			});
