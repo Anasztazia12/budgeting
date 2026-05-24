@@ -72,6 +72,7 @@ const dictionary = {
         registerButton: "Regisztrálok",
         loginButton: "Belépés",
         guestButton: "Folytatás vendégként",
+        contactUs: "Kapcsolat",
         downloadAppButton: "App letöltése",
         deleteAccountButton: "Regisztráció törlése",
         logoutButton: "Kijelentkezés",
@@ -148,6 +149,7 @@ const dictionary = {
         registerButton: "Create account",
         loginButton: "Sign in",
         guestButton: "Continue as guest",
+        contactUs: "Contact us",
         downloadAppButton: "Download App",
         deleteAccountButton: "Delete account",
         logoutButton: "Sign out",
@@ -214,6 +216,7 @@ const authMessage = document.getElementById("auth-message");
 const authMessageCard = authMessage ? authMessage.closest(".session-card") : null;
 const appLinks = document.getElementById("app-links");
 const languageSelect = document.getElementById("app-language");
+const contactUsButton = document.getElementById("contact-us-button");
 
 let deferredInstallPrompt = null;
 let currentUser = localStorage.getItem(SESSION_KEY) || "";
