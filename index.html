@@ -49,6 +49,7 @@
                         <a href="budget-forecast.html" data-i18n="forecastLink">Költségvetési előrejelző</a>
                         <a href="monthly_budget.html" data-i18n="monthlyLink">Összesítés</a>
                         <button type="button" id="menu-back-button" data-i18n="backAction">Vissza</button>
+                        <button type="button" id="show-change-password-button" data-i18n="changePasswordMenuButton">Jelszó módosítása</button>
                         <button type="button" id="install-app-button" data-i18n="downloadAppButton">App letöltése</button>
                         <button type="button" id="menu-logout-button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
                         <hr class="menu-divider">
@@ -115,6 +116,37 @@
                     <label for="reset-identifier" data-i18n="resetIdentifierLabel">Becenév vagy email cím</label>
                     <input type="text" id="reset-identifier" required>
                     <button type="submit" data-i18n="resetButton">Reset email küldése</button>
+                </form>
+            </article>
+
+            <article class="card hidden" id="change-password-card">
+                <h2 data-i18n="changePasswordTitle">Jelszó módosítása</h2>
+                <p data-i18n="changePasswordHint">Add meg a jelenlegi jelszavadat és az új jelszót.</p>
+                <form id="change-password-form" class="stack">
+                    <label for="change-current-password" data-i18n="currentPasswordLabel">Jelenlegi jelszó</label>
+                    <input type="password" id="change-current-password" required>
+
+                    <label for="change-new-password" data-i18n="newPasswordLabel">Új jelszó</label>
+                    <input type="password" id="change-new-password" minlength="6" maxlength="20" required>
+
+                    <label for="change-new-password-confirm" data-i18n="newPasswordConfirmLabel">Új jelszó megerősítése</label>
+                    <input type="password" id="change-new-password-confirm" minlength="6" maxlength="20" required>
+
+                    <button type="submit" data-i18n="changePasswordButton">Jelszó módosítása</button>
+                </form>
+            </article>
+
+            <article class="card hidden" id="reset-complete-card">
+                <h2 data-i18n="resetCompleteTitle">Új jelszó beállítása</h2>
+                <p data-i18n="resetCompleteHint">Adj meg egy új jelszót. Korábban használt jelszó nem adható meg.</p>
+                <form id="reset-complete-form" class="stack">
+                    <label for="reset-new-password" data-i18n="newPasswordLabel">Új jelszó</label>
+                    <input type="password" id="reset-new-password" minlength="6" maxlength="20" required>
+
+                    <label for="reset-new-password-confirm" data-i18n="newPasswordConfirmLabel">Új jelszó megerősítése</label>
+                    <input type="password" id="reset-new-password-confirm" minlength="6" maxlength="20" required>
+
+                    <button type="submit" data-i18n="resetCompleteButton">Új jelszó mentése</button>
                 </form>
             </article>
         </section>

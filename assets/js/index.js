@@ -1,4 +1,6 @@
 import {
+    changeCurrentUserPassword,
+    completePasswordResetWithHistory,
     deleteCurrentAccount,
     getAuthErrorCode,
     getFirebaseErrorMessage,
@@ -48,11 +50,23 @@ const dictionary = {
         passwordWeak: "A jelszó túl gyenge.",
         passwordStrong: "A jelszó elég erős.",
         forgotPasswordButton: "Elfelejtett jelszó",
+        changePasswordMenuButton: "Jelszó módosítása",
+        changePasswordTitle: "Jelszó módosítása",
+        changePasswordHint: "Add meg a jelenlegi jelszavadat és az új jelszót.",
+        currentPasswordLabel: "Jelenlegi jelszó",
+        newPasswordLabel: "Új jelszó",
+        newPasswordConfirmLabel: "Új jelszó megerősítése",
+        changePasswordButton: "Jelszó módosítása",
+        changePasswordSuccess: "A jelszó sikeresen módosítva.",
         resetTitle: "Jelszó visszaállítása",
         resetHint: "Add meg a beceneved vagy az email címed, és küldünk egy visszaállító linket.",
         resetIdentifierLabel: "Becenév vagy email cím",
         resetButton: "Reset email küldése",
         resetSuccess: "A reset email elküldve.",
+        resetCompleteTitle: "Új jelszó beállítása",
+        resetCompleteHint: "Adj meg egy új jelszót. Korábban használt jelszó nem adható meg.",
+        resetCompleteButton: "Új jelszó mentése",
+        resetCompleteSuccess: "A jelszó visszaállítása sikeres. Most már bejelentkezhetsz.",
         registerButton: "Regisztrálok",
         loginButton: "Belépés",
         guestButton: "Folytatás vendégként",
@@ -110,11 +124,23 @@ const dictionary = {
         passwordWeak: "Password is too weak.",
         passwordStrong: "Password is strong enough.",
         forgotPasswordButton: "Forgot password",
+        changePasswordMenuButton: "Change password",
+        changePasswordTitle: "Change password",
+        changePasswordHint: "Enter your current password and your new password.",
+        currentPasswordLabel: "Current password",
+        newPasswordLabel: "New password",
+        newPasswordConfirmLabel: "Confirm new password",
+        changePasswordButton: "Change password",
+        changePasswordSuccess: "Password changed successfully.",
         resetTitle: "Reset password",
         resetHint: "Enter your nickname or email address and we will send a reset link.",
         resetIdentifierLabel: "Nickname or email address",
         resetButton: "Send reset email",
         resetSuccess: "Reset email sent.",
+        resetCompleteTitle: "Set a new password",
+        resetCompleteHint: "Enter a new password. Previously used passwords are not allowed.",
+        resetCompleteButton: "Save new password",
+        resetCompleteSuccess: "Password reset successful. You can sign in now.",
         registerButton: "Create account",
         loginButton: "Sign in",
         guestButton: "Continue as guest",
@@ -157,12 +183,19 @@ const showLoginButton = document.getElementById("show-login-button");
 const registerCard = document.getElementById("register-card");
 const loginCard = document.getElementById("login-card");
 const resetCard = document.getElementById("reset-card");
+const changePasswordCard = document.getElementById("change-password-card");
+const resetCompleteCard = document.getElementById("reset-complete-card");
 const registerForm = document.getElementById("register-form");
 const loginForm = document.getElementById("login-form");
 const resetForm = document.getElementById("reset-form");
+const changePasswordForm = document.getElementById("change-password-form");
+const resetCompleteForm = document.getElementById("reset-complete-form");
 const resetIdentifierInput = document.getElementById("reset-identifier");
 const registerPasswordInput = document.getElementById("register-password");
+const changeNewPasswordInput = document.getElementById("change-new-password");
+const resetNewPasswordInput = document.getElementById("reset-new-password");
 const passwordStrengthMessage = document.getElementById("password-strength-message");
+const showChangePasswordButton = document.getElementById("show-change-password-button");
 const guestButton = document.getElementById("guest-button");
 const installAppButton = document.getElementById("install-app-button");
 const deleteAccountButton = document.getElementById("delete-account-button");
@@ -181,6 +214,9 @@ let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
 let appLanguage = shared.loadLanguage();
 let appTheme = shared.loadTheme();
+const urlParams = new URLSearchParams(window.location.search);
+const resetActionCode = String(urlParams.get("oobCode") || "").trim();
+const isResetPasswordMode = urlParams.get("mode") === "resetPassword" && Boolean(resetActionCode);
 
 wireEvents();
 void initializePage();
@@ -239,17 +275,14 @@ function wireEvents() {
     if (showRegisterButton && registerCard) {
         showRegisterButton.addEventListener("click", () => {
             authOptions.classList.remove("hidden");
-            registerCard.classList.remove("hidden");
-            loginCard.classList.add("hidden");
+            showSingleAuthCard(registerCard);
         });
     }
 
     if (showLoginButton) {
         showLoginButton.addEventListener("click", () => {
             authOptions.classList.remove("hidden");
-            loginCard.classList.remove("hidden");
-            registerCard.classList.add("hidden");
-            resetCard?.classList.add("hidden");
+            showSingleAuthCard(loginCard);
         });
     }
 
@@ -257,9 +290,19 @@ function wireEvents() {
     if (showResetButton) {
         showResetButton.addEventListener("click", () => {
             authOptions.classList.remove("hidden");
-            resetCard?.classList.remove("hidden");
-            loginCard.classList.add("hidden");
-            registerCard.classList.add("hidden");
+            showSingleAuthCard(resetCard);
+        });
+    }
+
+    if (showChangePasswordButton) {
+        showChangePasswordButton.addEventListener("click", () => {
+            authOptions.classList.remove("hidden");
+            showSingleAuthCard(changePasswordCard);
+            if (menuPanel && menuToggle) {
+                menuPanel.classList.remove("is-open");
+                menuToggle.classList.remove("is-open");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
         });
     }
 
@@ -352,6 +395,74 @@ function wireEvents() {
         });
     }
 
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const currentPassword = document.getElementById("change-current-password").value;
+            const newPassword = document.getElementById("change-new-password").value;
+            const confirmPassword = document.getElementById("change-new-password-confirm").value;
+
+            if (newPassword !== confirmPassword) {
+                showMessage(t("passwordMismatch"), true);
+                return;
+            }
+
+            if (!isPasswordStrong(newPassword)) {
+                showMessage(t("passwordWeak"), true);
+                return;
+            }
+
+            try {
+                await changeCurrentUserPassword({ currentPassword, newPassword });
+                changePasswordForm.reset();
+                showMessage(t("changePasswordSuccess"), false);
+                showSingleAuthCard(loginCard);
+            } catch (error) {
+                showMessage(getFirebaseErrorMessage(error, appLanguage, "reset"), true);
+            }
+        });
+    }
+
+    if (resetCompleteForm) {
+        resetCompleteForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const newPassword = document.getElementById("reset-new-password").value;
+            const confirmPassword = document.getElementById("reset-new-password-confirm").value;
+
+            if (newPassword !== confirmPassword) {
+                showMessage(t("passwordMismatch"), true);
+                return;
+            }
+
+            if (!isPasswordStrong(newPassword)) {
+                showMessage(t("passwordWeak"), true);
+                return;
+            }
+
+            try {
+                await completePasswordResetWithHistory({ oobCode: resetActionCode, newPassword });
+                resetCompleteForm.reset();
+                showMessage(t("resetCompleteSuccess"), false);
+                window.history.replaceState({}, document.title, "index.html");
+                showSingleAuthCard(loginCard);
+            } catch (error) {
+                showMessage(getFirebaseErrorMessage(error, appLanguage, "reset"), true);
+            }
+        });
+    }
+
+    if (changeNewPasswordInput) {
+        changeNewPasswordInput.addEventListener("input", () => {
+            showPasswordStrengthForInput(changeNewPasswordInput);
+        });
+    }
+
+    if (resetNewPasswordInput) {
+        resetNewPasswordInput.addEventListener("input", () => {
+            showPasswordStrengthForInput(resetNewPasswordInput);
+        });
+    }
+
     if (guestButton) {
         guestButton.addEventListener("click", () => {
             loginGuest();
@@ -438,9 +549,20 @@ async function initializePage() {
     languageSelect.value = appLanguage;
     applyTranslations();
     updatePasswordStrengthFeedback();
+    if (isResetPasswordMode) {
+        authOptions.classList.remove("hidden");
+        showSingleAuthCard(resetCompleteCard);
+    }
     updateAccessUI();
     updateInstallButtonState();
     showMessage("", false);
+}
+
+function showSingleAuthCard(cardToShow) {
+    [registerCard, loginCard, resetCard, changePasswordCard, resetCompleteCard].forEach((card) => {
+        card?.classList.add("hidden");
+    });
+    cardToShow?.classList.remove("hidden");
 }
 
 function applyTranslations() {
@@ -507,6 +629,25 @@ function updatePasswordStrengthFeedback() {
     registerPasswordInput.setCustomValidity(t("passwordWeak"));
 }
 
+function showPasswordStrengthForInput(inputElement) {
+    if (!inputElement) {
+        return;
+    }
+
+    const result = evaluatePassword(inputElement.value);
+    if (!result.hasContent) {
+        inputElement.setCustomValidity("");
+        return;
+    }
+
+    if (result.valid) {
+        inputElement.setCustomValidity("");
+        return;
+    }
+
+    inputElement.setCustomValidity(t("passwordWeak"));
+}
+
 function updateResetFormTexts() {
     if (!resetForm) {
         return;
@@ -541,12 +682,12 @@ function updateResetFormTexts() {
 function updateAccessUI() {
     const loggedIn = Boolean(currentUser);
     authActions.classList.remove("hidden");
-    authOptions.classList.toggle("hidden", true);
-    if (registerCard) {
-        registerCard.classList.add("hidden");
+    if (!isResetPasswordMode) {
+        authOptions.classList.toggle("hidden", true);
+        showSingleAuthCard(null);
     }
-    if (loginCard) {
-        loginCard.classList.add("hidden");
+    if (showChangePasswordButton) {
+        showChangePasswordButton.classList.toggle("hidden", !loggedIn);
     }
     if (logoutButton) {
         logoutButton.classList.toggle("hidden", !loggedIn);
@@ -594,7 +735,7 @@ function getSignedInDisplayName() {
         return t("guestUser");
     }
 
-    return currentProfile?.nickname || currentProfile?.username || currentUser;
+    return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
 }
 
 function showMessage(message, isError) {

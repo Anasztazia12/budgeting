@@ -1,22 +1,33 @@
 import {
+    EmailAuthProvider,
     browserLocalPersistence,
+    confirmPasswordReset,
     createUserWithEmailAndPassword,
     deleteUser,
     getAuth,
     onAuthStateChanged,
+    reauthenticateWithCredential,
     setPersistence,
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signOut,
-    updateProfile
+    updatePassword,
+    updateProfile,
+    verifyPasswordResetCode
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import {
+    arrayUnion,
+    collection,
     deleteDoc,
     doc,
     getDoc,
+    getDocs,
     getFirestore,
+    limit,
+    query,
     runTransaction,
-    setDoc
+    setDoc,
+    where
 } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 import { app } from "./firebase-init.js";
 
@@ -75,6 +86,83 @@ function createAppError(code, cause) {
         error.cause = cause;
     }
     return error;
+}
+
+async function hashPassword(password) {
+    if (!globalThis.crypto?.subtle) {
+        throw createAppError("app/crypto-unavailable");
+    }
+
+    const encoder = new TextEncoder();
+    const data = encoder.encode(String(password || ""));
+    const hashBuffer = await globalThis.crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+async function findUserUidByEmail(email) {
+    const cleanEmail = String(email || "").trim();
+    if (!cleanEmail) {
+        return "";
+    }
+
+    const usersQuery = query(
+        collection(db, "users"),
+        where("profile.email", "==", cleanEmail),
+        limit(1)
+    );
+    const usersSnapshot = await getDocs(usersQuery);
+    if (usersSnapshot.empty) {
+        return "";
+    }
+
+    return String(usersSnapshot.docs[0].id || "");
+}
+
+async function readPasswordHistory(uid) {
+    const cleanUid = String(uid || "").trim();
+    if (!cleanUid) {
+        return [];
+    }
+
+    const snapshot = await getDoc(doc(db, "users", cleanUid));
+    if (!snapshot.exists()) {
+        return [];
+    }
+
+    const previousPasswords = snapshot.data()?.previousPasswords;
+    return Array.isArray(previousPasswords) ? previousPasswords : [];
+}
+
+async function appendPasswordToHistory(uid, password) {
+    const cleanUid = String(uid || "").trim();
+    if (!cleanUid || !password) {
+        return;
+    }
+
+    const hash = await hashPassword(password);
+    await setDoc(
+        doc(db, "users", cleanUid),
+        {
+            previousPasswords: arrayUnion(hash),
+            updatedAt: new Date().toISOString()
+        },
+        { merge: true }
+    );
+}
+
+async function ensurePasswordNotReused(uid, candidatePassword) {
+    const cleanUid = String(uid || "").trim();
+    if (!cleanUid || !candidatePassword) {
+        return;
+    }
+
+    const candidateHash = await hashPassword(candidatePassword);
+    const previousPasswords = await readPasswordHistory(cleanUid);
+    if (previousPasswords.includes(candidateHash)) {
+        throw createAppError("app/password-reused");
+    }
 }
 
 async function ensureAuthReady() {
@@ -212,6 +300,7 @@ export async function registerWithUsername({ username, email, password }) {
             transaction.set(doc(db, "users", credential.user.uid), {
                 profile,
                 data: normalizeEntriesData(null),
+                previousPasswords: [await hashPassword(password)],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             });
@@ -272,15 +361,61 @@ export async function requestPasswordReset(identifier) {
         }
     }
 
-    const continueUrl = `${window.location.origin}/index.html?reset=1`;
+    const continueUrl = `${window.location.origin}/index.html`;
     await sendPasswordResetEmail(auth, email, {
         url: continueUrl,
-        handleCodeInApp: false
+        handleCodeInApp: true
     });
 
     return {
         email
     };
+}
+
+export async function changeCurrentUserPassword({ currentPassword, newPassword }) {
+    await ensureAuthReady();
+
+    const user = auth.currentUser;
+    if (!user) {
+        throw createAppError("app/not-authenticated");
+    }
+
+    if (!newPassword) {
+        throw createAppError("app/invalid-password-change");
+    }
+
+    await ensurePasswordNotReused(user.uid, newPassword);
+
+    const cleanCurrentPassword = String(currentPassword || "");
+    if (!cleanCurrentPassword || !user.email) {
+        throw createAppError("app/requires-current-password");
+    }
+
+    const credential = EmailAuthProvider.credential(user.email, cleanCurrentPassword);
+    await reauthenticateWithCredential(user, credential);
+    await updatePassword(user, newPassword);
+    await appendPasswordToHistory(user.uid, newPassword);
+}
+
+export async function completePasswordResetWithHistory({ oobCode, newPassword }) {
+    const cleanCode = String(oobCode || "").trim();
+    if (!cleanCode || !newPassword) {
+        throw createAppError("app/invalid-password-reset");
+    }
+
+    const email = await verifyPasswordResetCode(auth, cleanCode);
+    const uid = await findUserUidByEmail(email);
+    if (uid) {
+        await ensurePasswordNotReused(uid, newPassword);
+    }
+
+    await confirmPasswordReset(auth, cleanCode, newPassword);
+
+    if (uid) {
+        await appendPasswordToHistory(uid, newPassword);
+    }
+
+    return { email };
 }
 
 export async function logoutCurrentUser() {
@@ -400,6 +535,26 @@ export function getFirebaseErrorMessage(error, language, operation) {
             en: "Please enter a valid nickname or email address.",
             hu: "Adj meg egy érvényes becenevet vagy email címet."
         },
+        "app/invalid-password-change": {
+            en: "Please enter a valid new password.",
+            hu: "Adj meg egy érvényes új jelszót."
+        },
+        "app/requires-current-password": {
+            en: "Please enter your current password first.",
+            hu: "Először add meg a jelenlegi jelszavadat."
+        },
+        "app/invalid-password-reset": {
+            en: "The password reset link is invalid.",
+            hu: "A jelszó-visszaállítási link érvénytelen."
+        },
+        "app/password-reused": {
+            en: "This password was already used earlier. Please choose a different one.",
+            hu: "Ez a jelszó korábban már használt volt, válassz másikat."
+        },
+        "app/crypto-unavailable": {
+            en: "Secure password check is not available in this browser.",
+            hu: "A biztonságos jelszóellenőrzés ebben a böngészőben nem érhető el."
+        },
         "auth/email-already-in-use": {
             en: "This email address is already in use.",
             hu: "Ez az email cím már használatban van."
@@ -444,6 +599,14 @@ export function getFirebaseErrorMessage(error, language, operation) {
             en: "Network error while contacting Firebase.",
             hu: "Hálózati hiba történt a Firebase elérése közben."
         },
+        "auth/invalid-action-code": {
+            en: "The reset link is invalid or already used.",
+            hu: "A visszaállító link érvénytelen vagy már felhasználták."
+        },
+        "auth/expired-action-code": {
+            en: "The reset link has expired. Please request a new one.",
+            hu: "A visszaállító link lejárt. Kérj új linket."
+        },
         "permission-denied": {
             en: "Firestore permission denied. Check your Firebase rules.",
             hu: "A Firestore hozzáférést megtagadta. Ellenőrizd a Firebase rules beállítást."
@@ -465,6 +628,8 @@ window.BudgetAppFirebaseService = {
     restoreSession,
     registerWithUsername,
     loginWithUsername,
+    changeCurrentUserPassword,
+    completePasswordResetWithHistory,
     logoutCurrentUser,
     loadCurrentUserData,
     saveCurrentUserData,
