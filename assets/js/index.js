@@ -264,6 +264,12 @@ function wireEvents() {
         });
     }
 
+    if (contactUsButton) {
+        contactUsButton.addEventListener("click", () => {
+            window.location.href = "contact.html";
+        });
+    }
+
     document.addEventListener("click", (event) => {
         if (!event.target.closest(".menu-wrap") && menuPanel && menuToggle) {
             menuPanel.classList.remove("is-open");
@@ -382,6 +388,20 @@ function wireEvents() {
                 completeLogin(session);
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error, appLanguage, "login"), true);
+                const errorCode = getAuthErrorCode(error);
+                if (
+                    errorCode === "app/invalid-login" ||
+                    errorCode === "auth/invalid-credential" ||
+                    errorCode === "auth/wrong-password" ||
+                    errorCode === "auth/user-not-found"
+                ) {
+                    authOptions.classList.remove("hidden");
+                    showSingleAuthCard(resetCard);
+                    if (resetIdentifierInput && username) {
+                        resetIdentifierInput.value = username;
+                    }
+                    resetIdentifierInput?.focus();
+                }
             }
         });
     }
@@ -394,6 +414,12 @@ function wireEvents() {
             try {
                 const result = await requestPasswordReset(identifier);
                 resetForm.reset();
+                if (identifier.includes("@") && result.username) {
+                    const alertText = appLanguage === "en"
+                        ? `Your username is: ${result.username}`
+                        : `A felhasználóneved: ${result.username}`;
+                    alert(alertText);
+                }
                 showMessage(
                     appLanguage === "en"
                         ? `Reset email sent to ${result.email}.`
