@@ -1335,7 +1335,7 @@ input[type="month"] {
 	padding-right: 2.75rem;
 }
 
-.password-input-wrap .password-visibility-toggle {
+.password-input-wrap button.password-visibility-toggle {
 	position: absolute;
 	right: 0.3rem;
 	top: 50%;
@@ -1356,6 +1356,12 @@ input[type="month"] {
 	align-items: center;
 	justify-content: center;
 	z-index: 2;
+	overflow: visible;
+	isolation: auto;
+}
+
+.password-input-wrap button.password-visibility-toggle::after {
+	display: none;
 }
 
 [data-theme="dark"] .password-visibility-toggle {
