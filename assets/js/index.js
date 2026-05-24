@@ -220,6 +220,7 @@ let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
 let appLanguage = shared.loadLanguage();
 let appTheme = shared.loadTheme();
+let accountDeleteConfirmArmedUntil = 0;
 const urlParams = new URLSearchParams(window.location.search);
 const resetActionCode = String(urlParams.get("oobCode") || "").trim();
 const isResetPasswordMode = urlParams.get("mode") === "resetPassword" && Boolean(resetActionCode);
@@ -411,16 +412,15 @@ function wireEvents() {
             try {
                 const result = await requestPasswordReset(identifier);
                 resetForm.reset();
-                if (identifier.includes("@") && result.username) {
-                    const alertText = appLanguage === "en"
-                        ? `Your username is: ${result.username}`
-                        : `A felhasználóneved: ${result.username}`;
-                    alert(alertText);
-                }
+                const usernameHint = identifier.includes("@") && result.username
+                    ? (appLanguage === "en"
+                        ? ` Your username is: ${result.username}.`
+                        : ` A felhasználóneved: ${result.username}.`)
+                    : "";
                 showMessage(
                     appLanguage === "en"
-                        ? `Reset email sent to ${result.email}. Please check your spam folder too. Amethyst Nexalune`
-                        : `A reset email elküldve ide: ${result.email}. Nézd meg a spam mappát is. Amethyst Nexalune`,
+                        ? `Reset email sent to ${result.email}. Please check your spam folder too. Amethyst Nexalune${usernameHint}`
+                        : `A reset email elküldve ide: ${result.email}. Nézd meg a spam mappát is. Amethyst Nexalune${usernameHint}`,
                     false
                 );
             } catch (error) {
@@ -829,9 +829,12 @@ async function handleAccountDelete() {
         return;
     }
 
-    if (!window.confirm(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser))) {
+    if (Date.now() > accountDeleteConfirmArmedUntil) {
+        accountDeleteConfirmArmedUntil = Date.now() + 7000;
+        showMessage(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser), true);
         return;
     }
+    accountDeleteConfirmArmedUntil = 0;
 
     const email = currentProfile?.email || "";
 

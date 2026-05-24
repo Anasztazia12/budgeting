@@ -979,12 +979,45 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 }
 
 .whatif-row.forecast-grid {
-	grid-template-columns: repeat(6, minmax(0, 1fr));
+	grid-template-columns: minmax(88px, 0.8fr) minmax(92px, 0.8fr) minmax(130px, 1fr) minmax(150px, 1.2fr) auto auto;
 	align-items: end;
+	min-width: 780px;
 }
 
 .forecast-whatif-note {
 	width: 100%;
+}
+
+#whatif-rows {
+	overflow-x: auto;
+	padding-bottom: 0.2rem;
+}
+
+#whatif-rows .whatif-row label {
+	font-size: 0.78rem;
+	line-height: 1.15;
+	margin-bottom: 0.18rem;
+}
+
+#whatif-rows .whatif-row input,
+#whatif-rows .whatif-row select {
+	min-height: 2rem;
+	padding: 0.32rem 0.45rem;
+	font-size: 0.86rem;
+	line-height: 1.1;
+}
+
+#whatif-rows button[data-action="save-whatif"] {
+	color: #ffffff;
+	background: linear-gradient(125deg, #2a9d8f, #269186);
+	border: 1px solid #1f7e74;
+}
+
+#whatif-rows button[data-action="save-whatif"]:hover,
+#whatif-rows button[data-action="save-whatif"]:focus-visible {
+	color: #ffffff;
+	background: linear-gradient(125deg, #30aa9a, #2a9b8f);
+	border-color: #1f7e74;
 }
 
 #forecast-planner > .forecast-grid {
@@ -1989,11 +2022,12 @@ select:focus-visible {
 	}
 
 	.whatif-row.forecast-grid {
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(88px, 0.8fr) minmax(92px, 0.8fr) minmax(130px, 1fr) minmax(150px, 1.2fr) auto auto;
+		min-width: 760px;
 	}
 
 	.whatif-row.forecast-grid > .control-action {
-		grid-column: 1 / -1;
+		grid-column: auto;
 	}
 
 	.forecast-scenario-actions button {
@@ -2299,7 +2333,8 @@ select:focus-visible {
 	}
 
 	.whatif-row.forecast-grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(88px, 0.8fr) minmax(92px, 0.8fr) minmax(130px, 1fr) minmax(150px, 1.2fr) auto auto;
+		min-width: 740px;
 	}
 
 	#whatif-rows input[type="number"],
@@ -2310,11 +2345,13 @@ select:focus-visible {
 	}
 
 	#whatif-rows .control-action {
-		justify-content: stretch;
+		justify-content: flex-start;
 	}
 
 	#whatif-rows .control-action button {
-		width: 100%;
+		width: auto;
+		min-width: 6rem;
+		white-space: nowrap;
 	}
 
 	.forecast-scenario-actions button {

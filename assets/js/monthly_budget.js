@@ -164,6 +164,7 @@
 		let appTheme = loadTheme();
 		let appCurrency = loadCurrency();
 		let appState = { incomes: [], expenses: [] };
+		let accountDeleteConfirmArmedUntil = 0;
 
 		const menuToggle = document.getElementById("menu-toggle");
 		const menuPanel = document.getElementById("menu-panel");
@@ -457,9 +458,12 @@
 				return;
 			}
 
-			if (!window.confirm(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser))) {
+			if (Date.now() > accountDeleteConfirmArmedUntil) {
+				accountDeleteConfirmArmedUntil = Date.now() + 7000;
+				setMenuInfoMessage(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser));
 				return;
 			}
+			accountDeleteConfirmArmedUntil = 0;
 
 			const email = currentProfile?.email || "";
 			try {
