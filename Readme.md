@@ -119,7 +119,7 @@ For restore, pay attention to:
 - old/new field compatibility
 - keeping Auth and Firestore data consistent
 
-## UX 5 Plan (simple practical version)
+## UX 5 Plan
 
 This is how I use the 5-plane UX model during development.
 
