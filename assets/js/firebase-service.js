@@ -65,6 +65,10 @@ function normalizeUsername(username) {
     return String(username || "").trim().toLowerCase();
 }
 
+function normalizeEmail(email) {
+    return String(email || "").trim().toLowerCase();
+}
+
 function normalizeProfile(profile, user) {
     const username = String(
         profile?.username || profile?.nickname || user?.displayName || user?.email || ""
@@ -102,7 +106,7 @@ async function hashPassword(password) {
 }
 
 async function findUserUidByEmail(email) {
-    const cleanEmail = String(email || "").trim();
+    const cleanEmail = normalizeEmail(email);
     if (!cleanEmail) {
         return "";
     }
@@ -121,7 +125,7 @@ async function findUserUidByEmail(email) {
 }
 
 async function findUsernameByEmail(email) {
-    const cleanEmail = String(email || "").trim();
+    const cleanEmail = normalizeEmail(email);
     if (!cleanEmail) {
         return "";
     }
@@ -281,7 +285,7 @@ export async function restoreSession(expectedUsername) {
 
 export async function registerWithUsername({ username, email, password }) {
     const cleanUsername = String(username || "").trim();
-    const cleanEmail = String(email || "").trim();
+    const cleanEmail = normalizeEmail(email);
     const normalizedUsername = normalizeUsername(cleanUsername);
 
     if (!cleanUsername || !cleanEmail || !password) {
@@ -376,7 +380,7 @@ export async function requestPasswordReset(identifier) {
         throw createAppError("app/invalid-reset-request");
     }
 
-    let email = cleanIdentifier;
+    let email = normalizeEmail(cleanIdentifier);
     let username = "";
     if (!cleanIdentifier.includes("@")) {
         const normalizedUsername = normalizeUsername(cleanIdentifier);
@@ -386,7 +390,7 @@ export async function requestPasswordReset(identifier) {
         }
 
         const mapping = usernameSnap.data() || {};
-        email = String(mapping.email || "").trim();
+        email = normalizeEmail(mapping.email);
         username = String(mapping.username || cleanIdentifier).trim();
         if (!email) {
             throw createAppError("app/invalid-reset-request");
