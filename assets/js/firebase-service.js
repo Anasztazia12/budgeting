@@ -363,8 +363,7 @@ export async function requestPasswordReset(identifier) {
 
     const continueUrl = `https://anasztazia12.github.io/budgeting/`;
     await sendPasswordResetEmail(auth, email, {
-        url: continueUrl,
-        handleCodeInApp: true
+        url: continueUrl
     });
 
     return {
