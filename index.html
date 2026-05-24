@@ -104,6 +104,17 @@
                     <input type="password" id="login-password" required>
 
                     <button type="submit" data-i18n="loginButton">Belépés</button>
+                    <button type="button" id="show-reset-button" class="secondary" data-i18n="forgotPasswordButton">Elfelejtett jelszó</button>
+                </form>
+            </article>
+
+            <article class="card hidden" id="reset-card">
+                <h2 data-i18n="resetTitle">Jelszó visszaállítása</h2>
+                <p data-i18n="resetHint">Add meg a beceneved vagy az email címed, és küldünk egy visszaállító linket.</p>
+                <form id="reset-form" class="stack">
+                    <label for="reset-identifier" data-i18n="resetIdentifierLabel">Becenév vagy email cím</label>
+                    <input type="text" id="reset-identifier" required>
+                    <button type="submit" data-i18n="resetButton">Reset email küldése</button>
                 </form>
             </article>
         </section>

@@ -5,6 +5,7 @@ import {
     getAuth,
     onAuthStateChanged,
     setPersistence,
+    sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signOut,
     updateProfile
@@ -250,6 +251,38 @@ export async function loginWithUsername({ username, password }) {
     return getCurrentSession();
 }
 
+export async function requestPasswordReset(identifier) {
+    const cleanIdentifier = String(identifier || "").trim();
+    if (!cleanIdentifier) {
+        throw createAppError("app/invalid-reset-request");
+    }
+
+    let email = cleanIdentifier;
+    if (!cleanIdentifier.includes("@")) {
+        const normalizedUsername = normalizeUsername(cleanIdentifier);
+        const usernameSnap = await getDoc(doc(db, "usernames", normalizedUsername));
+        if (!usernameSnap.exists()) {
+            throw createAppError("app/invalid-reset-request");
+        }
+
+        const mapping = usernameSnap.data() || {};
+        email = String(mapping.email || "").trim();
+        if (!email) {
+            throw createAppError("app/invalid-reset-request");
+        }
+    }
+
+    const continueUrl = `${window.location.origin}/index.html?reset=1`;
+    await sendPasswordResetEmail(auth, email, {
+        url: continueUrl,
+        handleCodeInApp: false
+    });
+
+    return {
+        email
+    };
+}
+
 export async function logoutCurrentUser() {
     await signOut(auth);
 }
@@ -330,6 +363,7 @@ export function getFirebaseErrorMessage(error, language, operation) {
             generic: "Firebase request failed.",
             login: "Sign in failed.",
             register: "Registration failed.",
+            reset: "Password reset request failed.",
             save: "Saving to Firebase failed.",
             delete: "Account deletion failed.",
             load: "Loading data from Firebase failed."
@@ -338,6 +372,7 @@ export function getFirebaseErrorMessage(error, language, operation) {
             generic: "A Firebase kérés nem sikerült.",
             login: "A bejelentkezés nem sikerült.",
             register: "A regisztráció nem sikerült.",
+            reset: "A jelszó-visszaállítási kérés nem sikerült.",
             save: "A Firebase mentés nem sikerült.",
             delete: "A fiók törlése nem sikerült.",
             load: "A Firebase adatbetöltés nem sikerült."
@@ -360,6 +395,10 @@ export function getFirebaseErrorMessage(error, language, operation) {
         "app/invalid-login": {
             en: "Invalid nickname or password.",
             hu: "Hibás becenév vagy jelszó."
+        },
+        "app/invalid-reset-request": {
+            en: "Please enter a valid nickname or email address.",
+            hu: "Adj meg egy érvényes becenevet vagy email címet."
         },
         "auth/email-already-in-use": {
             en: "This email address is already in use.",
@@ -384,6 +423,10 @@ export function getFirebaseErrorMessage(error, language, operation) {
         "auth/invalid-login-credentials": {
             en: "Invalid nickname or password.",
             hu: "Hibás becenév vagy jelszó."
+        },
+        "auth/invalid-email": {
+            en: "Please enter a valid email address.",
+            hu: "Adj meg egy érvényes email címet."
         },
         "auth/user-not-found": {
             en: "Invalid nickname or password.",

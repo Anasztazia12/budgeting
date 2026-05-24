@@ -5,6 +5,7 @@ import {
     loginWithUsername,
     logoutCurrentUser,
     registerWithUsername,
+    requestPasswordReset,
     restoreSession
 } from "./firebase-service.js";
 
@@ -45,6 +46,12 @@ const dictionary = {
         passwordRuleHint: "A jelszó legyen 6-20 karakter, tartalmazzon kisbetűt, nagybetűt és számot.",
         passwordWeak: "A jelszó túl gyenge.",
         passwordStrong: "A jelszó elég erős.",
+        forgotPasswordButton: "Elfelejtett jelszó",
+        resetTitle: "Jelszó visszaállítása",
+        resetHint: "Add meg a beceneved vagy az email címed, és küldünk egy visszaállító linket.",
+        resetIdentifierLabel: "Becenév vagy email cím",
+        resetButton: "Reset email küldése",
+        resetSuccess: "A reset email elküldve.",
         registerButton: "Regisztrálok",
         loginButton: "Belépés",
         guestButton: "Folytatás vendégként",
@@ -101,6 +108,12 @@ const dictionary = {
         passwordRuleHint: "Password must be 6-20 chars and include lowercase, uppercase, and a number.",
         passwordWeak: "Password is too weak.",
         passwordStrong: "Password is strong enough.",
+        forgotPasswordButton: "Forgot password",
+        resetTitle: "Reset password",
+        resetHint: "Enter your nickname or email address and we will send a reset link.",
+        resetIdentifierLabel: "Nickname or email address",
+        resetButton: "Send reset email",
+        resetSuccess: "Reset email sent.",
         registerButton: "Create account",
         loginButton: "Sign in",
         guestButton: "Continue as guest",
@@ -142,8 +155,11 @@ const showRegisterButton = document.getElementById("show-register-button");
 const showLoginButton = document.getElementById("show-login-button");
 const registerCard = document.getElementById("register-card");
 const loginCard = document.getElementById("login-card");
+const resetCard = document.getElementById("reset-card");
 const registerForm = document.getElementById("register-form");
 const loginForm = document.getElementById("login-form");
+const resetForm = document.getElementById("reset-form");
+const resetIdentifierInput = document.getElementById("reset-identifier");
 const registerPasswordInput = document.getElementById("register-password");
 const passwordStrengthMessage = document.getElementById("password-strength-message");
 const guestButton = document.getElementById("guest-button");
@@ -232,6 +248,17 @@ function wireEvents() {
             authOptions.classList.remove("hidden");
             loginCard.classList.remove("hidden");
             registerCard.classList.add("hidden");
+            resetCard?.classList.add("hidden");
+        });
+    }
+
+    const showResetButton = document.getElementById("show-reset-button");
+    if (showResetButton) {
+        showResetButton.addEventListener("click", () => {
+            authOptions.classList.remove("hidden");
+            resetCard?.classList.remove("hidden");
+            loginCard.classList.add("hidden");
+            registerCard.classList.add("hidden");
         });
     }
 
@@ -300,6 +327,26 @@ function wireEvents() {
                 completeLogin(session);
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error, appLanguage, "login"), true);
+            }
+        });
+    }
+
+    if (resetForm) {
+        resetForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const identifier = resetIdentifierInput?.value.trim() || "";
+
+            try {
+                const result = await requestPasswordReset(identifier);
+                resetForm.reset();
+                showMessage(
+                    appLanguage === "en"
+                        ? `Reset email sent to ${result.email}.`
+                        : `A reset email elküldve ide: ${result.email}.`,
+                    false
+                );
+            } catch (error) {
+                showMessage(getFirebaseErrorMessage(error, appLanguage, "reset"), true);
             }
         });
     }
@@ -408,6 +455,7 @@ function applyTranslations() {
         element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
     });
     updatePasswordStrengthFeedback();
+    updateResetFormTexts();
     updateSessionLabel();
     updateMenuSessionLabel();
 }
@@ -456,6 +504,37 @@ function updatePasswordStrengthFeedback() {
     passwordStrengthMessage.classList.add("is-error");
     passwordStrengthMessage.classList.remove("is-ok");
     registerPasswordInput.setCustomValidity(t("passwordWeak"));
+}
+
+function updateResetFormTexts() {
+    if (!resetForm) {
+        return;
+    }
+
+    const title = resetForm.querySelector("h2[data-i18n]");
+    if (title) {
+        title.textContent = t("resetTitle");
+    }
+
+    const hint = resetForm.querySelector("p[data-i18n]");
+    if (hint) {
+        hint.textContent = t("resetHint");
+    }
+
+    const identifierLabel = resetForm.querySelector("label[for='reset-identifier']");
+    if (identifierLabel) {
+        identifierLabel.textContent = t("resetIdentifierLabel");
+    }
+
+    const submitButton = resetForm.querySelector("button[type='submit']");
+    if (submitButton) {
+        submitButton.textContent = t("resetButton");
+    }
+
+    const showResetButton = document.getElementById("show-reset-button");
+    if (showResetButton) {
+        showResetButton.textContent = t("forgotPasswordButton");
+    }
 }
 
 function updateAccessUI() {
