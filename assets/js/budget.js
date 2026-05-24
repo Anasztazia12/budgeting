@@ -822,14 +822,14 @@
 		}
 
 		async function handleEntryAction(event, listType) {
-			const button = event.target.closest("button[data-action]");
-			if (!button) {
+			const actionTarget = event.target.closest("[data-action]");
+			if (!actionTarget) {
 				return;
 			}
 
-			const entryId = button.dataset.id;
-			const clickedDate = button.dataset.date || "";
-			const action = button.dataset.action;
+			const entryId = actionTarget.dataset.id;
+			const clickedDate = actionTarget.dataset.date || "";
+			const action = actionTarget.dataset.action;
 			const entry = appState[listType].find((item) => item.id === entryId);
 
 			if (!entry) {
@@ -842,7 +842,9 @@
 			}
 
 			if (action === "toggle-repeat-monthly") {
-				entry.repeatMonthly = !entry.repeatMonthly;
+				entry.repeatMonthly = actionTarget instanceof HTMLInputElement
+					? actionTarget.checked
+					: !entry.repeatMonthly;
 				if (entry.repeatMonthly) {
 					entry.excludedMonths = [];
 				}

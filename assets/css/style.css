@@ -1555,62 +1555,71 @@ h2[data-i18n="projectionTitle"] {
 	flex-wrap: nowrap;
 }
 
-.row-menu {
-	position: relative;
+.row-actions-icons {
+	align-items: center;
 }
 
-.row-menu > summary {
-	list-style: none;
+.inline-icon-button {
+	width: 1.9rem;
+	height: 1.9rem;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2rem;
-	height: 2rem;
-	border-radius: var(--control-radius);
-	cursor: pointer;
+	border-radius: 0.5rem;
+	border: 1px solid #89a9e2;
+	background: #edf4ff;
+	color: #1f4d99;
 	font-size: 1rem;
 	font-weight: 700;
-	color: #224f9b;
-	background: #edf4ff;
-	border: 1px solid #84a9e8;
-	user-select: none;
+	line-height: 1;
 }
 
-.row-menu > summary::-webkit-details-marker {
-	display: none;
+.inline-icon-button.danger {
+	color: #c62828;
+	border-color: #e39a9a;
+	background: #fff1f1;
 }
 
-[data-theme="dark"] .row-menu > summary {
-	color: #e7f0ff;
-	background: #274276;
-	border-color: #7fa7f3;
+[data-theme="dark"] .inline-icon-button {
+	background: #1f3765;
+	border-color: #6187c8;
+	color: #e6efff;
 }
 
-.row-menu-list {
-	position: absolute;
-	right: 0;
-	top: calc(100% + 0.25rem);
-	min-width: 220px;
-	display: grid;
-	gap: 0.45rem;
-	padding: 0.45rem;
-	border-radius: var(--panel-radius);
-	border: 1px solid #a3bced;
-	background: #ffffff;
-	box-shadow: 0 10px 24px rgba(22, 56, 121, 0.18);
-	z-index: 20;
+[data-theme="dark"] .inline-icon-button.danger {
+	background: #51242a;
+	border-color: #ba7f88;
+	color: #ffd7dc;
 }
 
-[data-theme="dark"] .row-menu-list {
-	background: #142446;
-	border-color: #4f6fb1;
-	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+.entry-repeat-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	justify-content: flex-end;
 }
 
-.row-menu-list .inline-button {
-	width: 100%;
-	text-align: left;
+.entry-repeat-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-size: 0.82rem;
+	color: var(--muted);
+	margin: 0;
+	white-space: nowrap;
 }
+
+.entry-repeat-toggle input {
+	width: 0.92rem;
+	height: 0.92rem;
+}
+
+[data-theme="dark"] .entry-repeat-toggle {
+	color: #d3e0fb;
+}
+
+ 
 
 .entry-list li.empty {
 	display: block;
@@ -2064,13 +2073,7 @@ select:focus-visible {
 	}
 
 	.row-actions {
-		flex-direction: column;
-	}
-
-	.row-menu-list {
-		left: 0;
-		right: auto;
-		min-width: min(220px, 86vw);
+		flex-direction: row;
 	}
 
 	.menu-wrap {
