@@ -9,9 +9,7 @@
 		const {
 			SESSION_KEY,
 			DISPLAY_NAME_KEY,
-			LANGUAGE_KEY,
 			THEME_KEY,
-			CURRENCY_KEY,
 			INSTALL_STATUS_KEY
 		} = shared.KEYS;
 		const { GUEST_SESSION_VALUE } = shared;
@@ -198,14 +196,14 @@
 
 		languageSelect.addEventListener("change", () => {
 			appLanguage = languageSelect.value;
-			localStorage.setItem(LANGUAGE_KEY, appLanguage);
+			shared.saveLanguage(appLanguage);
 			applyTranslations();
 			render();
 		});
 
 		currencySelect.addEventListener("change", () => {
 			appCurrency = currencySelect.value;
-			localStorage.setItem(CURRENCY_KEY, appCurrency);
+			shared.saveCurrency(appCurrency);
 			render();
 		});
 

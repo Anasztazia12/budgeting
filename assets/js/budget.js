@@ -11,9 +11,7 @@
 		const {
 			SESSION_KEY,
 			DISPLAY_NAME_KEY,
-			LANGUAGE_KEY,
 			THEME_KEY,
-			CURRENCY_KEY,
 			INSTALL_STATUS_KEY
 		} = shared.KEYS;
 		const { GUEST_SESSION_VALUE } = shared;
