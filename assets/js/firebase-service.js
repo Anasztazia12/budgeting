@@ -120,6 +120,26 @@ async function findUserUidByEmail(email) {
     return String(usersSnapshot.docs[0].id || "");
 }
 
+async function findUsernameByEmail(email) {
+    const cleanEmail = String(email || "").trim();
+    if (!cleanEmail) {
+        return "";
+    }
+
+    const usernameQuery = query(
+        collection(db, "usernames"),
+        where("email", "==", cleanEmail),
+        limit(1)
+    );
+    const usernameSnapshot = await getDocs(usernameQuery);
+    if (usernameSnapshot.empty) {
+        return "";
+    }
+
+    const mapping = usernameSnapshot.docs[0].data() || {};
+    return String(mapping.username || "").trim();
+}
+
 async function readPasswordHistory(uid) {
     const cleanUid = String(uid || "").trim();
     if (!cleanUid) {
@@ -347,6 +367,7 @@ export async function requestPasswordReset(identifier) {
     }
 
     let email = cleanIdentifier;
+    let username = "";
     if (!cleanIdentifier.includes("@")) {
         const normalizedUsername = normalizeUsername(cleanIdentifier);
         const usernameSnap = await getDoc(doc(db, "usernames", normalizedUsername));
@@ -356,9 +377,12 @@ export async function requestPasswordReset(identifier) {
 
         const mapping = usernameSnap.data() || {};
         email = String(mapping.email || "").trim();
+        username = String(mapping.username || cleanIdentifier).trim();
         if (!email) {
             throw createAppError("app/invalid-reset-request");
         }
+    } else {
+        username = await findUsernameByEmail(email);
     }
 
     const continueUrl = `https://anasztazia12.github.io/budgeting/`;
@@ -367,7 +391,8 @@ export async function requestPasswordReset(identifier) {
     });
 
     return {
-        email
+        email,
+        username
     };
 }
 

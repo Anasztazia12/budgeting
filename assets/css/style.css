@@ -481,6 +481,26 @@ body {
 	white-space: nowrap;
 }
 
+#contact-us-button {
+	width: auto;
+	margin: 0;
+	padding: 0.5rem 0.72rem;
+	min-height: 2.32rem;
+	border: 1px solid #1f4fbf;
+	background: linear-gradient(125deg, #2f5fd0, #234eae);
+	color: #ffffff;
+	font-weight: 700;
+	font-size: 0.9rem;
+	line-height: 1.1;
+	flex: 0 0 auto;
+}
+
+#contact-us-button:hover,
+#contact-us-button:focus-visible {
+	filter: brightness(1.08);
+	box-shadow: 0 10px 20px rgba(22, 56, 121, 0.24);
+}
+
 .menu-toggle {
 	width: 48px;
 	height: 42px;
@@ -782,6 +802,16 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 .auth-grid {
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	margin-top: 1rem;
+	max-width: 980px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.auth-grid > .card {
+	max-width: 460px;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .auth-action-bar {
@@ -789,6 +819,9 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 1rem;
 	align-items: center;
+	max-width: 980px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .auth-action-bar button {
@@ -812,6 +845,30 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 
 #guest-button.guest-accent {
 	background: linear-gradient(125deg, #2a9d8f, #269186);
+}
+
+.contact-page {
+	max-width: min(760px, 94vw);
+}
+
+.contact-page .hero {
+	text-align: left;
+}
+
+.contact-quick-actions {
+	display: flex;
+	gap: 0.55rem;
+	margin-top: 0.85rem;
+	flex-wrap: wrap;
+}
+
+.contact-quick-actions .btn {
+	width: auto;
+}
+
+.contact-card {
+	max-width: 720px;
+	margin: 0 auto;
 }
 
 .forms-grid,

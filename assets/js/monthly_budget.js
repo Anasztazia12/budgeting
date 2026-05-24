@@ -32,6 +32,7 @@
 				themeModeLabel: "Téma",
 				themeModeLight: "Világos",
 				themeModeDark: "Sötét",
+				contactUs: "Kapcsolat",
 				backAction: "Vissza",
 				downloadAppButton: "App letöltése",
 				deleteAccountButton: "Regisztráció törlése",
@@ -101,6 +102,7 @@
 				themeModeLabel: "Theme",
 				themeModeLight: "Light",
 				themeModeDark: "Dark",
+				contactUs: "Contact us",
 				backAction: "Back",
 				downloadAppButton: "Download App",
 				deleteAccountButton: "Delete account",
@@ -170,6 +172,7 @@
 
 		const menuToggle = document.getElementById("menu-toggle");
 		const menuPanel = document.getElementById("menu-panel");
+		const contactUsButton = document.getElementById("contact-us-button");
 		const menuBackButton = document.getElementById("menu-back-button");
 		const installAppButton = document.getElementById("install-app-button");
 		const deleteAccountButton = document.getElementById("delete-account-button");
@@ -248,6 +251,12 @@
 		if (themeDarkButton) {
 			themeDarkButton.addEventListener("click", () => {
 				setTheme("dark");
+			});
+		}
+
+		if (contactUsButton) {
+			contactUsButton.addEventListener("click", () => {
+				window.location.href = "contact.html";
 			});
 		}
 
