@@ -1,221 +1,261 @@
 # Budgeting App
 
-This is a browser budgeting app project. It works in Hungarian and English, runs locally, and helps with tracking income/expenses, summary, and forecast.
+This is my budgeting app project.
 
-## Table of Contents
+The goal was to build a simple and clear money-tracking web app that works in both Hungarian and English.
 
-- Overview
-- What this project is for
-- What it does and what it does not do
-- Project structure
-- Main pages
-- Data storage
-- Language handling (HU/EN)
-- PWA and offline notes
-- How to run locally
-- Error handling and troubleshooting
-- Testing
-- Manual test list
-- Release checklist
-- Accessibility and UX notes
-- Security and privacy notes
-- Known limitations
-- Future ideas
+It is still evolving, but I have already added many UX improvements recently, including mobile usability updates.
 
 ## Overview
 
-The main idea was to make a simple budgeting workflow without backend setup.
+This app was created to solve a very common everyday problem: many people know their monthly income and regular bills, but it is still hard to see the real financial situation for a selected period.
 
-You can:
+In practice, money planning is often not only about fixed costs. Unexpected expenses can appear (for example car repair), and extra income can also happen (for example overtime payment). Without a simple planning tool, it is difficult to estimate how these changes affect the period balance.
 
-- create local account or use guest mode
-- add/edit/delete income and expense entries
-- check period summary values
-- try forecast with extra what-if rows
-- switch between light and dark mode
-- export data to CSV
+The main goal of this project is to make personal budgeting more transparent and easier to plan ahead:
 
-Everything is client-side, so data is saved in browser storage.
+- track income and expenses in one place
+- keep data readable by date and category
+- calculate totals for a selected period
+- test what-if scenarios before making decisions
 
-## What this project is for
+The forecast part is especially important in this project. It lets the user simulate "what happens if..." cases, such as:
 
-This app is useful if you want a fast way to track money on one device.
+- "What if I need to pay for a car repair this month?"
+- "What if I get extra overtime income this month?"
 
-Typical flow:
+Based on these extra planned items, the app recalculates expected results for the selected period, so the user can decide earlier and plan more safely.
 
-1. Open app and sign in (or use guest mode).
-1. Add entries with amount, date, category.
-1. Check summary and forecast pages.
-1. Export CSV if needed.
+## Key features
 
-## What it does and what it does not do
-
-### In scope
-
-- local auth (browser only)
-- budget entry CRUD
-- period summary
-- forecast planner
-- language/theme/currency preferences
-- light/dark mode switch with saved preference
+- registration / login / guest mode
+- income and expense tracking
+- edit and delete entries
+- date range filtering
+- forecast page with what-if rows
+- monthly summary page
+- light/dark theme switch
+- HU/EN language switch
 - PWA install support
-
-### Out of scope (current version)
-
-- backend API
-- cloud sync
-- bank import/integration
-- multi-device account sync
-
-## Project structure
-
-| Layer | Used tech | Why it is here |
-| --- | --- | --- |
-| UI | HTML + CSS | Forms, cards, page layout, responsive behavior |
-| Logic | Vanilla JavaScript | State handling, CRUD logic, i18n, calculations |
-| Storage | localStorage/sessionStorage | Save users, settings, entries |
-| PWA | Service worker + manifest | Install and caching |
-| Dev server | Node HTTP server | Quick local run |
 
 ## Main pages
 
-| Page | Purpose |
-| --- | --- |
-| index.html | Start page (register/login/guest) |
-| budget.html | Main budgeting page |
-| budget-forecast.html | Forecast planner page |
-| monthly_budget.html | Summary page |
+- `index.html` - start page (auth, language, theme, menu)
+- `budget.html` - main budgeting page (CRUD + stats + lists)
+- `budget-forecast.html` - forecast planner
+- `monthly_budget.html` - monthly summary
 
-## Data storage
+## Tech stack
 
-Data is stored with browser keys (localStorage/sessionStorage).
+- HTML, CSS, Vanilla JS
+- Firebase Auth
+- Firestore
+- localStorage / sessionStorage
+- Service Worker + manifest (PWA)
+- local run with Node server
 
-### Main keys
+## Registration and data saving
 
-| Key | Meaning |
-| --- | --- |
-| budgetAppUsers | Registered local users and their data |
-| budgetAppSession | Current active session |
-| budgetAppLanguage | Selected language |
-| budgetAppTheme | Theme mode (light/dark) |
-| budgetAppCurrency | Selected currency |
-| budgetAppInstalled | Install status flag |
-| budgetAppGuestData | Guest mode entries |
-| budgetAppFlashMessage | One-time message between pages |
+Registration flow in short:
 
-### Entry format (simplified)
+1. User fills in registration fields.
+2. Firebase Auth creates the account.
+3. A user document is created in Firestore (`users/{uid}`), where app-related user data is stored.
+4. Session and some UI preferences are also stored locally so page refresh does not lose state.
 
-- id
-- type (income/expense)
-- category
-- amount
-- date
-- note (optional)
-- repeatMonthly (boolean)
-- excludedMonths (optional)
+Important notes:
 
-## Language handling (HU/EN)
+- in guest mode, data is stored separately
+- for logged-in users, Firestore is the main data source
 
-The app uses dictionary objects in page scripts and data-i18n attributes in HTML.
+## Data storage (what goes where)
 
-Important rules for maintenance:
+### Firestore
 
-- keep HU and EN keys aligned
-- menu labels should match across pages
-- fallback HTML text should not conflict with final translated labels
+Mainly user-specific data:
 
-### Terminology
+- budget entries
+- profile data
+- password history related fields (if enabled)
 
-| Concept | HU | EN |
-| --- | --- | --- |
-| Budget | Koltsegvetes | Budget |
-| Forecast | Koltsegvetesi elorejelzo | Budget Forecast Planner |
-| Summary | Osszesites | Summary |
-| Sign out | Kijelentkezes | Sign out |
+### localStorage / sessionStorage
 
-## PWA and offline notes
+UI and session-related values, for example:
 
-Service worker is cache-first for GET requests:
+- language
+- theme
+- currency
+- current session info
+- install status
+- guest data
+- forecast scenario cache (scoped per user)
 
-- install: cache predefined files
-- activate: clean old cache versions
-- fetch: cache -> network -> fallback
+## Firestore backup
 
-If you change UI text or static files and still see old content, increase cache version in sw.js.
+Firestore backup is supported.
 
-## How to run locally
+What is most important to back up:
 
-### Prerequisite
+- `users` collection (highest priority)
+- username mapping and helper collections (if used)
 
-- Node.js 18+ recommended
+Practical backup options:
 
-### Start
+1. Firebase Console export (good for manual backup)
+2. Scheduled export to GCP bucket (better for production)
+3. Periodic JSON export script (simple setups)
 
-1. Install Node.js (if not installed).
-1. Run:
+For restore, pay attention to:
+
+- schema changes
+- old/new field compatibility
+- keeping Auth and Firestore data consistent
+
+## UX 5 Plan (simple practical version)
+
+This is how I use the 5-plane UX model during development.
+
+### 1) Strategy (why)
+
+Main problem I want to solve:
+
+- users can add data, but they still do not clearly see how their money situation changes in a period
+
+Main goals:
+
+- make money input fast
+- let users start in 1-2 minutes
+- keep daily usage comfortable on mobile too
+- reduce mistakes during edit/delete actions
+
+How I check if this works:
+
+- new user can create first entry quickly
+- user can understand totals without extra explanation
+- user gets clear feedback after each important action
+
+### 2) Scope (what)
+
+Included now:
+
+- auth flow
+- budget CRUD
+- forecast
+- summary
+- HU/EN
+- PWA install
+- recurring entries
+- date filters for list and period
+
+Not included now:
+
+- bank import
+- advanced charting system
+- full multi-device sync for all edge cases
+
+Why this scope:
+
+- I focused first on core daily budgeting actions
+- I postponed advanced features so the base flow can stay stable and easy
+
+### 3) Structure (how it works)
+
+- index: entry + basic settings
+- budget: day-to-day usage
+- forecast: planning
+- summary: quick check
+
+Main rules:
+
+- after edit click, jump to the input field
+- delete should use in-app confirmation, not browser native confirm
+- important actions should always show feedback
+
+Main user flow I design for:
+
+1. user signs in or continues as guest
+2. user adds income and expenses
+3. user reviews totals and list
+4. user opens forecast for "what if" simulation
+5. user adjusts plan for selected period
+
+Navigation idea:
+
+- each page has a clear role
+- menu labels should be consistent in HU and EN
+- user should not feel lost when switching pages
+
+### 4) Skeleton (layout)
+
+- controls at the top
+- forms below
+- stats next to/below forms
+- lists at the bottom
+
+Form behavior details:
+
+- labels and input order should stay predictable
+- edit mode should be clearly visible (updated button labels)
+- delete action should be close to the selected item
+
+On mobile:
+
+- buttons must be easy to tap
+- edit/delete controls must stay visible
+- delete confirmation should appear in a visible safe place
+
+List behavior details:
+
+- each row should quickly show category, date, amount, and note
+- recurring state should be visible (badge + toggle)
+- actions should remain usable even on small screens
+
+### 5) Surface (look and microcopy)
+
+- clear and high-contrast UI
+- destructive action (delete) should stand out
+- short understandable messages in HU and EN
+
+Microcopy style I follow:
+
+- short action-based texts (Save, Delete, Cancel)
+- plain language instead of technical wording
+- same meaning in both languages, not literal-only translation
+
+Visual consistency checklist:
+
+- similar button style for similar action type
+- danger color only for destructive actions
+- readable spacing and text size on mobile and desktop
+
+### Practical UX checks before release
+
+- add/edit/delete works on desktop and mobile
+- no dead clicks in main flow
+- forecast update is visible after each what-if change
+- HU/EN labels are consistent on all main pages
+
+## Run locally
+
+Node is required.
 
 ```bash
 npm start
 ```
 
-1. Open:
+Usually available at:
 
-- <http://localhost:3000>
+- `http://localhost:3000`
 
-### Optional custom port
+If this does not work, you can also run with a simple local static server.
 
-```bash
-PORT=4200 npm start
-```
+## Testing (manual)
 
-PowerShell example:
+Currently I test mostly manually.
 
-```powershell
-$env:PORT=4200; npm start
-```
+### Test types
 
-### Fallback without Node
-
-```bash
-py -m http.server 3000
-```
-
-## Error handling and troubleshooting
-
-### Common user-facing situations
-
-| Case | What user sees | Common reason |
-| --- | --- | --- |
-| Wrong login | Invalid username/password | Typo or wrong local account |
-| Email mismatch | Emails do not match | Register form mismatch |
-| Password mismatch | Passwords do not match | Register form mismatch |
-| Empty period | No entries in selected period | No records for filter range |
-| Install not available | Install unavailable message | Browser/platform limitation |
-
-### Troubleshooting table
-
-| Problem | Likely cause | Fix |
-| --- | --- | --- |
-| 404 on local assets | Server not started from project root | Start server in repo root |
-| Old UI text still visible | Service worker cache still active | Hard refresh and bump cache version |
-| Language switch half-working | Missing key in one dictionary | Compare HU and EN dictionaries |
-| Data "disappeared" | Browser storage cleared/profile changed | Check same browser profile and storage |
-| Install prompt not showing | Criteria not met by browser | Use Add to Home Screen menu path |
-
-### Quick debug steps
-
-1. Open browser console.
-1. Check localStorage/sessionStorage keys.
-1. Verify selected language key and current dictionary values.
-1. Check service worker status.
-
-## Testing
-
-At the moment this project is tested manually (no full automated suite yet).
-
-### Test types we use
-
-| Test type | What we check | When |
+| Test type | What I check | When |
 | --- | --- | --- |
 | Smoke test | App opens, navigation works, no crash | Every change |
 | Functional test | CRUD, summary, forecast, export | Feature changes |
@@ -233,95 +273,69 @@ At the moment this project is tested manually (no full automated suite yet).
 | Safari | Optional | Yes |
 | Samsung Internet | Optional | Yes |
 
-## Manual test list
+### Manual test list
 
-### Authentication
+#### Authentication
 
 | ID | Test step | Expected |
 | --- | --- | --- |
-| AUTH-01 | Register with valid values | Success + user saved locally |
+| AUTH-01 | Register with valid values | Success + user saved |
 | AUTH-02 | Register with mismatched email | Validation message |
 | AUTH-03 | Login with correct credentials | Session active |
 | AUTH-04 | Login with wrong password | Error message |
 | AUTH-05 | Continue as guest | Guest session active |
-| AUTH-06 | Logout from hamburger menu | Session cleared |
-| AUTH-07 | Change password with new value | Password updated successfully |
-| AUTH-08 | Change password with previously used value | Rejected with validation message |
-| AUTH-09 | Reset password via email link with new value | Password reset successful |
-| AUTH-10 | Reset password via email link with previously used value | Rejected with validation message |
+| AUTH-06 | Logout from menu | Session cleared |
+| AUTH-07 | Change password with new value | Password updated |
+| AUTH-08 | Change password with previously used value | Rejected with message |
+| AUTH-09 | Reset password from email link with new value | Password reset works |
+| AUTH-10 | Reset password from email link with old value | Rejected with message |
 
-### Budget CRUD and recurring
+#### Budget CRUD and recurring
 
 | ID | Test step | Expected |
 | --- | --- | --- |
-| BUD-01 | Add income | Appears in list and affects totals |
-| BUD-02 | Add expense | Appears in list and affects totals |
+| BUD-01 | Add income | Appears in list and totals update |
+| BUD-02 | Add expense | Appears in list and totals update |
 | BUD-03 | Edit entry | New values visible |
 | BUD-04 | Delete entry | Removed and totals recalculated |
-| BUD-05 | Toggle recurring | Badge/action label updates |
-| BUD-06 | Date filtering | Only matching entries shown |
+| BUD-05 | Toggle recurring | Badge/action state updates |
+| BUD-06 | Filter by date range | Only matching entries shown |
 
-### Forecast and summary
+#### Forecast and summary
 
 | ID | Test step | Expected |
 | --- | --- | --- |
 | FC-01 | Set target date | Forecast values recalc |
 | FC-02 | Add extra expense row | Simulated balance decreases |
 | FC-03 | Add extra income row | Simulated balance increases |
-| FC-04 | Remove row | Forecast updates correctly |
-| SUM-01 | Open summary | Cards show period totals |
+| FC-04 | Remove what-if row | Forecast updates correctly |
+| SUM-01 | Open summary page | Cards show period totals |
 | SUM-02 | Change period | Summary values refresh |
 
-### Language consistency
+#### Language consistency
 
 | ID | Test step | Expected |
 | --- | --- | --- |
 | I18N-01 | Switch HU -> EN on all pages | Labels translated everywhere |
-| I18N-02 | Check summary label in menu | HU: Osszesites, EN: Summary |
-| I18N-03 | Check forecast EN wording | Natural English labels |
-| I18N-04 | Check fallback text before JS loads | Same meaning as translated UI |
+| I18N-02 | Check summary wording in menu | HU/EN wording is correct |
+| I18N-03 | Check forecast EN wording | Natural and consistent labels |
+| I18N-04 | Check fallback text before JS loads | Same meaning as final UI |
 
-## Release checklist
+### Quick minimum checks before release
 
-- All pages open without console errors.
-- Hamburger menu works on every page.
-- Language switch works on every page.
-- Summary wording is consistent.
-- Forecast values recalculate correctly.
-- CSV export works.
-- Theme stays after navigation.
-- Service worker cache version checked.
-- Manual test list executed.
-
-## Accessibility and UX notes
-
-- Skip link exists for keyboard users.
-- ARIA labels are used for key controls.
-- Layout is responsive for smaller screens.
-- User gets feedback messages after actions.
-
-## Security and privacy notes
-
-- Data stays in browser profile.
-- No backend and no third-party API sync.
-- If browser storage is cleared, app data is removed.
-- Password handling is local, but still browser-profile based.
+- auth works
+- add/edit/delete works
+- recurring logic is correct
+- forecast calculation is correct
+- HU/EN labels stay consistent
+- mobile layout is usable
+- PWA install button gives meaningful response
 
 ## Known limitations
 
-- No sync between devices.
-- No change history/audit log.
-- No bank import.
-- No automated tests yet.
-- Data can be lost if browser storage is cleared.
-
-## Future ideas
-
-1. Add automated tests (unit + e2e).
-1. Add data versioning/migration.
-1. Add backup and restore JSON.
-1. Improve validation for edge cases.
-1. Optional cloud sync later.
+- no full automated test suite yet
+- if browser storage is cleared, some local data can be lost
+- backup/restore flow can still be improved
 
 ## Screenshots
 
@@ -329,11 +343,19 @@ At the moment this project is tested manually (no full automated suite yet).
 ![english ui](assets/images/budgeting-app-english.png)
 ![mobile view](assets/images/app-mobile-view.png)
 
-### Password change and reset (tested)
-
-- Password change flow tested: AUTH-07, AUTH-08
-- Password reset flow tested: AUTH-09, AUTH-10
+### Password change/reset screenshots
 
 ![password change result](assets/images/password-changed.png)
 ![password reset step](assets/images/password-reset.png)
 ![password reset result](assets/images/password-reset2.png)
+
+## Note
+
+This project is still evolving, so there is room for polishing.
+The main workflows are now stable, and mobile usage is much better than before.
+
+## Thank you for reading
+
+Thank you for taking the time to review my project.  
+I hope you found it clear and useful.  
+If you have any questions or feedback, feel free to contact me.
