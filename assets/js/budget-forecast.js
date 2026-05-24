@@ -64,6 +64,21 @@
 				forecastWithPurchaseLabel: "Egyenleg tervezett tételekkel:",
 				forecastDifferenceLabel: "Különbség:",
 				forecastMonthEndImpactLabel: "Egyenleg új állapotban:",
+				forecastScenarioNameLabel: "Terv neve",
+				forecastScenarioNamePlaceholder: "Pl. Nyári terv",
+				forecastScenarioSavedLabel: "Mentett tervek",
+				forecastScenarioNone: "Nincs mentett terv",
+				forecastSaveButton: "Mentés",
+				forecastNewButton: "Új terv",
+				forecastLoadButton: "Betöltés",
+				forecastDeleteButton: "Törlés",
+				forecastScenarioNameRequired: "Adj nevet a tervnek.",
+				forecastScenarioEmpty: "Nincs menthető forecast sor.",
+				forecastScenarioSaved: "A terv elmentve.",
+				forecastScenarioUpdated: "A terv frissítve.",
+				forecastScenarioLoaded: "A terv betöltve, szerkeszthető.",
+				forecastScenarioDeleted: "A terv törölve.",
+				forecastScenarioDeleteConfirm: "Biztosan törölni szeretnéd ezt a tervet?",
 				registerTitle: "Regisztráció",
 				loginTitle: "Bejelentkezés",
 				usernameLabel: "Felhasználónév",
@@ -188,6 +203,21 @@
 				forecastWithPurchaseLabel: "Balance with planned items:",
 				forecastDifferenceLabel: "Difference:",
 				forecastMonthEndImpactLabel: "Updated period-end balance:",
+				forecastScenarioNameLabel: "Plan name",
+				forecastScenarioNamePlaceholder: "e.g. Summer plan",
+				forecastScenarioSavedLabel: "Saved plans",
+				forecastScenarioNone: "No saved plan",
+				forecastSaveButton: "Save",
+				forecastNewButton: "New plan",
+				forecastLoadButton: "Load",
+				forecastDeleteButton: "Delete",
+				forecastScenarioNameRequired: "Please provide a plan name.",
+				forecastScenarioEmpty: "There are no forecast rows to save.",
+				forecastScenarioSaved: "Plan saved.",
+				forecastScenarioUpdated: "Plan updated.",
+				forecastScenarioLoaded: "Plan loaded and ready to edit.",
+				forecastScenarioDeleted: "Plan deleted.",
+				forecastScenarioDeleteConfirm: "Delete this saved plan?",
 				registerTitle: "Register",
 				loginTitle: "Sign in",
 				usernameLabel: "Username",
@@ -315,11 +345,19 @@
 		const forecastTargetDateInput = document.getElementById("forecast-target-date");
 		const addWhatIfRowButton = document.getElementById("add-whatif-row");
 		const whatIfRowsContainer = document.getElementById("whatif-rows");
+		const forecastScenarioNameInput = document.getElementById("forecast-scenario-name");
+		const forecastScenarioSelect = document.getElementById("forecast-scenario-select");
+		const forecastSaveScenarioButton = document.getElementById("forecast-save-scenario");
+		const forecastNewScenarioButton = document.getElementById("forecast-new-scenario");
+		const forecastLoadScenarioButton = document.getElementById("forecast-load-scenario");
+		const forecastDeleteScenarioButton = document.getElementById("forecast-delete-scenario");
 		const forecastBaseUntilEl = document.getElementById("forecast-base-until");
 		const forecastWithPurchaseEl = document.getElementById("forecast-with-purchase");
 		const forecastDifferenceEl = document.getElementById("forecast-difference");
 		const forecastMonthEndEl = document.getElementById("forecast-month-end");
 		let deferredInstallPrompt = null;
+		let forecastScenarios = [];
+		let activeForecastScenarioId = "";
 
 		void initializePage();
 
@@ -360,6 +398,26 @@
 			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "" });
 			renderForecastPlanner();
 		});
+		if (forecastSaveScenarioButton) {
+			forecastSaveScenarioButton.addEventListener("click", saveForecastScenario);
+		}
+		if (forecastNewScenarioButton) {
+			forecastNewScenarioButton.addEventListener("click", () => {
+				activeForecastScenarioId = "";
+				if (forecastScenarioNameInput) {
+					forecastScenarioNameInput.value = "";
+				}
+				setDefaultWhatIfRows();
+				renderForecastPlanner();
+				refreshScenarioSelect();
+			});
+		}
+		if (forecastLoadScenarioButton) {
+			forecastLoadScenarioButton.addEventListener("click", loadSelectedForecastScenario);
+		}
+		if (forecastDeleteScenarioButton) {
+			forecastDeleteScenarioButton.addEventListener("click", deleteSelectedForecastScenario);
+		}
 		whatIfRowsContainer.addEventListener("input", renderForecastPlanner);
 		whatIfRowsContainer.addEventListener("change", renderForecastPlanner);
 		whatIfRowsContainer.addEventListener("click", (event) => {
@@ -558,6 +616,8 @@
 			resetExpenseForm();
 			setDefaultForecastDates();
 			setDefaultWhatIfRows();
+			loadForecastScenarios();
+			refreshScenarioSelect();
 			applyTranslations();
 			updateAccessUI();
 			updateInstallButtonState();
@@ -574,6 +634,9 @@
 			document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
 				element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
 			});
+			document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+				element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
+			});
 
 			document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
 				option.textContent = translateCategory(option.value);
@@ -581,7 +644,173 @@
 
 			updateFormButtonLabels();
 			refreshWhatIfRowLabels();
+			refreshScenarioSelect();
 			updateMenuSessionLabel();
+		}
+
+		function getForecastScenarioStorageKey() {
+			const sessionKey = currentUser === GUEST_SESSION_VALUE ? "guest" : (currentUser || "anon");
+			return `budgetAppForecastScenarios:${sessionKey}`;
+		}
+
+		function normalizeScenarioRows(rows) {
+			return (Array.isArray(rows) ? rows : []).map((row) => {
+				const type = row?.type === "income" ? "income" : "expense";
+				const amount = Number(row?.amount || 0);
+				const date = String(row?.date || "");
+				const note = String(row?.note || "").trim().slice(0, 80);
+				return { type, amount, date, note };
+			});
+		}
+
+		function loadForecastScenarios() {
+			const raw = localStorage.getItem(getForecastScenarioStorageKey());
+			if (!raw) {
+				forecastScenarios = [];
+				return;
+			}
+
+			try {
+				const parsed = JSON.parse(raw);
+				forecastScenarios = (Array.isArray(parsed) ? parsed : []).map((scenario) => ({
+					id: String(scenario?.id || createEntryId()),
+					name: String(scenario?.name || "").trim().slice(0, 50),
+					targetDate: String(scenario?.targetDate || ""),
+					rows: normalizeScenarioRows(scenario?.rows)
+				})).filter((scenario) => scenario.name);
+			} catch (_error) {
+				forecastScenarios = [];
+			}
+		}
+
+		function saveForecastScenarios() {
+			localStorage.setItem(getForecastScenarioStorageKey(), JSON.stringify(forecastScenarios));
+		}
+
+		function refreshScenarioSelect() {
+			if (!forecastScenarioSelect) {
+				return;
+			}
+
+			forecastScenarioSelect.innerHTML = "";
+			if (!forecastScenarios.length) {
+				const option = document.createElement("option");
+				option.value = "";
+				option.textContent = t("forecastScenarioNone");
+				forecastScenarioSelect.appendChild(option);
+				forecastScenarioSelect.disabled = true;
+				return;
+			}
+
+			forecastScenarioSelect.disabled = false;
+			forecastScenarios.forEach((scenario) => {
+				const option = document.createElement("option");
+				option.value = scenario.id;
+				option.textContent = scenario.name;
+				forecastScenarioSelect.appendChild(option);
+			});
+
+			if (activeForecastScenarioId && forecastScenarios.some((scenario) => scenario.id === activeForecastScenarioId)) {
+				forecastScenarioSelect.value = activeForecastScenarioId;
+			} else {
+				forecastScenarioSelect.value = forecastScenarios[0].id;
+			}
+		}
+
+		function getWhatIfRowsForScenario() {
+			return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => ({
+				type: row.querySelector(".forecast-whatif-type")?.value || "expense",
+				amount: Number(row.querySelector(".forecast-whatif-amount")?.value || 0),
+				date: row.querySelector(".forecast-whatif-date")?.value || "",
+				note: String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80)
+			})).filter((row) => row.amount > 0 || row.date || row.note);
+		}
+
+		function saveForecastScenario() {
+			const scenarioName = String(forecastScenarioNameInput?.value || "").trim();
+			if (!scenarioName) {
+				showMessage(t("forecastScenarioNameRequired"), true);
+				return;
+			}
+
+			const rows = getWhatIfRowsForScenario();
+			if (!rows.length) {
+				showMessage(t("forecastScenarioEmpty"), true);
+				return;
+			}
+
+			const targetDate = forecastTargetDateInput?.value || "";
+			const existingIndex = forecastScenarios.findIndex((scenario) => scenario.id === activeForecastScenarioId);
+			if (existingIndex >= 0) {
+				forecastScenarios[existingIndex] = {
+					...forecastScenarios[existingIndex],
+					name: scenarioName,
+					targetDate,
+					rows
+				};
+				saveForecastScenarios();
+				refreshScenarioSelect();
+				showMessage(t("forecastScenarioUpdated"), false);
+				return;
+			}
+
+			activeForecastScenarioId = createEntryId();
+			forecastScenarios.push({
+				id: activeForecastScenarioId,
+				name: scenarioName,
+				targetDate,
+				rows
+			});
+			saveForecastScenarios();
+			refreshScenarioSelect();
+			showMessage(t("forecastScenarioSaved"), false);
+		}
+
+		function loadSelectedForecastScenario() {
+			const selectedId = String(forecastScenarioSelect?.value || "");
+			const scenario = forecastScenarios.find((item) => item.id === selectedId);
+			if (!scenario) {
+				return;
+			}
+
+			activeForecastScenarioId = scenario.id;
+			if (forecastScenarioNameInput) {
+				forecastScenarioNameInput.value = scenario.name;
+			}
+			if (forecastTargetDateInput && scenario.targetDate) {
+				forecastTargetDateInput.value = scenario.targetDate;
+			}
+			whatIfRowsContainer.innerHTML = "";
+			normalizeScenarioRows(scenario.rows).forEach((row) => {
+				appendWhatIfRow(row);
+			});
+			if (!whatIfRowsContainer.children.length) {
+				appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || toDateInput(today), note: "" });
+			}
+			renderForecastPlanner();
+			refreshScenarioSelect();
+			showMessage(t("forecastScenarioLoaded"), false);
+		}
+
+		function deleteSelectedForecastScenario() {
+			const selectedId = String(forecastScenarioSelect?.value || "");
+			if (!selectedId) {
+				return;
+			}
+			if (!window.confirm(t("forecastScenarioDeleteConfirm"))) {
+				return;
+			}
+
+			forecastScenarios = forecastScenarios.filter((item) => item.id !== selectedId);
+			if (activeForecastScenarioId === selectedId) {
+				activeForecastScenarioId = "";
+				if (forecastScenarioNameInput) {
+					forecastScenarioNameInput.value = "";
+				}
+			}
+			saveForecastScenarios();
+			refreshScenarioSelect();
+			showMessage(t("forecastScenarioDeleted"), false);
 		}
 
 		function updateMenuSessionLabel() {

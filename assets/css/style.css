@@ -900,6 +900,23 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 	margin: 0;
 }
 
+.forecast-scenario-grid {
+	grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+	align-items: end;
+	margin-top: 0.55rem;
+}
+
+.forecast-scenario-actions {
+	display: flex;
+	gap: 0.45rem;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+}
+
+.forecast-scenario-actions button {
+	min-width: 6.4rem;
+}
+
 .stats-grid {
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 	margin-top: 1rem;
@@ -1703,6 +1720,14 @@ select:focus-visible {
 
 	.forecast-grid {
 		grid-template-columns: 1fr 1fr;
+	}
+
+	.forecast-scenario-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.forecast-scenario-actions {
+		justify-content: flex-start;
 	}
 
 	.whatif-row.forecast-grid {

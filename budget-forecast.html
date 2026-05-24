@@ -188,6 +188,22 @@
 						<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
 					</div>
 				</div>
+				<div class="grid forecast-scenario-grid">
+					<div>
+						<label for="forecast-scenario-name" data-i18n="forecastScenarioNameLabel">Terv neve</label>
+						<input type="text" id="forecast-scenario-name" maxlength="50" data-i18n-placeholder="forecastScenarioNamePlaceholder" placeholder="Pl. Nyári terv">
+					</div>
+					<div>
+						<label for="forecast-scenario-select" data-i18n="forecastScenarioSavedLabel">Mentett tervek</label>
+						<select id="forecast-scenario-select"></select>
+					</div>
+					<div class="control-action forecast-scenario-actions">
+						<button id="forecast-save-scenario" type="button" class="btn btn-outline-info" data-i18n="forecastSaveButton">Mentés</button>
+						<button id="forecast-new-scenario" type="button" class="secondary" data-i18n="forecastNewButton">Új terv</button>
+						<button id="forecast-load-scenario" type="button" class="secondary" data-i18n="forecastLoadButton">Betöltés</button>
+						<button id="forecast-delete-scenario" type="button" class="btn btn-danger" data-i18n="forecastDeleteButton">Törlés</button>
+					</div>
+				</div>
 				<div id="whatif-rows" class="stack forecast-rows"></div>
 				<div class="forecast-results">
 					<p><strong data-i18n="forecastBaseUntilLabel">Egyenleg eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
