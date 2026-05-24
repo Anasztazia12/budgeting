@@ -288,6 +288,16 @@ export async function registerWithUsername({ username, email, password }) {
         throw createAppError("app/invalid-registration");
     }
 
+    const emailQuery = query(
+        collection(db, "usernames"),
+        where("email", "==", cleanEmail),
+        limit(1)
+    );
+    const emailSnap = await getDocs(emailQuery);
+    if (!emailSnap.empty) {
+        throw createAppError("app/email-already-exists");
+    }
+
     let credential = null;
 
     try {
@@ -542,6 +552,10 @@ export function getFirebaseErrorMessage(error, language, operation) {
         "app/username-taken": {
             en: "This nickname is already taken.",
             hu: "Ez a becenév már foglalt."
+        },
+        "app/email-already-exists": {
+            en: "This email address is already registered.",
+            hu: "Ez az email cím már regisztrálva van!"
         },
         "app/not-authenticated": {
             en: "You are not signed in.",
