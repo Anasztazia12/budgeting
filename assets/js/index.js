@@ -233,7 +233,11 @@ void initializePage();
 
 function wireEvents() {
     if (menuToggle && menuPanel) {
+        let menuBusy = false;
         menuToggle.addEventListener("click", () => {
+            if (menuBusy) return;
+            menuBusy = true;
+            setTimeout(() => { menuBusy = false; }, 350); // Prevent rapid double toggling
             const isOpen = menuPanel.classList.toggle("is-open");
             menuToggle.classList.toggle("is-open", isOpen);
             menuToggle.setAttribute("aria-expanded", String(isOpen));
@@ -333,6 +337,8 @@ function wireEvents() {
     if (registerForm) {
         registerForm.addEventListener("submit", async (event) => {
             event.preventDefault();
+            const submitBtn = registerForm.querySelector("button[type='submit']");
+            if (submitBtn) submitBtn.disabled = true;
             const username = document.getElementById("register-username").value.trim();
             const email = document.getElementById("register-email").value.trim();
             const emailConfirm = document.getElementById("register-email-confirm").value.trim();
@@ -341,17 +347,20 @@ function wireEvents() {
 
             if (email !== emailConfirm) {
                 showMessage(t("emailMismatch"), true);
+                if (submitBtn) submitBtn.disabled = false;
                 return;
             }
 
             if (password !== passwordConfirm) {
                 showMessage(t("passwordMismatch"), true);
+                if (submitBtn) submitBtn.disabled = false;
                 return;
             }
 
             if (!isPasswordStrong(password)) {
                 updatePasswordStrengthFeedback();
                 showMessage(t("passwordWeak"), true);
+                if (submitBtn) submitBtn.disabled = false;
                 return;
             }
 
@@ -363,6 +372,8 @@ function wireEvents() {
                 completeLogin(session);
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error, appLanguage, "register"), true);
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
             }
         });
     }
@@ -574,32 +585,36 @@ async function initializePage() {
     }
 
     const session = await restoreSession(currentUser);
-    if (session) {
-        applyAuthenticatedState(session);
-    } else if (currentUser) {
-        clearAuthenticatedState();
-    }
+    if (loginForm) {
+        loginForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const submitBtn = loginForm.querySelector("button[type='submit']");
+            if (submitBtn) submitBtn.disabled = true;
+            const username = document.getElementById("login-username").value.trim();
+            const password = document.getElementById("login-password").value;
 
-    applyTheme();
-    syncThemeButtons();
-    languageSelect.value = appLanguage;
-    applyTranslations();
-    updatePasswordStrengthFeedback();
-    if (isResetPasswordMode) {
-        authOptions.classList.remove("hidden");
-        showSingleAuthCard(resetCompleteCard);
+            try {
+                const session = await loginWithUsername({ username, password });
+                loginForm.reset();
+                showMessage(t("loginSuccess"), false);
+                completeLogin(session);
+            } catch (error) {
+                showMessage(getFirebaseErrorMessage(error, appLanguage, "login"), true);
+                const errorCode = getAuthErrorCode(error);
+                if (
+                    errorCode === "app/invalid-login" ||
+                    errorCode === "auth/invalid-credential" ||
+                    errorCode === "auth/wrong-password" ||
+                    errorCode === "auth/user-not-found"
+                ) {
+                    authOptions.classList.remove("hidden");
+                    showSingleAuthCard(resetCard);
+                }
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        });
     }
-    updateAccessUI();
-    updateInstallButtonState();
-    showMessage("", false);
-}
-
-function showSingleAuthCard(cardToShow) {
-    [registerCard, loginCard, resetCard, changePasswordCard, resetCompleteCard].forEach((card) => {
-        card?.classList.add("hidden");
-    });
-    cardToShow?.classList.remove("hidden");
-}
 
 function applyTranslations() {
     document.documentElement.lang = appLanguage;
