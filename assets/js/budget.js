@@ -1334,30 +1334,34 @@
 				return;
 			}
 
-			showDeleteModal(async () => {
-				// Confirmed delete
-				const email = currentProfile?.email || "";
-				try {
-					showDeleteToast(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
-					await deleteUserData();
-					await sendConfirmationEmail(email);
-					await logoutCurrentUser().catch(() => null);
-					shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-					currentUser = "";
-					currentProfile = null;
-					localStorage.removeItem(SESSION_KEY);
-					localStorage.removeItem(DISPLAY_NAME_KEY);
-					showDeleteToast(shared.getDeleteAccountSuccessMessage(appLanguage));
-					window.setTimeout(() => {
-						window.location.href = "index.html";
-					}, 900);
-				} catch (error) {
-					showDeleteToast(getFirebaseErrorMessage(error, appLanguage, "delete"));
-				}
-			}, () => {
-				// Cancelled
-				showDeleteToast(appLanguage === "en" ? "Account deletion cancelled." : "A fiók törlése megszakítva.");
-			});
+			showDeleteModal(
+				async () => {
+					// Confirmed delete
+					const email = currentProfile?.email || "";
+					try {
+						showDeleteToast(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
+						await deleteUserData();
+						await sendConfirmationEmail(email);
+						await logoutCurrentUser().catch(() => null);
+						shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+						currentUser = "";
+						currentProfile = null;
+						localStorage.removeItem(SESSION_KEY);
+						localStorage.removeItem(DISPLAY_NAME_KEY);
+						showDeleteToast(shared.getDeleteAccountSuccessMessage(appLanguage));
+						window.setTimeout(() => {
+							window.location.href = "index.html";
+						}, 900);
+					} catch (error) {
+						showDeleteToast(getFirebaseErrorMessage(error, appLanguage, "delete"));
+					}
+				},
+				() => {
+					// Cancelled
+					showDeleteToast(appLanguage === "en" ? "Account deletion cancelled." : "A fiók törlése megszakítva.");
+				},
+				appLanguage
+			);
 		}
 
 		function resetDeleteAccountConfirmState() {

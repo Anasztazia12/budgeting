@@ -18,14 +18,27 @@ export function showGuestModal() {
 }
 
 // Show delete confirmation modal
-export function showDeleteModal(onConfirm, onCancel) {
+export function showDeleteModal(onConfirm, onCancel, lang = "hu") {
   const modal = document.getElementById("delete-account-modal");
   const msg = document.getElementById("delete-account-modal-message");
   const actions = document.getElementById("delete-account-modal-actions");
-  msg.textContent = "Are you sure you want to delete your account? This action is permanent.";
+  const texts = {
+    hu: {
+      confirm: "Biztosan törölni szeretnéd a regisztrációdat? Ez a művelet végleges.",
+      cancel: "Mégse",
+      delete: "Törlés"
+    },
+    en: {
+      confirm: "Are you sure you want to delete your account? This action is permanent.",
+      cancel: "Cancel",
+      delete: "Delete"
+    }
+  };
+  const t = texts[lang] || texts.hu;
+  msg.textContent = t.confirm;
   actions.innerHTML = "";
   const cancelBtn = document.createElement("button");
-  cancelBtn.textContent = "Cancel";
+  cancelBtn.textContent = t.cancel;
   cancelBtn.className = "cancel";
   cancelBtn.onclick = () => {
     modal.classList.remove("active");
@@ -33,7 +46,7 @@ export function showDeleteModal(onConfirm, onCancel) {
     if (onCancel) onCancel();
   };
   const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "Delete";
+  deleteBtn.textContent = t.delete;
   deleteBtn.className = "delete";
   deleteBtn.onclick = () => {
     modal.classList.remove("active");
