@@ -545,7 +545,6 @@ function wireEvents() {
     }
 
     window.addEventListener("beforeinstallprompt", (event) => {
-        event.preventDefault();
         deferredInstallPrompt = event;
         localStorage.setItem(INSTALL_STATUS_KEY, "0");
         updateInstallButtonState();

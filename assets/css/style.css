@@ -2313,11 +2313,8 @@ select:focus-visible {
 	.forms-grid .stack input[type="date"],
 	.forms-grid .stack input[type="month"] {
 		width: 100%;
-		inline-size: 100%;
 		min-width: 0;
-		min-inline-size: 0;
-		max-width: 100%;
-		max-inline-size: 100%;
+		max-width: 120px;
 		font-size: 0.9rem;
 		line-height: 1.1;
 		padding-top: 0.3rem;
