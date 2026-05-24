@@ -1,5 +1,13 @@
 # Budgeting App
 
+## Live Demo  
+
+👉 [Click here to open the live project](https://anasztazia12.github.io/budgeting/)
+
+Responsive design
+
+![Responsive design](assets/images/responsive-device-mockup.png)
+
 This is my budgeting app project.
 
 The goal was to build a simple and clear money-tracking web app that works in both Hungarian and English.
