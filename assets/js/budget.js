@@ -753,6 +753,10 @@
 		}
 
 		function render() {
+			if (inlineDeleteConfirmResolver) {
+				closeInlineDeleteConfirm(false);
+			}
+
 			if (!currentUser) {
 				monthlyIncomeEl.textContent = formatCurrency(0);
 				monthlyExpenseEl.textContent = formatCurrency(0);
@@ -862,7 +866,7 @@
 			}
 
 			if (action === "delete") {
-				if (!(await handleEntryDelete(listType, entryId, clickedDate))) {
+				if (!(await handleEntryDelete(listType, entryId, clickedDate, actionTarget))) {
 					return;
 				}
 				if (listType === "incomes") {
@@ -875,14 +879,15 @@
 			}
 		}
 
-		async function handleEntryDelete(listType, entryId, clickedDate) {
+		async function handleEntryDelete(listType, entryId, clickedDate, triggerElement) {
 			const entry = appState[listType].find((item) => item.id === entryId);
 			if (!entry) {
 				return false;
 			}
 
 			if (!entry.repeatMonthly) {
-				if (!window.confirm(t("confirmDelete"))) {
+				const isConfirmed = await openInlineDeleteConfirm(triggerElement, t("confirmDelete"));
+				if (!isConfirmed) {
 					return false;
 				}
 				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
@@ -896,18 +901,12 @@
 			}
 
 			if (scope === "all") {
-				if (!window.confirm(t("confirmDeleteAllMonths"))) {
-					return false;
-				}
 				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
 				saveState();
 				return true;
 			}
 
 			if (scope === "month") {
-				if (!window.confirm(t("confirmDeleteThisMonth"))) {
-					return false;
-				}
 				const monthToExclude = (clickedDate || entry.date || "").slice(0, 7);
 				if (/^\d{4}-\d{2}$/.test(monthToExclude)) {
 					const excludedMonths = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
