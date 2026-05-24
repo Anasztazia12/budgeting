@@ -848,6 +848,11 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 	background: linear-gradient(125deg, #2a9d8f, #269186);
 }
 
+#login-form button[type="submit"] {
+	background: linear-gradient(125deg, #2a9d8f, #269186);
+	border: 1px solid #1f7e74;
+}
+
 .contact-page {
 	max-width: min(760px, 94vw);
 }
