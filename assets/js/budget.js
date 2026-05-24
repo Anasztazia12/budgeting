@@ -1,3 +1,12 @@
+
+		import {
+			checkGuestMode,
+			showGuestModal,
+			showDeleteModal,
+			deleteUserData,
+			sendConfirmationEmail,
+			showDeleteToast
+		} from "./delete-account.js";
 		import {
 			deleteCurrentAccount,
 			getFirebaseErrorMessage,
@@ -1317,45 +1326,38 @@
 			window.location.href = "index.html";
 		}
 
+
 		async function handleAccountDelete() {
-			if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
-				resetDeleteAccountConfirmState();
-				showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE), true);
+			// Guest mode: show guest modal
+			if (checkGuestMode(currentUser, GUEST_SESSION_VALUE)) {
+				showGuestModal();
 				return;
 			}
 
-			if (!deleteAccountConfirmArmed) {
-				deleteAccountConfirmArmed = true;
-				if (deleteAccountConfirmTimer) {
-					window.clearTimeout(deleteAccountConfirmTimer);
+			showDeleteModal(async () => {
+				// Confirmed delete
+				const email = currentProfile?.email || "";
+				try {
+					showDeleteToast(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
+					await deleteUserData();
+					await sendConfirmationEmail(email);
+					await logoutCurrentUser().catch(() => null);
+					shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+					currentUser = "";
+					currentProfile = null;
+					localStorage.removeItem(SESSION_KEY);
+					localStorage.removeItem(DISPLAY_NAME_KEY);
+					showDeleteToast(shared.getDeleteAccountSuccessMessage(appLanguage));
+					window.setTimeout(() => {
+						window.location.href = "index.html";
+					}, 900);
+				} catch (error) {
+					showDeleteToast(getFirebaseErrorMessage(error, appLanguage, "delete"));
 				}
-				deleteAccountConfirmTimer = window.setTimeout(() => {
-					resetDeleteAccountConfirmState();
-				}, 7000);
-				showMessage(t("deleteAccountNeedsSecondClick"), true);
-				return;
-			}
-
-			resetDeleteAccountConfirmState();
-
-			const email = currentProfile?.email || "";
-			try {
-				showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
-				await deleteCurrentAccount();
-				await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
-				await logoutCurrentUser().catch(() => null);
-				shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-				currentUser = "";
-				currentProfile = null;
-				localStorage.removeItem(SESSION_KEY);
-				localStorage.removeItem(DISPLAY_NAME_KEY);
-				showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-				window.setTimeout(() => {
-					window.location.href = "index.html";
-				}, 500);
-			} catch (error) {
-				showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
-			}
+			}, () => {
+				// Cancelled
+				showDeleteToast(appLanguage === "en" ? "Account deletion cancelled." : "A fiók törlése megszakítva.");
+			});
 		}
 
 		function resetDeleteAccountConfirmState() {

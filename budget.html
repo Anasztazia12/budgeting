@@ -242,7 +242,14 @@ választó</label>
 		</div>
 	</div>
 
-	<script src="assets/js/app-shared.js"></script>
-	<script type="module" src="assets/js/budget.js"></script>
+		<link rel="stylesheet" href="assets/css/delete-account-modal.css">
+		<script>
+			// Inline inject modal HTML for delete account
+			fetch('assets/js/delete-account-modal-inline.html').then(r => r.text()).then(html => {
+				document.body.insertAdjacentHTML('beforeend', html);
+			});
+		</script>
+		<script type="module" src="assets/js/delete-account.js"></script>
+		<script type="module" src="assets/js/budget.js"></script>
 </body>
 </html>
