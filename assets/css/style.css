@@ -2216,8 +2216,8 @@ select:focus-visible {
 
 	input[type="date"],
 	input[type="month"] {
-		width: 80%;
-		max-width: 80%;
+		width: 100%;
+		max-width: 100%;
 		min-width: 0;
 	}
 
@@ -2244,8 +2244,8 @@ select:focus-visible {
 
 	#forecast-planner input[type="date"],
 	#whatif-rows input[type="date"] {
-		width: 80%;
-		inline-size: 80%;
+		width: 100%;
+		inline-size: 100%;
 		min-width: 0;
 		min-inline-size: 0;
 		max-width: 100%;
@@ -2282,10 +2282,10 @@ select:focus-visible {
 
 	#income-date,
 	#expense-date {
-		width: 80%;
-		inline-size: 80%;
+		width: 100%;
+		inline-size: 100%;
 		min-inline-size: 0;
-		max-inline-size: 80%;
+		max-inline-size: 100%;
 		justify-self: stretch;
 	}
 
