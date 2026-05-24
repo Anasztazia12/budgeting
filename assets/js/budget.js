@@ -297,7 +297,6 @@
 		let appTheme = loadTheme();
 		let appCurrency = loadCurrency();
 		let appState = { incomes: [], expenses: [] };
-		let accountDeleteConfirmArmedUntil = 0;
 
 		const incomeForm = document.getElementById("income-form");
 		const expenseForm = document.getElementById("expense-form");
@@ -1321,20 +1320,17 @@
 				return;
 			}
 
-			if (Date.now() > accountDeleteConfirmArmedUntil) {
-				accountDeleteConfirmArmedUntil = Date.now() + 7000;
-				showMessage(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser), true);
-				return;
-			}
-			accountDeleteConfirmArmedUntil = 0;
-
 			const email = currentProfile?.email || "";
 			try {
+				showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
 				await deleteCurrentAccount();
 				await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
 				shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
 				localStorage.removeItem(SESSION_KEY);
-				window.location.href = "index.html";
+				showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+				window.setTimeout(() => {
+					window.location.href = "index.html";
+				}, 500);
 			} catch (error) {
 				showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
 			}

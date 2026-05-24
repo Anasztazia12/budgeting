@@ -220,7 +220,6 @@ let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
 let appLanguage = shared.loadLanguage();
 let appTheme = shared.loadTheme();
-let accountDeleteConfirmArmedUntil = 0;
 const urlParams = new URLSearchParams(window.location.search);
 const resetActionCode = String(urlParams.get("oobCode") || "").trim();
 const isResetPasswordMode = urlParams.get("mode") === "resetPassword" && Boolean(resetActionCode);
@@ -829,21 +828,18 @@ async function handleAccountDelete() {
         return;
     }
 
-    if (Date.now() > accountDeleteConfirmArmedUntil) {
-        accountDeleteConfirmArmedUntil = Date.now() + 7000;
-        showMessage(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser), true);
-        return;
-    }
-    accountDeleteConfirmArmedUntil = 0;
-
     const email = currentProfile?.email || "";
 
     try {
+        showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
         await deleteCurrentAccount();
         await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
         shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
         clearAuthenticatedState();
-        window.location.href = "index.html";
+        showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+        window.setTimeout(() => {
+            window.location.href = "index.html";
+        }, 500);
     } catch (error) {
         showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
     }
