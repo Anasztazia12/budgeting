@@ -2,6 +2,7 @@
     const KEYS = {
         USERS_KEY: "budgetAppUsers",
         SESSION_KEY: "budgetAppSession",
+        DISPLAY_NAME_KEY: "budgetAppDisplayName",
         LANGUAGE_KEY: "budgetAppLanguage",
         THEME_KEY: "budgetAppTheme",
         CURRENCY_KEY: "budgetAppCurrency",

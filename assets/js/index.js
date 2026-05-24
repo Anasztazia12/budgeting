@@ -12,6 +12,7 @@ import {
 const shared = window.BudgetAppShared;
 const {
     SESSION_KEY,
+    DISPLAY_NAME_KEY,
     LANGUAGE_KEY,
     INSTALL_STATUS_KEY
 } = shared.KEYS;
@@ -652,6 +653,7 @@ function loginGuest() {
     currentUser = GUEST_SESSION_VALUE;
     currentProfile = null;
     localStorage.setItem(SESSION_KEY, GUEST_SESSION_VALUE);
+    localStorage.setItem(DISPLAY_NAME_KEY, t("guestUser"));
     window.location.href = "budget.html";
 }
 
@@ -674,6 +676,7 @@ function applyAuthenticatedState(session) {
         data: session.data || { incomes: [], expenses: [] }
     };
     localStorage.setItem(SESSION_KEY, username);
+    localStorage.setItem(DISPLAY_NAME_KEY, currentProfile?.nickname || currentProfile?.username || username);
 }
 
 function clearAuthenticatedState() {
@@ -683,6 +686,7 @@ function clearAuthenticatedState() {
     currentUser = "";
     currentProfile = null;
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(DISPLAY_NAME_KEY);
 }
 
 function t(key) {

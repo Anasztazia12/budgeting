@@ -9,6 +9,7 @@
 		const {
 			USERS_KEY,
 			SESSION_KEY,
+			DISPLAY_NAME_KEY,
 			LANGUAGE_KEY,
 			THEME_KEY,
 			CURRENCY_KEY,
@@ -395,7 +396,7 @@
 				return t("guestUser");
 			}
 
-			return currentProfile?.nickname || currentProfile?.username || currentUser;
+			return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
 		}
 
 		function setMenuInfoMessage(message) {

@@ -11,6 +11,7 @@
 		const {
 			USERS_KEY,
 			SESSION_KEY,
+			DISPLAY_NAME_KEY,
 			LANGUAGE_KEY,
 			THEME_KEY,
 			CURRENCY_KEY,
@@ -694,8 +695,7 @@
 				return t("guestUser");
 			}
 
-			const profile = users[currentUser] && users[currentUser].profile ? users[currentUser].profile : null;
-			return profile?.nickname || profile?.username || currentUser;
+			return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
 		}
 
 		function sortExpenseCategoryOptions() {
