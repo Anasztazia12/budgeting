@@ -421,8 +421,8 @@ function wireEvents() {
                 }
                 showMessage(
                     appLanguage === "en"
-                        ? `Reset email sent to ${result.email}.`
-                        : `A reset email elküldve ide: ${result.email}.`,
+                        ? `Reset email sent to ${result.email}. Please check your spam folder too. Amethyst Nexalune`
+                        : `A reset email elküldve ide: ${result.email}. Nézd meg a spam mappát is. Amethyst Nexalune`,
                     false
                 );
             } catch (error) {

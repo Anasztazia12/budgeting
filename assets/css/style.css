@@ -1327,23 +1327,26 @@ input[type="month"] {
 }
 
 .password-input-wrap {
-	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
 	width: 100%;
 }
 
 .password-input-wrap input {
-	padding-right: 2.75rem;
+	flex: 1 1 auto;
+	min-width: 0;
+	padding-right: var(--control-padding-x);
 }
 
 .password-input-wrap button.password-visibility-toggle {
-	position: absolute;
-	right: 0.3rem;
-	top: 50%;
-	transform: translateY(-50%);
+	position: static;
+	transform: none;
 	width: 2rem;
 	height: 2rem;
-	min-width: 0;
-	max-width: none;
+	min-width: 2rem;
+	max-width: 2rem;
+	flex: 0 0 2rem;
 	margin: 0;
 	padding: 0;
 	border-radius: 999px;
