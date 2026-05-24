@@ -968,3 +968,7 @@ function updateInstallButtonState() {
 function ensureGuestData() {
     shared.saveGuestData(shared.loadGuestData());
 }
+
+// HIÁNYZÓ ZÁRÓJEL PÓTLÁSA
+// Ez zárja le a fő szkriptet, hogy ne legyen szintaktikai hiba
+}

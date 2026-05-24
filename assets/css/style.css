@@ -1,30 +1,32 @@
+
 :root {
-	--bg-top: #f3f8ff;
-	--bg-bottom: #dce9ff;
-	--card: #ffffff;
-	--ink: #102446;
-	--muted: #3d5f94;
-	--muted-strong: #2e4f87;
-	--accent: #1e59db;
-	--accent-strong: #123f9f;
-	--good: #2c9a8f;
-	--danger: #305ad4;
-	--line: #8fb2ec;
-	--radius-sm: 10px;
-	--radius-md: 12px;
-	--radius-lg: 14px;
-	--radius-xl: 16px;
-	--radius-pill: 999px;
-	--control-radius: var(--radius-sm);
-	--panel-radius: var(--radius-md);
-	--card-radius: var(--radius-lg);
-	--control-min-height: 2.24rem;
-	--control-padding-y: 0.42rem;
-	--control-padding-x: 0.62rem;
-	--btn-padding-y: 0.56rem;
-	--btn-padding-x: 0.84rem;
-	--btn-font-size: 1rem;
+  --bg-top: #f3f8ff;
+  --bg-bottom: #dce9ff;
+  --card: #ffffff;
+  --ink: #102446;
+  --muted: #3d5f94;
+  --muted-strong: #2e4f87;
+  --accent: #1e59db;
+  --accent-strong: #123f9f;
+  --good: #2c9a8f;
+  --danger: #305ad4;
+  --line: #8fb2ec;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+  --control-radius: var(--radius-sm);
+  --panel-radius: var(--radius-md);
+  --card-radius: var(--radius-lg);
+  --control-min-height: 2.24rem;
+  --control-padding-y: 0.42rem;
+  --control-padding-x: 0.62rem;
+  --btn-padding-y: 0.56rem;
+  --btn-padding-x: 0.84rem;
+  --btn-font-size: 1rem;
 }
+
 
 [data-theme="dark"] {
 	--bg-top: #0c1426;
@@ -946,7 +948,8 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 }
 
 .budget-columns {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	/* Enforced two-column layout for Income and Expenses. Never stack vertically. */
+	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	grid-template-rows: auto auto;
 	margin-top: 1rem;
 }
@@ -954,7 +957,6 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 .budget-column {
 	display: grid;
 	grid-row: span 2;
-	grid-template-rows: subgrid;
 	min-width: 0;
 }
 
@@ -2002,7 +2004,7 @@ select:focus-visible {
 	}
 
 	.budget-columns {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	}
 
 	.compact-controls {
@@ -2057,7 +2059,9 @@ select:focus-visible {
 }
 
 @media (max-width: 760px) {
-	.budget-columns,
+	.budget-columns {
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	}
 	.forms-grid,
 	.lists-grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
