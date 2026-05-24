@@ -180,13 +180,11 @@
 
 			<section id="forecast-planner" class="card">
 				<h2 data-i18n="forecastTitle">Költségvetési előrejelző</h2>
+				<p id="auth-message" class="auth-message hidden" aria-live="polite"></p>
 				<div class="grid forecast-grid">
 					<div>
 						<label for="forecast-target-date" data-i18n="forecastTargetDateLabel">Elemzés dátuma</label>
 						<input type="date" id="forecast-target-date">
-					</div>
-					<div class="control-action">
-						<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
 					</div>
 				</div>
 				<div class="grid forecast-scenario-grid">
@@ -195,14 +193,12 @@
 						<input type="text" id="forecast-scenario-name" maxlength="50" data-i18n-placeholder="forecastScenarioNamePlaceholder" placeholder="Pl. Nyári terv">
 					</div>
 					<div>
-						<label for="forecast-scenario-select" data-i18n="forecastScenarioSavedLabel">Mentett tervek</label>
-						<select id="forecast-scenario-select"></select>
+						<label data-i18n="forecastScenarioSavedLabel">Mentett tervek</label>
+						<div id="forecast-scenario-list" class="forecast-scenario-list" role="group" aria-label="Saved plans"></div>
 					</div>
 					<div class="control-action forecast-scenario-actions">
-						<button id="forecast-save-scenario" type="button" class="btn btn-outline-info" data-i18n="forecastSaveButton">Mentés</button>
-						<button id="forecast-new-scenario" type="button" class="secondary" data-i18n="forecastNewButton">Új terv</button>
+						<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
 						<button id="forecast-load-scenario" type="button" class="secondary" data-i18n="forecastLoadButton">Betöltés</button>
-						<button id="forecast-delete-scenario" type="button" class="btn btn-danger" data-i18n="forecastDeleteButton">Törlés</button>
 					</div>
 				</div>
 				<div id="whatif-rows" class="stack forecast-rows"></div>

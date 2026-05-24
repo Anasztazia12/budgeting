@@ -979,7 +979,7 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 }
 
 .whatif-row.forecast-grid {
-	grid-template-columns: repeat(5, minmax(0, 1fr));
+	grid-template-columns: repeat(6, minmax(0, 1fr));
 	align-items: end;
 }
 
@@ -1022,6 +1022,48 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 	grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
 	align-items: end;
 	margin-top: 0.55rem;
+}
+
+.forecast-scenario-list {
+	border: 1px solid #c4d5f2;
+	border-radius: var(--control-radius);
+	background: #f8fbff;
+	max-height: 10rem;
+	overflow: auto;
+	padding: 0.4rem;
+	display: grid;
+	gap: 0.25rem;
+}
+
+.forecast-scenario-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.2rem 0.1rem;
+	font-size: 0.92rem;
+	margin: 0;
+}
+
+.forecast-scenario-item input[type="checkbox"] {
+	width: auto;
+	max-width: none;
+	margin: 0;
+	accent-color: var(--accent);
+}
+
+.forecast-scenario-empty {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+[data-theme="dark"] .forecast-scenario-list {
+	border-color: #3f568d;
+	background: #13213d;
+}
+
+[data-theme="dark"] .forecast-scenario-empty {
+	color: #c8d7fb;
 }
 
 .forecast-scenario-actions {
