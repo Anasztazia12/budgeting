@@ -95,6 +95,7 @@ const dictionary = {
         appInstalled: "Az app telepítve.",
         appDownloaded: "Az app letöltve.",
         appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
+        deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
         footerText: "Minden jog fenntartva."
     },
     en: {
@@ -171,6 +172,7 @@ const dictionary = {
         appInstalled: "App installed.",
         appDownloaded: "App downloaded.",
         appInstallUnavailable: "App install is not available on this device right now.",
+        deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
         footerText: "All rights reserved."
     }
 };
@@ -220,6 +222,8 @@ let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
 let appLanguage = shared.loadLanguage();
 let appTheme = shared.loadTheme();
+let deleteAccountConfirmArmed = false;
+let deleteAccountConfirmTimer = null;
 const urlParams = new URLSearchParams(window.location.search);
 const resetActionCode = String(urlParams.get("oobCode") || "").trim();
 const isResetPasswordMode = urlParams.get("mode") === "resetPassword" && Boolean(resetActionCode);
@@ -824,9 +828,24 @@ async function performLogout() {
 
 async function handleAccountDelete() {
     if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
-        showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage), true);
+        resetDeleteAccountConfirmState();
+        showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE), true);
         return;
     }
+
+    if (!deleteAccountConfirmArmed) {
+        deleteAccountConfirmArmed = true;
+        if (deleteAccountConfirmTimer) {
+            window.clearTimeout(deleteAccountConfirmTimer);
+        }
+        deleteAccountConfirmTimer = window.setTimeout(() => {
+            resetDeleteAccountConfirmState();
+        }, 7000);
+        showMessage(t("deleteAccountNeedsSecondClick"), true);
+        return;
+    }
+
+    resetDeleteAccountConfirmState();
 
     const email = currentProfile?.email || "";
 
@@ -834,6 +853,7 @@ async function handleAccountDelete() {
         showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
         await deleteCurrentAccount();
         await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+        await logoutCurrentUser().catch(() => null);
         shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
         clearAuthenticatedState();
         showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
@@ -842,6 +862,14 @@ async function handleAccountDelete() {
         }, 500);
     } catch (error) {
         showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
+    }
+}
+
+function resetDeleteAccountConfirmState() {
+    deleteAccountConfirmArmed = false;
+    if (deleteAccountConfirmTimer) {
+        window.clearTimeout(deleteAccountConfirmTimer);
+        deleteAccountConfirmTimer = null;
     }
 }
 

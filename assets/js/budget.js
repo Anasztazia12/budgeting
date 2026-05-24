@@ -98,6 +98,7 @@
 				welcomeRegistered: "Welcome, {username}!",
 				appDownloaded: "Az app letöltve.",
 				appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
+				deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
 				loginFirst: "Először jelentkezz be.",
 				entrySaved: "A tétel elmentve.",
 				entryUpdated: "A tétel frissítve.",
@@ -233,6 +234,7 @@
 				welcomeRegistered: "Welcome, {username}!",
 				appDownloaded: "App downloaded.",
 				appInstallUnavailable: "App install is not available on this device right now.",
+				deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
 				loginFirst: "Please sign in first.",
 				entrySaved: "Entry saved.",
 				entryUpdated: "Entry updated.",
@@ -346,6 +348,8 @@
 		let inlineDeleteConfirmElement = null;
 		let inlineDeleteConfirmOutsideHandler = null;
 		let deferredInstallPrompt = null;
+		let deleteAccountConfirmArmed = false;
+		let deleteAccountConfirmTimer = null;
 
 		void initializePage();
 
@@ -1316,23 +1320,50 @@
 
 		async function handleAccountDelete() {
 			if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
-				showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage), true);
+				resetDeleteAccountConfirmState();
+				showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE), true);
 				return;
 			}
+
+			if (!deleteAccountConfirmArmed) {
+				deleteAccountConfirmArmed = true;
+				if (deleteAccountConfirmTimer) {
+					window.clearTimeout(deleteAccountConfirmTimer);
+				}
+				deleteAccountConfirmTimer = window.setTimeout(() => {
+					resetDeleteAccountConfirmState();
+				}, 7000);
+				showMessage(t("deleteAccountNeedsSecondClick"), true);
+				return;
+			}
+
+			resetDeleteAccountConfirmState();
 
 			const email = currentProfile?.email || "";
 			try {
 				showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
 				await deleteCurrentAccount();
 				await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+				await logoutCurrentUser().catch(() => null);
 				shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+				currentUser = "";
+				currentProfile = null;
 				localStorage.removeItem(SESSION_KEY);
+				localStorage.removeItem(DISPLAY_NAME_KEY);
 				showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
 				window.setTimeout(() => {
 					window.location.href = "index.html";
 				}, 500);
 			} catch (error) {
 				showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
+			}
+		}
+
+		function resetDeleteAccountConfirmState() {
+			deleteAccountConfirmArmed = false;
+			if (deleteAccountConfirmTimer) {
+				window.clearTimeout(deleteAccountConfirmTimer);
+				deleteAccountConfirmTimer = null;
 			}
 		}
 

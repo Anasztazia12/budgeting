@@ -271,9 +271,15 @@
         return `Biztosan torolni szeretned ezt az accountot (${username})?`;
     }
 
-    function getDeleteAccountNoSessionMessage(language) {
-        return language === "en"
-            ? "Please sign in with a registered account first."
+    function getDeleteAccountNoSessionMessage(language, isGuestMode = false) {
+        if (language === "en") {
+            return isGuestMode
+                ? "You are signed in as a guest. Sign in with a registered account to delete it."
+                : "Please sign in with a registered account first.";
+        }
+
+        return isGuestMode
+            ? "Vendegkent vagy bejelentkezve. Fiok torlesehez regisztralt fiokkal jelentkezz be."
             : "Eloszor jelentkezz be regisztralt fiokkal.";
     }
 
