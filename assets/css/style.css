@@ -2173,7 +2173,6 @@ select:focus-visible {
 		grid-template-columns: 1fr;
 	}
 
-	.budget-columns,
 	.forms-grid,
 	.lists-grid {
 		grid-template-columns: 1fr;

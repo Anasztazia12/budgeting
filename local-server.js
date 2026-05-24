@@ -19,6 +19,18 @@ const MIME_TYPES = {
     ".ico": "image/x-icon"
 };
 
+function shouldRedirectToLocalhost(hostHeader) {
+    const host = String(hostHeader || "").toLowerCase();
+    return host === "127.0.0.1" || host.startsWith("127.0.0.1:") || host === "[::1]" || host.startsWith("[::1]:");
+}
+
+function buildLocalhostUrl(req) {
+    const hostHeader = String(req.headers.host || "");
+    const [, port = String(PORT)] = hostHeader.split(":");
+    const requestPath = req.url || "/";
+    return `http://localhost:${port}${requestPath}`;
+}
+
 function safePath(urlPath) {
     const decoded = decodeURIComponent(urlPath.split("?")[0]);
     const normalized = path.normalize(decoded).replace(/^([.][.][/\\])+/, "");
@@ -41,6 +53,15 @@ function sendFile(filePath, res) {
 }
 
 const server = http.createServer((req, res) => {
+    if (shouldRedirectToLocalhost(req.headers.host)) {
+        res.writeHead(308, {
+            Location: buildLocalhostUrl(req, PORT),
+            "Content-Type": "text/plain; charset=utf-8"
+        });
+        res.end("Redirecting to localhost");
+        return;
+    }
+
     const requestPath = req.url === "/" ? "/index.html" : req.url;
     const absolutePath = safePath(requestPath);
 
