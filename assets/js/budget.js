@@ -344,6 +344,9 @@
 		const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
 		const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
 		let deleteScopeResolver = null;
+		let inlineDeleteConfirmResolver = null;
+		let inlineDeleteConfirmElement = null;
+		let inlineDeleteConfirmOutsideHandler = null;
 		let deferredInstallPrompt = null;
 
 		void initializePage();
@@ -447,16 +450,16 @@
 			incomeCancelEdit.addEventListener("click", resetIncomeForm);
 		}
 		if (incomeDeleteButton) {
-			incomeDeleteButton.addEventListener("click", async () => {
-				await handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm);
+			incomeDeleteButton.addEventListener("click", async (event) => {
+				await handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm, event.currentTarget);
 			});
 		}
 		if (expenseCancelEdit) {
 			expenseCancelEdit.addEventListener("click", resetExpenseForm);
 		}
 		if (expenseDeleteButton) {
-			expenseDeleteButton.addEventListener("click", async () => {
-				await handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm);
+			expenseDeleteButton.addEventListener("click", async (event) => {
+				await handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm, event.currentTarget);
 			});
 		}
 		if (deleteThisMonthButton) {
@@ -497,6 +500,11 @@
 		});
 
 		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape" && inlineDeleteConfirmResolver) {
+				closeInlineDeleteConfirm(false);
+				return;
+			}
+
 			if (event.key === "Escape" && deleteScopeModal && !deleteScopeModal.classList.contains("hidden")) {
 				closeDeleteScopeModal(null);
 				return;
