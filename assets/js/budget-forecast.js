@@ -747,11 +747,18 @@
 			const targetDate = forecastTargetDateInput?.value || "";
 			if (activeForecastScenarioId) {
 				const existing = forecastScenarios.find((scenario) => scenario.id === activeForecastScenarioId);
-				if (existing) {
+				if (existing && existing.name === scenarioName) {
 					existing.name = scenarioName;
 					existing.targetDate = targetDate;
 					return existing;
 				}
+			}
+
+			const byName = forecastScenarios.find((scenario) => scenario.name === scenarioName);
+			if (byName) {
+				byName.targetDate = targetDate;
+				activeForecastScenarioId = byName.id;
+				return byName;
 			}
 
 			const created = {
@@ -841,6 +848,9 @@
 			scenario.targetDate = forecastTargetDateInput?.value || scenario.targetDate;
 			saveForecastScenarios();
 			renderScenarioList();
+			if (forecastScenarioNameInput) {
+				forecastScenarioNameInput.value = "";
+			}
 		}
 
 		function updateMenuSessionLabel() {
