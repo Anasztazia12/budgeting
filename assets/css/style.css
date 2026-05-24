@@ -1332,32 +1332,35 @@ input[type="month"] {
 }
 
 .password-input-wrap input {
-	padding-right: 2.4rem;
+	padding-right: 2.75rem;
 }
 
-.password-visibility-toggle {
+.password-input-wrap .password-visibility-toggle {
 	position: absolute;
-	right: 0.35rem;
+	right: 0.3rem;
 	top: 50%;
 	transform: translateY(-50%);
-	width: 1.9rem;
-	height: 1.9rem;
+	width: 2rem;
+	height: 2rem;
+	min-width: 0;
+	max-width: none;
+	margin: 0;
 	padding: 0;
-	border-radius: 0.45rem;
-	border: 1px solid #9db8ea;
-	background: #edf4ff;
-	color: #1a4ea9;
-	font-size: 0.95rem;
+	border-radius: 999px;
+	border: 0;
+	background: transparent;
+	color: #101010;
+	font-size: 1rem;
 	line-height: 1;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	z-index: 2;
 }
 
 [data-theme="dark"] .password-visibility-toggle {
-	background: #294676;
-	border-color: #7fa7f3;
-	color: #e8efff;
+	background: transparent;
+	color: #ffffff;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator,

@@ -643,7 +643,7 @@ function syncLoginPasswordToggleButton() {
 
     const isVisible = loginPasswordInput.type === "text";
     const label = isVisible ? t("hidePassword") : t("showPassword");
-    loginPasswordToggle.textContent = isVisible ? "🙈" : "👁";
+    loginPasswordToggle.textContent = "👁";
     loginPasswordToggle.setAttribute("aria-label", label);
     loginPasswordToggle.setAttribute("title", label);
 }
