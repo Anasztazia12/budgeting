@@ -2312,7 +2312,7 @@ select:focus-visible {
 	.budget-columns .stack input[type="month"],
 	.forms-grid .stack input[type="date"],
 	.forms-grid .stack input[type="month"] {
-		width: 80%;
+		width: 90%;
 		min-width: 0;
 		max-width: 100px;
 		font-size: 0.9rem;
@@ -2328,12 +2328,12 @@ select:focus-visible {
 
 	#forecast-planner input[type="date"],
 	#whatif-rows input[type="date"] {
-		width: 80%;
-		inline-size: 80%;
+		width: 90%;
+		inline-size: 90%;
 		min-width: 0;
 		min-inline-size: 0;
-		max-width: 80%;
-		max-inline-size: 80%;
+		max-width: 90%;
+		max-inline-size: 90%;
 		font-size: 0.86rem;
 		padding-left: 0.44rem;
 		padding-right: 0.44rem;
@@ -2369,10 +2369,10 @@ select:focus-visible {
 
 	#income-date,
 	#expense-date {
-		width: 80%;
-		inline-size: 80%;
+		width: 90%;
+		inline-size: 90%;
 		min-inline-size: 0;
-		max-inline-size: 80%;
+		max-inline-size: 90%;
 		justify-self: stretch;
 	}
 
@@ -2411,10 +2411,10 @@ select:focus-visible {
 	}
 
 	.entry-filters input[type="date"] {
-		width: min(80%, 180px);
-		inline-size: min(80%, 180px);
-		max-width: min(80%, 180px);
-		max-inline-size: min(80%, 180px);
+		width: min(90%, 180px);
+		inline-size: min(90%, 180px);
+		max-width: min(90%, 180px);
+		max-inline-size: min(90%, 180px);
 		min-width: 0;
 		min-inline-size: 0;
 		min-height: 2.12rem;
