@@ -905,11 +905,9 @@ function updateInstallButtonState() {
     const installed = isAppInstalled();
     if (installed && !deferredInstallPrompt) {
         installAppButton.textContent = t("appDownloaded");
-        installAppButton.disabled = true;
-        return;
+    } else {
+        installAppButton.textContent = t("downloadAppButton");
     }
-
-    installAppButton.textContent = t("downloadAppButton");
     installAppButton.disabled = false;
 }
 
