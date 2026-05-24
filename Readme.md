@@ -6,7 +6,7 @@
 
 Responsive design
 
-![Responsive design](assets/images/responsive-device-mockup.png)
+![Responsive design](assets/images/responsive-devices-mockup.png)
 
 This is my budgeting app project.
 

@@ -1,0 +1,69 @@
+/* Simple modal for account deletion confirmation */
+#delete-account-modal, #guest-account-modal {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(16,30,56,0.52);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#delete-account-modal.active, #guest-account-modal.active {
+  visibility: visible;
+  opacity: 1;
+}
+.delete-modal-content {
+  background: #fff;
+  color: #222;
+  border-radius: 14px;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.18);
+  padding: 2rem 2.2rem 1.5rem;
+  max-width: 95vw;
+  width: 340px;
+  text-align: center;
+}
+[data-theme="dark"] .delete-modal-content {
+  background: #17223d;
+  color: #e8efff;
+}
+.delete-modal-content button {
+  margin: 1.2rem 0.5rem 0 0.5rem;
+  min-width: 90px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.delete-modal-content .delete {
+  background: #c63e5e;
+  color: #fff;
+}
+.delete-modal-content .cancel {
+  background: #e6f0ff;
+  color: #234eae;
+}
+.toast-message {
+  position: fixed;
+  left: 50%;
+  bottom: 2.5rem;
+  transform: translateX(-50%);
+  background: #234eae;
+  color: #fff;
+  padding: 1rem 2.2rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.toast-message.active {
+  opacity: 1;
+  pointer-events: auto;
+}
