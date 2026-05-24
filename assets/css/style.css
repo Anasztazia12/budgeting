@@ -1734,6 +1734,15 @@ select:focus-visible {
 		grid-template-columns: 1fr 1fr;
 	}
 
+	.whatif-row.forecast-grid > .control-action {
+		grid-column: 1 / -1;
+	}
+
+	.forecast-scenario-actions button {
+		flex: 1 1 calc(50% - 0.45rem);
+		min-width: 0;
+	}
+
 	#forecast-planner #add-whatif-row {
 		white-space: normal;
 		width: 100%;
@@ -1860,13 +1869,10 @@ select:focus-visible {
 		grid-template-columns: 1fr;
 	}
 
-	.budget-columns {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
+	.budget-columns,
 	.forms-grid,
 	.lists-grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: 1fr;
 	}
 
 	.budget-column > .card,
@@ -2026,12 +2032,36 @@ select:focus-visible {
 		inline-size: 80%;
 		min-width: 0;
 		min-inline-size: 0;
-		max-width: 80%;
-		max-inline-size: 80%;
+		max-width: 100%;
+		max-inline-size: 100%;
 		font-size: 0.86rem;
 		padding-left: 0.44rem;
 		padding-right: 0.44rem;
 		box-sizing: border-box;
+	}
+
+	.whatif-row.forecast-grid {
+		grid-template-columns: 1fr;
+	}
+
+	#whatif-rows input[type="number"],
+	#whatif-rows input[type="text"],
+	#whatif-rows select {
+		width: 100%;
+		max-width: 100%;
+	}
+
+	#whatif-rows .control-action {
+		justify-content: stretch;
+	}
+
+	#whatif-rows .control-action button {
+		width: 100%;
+	}
+
+	.forecast-scenario-actions button {
+		flex: 1 1 100%;
+		width: 100%;
 	}
 
 	#income-date,
