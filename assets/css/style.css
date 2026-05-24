@@ -1621,6 +1621,16 @@ h2[data-i18n="projectionTitle"] {
 	box-shadow: 0 10px 24px rgba(12, 33, 76, 0.22);
 }
 
+.inline-delete-confirm.is-mobile {
+	position: fixed;
+	left: 0.625rem;
+	right: 0.625rem;
+	bottom: 0.7rem;
+	width: auto;
+	max-width: none;
+	z-index: 110;
+}
+
 .inline-delete-confirm p {
 	margin: 0;
 	font-size: 0.82rem;
@@ -2204,6 +2214,32 @@ select:focus-visible {
 
 	.row-actions {
 		flex-direction: row;
+	}
+
+	.inline-icon-button {
+		width: 2rem;
+		height: 2rem;
+		font-size: 1rem;
+	}
+
+	.inline-delete-confirm {
+		width: min(300px, calc(100vw - 1rem));
+	}
+
+	.inline-delete-confirm.is-mobile {
+		left: 0.5rem;
+		right: 0.5rem;
+		bottom: 0.55rem;
+	}
+
+	.inline-delete-confirm-actions {
+		gap: 0.45rem;
+	}
+
+	.inline-delete-confirm-actions .btn {
+		flex: 1 1 50%;
+		min-height: 2.3rem;
+		font-size: 0.85rem;
 	}
 
 	.menu-wrap {

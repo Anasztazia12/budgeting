@@ -975,14 +975,19 @@
 			document.body.appendChild(popover);
 			inlineDeleteConfirmElement = popover;
 
-			const rect = anchorElement.getBoundingClientRect();
-			const top = window.scrollY + rect.top - popover.offsetHeight - 8;
-			const preferredLeft = window.scrollX + rect.right + 10;
-			const maxLeft = window.scrollX + window.innerWidth - popover.offsetWidth - 10;
-			const safeTop = Math.max(window.scrollY + 10, top);
-			const safeLeft = Math.max(window.scrollX + 10, Math.min(preferredLeft, maxLeft));
-			popover.style.top = `${safeTop}px`;
-			popover.style.left = `${safeLeft}px`;
+			const isSmallScreen = window.matchMedia("(max-width: 760px)").matches;
+			if (isSmallScreen) {
+				popover.classList.add("is-mobile");
+			} else {
+				const rect = anchorElement.getBoundingClientRect();
+				const top = window.scrollY + rect.top - popover.offsetHeight - 8;
+				const preferredLeft = window.scrollX + rect.right + 10;
+				const maxLeft = window.scrollX + window.innerWidth - popover.offsetWidth - 10;
+				const safeTop = Math.max(window.scrollY + 10, top);
+				const safeLeft = Math.max(window.scrollX + 10, Math.min(preferredLeft, maxLeft));
+				popover.style.top = `${safeTop}px`;
+				popover.style.left = `${safeLeft}px`;
+			}
 
 			const buttons = popover.querySelectorAll("button");
 			const confirmButton = buttons[0];
@@ -1060,8 +1065,10 @@
 			updateFormButtonLabels();
 			if (focusField) {
 				focusField.scrollIntoView({ behavior: "smooth", block: "center" });
-				focusField.focus({ preventScroll: true });
-				focusField.select?.();
+				window.requestAnimationFrame(() => {
+					focusField.focus();
+					focusField.select?.();
+				});
 			}
 		}
 
