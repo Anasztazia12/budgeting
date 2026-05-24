@@ -245,6 +245,10 @@ At the moment this project is tested manually (no full automated suite yet).
 | AUTH-04 | Login with wrong password | Error message |
 | AUTH-05 | Continue as guest | Guest session active |
 | AUTH-06 | Logout from hamburger menu | Session cleared |
+| AUTH-07 | Change password with new value | Password updated successfully |
+| AUTH-08 | Change password with previously used value | Rejected with validation message |
+| AUTH-09 | Reset password via email link with new value | Password reset successful |
+| AUTH-10 | Reset password via email link with previously used value | Rejected with validation message |
 
 ### Budget CRUD and recurring
 
@@ -321,7 +325,15 @@ At the moment this project is tested manually (no full automated suite yet).
 
 ## Screenshots
 
-![screenshot1](assets/images/screenshot1.png)
-![screenshot2](assets/images/screenshot2.png)
-![screenshot3 - light mode](assets/images/screenshot3.png)
-![screenshot4 - dark mode](assets/images/screenshot4.png)
+![hungarian ui](assets/images/budgeting-app-hungarian.png)
+![english ui](assets/images/budgeting-app-english.png)
+![mobile view](assets/images/app-mobile-view.png)
+
+### Password change and reset (tested)
+
+- Password change flow tested: AUTH-07, AUTH-08
+- Password reset flow tested: AUTH-09, AUTH-10
+
+![password change result](assets/images/password-changed.png)
+![password reset step](assets/images/password-reset.png)
+![password reset result](assets/images/password-reset2.png)
