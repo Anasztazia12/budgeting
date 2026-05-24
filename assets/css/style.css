@@ -800,11 +800,12 @@ button:not(.btn):not([class*="btn-"]):hover::after {
 }
 
 .auth-grid {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: 1fr;
 	margin-top: 1rem;
-	max-width: 980px;
+	max-width: 560px;
 	margin-left: auto;
 	margin-right: auto;
+	justify-items: center;
 }
 
 .auth-grid > .card {
