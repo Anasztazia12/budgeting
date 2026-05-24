@@ -292,14 +292,21 @@ export async function registerWithUsername({ username, email, password }) {
         throw createAppError("app/invalid-registration");
     }
 
-    const emailQuery = query(
-        collection(db, "usernames"),
-        where("email", "==", cleanEmail),
-        limit(1)
-    );
-    const emailSnap = await getDocs(emailQuery);
-    if (!emailSnap.empty) {
-        throw createAppError("app/email-already-exists");
+    try {
+        const emailQuery = query(
+            collection(db, "usernames"),
+            where("email", "==", cleanEmail),
+            limit(1)
+        );
+        const emailSnap = await getDocs(emailQuery);
+        if (!emailSnap.empty) {
+            throw createAppError("app/email-already-exists");
+        }
+    } catch (error) {
+        if (error?.code === "app/email-already-exists") {
+            throw error;
+        }
+        // If email lookup is blocked by rules, continue and rely on Firebase Auth duplicate email check.
     }
 
     let credential = null;
