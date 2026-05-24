@@ -486,8 +486,8 @@ body {
 	margin: 0;
 	padding: 0.5rem 0.72rem;
 	min-height: 2.32rem;
-	border: 1px solid #1f4fbf;
-	background: linear-gradient(125deg, #2f5fd0, #234eae);
+	border: 1px solid #1f7e74;
+	background: linear-gradient(125deg, #2a9d8f, #269186);
 	color: #ffffff;
 	font-weight: 700;
 	font-size: 0.9rem;
@@ -498,7 +498,7 @@ body {
 #contact-us-button:hover,
 #contact-us-button:focus-visible {
 	filter: brightness(1.08);
-	box-shadow: 0 10px 20px rgba(22, 56, 121, 0.24);
+	box-shadow: 0 10px 20px rgba(23, 104, 95, 0.24);
 }
 
 .menu-toggle {
