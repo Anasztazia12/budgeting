@@ -1,4 +1,4 @@
-const CACHE_NAME = "budgeting-app-v3"; // növelt verzió!
+const CACHE_NAME = "budgeting-app-v3"; 
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
