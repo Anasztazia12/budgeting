@@ -1,4 +1,4 @@
-const CACHE_NAME = "budgeting-app-v2";
+const CACHE_NAME = "budgeting-app-v3"; // növelt verzió!
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -13,6 +13,7 @@ const ASSETS_TO_CACHE = [
   "./manifest.webmanifest"
 ];
 
+// INSTALL → cache alap fájlok
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
@@ -20,6 +21,7 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
+// ACTIVATE → régi cache törlése
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -33,24 +35,36 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// FETCH → HTML: always network first, others: cache first
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") {
-    return;
-  }
+  if (event.request.method !== "GET") return;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
+  const url = new URL(event.request.url);
 
-      return fetch(event.request)
+  // HTML → mindig friss
+  if (url.pathname.endsWith(".html")) {
+    event.respondWith(
+      fetch(event.request)
         .then((response) => {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           return response;
         })
-        .catch(() => caches.match("./index.html"));
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Minden más → cache first
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+
+      return fetch(event.request).then((response) => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        return response;
+      });
     })
   );
 });
