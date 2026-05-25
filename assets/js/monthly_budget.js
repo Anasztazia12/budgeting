@@ -83,10 +83,10 @@
 					telefon: "Telefon",
 					internet: "Internet",
 					iskola: "Iskola",
-					egyeb_kiadas: "Egyéb kiadás"
-				}
-			},
-			en: {
+					   egyeb_kiadas: "Egyéb kiadás"
+				   }
+			   },
+			   en: {
 				pageTitle: "Summary",
 				heroTitle: "Summary",
 				heroText: "Income and expense summary for a selected date range.",
@@ -196,8 +196,7 @@
 		let deleteAccountConfirmArmed = false;
 		let deleteAccountConfirmTimer = null;
 
-		languageSelect.addEventListener("change", () => {
-		currencySelect.addEventListener("change", () => {
+
 		window.addEventListener('DOMContentLoaded', () => {
 			void initializePage();
 			languageSelect.addEventListener("change", () => {
@@ -211,8 +210,7 @@
 				shared.saveCurrency(appCurrency);
 				render();
 			});
-			// ...add all other event listeners here as needed...
-		});
+		
 		});
 
 		if (periodStartInput) {
