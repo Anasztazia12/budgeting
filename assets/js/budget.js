@@ -296,10 +296,10 @@
 					internet: "Internet",
 					iskola: "School",
 					suli: "School",
-					"egyeb kiadas": "Other expense"
+							"egyeb kiadas": "Other expense"
+
 				}
-			}
-		};
+		}		};
 
 		const today = new Date();
 		let currentUser = localStorage.getItem(SESSION_KEY) || "";
@@ -360,322 +360,266 @@
 		let deleteAccountConfirmArmed = false;
 		let deleteAccountConfirmTimer = null;
 
-		void initializePage();
-
-		languageSelect.addEventListener("change", () => {
-			appLanguage = languageSelect.value;
-			saveLanguage();
-			applyTranslations();
-			render();
-		});
-
-		currencySelect.addEventListener("change", () => {
-			appCurrency = currencySelect.value;
-			saveCurrency();
-			render();
-		});
-
-		[periodStartInput, periodEndInput].forEach((input) => {
-			if (!input) {
-				return;
-			}
-			input.addEventListener("change", () => {
-				syncPeriodInputOrder();
-				setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
+		window.addEventListener('DOMContentLoaded', () => {
+			// ...existing code...
+			void initializePage();
+			languageSelect.addEventListener("change", () => {
+				appLanguage = languageSelect.value;
+				saveLanguage();
+				applyTranslations();
 				render();
 			});
- 		});
-		[incomeFilterStart, incomeFilterEnd, expenseFilterStart, expenseFilterEnd].forEach((input) => {
-			if (!input) {
-				return;
-			}
-			input.addEventListener("change", render);
- 		});
-		forecastToggleButton.addEventListener("click", () => {
-			const periodStart = periodStartInput?.value || toDateInput(today);
-			const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-			window.location.href = `budget-forecast.html?month=${monthParam}`;
-		});
-		if (summaryToggleButton) {
-			summaryToggleButton.addEventListener("click", () => {
+			currencySelect.addEventListener("change", () => {
+				appCurrency = currencySelect.value;
+				saveCurrency();
+				render();
+			});
+			[periodStartInput, periodEndInput].forEach((input) => {
+				if (!input) {
+					return;
+				}
+				input.addEventListener("change", () => {
+					syncPeriodInputOrder();
+					setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
+					render();
+				});
+			 });
+			[incomeFilterStart, incomeFilterEnd, expenseFilterStart, expenseFilterEnd].forEach((input) => {
+				if (!input) {
+					return;
+				}
+				input.addEventListener("change", render);
+			 });
+			forecastToggleButton.addEventListener("click", () => {
 				const periodStart = periodStartInput?.value || toDateInput(today);
 				const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-				window.location.href = `monthly_budget.html?month=${monthParam}`;
+				window.location.href = `budget-forecast.html?month=${monthParam}`;
 			});
-		}
-
-		if (saveStateButton) {
-			saveStateButton.addEventListener("click", () => {
-				saveState();
-				showMessage(t("saveAllDone"), false);
+			if (summaryToggleButton) {
+				summaryToggleButton.addEventListener("click", () => {
+					const periodStart = periodStartInput?.value || toDateInput(today);
+					const monthParam = encodeURIComponent(periodStart.slice(0, 7));
+					window.location.href = `monthly_budget.html?month=${monthParam}`;
+				});
+			}
+			if (saveStateButton) {
+				saveStateButton.addEventListener("click", () => {
+					saveState();
+					showMessage(t("saveAllDone"), false);
+				});
+			}
+			if (menuBackButton) {
+				menuBackButton.addEventListener("click", () => {
+					window.history.back();
+				});
+			}
+			if (installAppButton) {
+				installAppButton.addEventListener("click", async () => {
+					if (isAppInstalled() && !deferredInstallPrompt) {
+						showMessage(t("appDownloaded"), false);
+						return;
+					}
+					if (!deferredInstallPrompt) {
+						showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
+						return;
+					}
+					menuPanel.classList.remove("is-open");
+					menuToggle.classList.remove("is-open");
+					menuToggle.setAttribute("aria-expanded", "false");
+					deferredInstallPrompt.prompt();
+					const choice = await deferredInstallPrompt.userChoice;
+					if (choice.outcome === "accepted") {
+						localStorage.setItem(INSTALL_STATUS_KEY, "1");
+						showMessage(t("appDownloaded"), false);
+					}
+					deferredInstallPrompt = null;
+					updateInstallButtonState();
+				});
+			}
+			if (menuLogoutButton) {
+				menuLogoutButton.addEventListener("click", handleLogout);
+			}
+			if (deleteAccountButton) {
+				deleteAccountButton.addEventListener("click", handleAccountDelete);
+			}
+			if (themeLightButton) {
+				themeLightButton.addEventListener("click", () => {
+					setTheme("light");
+				});
+			}
+			if (themeDarkButton) {
+				themeDarkButton.addEventListener("click", () => {
+					setTheme("dark");
+				});
+			}
+			if (contactUsButton) {
+				contactUsButton.addEventListener("click", () => {
+					window.location.href = "contact.html";
+				});
+			}
+			if (incomeCancelEdit) {
+				incomeCancelEdit.addEventListener("click", resetIncomeForm);
+			}
+			if (incomeDeleteButton) {
+				incomeDeleteButton.addEventListener("click", async (event) => {
+					await handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm, event.currentTarget);
+				});
+			}
+			if (expenseCancelEdit) {
+				expenseCancelEdit.addEventListener("click", resetExpenseForm);
+			}
+			if (expenseDeleteButton) {
+				expenseDeleteButton.addEventListener("click", async (event) => {
+					await handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm, event.currentTarget);
+				});
+			}
+			if (deleteThisMonthButton) {
+				deleteThisMonthButton.addEventListener("click", () => {
+					closeDeleteScopeModal("month");
+				});
+			}
+			if (deleteAllMonthsButton) {
+				deleteAllMonthsButton.addEventListener("click", () => {
+					closeDeleteScopeModal("all");
+				});
+			}
+			if (deleteScopeCancelButton) {
+				deleteScopeCancelButton.addEventListener("click", () => {
+					closeDeleteScopeModal(null);
+				});
+			}
+			if (deleteScopeModal) {
+				deleteScopeModal.addEventListener("click", (event) => {
+					if (event.target === deleteScopeModal) {
+						closeDeleteScopeModal(null);
+					}
+				});
+			}
+			menuToggle.addEventListener("click", () => {
+				const isOpen = menuPanel.classList.toggle("is-open");
+				menuToggle.classList.toggle("is-open", isOpen);
+				menuToggle.setAttribute("aria-expanded", String(isOpen));
 			});
-		}
-		if (menuBackButton) {
-			menuBackButton.addEventListener("click", () => {
-				window.history.back();
+			document.addEventListener("click", (event) => {
+				if (!event.target.closest(".menu-wrap")) {
+					menuPanel.classList.remove("is-open");
+					menuToggle.classList.remove("is-open");
+					menuToggle.setAttribute("aria-expanded", "false");
+				}
 			});
-		}
-		if (installAppButton) {
-			installAppButton.addEventListener("click", async () => {
-				if (isAppInstalled() && !deferredInstallPrompt) {
-					showMessage(t("appDownloaded"), false);
+			document.addEventListener("keydown", (event) => {
+				if (event.key === "Escape" && inlineDeleteConfirmResolver) {
+					closeInlineDeleteConfirm(false);
 					return;
 				}
-
-				if (!deferredInstallPrompt) {
-					showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
+				if (event.key === "Escape" && deleteScopeModal && !deleteScopeModal.classList.contains("hidden")) {
+					closeDeleteScopeModal(null);
 					return;
 				}
-
-				menuPanel.classList.remove("is-open");
-				menuToggle.classList.remove("is-open");
-				menuToggle.setAttribute("aria-expanded", "false");
-				deferredInstallPrompt.prompt();
-				const choice = await deferredInstallPrompt.userChoice;
-				if (choice.outcome === "accepted") {
-					localStorage.setItem(INSTALL_STATUS_KEY, "1");
-					showMessage(t("appDownloaded"), false);
+				if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
+					menuPanel.classList.remove("is-open");
+					menuToggle.classList.remove("is-open");
+					menuToggle.setAttribute("aria-expanded", "false");
+					menuToggle.focus();
 				}
-				deferredInstallPrompt = null;
+			});
+			window.addEventListener("beforeinstallprompt", (event) => {
+				deferredInstallPrompt = event;
+				localStorage.setItem(INSTALL_STATUS_KEY, "0");
 				updateInstallButtonState();
 			});
-		}
-		if (menuLogoutButton) {
-			menuLogoutButton.addEventListener("click", handleLogout);
-		}
-		if (deleteAccountButton) {
-			deleteAccountButton.addEventListener("click", handleAccountDelete);
-		}
-		if (themeLightButton) {
-			themeLightButton.addEventListener("click", () => {
-				setTheme("light");
+			window.addEventListener("appinstalled", () => {
+				localStorage.setItem(INSTALL_STATUS_KEY, "1");
+				deferredInstallPrompt = null;
+				showMessage(t("appDownloaded"), false);
+				updateInstallButtonState();
 			});
-		}
-
-		if (themeDarkButton) {
-			themeDarkButton.addEventListener("click", () => {
-				setTheme("dark");
-			});
-		}
-		if (contactUsButton) {
-			contactUsButton.addEventListener("click", () => {
-				window.location.href = "contact.html";
-			});
-		}
-		if (incomeCancelEdit) {
-			incomeCancelEdit.addEventListener("click", resetIncomeForm);
-		}
-		if (incomeDeleteButton) {
-			incomeDeleteButton.addEventListener("click", async (event) => {
-				await handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm, event.currentTarget);
-			});
-		}
-		if (expenseCancelEdit) {
-			expenseCancelEdit.addEventListener("click", resetExpenseForm);
-		}
-		if (expenseDeleteButton) {
-			expenseDeleteButton.addEventListener("click", async (event) => {
-				await handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm, event.currentTarget);
-			});
-		}
-		if (deleteThisMonthButton) {
-			deleteThisMonthButton.addEventListener("click", () => {
-				closeDeleteScopeModal("month");
-			});
-		}
-		if (deleteAllMonthsButton) {
-			deleteAllMonthsButton.addEventListener("click", () => {
-				closeDeleteScopeModal("all");
-			});
-		}
-		if (deleteScopeCancelButton) {
-			deleteScopeCancelButton.addEventListener("click", () => {
-				closeDeleteScopeModal(null);
-			});
-		}
- 		if (deleteScopeModal) {
-			deleteScopeModal.addEventListener("click", (event) => {
-				if (event.target === deleteScopeModal) {
-					closeDeleteScopeModal(null);
-				}
-			});
-		}
-
-		menuToggle.addEventListener("click", () => {
-			const isOpen = menuPanel.classList.toggle("is-open");
-			menuToggle.classList.toggle("is-open", isOpen);
-			menuToggle.setAttribute("aria-expanded", String(isOpen));
-		});
-
-		document.addEventListener("click", (event) => {
-			if (!event.target.closest(".menu-wrap")) {
-				menuPanel.classList.remove("is-open");
-				menuToggle.classList.remove("is-open");
-				menuToggle.setAttribute("aria-expanded", "false");
-			}
-		});
-
-		document.addEventListener("keydown", (event) => {
-			if (event.key === "Escape" && inlineDeleteConfirmResolver) {
-				closeInlineDeleteConfirm(false);
-				return;
-			}
-
-			if (event.key === "Escape" && deleteScopeModal && !deleteScopeModal.classList.contains("hidden")) {
-				closeDeleteScopeModal(null);
-				return;
-			}
-
-			if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
-				menuPanel.classList.remove("is-open");
-				menuToggle.classList.remove("is-open");
-				menuToggle.setAttribute("aria-expanded", "false");
-				menuToggle.focus();
-			}
-		});
-
-		window.addEventListener("beforeinstallprompt", (event) => {
-			deferredInstallPrompt = event;
-			localStorage.setItem(INSTALL_STATUS_KEY, "0");
-			updateInstallButtonState();
-		});
-
-		window.addEventListener("appinstalled", () => {
-			localStorage.setItem(INSTALL_STATUS_KEY, "1");
-			deferredInstallPrompt = null;
-			showMessage(t("appDownloaded"), false);
-			updateInstallButtonState();
-		});
-
-		if ("serviceWorker" in navigator) {
-			window.addEventListener("load", () => {
-				navigator.serviceWorker.register("sw.js").catch(() => {
-					// Service worker errors should not block usage.
+			if ("serviceWorker" in navigator) {
+				window.addEventListener("load", () => {
+					navigator.serviceWorker.register("sw.js").catch(() => {
+						// Service worker errors should not block usage.
+					});
 				});
-			});
-		}
-
-		incomeForm.addEventListener("submit", (event) => {
-			event.preventDefault();
-			if (!requireLogin()) {
-				return;
 			}
-
-			const entry = buildEntryFromForm("income");
-			if (!entry.amount) {
-				showMessage(t("invalidAmount"), true);
-				return;
-			}
-			const editId = document.getElementById("income-edit-id").value;
-
-			if (editId) {
-				const existingEntry = appState.incomes.find((item) => item.id === editId);
-				upsertEntry("incomes", {
-					...entry,
-					id: editId,
-					repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
-					excludedMonths: Boolean(incomeRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
-				});
-				showMessage(t("entryUpdated"), false);
-			} else {
-				upsertEntry("incomes", {
-					...entry,
-					id: createEntryId(),
-					repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
-					excludedMonths: []
-				});
-				showMessage(t("entrySaved"), false);
-			}
-
-			saveState();
-			resetIncomeForm();
-			render();
-		});
-
-		expenseForm.addEventListener("submit", (event) => {
-			event.preventDefault();
-			if (!requireLogin()) {
-				return;
-			}
-
-			const entry = buildEntryFromForm("expense");
-			if (!entry.amount) {
-				showMessage(t("invalidAmount"), true);
-				return;
-			}
-			const editId = document.getElementById("expense-edit-id").value;
-
-			if (editId) {
-				const existingEntry = appState.expenses.find((item) => item.id === editId);
-				upsertEntry("expenses", {
-					...entry,
-					id: editId,
-					repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
-					excludedMonths: Boolean(expenseRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
-				});
-				showMessage(t("entryUpdated"), false);
-			} else {
-				upsertEntry("expenses", {
-					...entry,
-					id: createEntryId(),
-					repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
-					excludedMonths: []
-				});
-				showMessage(t("entrySaved"), false);
-			}
-
-			saveState();
-			resetExpenseForm();
-			render();
-		});
-
-		incomeList.addEventListener("click", async (event) => {
-			await handleEntryAction(event, "incomes");
-		});
-
-		incomeList.addEventListener("change", async (event) => {
-			await handleEntryAction(event, "incomes");
-		});
-
-		expenseList.addEventListener("click", async (event) => {
-			await handleEntryAction(event, "expenses");
-		});
-
-		expenseList.addEventListener("change", async (event) => {
-			await handleEntryAction(event, "expenses");
-		});
-
-		async function initializePage() {
-			if (currentUser === GUEST_SESSION_VALUE) {
-				appState = loadGuestData();
-			} else {
-				const session = await restoreSession(currentUser);
-				if (!session) {
-					window.location.href = "index.html";
+			incomeForm.addEventListener("submit", (event) => {
+				event.preventDefault();
+				if (!requireLogin()) {
 					return;
 				}
-
-				applyAuthenticatedState(session);
-				appState = session.data || await loadCurrentUserData();
-			}
-
-			applyTheme();
-			syncThemeButtons();
-			setDefaultPeriodRange();
-			setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
-			languageSelect.value = appLanguage;
-			currencySelect.value = appCurrency;
-			resetIncomeForm();
-			resetExpenseForm();
-			applyTranslations();
-			updateAccessUI();
-			updateInstallButtonState();
-			render();
-			const flashMessage = shared.consumeFlashMessage();
-			if (flashMessage) {
-				showMessage(flashMessage.message, flashMessage.isError);
-			}
-		}
+				const entry = buildEntryFromForm("income");
+				if (!entry.amount) {
+					showMessage(t("invalidAmount"), true);
+					return;
+				}
+				const editId = document.getElementById("income-edit-id").value;
+				if (editId) {
+					const existingEntry = appState.incomes.find((item) => item.id === editId);
+					upsertEntry("incomes", {
+						...entry,
+						id: editId,
+						repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
+						excludedMonths: Boolean(incomeRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
+					});
+					showMessage(t("entryUpdated"), false);
+				} else {
+					upsertEntry("incomes", {
+						...entry,
+						id: createEntryId(),
+						repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
+						excludedMonths: []
+					});
+					showMessage(t("entrySaved"), false);
+				}
+				saveState();
+				resetIncomeForm();
+				render();
+			});
+			expenseForm.addEventListener("submit", (event) => {
+				event.preventDefault();
+				if (!requireLogin()) {
+					return;
+				}
+				const entry = buildEntryFromForm("expense");
+				if (!entry.amount) {
+					showMessage(t("invalidAmount"), true);
+					return;
+				}
+				const editId = document.getElementById("expense-edit-id").value;
+				if (editId) {
+					const existingEntry = appState.expenses.find((item) => item.id === editId);
+					upsertEntry("expenses", {
+						...entry,
+						id: editId,
+						repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
+						excludedMonths: Boolean(expenseRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
+					});
+					showMessage(t("entryUpdated"), false);
+				} else {
+					upsertEntry("expenses", {
+						...entry,
+						id: createEntryId(),
+						repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
+						excludedMonths: []
+					});
+					showMessage(t("entrySaved"), false);
+				}
+				saveState();
+				resetExpenseForm();
+				render();
+			});
+			incomeList.addEventListener("click", async (event) => {
+				await handleEntryAction(event, "incomes");
+			});
+			incomeList.addEventListener("change", async (event) => {
+				await handleEntryAction(event, "incomes");
+			});
+			expenseList.addEventListener("click", async (event) => {
+				await handleEntryAction(event, "expenses");
+			});
+			expenseList.addEventListener("change", async (event) => {
+				await handleEntryAction(event, "expenses");
+			});
+		});
 
 		function applyTranslations() {
 			document.documentElement.lang = appLanguage;
@@ -1615,12 +1559,4 @@
 
 		function saveLanguage() {
 			shared.saveLanguage(appLanguage);
-		}
-
-		function loadGuestData() {
-			return shared.loadGuestData();
-		}
-
-		function saveGuestData(data) {
-			shared.saveGuestData(data);
 		}

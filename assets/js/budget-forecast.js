@@ -154,29 +154,28 @@
 					suli: "Iskola",
 					"egyeb kiadas": "Egyéb kiadás"
 				}
-			},
-			en: {
-				pageTitle: "Budget Forecast Planner",
-				heroTitle: "Budget Forecast Planner",
-				heroText: "Plan your upcoming expenses by date with forecast scenarios.",
-				menuButton: "Menu",
-				homeLink: "Home",
-				budgetLink: "Budget",
-				summaryLink: "Summary",
-				versionLabel: "Version",
-				themeModeLabel: "Theme",
-				themeModeLight: "Light",
-				themeModeDark: "Dark",
-				contactUs: "Contact us",
-				backAction: "Back",
-				downloadAppButton: "Download App",
-				deleteAccountButton: "Delete account",
-				languageLabel: "Language",
-				languageSelectorAria: "Language selector",
-				themeSwitchAria: "Theme switch",
-				currencySelectorAria: "Currency selector",
-				appName: "Budgeting App",
-				currencyLabel: "Currency\nselector",
+			       },
+			       en: {
+				       heroTitle: "Budget Forecast Planner",
+				       heroText: "Plan your upcoming expenses by date with forecast scenarios.",
+				       menuButton: "Menu",
+				       homeLink: "Home",
+				       budgetLink: "Budget",
+				       summaryLink: "Summary",
+				       versionLabel: "Version",
+				       themeModeLabel: "Theme",
+				       themeModeLight: "Light",
+				       themeModeDark: "Dark",
+				       contactUs: "Contact us",
+				       backAction: "Back",
+				       downloadAppButton: "Download App",
+				       deleteAccountButton: "Delete account",
+				       languageLabel: "Language",
+				       languageSelectorAria: "Language selector",
+				       themeSwitchAria: "Theme switch",
+				       currencySelectorAria: "Currency selector",
+				       appName: "Budgeting App",
+				       currencyLabel: "Currency\nselector",
 				currencyHuf: "HUF (forint)",
 				currencyGbp: "GBP (pound)",
 				currencyUsd: "USD (dollar)",
@@ -291,10 +290,126 @@
 					internet: "Internet",
 					iskola: "School",
 					suli: "School",
-					"egyeb kiadas": "Other expense"
-				}
-			}
-		};
+					   "egyeb kiadas": "Other expense"
+					   },
+					   currencyHuf: "HUF (forint)",
+					   currencyGbp: "GBP (pound)",
+					   currencyUsd: "USD (dollar)",
+					   currencyEur: "EUR (euro)",
+					   periodLabel: "Selected period",
+					   periodFromLabel: "from",
+					   periodToLabel: "to",
+					   forecastButton: "Back to Budget",
+					   forecastTitle: "Budget Forecast Planner",
+					   forecastTargetDateLabel: "Analysis date",
+					   forecastAddRowButton: "+ Add an extra unexpected item",
+					   forecastRowTypeLabel: "Type",
+					   forecastRowAmountLabel: "Amount",
+					   forecastRowDateLabel: "Date",
+					   forecastRowNoteLabel: "Note",
+					   forecastRowNotePlaceholder: "Short note (optional)",
+					   forecastTypeExpense: "Extra expense",
+					   forecastTypeIncome: "Extra income",
+					   forecastRemoveRow: "Delete",
+					   forecastSaveRow: "Save",
+					   forecastBaseUntilLabel: "Balance up to selected date:",
+					   forecastWithPurchaseLabel: "Balance with planned items:",
+					   forecastDifferenceLabel: "Difference:",
+					   forecastMonthEndImpactLabel: "Updated period-end balance:",
+					   forecastScenarioNameLabel: "Plan name",
+					   forecastScenarioNamePlaceholder: "e.g. Summer plan",
+					   forecastScenarioSavedLabel: "Saved plans",
+					   forecastScenarioNone: "No saved plan",
+					   forecastLoadButton: "Load",
+					   forecastScenarioNameRequired: "Please provide a plan name.",
+					   forecastScenarioEmpty: "There are no forecast rows to save.",
+					   forecastScenarioSaved: "Plan saved.",
+					   forecastScenarioUpdated: "Plan updated.",
+					   forecastScenarioLoaded: "Selected plan(s) loaded.",
+					   forecastScenarioSelectRequired: "Select at least one saved plan.",
+					   forecastRowSaved: "Row saved to plan.",
+					   deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete the account.",
+					   registerTitle: "Register",
+					   loginTitle: "Sign in",
+					   usernameLabel: "Username",
+					   emailLabel: "Email address",
+					   emailConfirmLabel: "Confirm email address",
+					   passwordLabel: "Password",
+					   passwordConfirmLabel: "Confirm password",
+					   registerButton: "Create account",
+					   loginButton: "Sign in",
+				       logoutButton: "Sign out",
+				       loginRequired: "Please sign in or register to manage entries.",
+				       incomeFormTitle: "Add income",
+				       expenseFormTitle: "Add expense",
+				       categoryLabel: "Category",
+				       amountLabel: "Amount",
+				       incomeDateLabel: "Expected date",
+				       expenseDateLabel: "Deduction date",
+				       saveIncomeButton: "Save income",
+				       saveExpenseButton: "Save expense",
+				       updateIncomeButton: "Update income",
+				       updateExpenseButton: "Update expense",
+				       cancelEditButton: "Edit",
+				       monthlyIncomeTitle: "Income",
+				       monthlyExpenseTitle: "Expenses",
+				       spentToDateTitle: "Spent to date",
+				       monthEndTitle: "Expected income",
+				       incomeEntriesTitle: "Income entries",
+				       expenseEntriesTitle: "Expense entries",
+				       loggedOut: "No user is signed in.",
+				       loggedIn: "Signed in as:",
+				       guestUser: "Guest",
+				       emailMismatch: "Email addresses do not match.",
+				       passwordMismatch: "Passwords do not match.",
+				       usernameTaken: "This username is already taken.",
+				       registerSuccess: "Registration successful.",
+				       loginSuccess: "Signed in successfully.",
+				       logoutSuccess: "Signed out successfully.",
+				       invalidLogin: "Invalid username or password.",
+				       appDownloaded: "App downloaded.",
+				       appInstallUnavailable: "App install is not available on this device right now.",
+				       loginFirst: "Please sign in first.",
+				       entrySaved: "Entry saved.",
+				       entryUpdated: "Entry updated.",
+				       entryDeleted: "Entry deleted.",
+				       confirmDelete: "Delete this entry?",
+				       emptyEntries: "No saved entries for this month.",
+				       exportEmpty: "There are no entries to export for this month.",
+				       exportDone: "CSV export started.",
+				       editAction: "Edit",
+				       deleteAction: "Delete",
+				       csvType: "Type",
+				       csvCategory: "Category",
+				       csvAmount: "Amount",
+				       csvDate: "Date",
+				       typeIncome: "Income",
+				       typeExpense: "Expense",
+				       categories: {
+					       fizetes: "Salary",
+					       egyeb: "Other",
+					       szamlak: "Bills",
+					       viz: "Water",
+					       gaz: "Gas",
+					       aram: "Electricity",
+					       auto: "Car",
+					       benzin: "Fuel",
+					       elemiszer: "Groceries",
+					       ruhak: "Clothes",
+					       rent: "Rent",
+					       biztositas: "Insurance",
+					       "hitelkartya 3": "Credit card 3",
+					       onkormanyzat: "Municipality",
+					       zilch: "Zilch",
+					       tv: "TV",
+					       telefon: "Phone",
+					       internet: "Internet",
+					       iskola: "School",
+					       suli: "School",
+					       "egyeb kiadas": "Other expense"
+				       }
+			       }
+			};
 
 		const today = new Date();
 		const pageParams = new URLSearchParams(window.location.search);
@@ -354,19 +469,22 @@
 		let forecastScenarios = [];
 		let activeForecastScenarioId = "";
 
-		void initializePage();
-
 		languageSelect.addEventListener("change", () => {
-			appLanguage = languageSelect.value;
-			saveLanguage();
-			applyTranslations();
-			render();
-		});
-
 		currencySelect.addEventListener("change", () => {
-			appCurrency = currencySelect.value;
-			saveCurrency();
-			render();
+		window.addEventListener('DOMContentLoaded', () => {
+			void initializePage();
+			languageSelect.addEventListener("change", () => {
+				appLanguage = languageSelect.value;
+				saveLanguage();
+				applyTranslations();
+				render();
+			});
+			currencySelect.addEventListener("change", () => {
+				appCurrency = currencySelect.value;
+				saveCurrency();
+				render();
+			});
+			// ...add all other event listeners here as needed...
 		});
 
 		[periodStartInput, periodEndInput].forEach((input) => {
@@ -1491,3 +1609,4 @@
 		function saveGuestData(data) {
 			shared.saveGuestData(data);
 		}
+	}

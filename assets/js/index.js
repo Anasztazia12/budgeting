@@ -1,235 +1,189 @@
-import {
-    changeCurrentUserPassword,
-    completePasswordResetWithHistory,
-    deleteCurrentAccount,
-    getAuthErrorCode,
-    getFirebaseErrorMessage,
-    loginWithUsername,
-    logoutCurrentUser,
-    registerWithUsername,
-    requestPasswordReset,
-    restoreSession
-} from "./firebase-service.js";
 
-const shared = window.BudgetAppShared;
-const {
-    SESSION_KEY,
-    DISPLAY_NAME_KEY,
-    LANGUAGE_KEY,
-    INSTALL_STATUS_KEY
-} = shared.KEYS;
-const { GUEST_SESSION_VALUE } = shared;
+window.addEventListener('DOMContentLoaded', () => {
+    // ...existing code...
+    import {
+        changeCurrentUserPassword,
+        completePasswordResetWithHistory,
+        deleteCurrentAccount,
+        getAuthErrorCode,
+        getFirebaseErrorMessage,
+        loginWithUsername,
+        logoutCurrentUser,
+        registerWithUsername,
+        requestPasswordReset,
+        restoreSession
+    } from "./firebase-service.js";
 
-const dictionary = {
-    hu: {
-        pageTitle: "Költségvetési app",
-        heroTitle: "Költségvetési app",
-        heroText: "Jelentkezz be, regisztrálj vagy folytasd vendégként.",
-        versionLabel: "Verzió",
-        menuButton: "Menü",
-        homeLink: "Kezdőlap",
-        budgetLink: "Költségvetés",
-        forecastLink: "Költségvetési előrejelző",
-        monthlyLink: "Összesítés",
-        themeModeLabel: "Téma",
-        themeModeLight: "Világos",
-        themeModeDark: "Sötét",
-        backAction: "Vissza",
-        languageLabel: "Nyelv",
-        languageSelectorAria: "Nyelv választó",
-        themeSwitchAria: "Téma váltó",
-        appName: "Költségvetési app",
-        registerTitle: "Regisztráció",
-        loginTitle: "Bejelentkezés",
-        usernameLabel: "Becenév",
-        emailLabel: "Email cím",
-        emailConfirmLabel: "Email cím megerősítése",
-        passwordLabel: "Jelszó",
-        showPassword: "Jelszó mutatása",
-        hidePassword: "Jelszó elrejtése",
-        passwordConfirmLabel: "Jelszó megerősítése",
-        passwordRuleHint: "A jelszó legyen 6-20 karakter, tartalmazzon kisbetűt, nagybetűt és számot.",
-        passwordWeak: "A jelszó túl gyenge.",
-        passwordStrong: "A jelszó elég erős.",
-        forgotPasswordButton: "Elfelejtett jelszó",
-        changePasswordMenuButton: "Jelszó módosítása",
-        changePasswordTitle: "Jelszó módosítása",
-        changePasswordHint: "Add meg a jelenlegi jelszavadat és az új jelszót.",
-        currentPasswordLabel: "Jelenlegi jelszó",
-        newPasswordLabel: "Új jelszó",
-        newPasswordConfirmLabel: "Új jelszó megerősítése",
-        changePasswordButton: "Jelszó módosítása",
-        changePasswordSuccess: "A jelszó sikeresen módosítva.",
-        resetTitle: "Jelszó visszaállítása",
-        resetHint: "Add meg a beceneved vagy az email címed, és küldünk egy visszaállító linket.",
-        resetIdentifierLabel: "Becenév vagy email cím",
-        resetButton: "Reset email küldése",
-        resetCompleteTitle: "Új jelszó beállítása",
-        resetCompleteHint: "Adj meg egy új jelszót. Korábban használt jelszó nem adható meg.",
-        resetCompleteButton: "Új jelszó mentése",
-        resetCompleteSuccess: "A jelszó visszaállítása sikeres. Most már bejelentkezhetsz.",
-        registerButton: "Regisztrálok",
-        loginButton: "Belépés",
-        guestButton: "Folytatás vendégként",
-        contactUs: "Kapcsolat",
-        downloadAppButton: "App letöltése",
-        deleteAccountButton: "Regisztráció törlése",
-        logoutButton: "Kijelentkezés",
-        budgetTitle: "Költségvetés",
-        budgetText: "Bevétel és kiadás rögzítés, szerkesztés, törlés, CSV export és felhasználókezelés.",
-        monthlyTitle: "Összesítés",
-        monthlyText: "Összesítés, mai napig kiadás, jövőbeli bevételek és kiadások dátum szerint.",
-        openButton: "Megnyitás",
-        loggedOut: "Nincs bejelentkezett felhasználó.",
-        loggedIn: "Bejelentkezve:",
-        guestUser: "Vendég",
-        emailMismatch: "Az email címek nem egyeznek.",
-        passwordMismatch: "A jelszavak nem egyeznek.",
-        usernameTaken: "Ez a becenév már foglalt.",
-        registerSuccess: "Sikeres regisztráció.",
-        loginSuccess: "Sikeres bejelentkezés.",
-        guestSuccess: "Vendég mód aktív.",
-        logoutSuccess: "Sikeres kijelentkezés.",
-        invalidLogin: "Hibás becenév vagy jelszó.",
-        welcomeRegistered: "Welcome, {username}! A regisztráció sikeres.",
-        appInstalled: "Az app telepítve.",
-        appDownloaded: "Az app letöltve.",
-        appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
-        deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
-        footerText: "Minden jog fenntartva."
-    },
-    en: {
-        pageTitle: "Budgeting App",
-        heroTitle: "Budgeting App",
-        heroText: "Sign in, register, or continue as a guest.",
-        versionLabel: "Version",
-        menuButton: "Menu",
-        homeLink: "Home",
-        budgetLink: "Budget",
-        forecastLink: "Budget Forecast Planner",
-        monthlyLink: "Summary",
-        themeModeLabel: "Theme",
-        themeModeLight: "Light",
-        themeModeDark: "Dark",
-        backAction: "Back",
-        languageLabel: "Language",
-        languageSelectorAria: "Language selector",
-        themeSwitchAria: "Theme switch",
-        appName: "Budgeting App",
-        registerTitle: "Register",
-        loginTitle: "Sign in",
-        usernameLabel: "Nickname",
-        emailLabel: "Email address",
-        emailConfirmLabel: "Confirm email address",
-        passwordLabel: "Password",
-        showPassword: "Show password",
-        hidePassword: "Hide password",
-        passwordConfirmLabel: "Confirm password",
-        passwordRuleHint: "Password must be 6-20 chars and include lowercase, uppercase, and a number.",
-        passwordWeak: "Password is too weak.",
-        passwordStrong: "Password is strong enough.",
-        forgotPasswordButton: "Forgot password",
-        changePasswordMenuButton: "Change password",
-        changePasswordTitle: "Change password",
-        changePasswordHint: "Enter your current password and your new password.",
-        currentPasswordLabel: "Current password",
-        newPasswordLabel: "New password",
-        newPasswordConfirmLabel: "Confirm new password",
-        changePasswordButton: "Change password",
-        changePasswordSuccess: "Password changed successfully.",
-        resetTitle: "Reset password",
-        resetHint: "Enter your nickname or email address and we will send a reset link.",
-        resetIdentifierLabel: "Nickname or email address",
-        resetButton: "Send reset email",
-        resetCompleteTitle: "Set a new password",
-        resetCompleteHint: "Enter a new password. Previously used passwords are not allowed.",
-        resetCompleteButton: "Save new password",
-        resetCompleteSuccess: "Password reset successful. You can sign in now.",
-        registerButton: "Create account",
-        loginButton: "Sign in",
-        guestButton: "Continue as guest",
-        contactUs: "Contact us",
-        downloadAppButton: "Download App",
-        deleteAccountButton: "Delete account",
-        logoutButton: "Sign out",
-        budgetTitle: "Budget",
-        budgetText: "Income and expense capture, edit/delete, CSV export, and user management.",
-        monthlyTitle: "Summary",
-        monthlyText: "Summary, spending to date, and upcoming dated income and expenses.",
-        openButton: "Open",
-        loggedOut: "No user is signed in.",
-        loggedIn: "Signed in as:",
-        guestUser: "Guest",
-        emailMismatch: "Email addresses do not match.",
-        passwordMismatch: "Passwords do not match.",
-        usernameTaken: "This nickname is already taken.",
-        registerSuccess: "Registration successful.",
-        loginSuccess: "Signed in successfully.",
-        guestSuccess: "Guest mode enabled.",
-        logoutSuccess: "Signed out successfully.",
-        invalidLogin: "Invalid nickname or password.",
-        welcomeRegistered: "Welcome, {username}! Registration successful.",
-        appInstalled: "App installed.",
-        appDownloaded: "App downloaded.",
-        appInstallUnavailable: "App install is not available on this device right now.",
-        deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
-        footerText: "All rights reserved."
-    }
-};
+    const shared = window.BudgetAppShared;
+    const {
+        SESSION_KEY,
+        DISPLAY_NAME_KEY,
+        LANGUAGE_KEY,
+        INSTALL_STATUS_KEY
+    } = shared.KEYS;
+    const { GUEST_SESSION_VALUE } = shared;
 
-const menuToggle = document.getElementById("menu-toggle");
-const menuPanel = document.getElementById("menu-panel");
-const menuBackButton = document.getElementById("menu-back-button");
-const menuLogoutButton = document.getElementById("menu-logout-button");
-const authActions = document.getElementById("auth-actions");
-const authOptions = document.getElementById("auth-options");
-const showRegisterButton = document.getElementById("show-register-button");
-const showLoginButton = document.getElementById("show-login-button");
-const registerCard = document.getElementById("register-card");
-const loginCard = document.getElementById("login-card");
-const resetCard = document.getElementById("reset-card");
-const changePasswordCard = document.getElementById("change-password-card");
-const resetCompleteCard = document.getElementById("reset-complete-card");
-const registerForm = document.getElementById("register-form");
-const loginForm = document.getElementById("login-form");
-const resetForm = document.getElementById("reset-form");
-const changePasswordForm = document.getElementById("change-password-form");
-const resetCompleteForm = document.getElementById("reset-complete-form");
-const resetIdentifierInput = document.getElementById("reset-identifier");
-const registerPasswordInput = document.getElementById("register-password");
-const loginPasswordInput = document.getElementById("login-password");
-const loginPasswordToggle = document.getElementById("login-password-toggle");
-const changeNewPasswordInput = document.getElementById("change-new-password");
-const resetNewPasswordInput = document.getElementById("reset-new-password");
-const passwordStrengthMessage = document.getElementById("password-strength-message");
-const showChangePasswordButton = document.getElementById("show-change-password-button");
-const guestButton = document.getElementById("guest-button");
-const installAppButton = document.getElementById("install-app-button");
-const deleteAccountButton = document.getElementById("delete-account-button");
-const themeLightButton = document.getElementById("theme-light-button");
-const themeDarkButton = document.getElementById("theme-dark-button");
-const logoutButton = document.getElementById("logout-button");
-const sessionInfo = document.getElementById("session-info");
-const menuSessionInfo = document.getElementById("menu-session-info");
-const authMessage = document.getElementById("auth-message");
-const authMessageCard = authMessage ? authMessage.closest(".session-card") : null;
-const appLinks = document.getElementById("app-links");
-const languageSelect = document.getElementById("app-language");
-const contactUsButton = document.getElementById("contact-us-button");
+    const dictionary = {
+        hu: {
+            pageTitle: "Költségvetési app",
+            heroTitle: "Költségvetési app",
+            heroText: "Jelentkezz be, regisztrálj vagy folytasd vendégként.",
+            versionLabel: "Verzió",
+            menuButton: "Menü",
+            homeLink: "Kezdőlap",
+            budgetLink: "Költségvetés",
+            forecastLink: "Költségvetési előrejelző",
+            monthlyLink: "Összesítés",
+            themeModeLabel: "Téma",
+            themeModeLight: "Világos",
+            themeModeDark: "Sötét",
+            backAction: "Vissza",
+            languageLabel: "Nyelv",
+            languageSelectorAria: "Nyelv választó",
+            themeSwitchAria: "Téma váltó",
+            appName: "Költségvetési app",
+            registerTitle: "Regisztráció",
+            loginTitle: "Bejelentkezés",
+            usernameLabel: "Becenév",
+            emailLabel: "Email cím",
+            emailConfirmLabel: "Email cím megerősítése",
+            passwordLabel: "Jelszó",
+            showPassword: "Jelszó mutatása",
+            hidePassword: "Jelszó elrejtése",
+            passwordConfirmLabel: "Jelszó megerősítése",
+            passwordRuleHint: "A jelszó legyen 6-20 karakter, tartalmazzon kisbetűt, nagybetűt és számot.",
+            passwordWeak: "A jelszó túl gyenge.",
+            passwordStrong: "A jelszó elég erős.",
+            forgotPasswordButton: "Elfelejtett jelszó",
+            changePasswordMenuButton: "Jelszó módosítása",
+            changePasswordTitle: "Jelszó módosítása",
+            changePasswordHint: "Add meg a jelenlegi jelszavadat és az új jelszót.",
+            currentPasswordLabel: "Jelenlegi jelszó",
+            newPasswordLabel: "Új jelszó",
+            newPasswordConfirmLabel: "Új jelszó megerősítése",
+            changePasswordButton: "Jelszó módosítása",
+            changePasswordSuccess: "A jelszó sikeresen módosítva.",
+            resetTitle: "Jelszó visszaállítása",
+            resetHint: "Add meg a beceneved vagy az email címed, és küldünk egy visszaállító linket.",
+            resetIdentifierLabel: "Becenév vagy email cím",
+            resetButton: "Reset email küldése",
+            resetCompleteTitle: "Új jelszó beállítása",
+            resetCompleteHint: "Adj meg egy új jelszót. Korábban használt jelszó nem adható meg.",
+            resetCompleteButton: "Új jelszó mentése",
+            resetCompleteSuccess: "A jelszó visszaállítása sikeres. Most már bejelentkezhetsz.",
+            registerButton: "Regisztrálok",
+            loginButton: "Belépés",
+            guestButton: "Folytatás vendégként",
+            contactUs: "Kapcsolat",
+            downloadAppButton: "App letöltése",
+            deleteAccountButton: "Regisztráció törlése",
+            logoutButton: "Kijelentkezés",
+            budgetTitle: "Költségvetés",
+            budgetText: "Bevétel és kiadás rögzítés, szerkesztés, törlés, CSV export és felhasználókezelés.",
+            monthlyTitle: "Összesítés",
+            monthlyText: "Összesítés, mai napig kiadás, jövőbeli bevételek és kiadások dátum szerint.",
+            openButton: "Megnyitás",
+            loggedOut: "Nincs bejelentkezett felhasználó.",
+            loggedIn: "Bejelentkezve:",
+            guestUser: "Vendég",
+            emailMismatch: "Az email címek nem egyeznek.",
+            passwordMismatch: "A jelszavak nem egyeznek.",
+            usernameTaken: "Ez a becenév már foglalt.",
+            registerSuccess: "Sikeres regisztráció.",
+            loginSuccess: "Sikeres bejelentkezés.",
+            guestSuccess: "Vendég mód aktív.",
+            logoutSuccess: "Sikeres kijelentkezés.",
+            invalidLogin: "Hibás becenév vagy jelszó.",
+            welcomeRegistered: "Welcome, {username}! A regisztráció sikeres.",
+            appInstalled: "Az app telepítve.",
+            appDownloaded: "Az app letöltve.",
+            appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
+            deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
+            footerText: "Minden jog fenntartva."
+        },
+        en: {
+            pageTitle: "Budgeting App",
+            heroTitle: "Budgeting App",
+            heroText: "Sign in, register, or continue as a guest.",
+            versionLabel: "Version",
+            menuButton: "Menu",
+            homeLink: "Home",
+            budgetLink: "Budget",
+            forecastLink: "Budget Forecast Planner",
+            monthlyLink: "Summary",
+            themeModeLabel: "Theme",
+            themeModeLight: "Light",
+            themeModeDark: "Dark",
+            backAction: "Back",
+            languageLabel: "Language",
+            languageSelectorAria: "Language selector",
+            themeSwitchAria: "Theme switch",
+            appName: "Budgeting App",
+            registerTitle: "Register",
+            loginTitle: "Sign in",
+            usernameLabel: "Nickname",
+            emailLabel: "Email address",
+            emailConfirmLabel: "Confirm email address",
+            passwordLabel: "Password",
+            showPassword: "Show password",
+            hidePassword: "Hide password",
+            passwordConfirmLabel: "Confirm password",
+            passwordRuleHint: "Password must be 6-20 chars and include lowercase, uppercase, and a number.",
+            passwordWeak: "Password is too weak.",
+            passwordStrong: "Password is strong enough.",
+            forgotPasswordButton: "Forgot password",
+            changePasswordMenuButton: "Change password",
+            changePasswordTitle: "Change password",
+            changePasswordHint: "Enter your current password and your new password.",
+            currentPasswordLabel: "Current password",
+            newPasswordLabel: "New password",
+            newPasswordConfirmLabel: "Confirm new password",
+            changePasswordButton: "Change password",
+            changePasswordSuccess: "Password changed successfully.",
+            resetTitle: "Reset password",
+            resetHint: "Enter your nickname or email address and we will send a reset link.",
+            resetIdentifierLabel: "Nickname or email address",
+            resetButton: "Send reset email",
+            resetCompleteTitle: "Set a new password",
+            resetCompleteHint: "Enter a new password. Previously used passwords are not allowed.",
+            resetCompleteButton: "Save new password",
+            resetCompleteSuccess: "Password reset successful. You can sign in now.",
+            registerButton: "Create account",
+            loginButton: "Sign in",
+            guestButton: "Continue as guest",
+            contactUs: "Contact us",
+            downloadAppButton: "Download App",
+            deleteAccountButton: "Delete account",
+            logoutButton: "Sign out",
+            budgetTitle: "Budget",
+            budgetText: "Income and expense capture, edit/delete, CSV export, and user management.",
+            monthlyTitle: "Summary",
+            monthlyText: "Summary, spending to date, and upcoming dated income and expenses.",
+            openButton: "Open",
+            loggedOut: "No user is signed in.",
+            loggedIn: "Signed in as:",
+            guestUser: "Guest",
+            emailMismatch: "Email addresses do not match.",
+            passwordMismatch: "Passwords do not match.",
+            usernameTaken: "This nickname is already taken.",
+            registerSuccess: "Registration successful.",
+            loginSuccess: "Signed in successfully.",
+            guestSuccess: "Guest mode enabled.",
+            logoutSuccess: "Signed out successfully.",
+            invalidLogin: "Invalid nickname or password.",
+            welcomeRegistered: "Welcome, {username}! Registration successful.",
+            appInstalled: "App installed.",
+            appDownloaded: "App downloaded.",
+            appInstallUnavailable: "App install is not available on this device right now.",
+            deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
+            footerText: "All rights reserved."
+        }
+    };
 
-let deferredInstallPrompt = null;
-let currentUser = localStorage.getItem(SESSION_KEY) || "";
-let currentProfile = null;
-let appLanguage = shared.loadLanguage();
-let appTheme = shared.loadTheme();
-let deleteAccountConfirmArmed = false;
-let deleteAccountConfirmTimer = null;
-const urlParams = new URLSearchParams(window.location.search);
-const resetActionCode = String(urlParams.get("oobCode") || "").trim();
-const isResetPasswordMode = urlParams.get("mode") === "resetPassword" && Boolean(resetActionCode);
-
-wireEvents();
-void initializePage();
+    // ...existing code...
+    wireEvents();
+    void initializePage();
+});
 
 function wireEvents() {
     if (menuToggle && menuPanel) {

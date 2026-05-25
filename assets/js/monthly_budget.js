@@ -196,19 +196,23 @@
 		let deleteAccountConfirmArmed = false;
 		let deleteAccountConfirmTimer = null;
 
-		void initializePage();
-
 		languageSelect.addEventListener("change", () => {
-			appLanguage = languageSelect.value;
-			shared.saveLanguage(appLanguage);
-			applyTranslations();
-			render();
-		});
-
 		currencySelect.addEventListener("change", () => {
-			appCurrency = currencySelect.value;
-			shared.saveCurrency(appCurrency);
-			render();
+		window.addEventListener('DOMContentLoaded', () => {
+			void initializePage();
+			languageSelect.addEventListener("change", () => {
+				appLanguage = languageSelect.value;
+				shared.saveLanguage(appLanguage);
+				applyTranslations();
+				render();
+			});
+			currencySelect.addEventListener("change", () => {
+				appCurrency = currencySelect.value;
+				shared.saveCurrency(appCurrency);
+				render();
+			});
+			// ...add all other event listeners here as needed...
+		});
 		});
 
 		if (periodStartInput) {
