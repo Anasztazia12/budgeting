@@ -45,12 +45,14 @@
 						<p id="menu-session-info" class="menu-session-info" aria-live="polite"></p>
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
 						<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
+						<a href="budget-forecast.html" data-i18n="forecastButton">Költségvetési előrejelző</a>
 						<a href="monthly_budget.html" data-i18n="summaryLink">Összesítés</a>
 						<button id="menu-back-button" type="button" data-i18n="backAction">Vissza</button>
 						<button id="install-app-button" type="button" data-i18n="downloadAppButton">App letöltése</button>
 						<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
 						<hr class="menu-divider">
 						<button type="button" class="btn btn-danger w-100 menu-danger-action" id="delete-account-button" data-i18n="deleteAccountButton">Regisztráció törlése</button>
+
 					</div>
 				</nav>
 			</div>
@@ -240,14 +242,7 @@ választó</label>
 		</div>
 	</div>
 
-		<link rel="stylesheet" href="assets/css/delete-account-modal.css">
-		   <script>
-			   // Inline inject modal HTML for delete account
-			   fetch('assets/js/delete-account-modal-inline.html').then(r => r.text()).then(html => {
-				   document.body.insertAdjacentHTML('beforeend', html);
-			   });
-		   </script>
-		   <script type="module" src="assets/js/delete-account.js"></script>
-		   <script type="module" src="assets/js/budget.js"></script>
+	<script src="assets/js/app-shared.js"></script>
+	<script type="module" src="assets/js/budget.js"></script>
 </body>
 </html>
