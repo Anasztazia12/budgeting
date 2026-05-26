@@ -95,7 +95,6 @@ const dictionary = {
         appInstalled: "Az app telepítve.",
         appDownloaded: "Az app letöltve.",
         appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
-        deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
         footerText: "Minden jog fenntartva."
     },
     en: {
@@ -172,7 +171,6 @@ const dictionary = {
         appInstalled: "App installed.",
         appDownloaded: "App downloaded.",
         appInstallUnavailable: "App install is not available on this device right now.",
-        deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
         footerText: "All rights reserved."
     }
 };
@@ -222,8 +220,7 @@ let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
 let appLanguage = shared.loadLanguage();
 let appTheme = shared.loadTheme();
-let deleteAccountConfirmArmed = false;
-let deleteAccountConfirmTimer = null;
+let accountDeleteConfirmArmedUntil = 0;
 const urlParams = new URLSearchParams(window.location.search);
 const resetActionCode = String(urlParams.get("oobCode") || "").trim();
 const isResetPasswordMode = urlParams.get("mode") === "resetPassword" && Boolean(resetActionCode);
@@ -387,15 +384,16 @@ function wireEvents() {
                 loginForm.reset();
                 showMessage(t("loginSuccess"), false);
                 completeLogin(session);
-            } catch (error) {
-                showMessage(getFirebaseErrorMessage(error, appLanguage, "login"), true);
-                const errorCode = getAuthErrorCode(error);
+           } catch (error) {
+    console.log(error?.code, error);
+    showMessage(getFirebaseErrorMessage(error, appLanguage, "login"), true);
+    const errorCode = error?.code || "";
                 if (
-                    errorCode === "app/invalid-login" ||
                     errorCode === "auth/invalid-credential" ||
                     errorCode === "auth/wrong-password" ||
                     errorCode === "auth/user-not-found"
                 ) {
+
                     authOptions.classList.remove("hidden");
                     showSingleAuthCard(resetCard);
                     if (resetIdentifierInput && username) {
@@ -545,6 +543,7 @@ function wireEvents() {
     }
 
     window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
         deferredInstallPrompt = event;
         localStorage.setItem(INSTALL_STATUS_KEY, "0");
         updateInstallButtonState();
@@ -560,7 +559,6 @@ function wireEvents() {
     if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
             navigator.serviceWorker.register("sw.js").catch(() => {
-                // Registration failures should not block app usage.
             });
         });
     }
@@ -568,15 +566,21 @@ function wireEvents() {
 
 async function initializePage() {
     ensureGuestData();
+
     if (currentUser === GUEST_SESSION_VALUE) {
         currentUser = "";
         localStorage.removeItem(SESSION_KEY);
     }
 
     const session = await restoreSession(currentUser);
+
     if (session) {
+        
         applyAuthenticatedState(session);
-    } else if (currentUser) {
+    } else {
+    
+        currentUser = "";
+        localStorage.removeItem(SESSION_KEY);
         clearAuthenticatedState();
     }
 
@@ -585,10 +589,12 @@ async function initializePage() {
     languageSelect.value = appLanguage;
     applyTranslations();
     updatePasswordStrengthFeedback();
+
     if (isResetPasswordMode) {
         authOptions.classList.remove("hidden");
         showSingleAuthCard(resetCompleteCard);
     }
+
     updateAccessUI();
     updateInstallButtonState();
     showMessage("", false);
@@ -827,48 +833,27 @@ async function performLogout() {
 
 async function handleAccountDelete() {
     if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
-        resetDeleteAccountConfirmState();
-        showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE), true);
+        showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage), true);
         return;
     }
 
-    if (!deleteAccountConfirmArmed) {
-        deleteAccountConfirmArmed = true;
-        if (deleteAccountConfirmTimer) {
-            window.clearTimeout(deleteAccountConfirmTimer);
-        }
-        deleteAccountConfirmTimer = window.setTimeout(() => {
-            resetDeleteAccountConfirmState();
-        }, 7000);
-        showMessage(t("deleteAccountNeedsSecondClick"), true);
+    if (Date.now() > accountDeleteConfirmArmedUntil) {
+        accountDeleteConfirmArmedUntil = Date.now() + 7000;
+        showMessage(shared.getDeleteAccountConfirmMessage(appLanguage, currentUser), true);
         return;
     }
-
-    resetDeleteAccountConfirmState();
+    accountDeleteConfirmArmedUntil = 0;
 
     const email = currentProfile?.email || "";
 
     try {
-        showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
         await deleteCurrentAccount();
         await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
-        await logoutCurrentUser().catch(() => null);
         shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
         clearAuthenticatedState();
-        showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-        window.setTimeout(() => {
-            window.location.href = "index.html";
-        }, 500);
+        window.location.href = "index.html";
     } catch (error) {
         showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
-    }
-}
-
-function resetDeleteAccountConfirmState() {
-    deleteAccountConfirmArmed = false;
-    if (deleteAccountConfirmTimer) {
-        window.clearTimeout(deleteAccountConfirmTimer);
-        deleteAccountConfirmTimer = null;
     }
 }
 
