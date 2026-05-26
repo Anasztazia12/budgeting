@@ -1,4 +1,4 @@
-		import {
+	import {
 			deleteCurrentAccount,
 			getFirebaseErrorMessage,
 			logoutCurrentUser,
@@ -83,10 +83,10 @@
 					telefon: "Telefon",
 					internet: "Internet",
 					iskola: "Iskola",
-					   egyeb_kiadas: "Egyéb kiadás"
-				   }
-			   },
-			   en: {
+					egyeb_kiadas: "Egyéb kiadás"
+				}
+			},
+			en: {
 				pageTitle: "Summary",
 				heroTitle: "Summary",
 				heroText: "Income and expense summary for a selected date range.",
@@ -196,21 +196,19 @@
 		let deleteAccountConfirmArmed = false;
 		let deleteAccountConfirmTimer = null;
 
+		void initializePage();
 
-		window.addEventListener('DOMContentLoaded', () => {
-			void initializePage();
-			languageSelect.addEventListener("change", () => {
-				appLanguage = languageSelect.value;
-				shared.saveLanguage(appLanguage);
-				applyTranslations();
-				render();
-			});
-			currencySelect.addEventListener("change", () => {
-				appCurrency = currencySelect.value;
-				shared.saveCurrency(appCurrency);
-				render();
-			});
-		
+		languageSelect.addEventListener("change", () => {
+			appLanguage = languageSelect.value;
+			shared.saveLanguage(appLanguage);
+			applyTranslations();
+			render();
+		});
+
+		currencySelect.addEventListener("change", () => {
+			appCurrency = currencySelect.value;
+			shared.saveCurrency(appCurrency);
+			render();
 		});
 
 		if (periodStartInput) {
