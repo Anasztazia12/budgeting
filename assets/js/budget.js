@@ -1,1620 +1,1620 @@
-import {
-			deleteCurrentAccount,
-			getFirebaseErrorMessage,
-			loadCurrentUserData,
-			logoutCurrentUser,
-			restoreSession,
-			saveCurrentUserData
-		} from "./firebase-service.js";
+﻿import {
+	deleteCurrentAccount,
+	getFirebaseErrorMessage,
+	loadCurrentUserData,
+	logoutCurrentUser,
+	restoreSession,
+	saveCurrentUserData
+} from "./firebase-service.js";
 
-		const shared = window.BudgetAppShared;
-		const {
-			SESSION_KEY,
-			DISPLAY_NAME_KEY,
-			THEME_KEY,
-			INSTALL_STATUS_KEY
-		} = shared.KEYS;
-		const { GUEST_SESSION_VALUE } = shared;
+const shared = window.BudgetAppShared;
+const {
+	SESSION_KEY,
+	DISPLAY_NAME_KEY,
+	THEME_KEY,
+	INSTALL_STATUS_KEY
+} = shared.KEYS;
+const { GUEST_SESSION_VALUE } = shared;
 
-		const dictionary = {
-			hu: {
-				pageTitle: "Költségvetés",
-				heroTitle: "Költségvetés",
-				heroText: "Rögzítsd a várható bevételeket és kiadásokat dátum szerint.",
-				menuButton: "Menü",
-				homeLink: "Kezdőlap",
-				budgetLink: "Költségvetés",
-				summaryLink: "Összesítés",
-				themeModeLabel: "Téma",
-				versionLabel: "Verzió",
-				themeModeLight: "Világos",
-				themeModeDark: "Sötét",
-				contactUs: "Kapcsolat",
-				backAction: "Vissza",
-				downloadAppButton: "App letöltése",
-				deleteAccountButton: "Regisztráció törlése",
-				languageLabel: "Nyelv",
-				languageSelectorAria: "Nyelv választó",
-				themeSwitchAria: "Téma váltó",
-				currencySelectorAria: "Pénznem választó",
-				incomeFiltersAria: "Bevétel dátumszűrők",
-				expenseFiltersAria: "Kiadás dátumszűrők",
-				appName: "Költségvetési app",
-				currencyLabel: "Pénznem\nválasztó",
-				currencyHuf: "HUF (forint)",
-				currencyGbp: "GBP (font)",
-				currencyUsd: "USD (dollár)",
-				currencyEur: "EUR (euró)",
-				monthLabel: "Választott hónap",
-				periodLabel: "Választott időszak",
-				periodFromLabel: "-tól",
-				periodToLabel: "-ig",
-				forecastButton: "Költségvetési előrejelző",
-				saveAllButton: "Mentés",
-				saveAllDone: "A módosítások mentve.",
-				registerTitle: "Regisztráció",
-				loginTitle: "Bejelentkezés",
-				usernameLabel: "Felhasználónév",
-				emailLabel: "Email cím",
-				emailConfirmLabel: "Email cím megerősítése",
-				passwordLabel: "Jelszó",
-				passwordConfirmLabel: "Jelszó megerősítése",
-				registerButton: "Regisztrálok",
-				loginButton: "Belépés",
-				logoutButton: "Kijelentkezés",
-				loginRequired: "A rögzítéshez jelentkezz be vagy regisztrálj.",
-				incomeFormTitle: "Bevétel",
-				expenseFormTitle: "Kiadás",
-				categoryLabel: "Kategória",
-				amountLabel: "Összeg",
-				incomeDateLabel: "Mikor várható a bevétel? (dátum)",
-				expenseDateLabel: "Mikor várható a levonás? (dátum)",
-				saveIncomeButton: "Bevétel mentése",
-				saveExpenseButton: "Kiadás mentése",
-				updateIncomeButton: "Bevétel frissítése",
-				updateExpenseButton: "Kiadás frissítése",
-				noteLabel: "Megjegyzés (opcionális)",
-				notePlaceholder: "Rövid megjegyzés",
-				repeatInEveryMonthLabel: "Megjelenítés minden hónapban",
-				listFromDateLabel: "Ettől",
-				listToDateLabel: "Eddig",
-				cancelEditButton: "Szerkesztés",
-				monthlyIncomeTitle: "Bevétel",
-				monthlyExpenseTitle: "Kiadás",
-				spentToDateTitle: "Várható kiadás",
-				monthEndTitle: "Várható bevétel",
-				incomeEntriesTitle: "Bevételek listája",
-				expenseEntriesTitle: "Kiadások listája",
-				loggedOut: "Nincs bejelentkezett felhasználó.",
-				loggedIn: "Bejelentkezve:",
-				guestUser: "Vendég",
-				emailMismatch: "Az email címek nem egyeznek.",
-				passwordMismatch: "A jelszavak nem egyeznek.",
-				usernameTaken: "Ez a felhasználónév már foglalt.",
-				registerSuccess: "Sikeres regisztráció.",
-				loginSuccess: "Sikeres bejelentkezés.",
-				logoutSuccess: "Sikeres kijelentkezés.",
-				invalidLogin: "Hibás felhasználónév vagy jelszó.",
-				welcomeRegistered: "Welcome, {username}!",
-				appDownloaded: "Az app letöltve.",
-				appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
-				deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
-				loginFirst: "Először jelentkezz be.",
-				entrySaved: "A tétel elmentve.",
-				entryUpdated: "A tétel frissítve.",
-				entryDeleted: "A tétel törölve.",
-				invalidAmount: "Adj meg 0-nál nagyobb összeget.",
-				confirmDelete: "Biztosan törölni szeretnéd ezt a tételt?",
-				deleteScopeTitle: "Ismétlődő tétel törlése",
-				deleteScopeMessage: "Válaszd ki, honnan töröljük a tételt.",
-				deleteOnlyThisMonthButton: "Törlés csak ebből a hónapból",
-				deleteAllMonthsButton: "Törlés minden hónapból",
-				cancelModalButton: "Mégse",
-				confirmDeleteAllMonths: "Biztos törlöd minden hónapból?",
-				confirmDeleteThisMonth: "Biztos törlöd ebből a hónapból?",
-				emptyEntries: "Nincs rögzített tétel a megadott időszakra.",
-				exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
-				exportDone: "A CSV export letöltése elindult.",
-				editAction: "Szerkesztés",
-				deleteAction: "Törlés",
-				repeatMonthlyAction: "Megjelenít minden hónapban",
-				stopRepeatMonthlyAction: "Ismétlés kikapcsolása",
-				repeatMonthlyBadge: "Ismétlődő",
-				moreActionsLabel: "További műveletek",
-				csvType: "Típus",
-				csvCategory: "Kategória",
-				csvAmount: "Összeg",
-				csvDate: "Dátum",
-				typeIncome: "Bevétel",
-				typeExpense: "Kiadás",
-				categories: {
-					fizetes: "Fizetés",
-					egyeb: "Egyéb",
-					szamlak: "Számlák",
-					viz: "Víz",
-					gaz: "Gáz",
-					aram: "Áram",
-					auto: "Autó",
-					benzin: "Benzin",
-					elemiszer: "Élelmiszer",
-					ruhak: "Ruhák",
-					rent: "Albérlet",
-					biztositas: "Biztosítás",
-					hitelkartya: "Hitelkártya",
-					council: "Önkormányzat",
-					onkormanyzat: "Önkormányzat",
-					travel: "Travel",
-					zilch: "Zilch",
-					tv: "TV",
-					telefon: "Telefon",
-					internet: "Internet",
-					iskola: "Iskola",
-					suli: "Iskola",
-					"egyeb kiadas": "Egyéb kiadás"
-				}
-			},
-			en: {
-				pageTitle: "Budget",
-				heroTitle: "Budget",
-				heroText: "Save expected income and expenses with exact dates.",
-				menuButton: "Menu",
-				homeLink: "Home",
-				budgetLink: "Budget",
-				summaryLink: "Summary",
-				themeModeLabel: "Theme",
-				versionLabel: "Version",
-				themeModeLight: "Light",
-				themeModeDark: "Dark",
-				contactUs: "Contact us",
-				backAction: "Back",
-				downloadAppButton: "Download App",
-				deleteAccountButton: "Delete account",
-				languageLabel: "Language",
-				languageSelectorAria: "Language selector",
-				themeSwitchAria: "Theme switch",
-				currencySelectorAria: "Currency selector",
-				incomeFiltersAria: "Income date filters",
-				expenseFiltersAria: "Expense date filters",
-				appName: "Budgeting App",
-				currencyLabel: "Currency\nselector",
-				currencyHuf: "HUF (forint)",
-				currencyGbp: "GBP (pound)",
-				currencyUsd: "USD (dollar)",
-				currencyEur: "EUR (euro)",
-				monthLabel: "Selected month",
-				periodLabel: "Selected period",
-				periodFromLabel: "from",
-				periodToLabel: "to",
-				forecastButton: "Budget Forecast Planner",
-				saveAllButton: "Save",
-				saveAllDone: "Changes saved.",
-				registerTitle: "Register",
-				loginTitle: "Sign in",
-				usernameLabel: "Username",
-				emailLabel: "Email address",
-				emailConfirmLabel: "Confirm email address",
-				passwordLabel: "Password",
-				passwordConfirmLabel: "Confirm password",
-				registerButton: "Create account",
-				loginButton: "Sign in",
-				logoutButton: "Sign out",
-				loginRequired: "Please sign in or register to manage entries.",
-				incomeFormTitle: "Income",
-				expenseFormTitle: "Expenses",
-				categoryLabel: "Category",
-				amountLabel: "Amount",
-				incomeDateLabel: "Expected date",
-				expenseDateLabel: "Deduction date",
-				saveIncomeButton: "Save income",
-				saveExpenseButton: "Save expense",
-				updateIncomeButton: "Update income",
-				updateExpenseButton: "Update expense",
-				noteLabel: "Note (optional)",
-				notePlaceholder: "Short note",
-				repeatInEveryMonthLabel: "Show in every month",
-				listFromDateLabel: "From",
-				listToDateLabel: "To",
-				cancelEditButton: "Edit",
-				monthlyIncomeTitle: "Income",
-				monthlyExpenseTitle: "Expenses",
-				spentToDateTitle: "Expected expense",
-				monthEndTitle: "Expected income",
-				incomeEntriesTitle: "Income entries",
-				expenseEntriesTitle: "Expense entries",
-				loggedOut: "No user is signed in.",
-				loggedIn: "Signed in as:",
-				guestUser: "Guest",
-				emailMismatch: "Email addresses do not match.",
-				passwordMismatch: "Passwords do not match.",
-				usernameTaken: "This username is already taken.",
-				registerSuccess: "Registration successful.",
-				loginSuccess: "Signed in successfully.",
-				logoutSuccess: "Signed out successfully.",
-				invalidLogin: "Invalid username or password.",
-				welcomeRegistered: "Welcome, {username}!",
-				appDownloaded: "App downloaded.",
-				appInstallUnavailable: "App install is not available on this device right now.",
-				deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
-				loginFirst: "Please sign in first.",
-				entrySaved: "Entry saved.",
-				entryUpdated: "Entry updated.",
-				entryDeleted: "Entry deleted.",
-				invalidAmount: "Enter an amount greater than 0.",
-				confirmDelete: "Delete this entry?",
-				deleteScopeTitle: "Delete recurring entry",
-				deleteScopeMessage: "Choose where to delete this entry.",
-				deleteOnlyThisMonthButton: "Delete only from this month",
-				deleteAllMonthsButton: "Delete from all months",
-				cancelModalButton: "Cancel",
-				confirmDeleteAllMonths: "Are you sure you want to delete from all months?",
-				confirmDeleteThisMonth: "Are you sure you want to delete only from this month?",
-				emptyEntries: "No saved entries for the selected period.",
-				exportEmpty: "There are no entries to export for this month.",
-				exportDone: "CSV export started.",
-				editAction: "Edit",
-				deleteAction: "Delete",
-				repeatMonthlyAction: "Show every month",
-				stopRepeatMonthlyAction: "Stop monthly repeat",
-				repeatMonthlyBadge: "Monthly repeat",
-				moreActionsLabel: "More actions",
-				csvType: "Type",
-				csvCategory: "Category",
-				csvAmount: "Amount",
-				csvDate: "Date",
-				typeIncome: "Income",
-				typeExpense: "Expense",
-				categories: {
-					fizetes: "Salary",
-					egyeb: "Other",
-					szamlak: "Bills",
-					viz: "Water",
-					gaz: "Gas",
-					aram: "Electricity",
-					auto: "Car",
-					benzin: "Fuel",
-					elemiszer: "Groceries",
-					ruhak: "Clothes",
-					rent: "Rent",
-					biztositas: "Insurance",
-					hitelkartya: "Credit card",
-					"hitelkartya 3": "Credit card",
-					council: "Council",
-					onkormanyzat: "Municipality",
-					travel: "Travel",
-					zilch: "Zilch",
-					tv: "TV",
-					telefon: "Phone",
-					internet: "Internet",
-					iskola: "School",
-					suli: "School",
-					"egyeb kiadas": "Other expense"
-				}
-			}
-		};
+const dictionary = {
+	hu: {
+		pageTitle: "Költségvetés",
+		heroTitle: "Költségvetés",
+		heroText: "Rögzítsd a várható bevételeket és kiadásokat dátum szerint.",
+		menuButton: "Menü",
+		homeLink: "Kezdőlap",
+		budgetLink: "Költségvetés",
+		summaryLink: "Összesítés",
+		themeModeLabel: "Téma",
+		versionLabel: "Verzió",
+		themeModeLight: "Világos",
+		themeModeDark: "Sötét",
+		contactUs: "Kapcsolat",
+		backAction: "Vissza",
+		downloadAppButton: "App letöltése",
+		deleteAccountButton: "Regisztráció törlése",
+		languageLabel: "Nyelv",
+		languageSelectorAria: "Nyelv választó",
+		themeSwitchAria: "Téma váltó",
+		currencySelectorAria: "Pénznem választó",
+		incomeFiltersAria: "Bevétel dátumszűrők",
+		expenseFiltersAria: "Kiadás dátumszűrők",
+		appName: "Költségvetési app",
+		currencyLabel: "Pénznem\nválasztó",
+		currencyHuf: "HUF (forint)",
+		currencyGbp: "GBP (font)",
+		currencyUsd: "USD (dollár)",
+		currencyEur: "EUR (euró)",
+		monthLabel: "Választott hónap",
+		periodLabel: "Választott időszak",
+		periodFromLabel: "-tól",
+		periodToLabel: "-ig",
+		forecastButton: "Költségvetési előrejelző",
+		saveAllButton: "Mentés",
+		saveAllDone: "A módosítások mentve.",
+		registerTitle: "Regisztráció",
+		loginTitle: "Bejelentkezés",
+		usernameLabel: "Felhasználónév",
+		emailLabel: "Email cím",
+		emailConfirmLabel: "Email cím megerősítése",
+		passwordLabel: "Jelszó",
+		passwordConfirmLabel: "Jelszó megerősítése",
+		registerButton: "Regisztrálok",
+		loginButton: "Belépés",
+		logoutButton: "Kijelentkezés",
+		loginRequired: "A rögzítéshez jelentkezz be vagy regisztrálj.",
+		incomeFormTitle: "Bevétel",
+		expenseFormTitle: "Kiadás",
+		categoryLabel: "Kategória",
+		amountLabel: "Összeg",
+		incomeDateLabel: "Mikor várható a bevétel? (dátum)",
+		expenseDateLabel: "Mikor várható a levonás? (dátum)",
+		saveIncomeButton: "Bevétel mentése",
+		saveExpenseButton: "Kiadás mentése",
+		updateIncomeButton: "Bevétel frissítése",
+		updateExpenseButton: "Kiadás frissítése",
+		noteLabel: "Megjegyzés (opcionális)",
+		notePlaceholder: "Rövid megjegyzés",
+		repeatInEveryMonthLabel: "Megjelenítés minden hónapban",
+		listFromDateLabel: "Ettől",
+		listToDateLabel: "Eddig",
+		cancelEditButton: "Szerkesztés",
+		monthlyIncomeTitle: "Bevétel",
+		monthlyExpenseTitle: "Kiadás",
+		spentToDateTitle: "Várható kiadás",
+		monthEndTitle: "Várható bevétel",
+		incomeEntriesTitle: "Bevételek listája",
+		expenseEntriesTitle: "Kiadások listája",
+		loggedOut: "Nincs bejelentkezett felhasználó.",
+		loggedIn: "Bejelentkezve:",
+		guestUser: "Vendég",
+		emailMismatch: "Az email címek nem egyeznek.",
+		passwordMismatch: "A jelszavak nem egyeznek.",
+		usernameTaken: "Ez a felhasználónév már foglalt.",
+		registerSuccess: "Sikeres regisztráció.",
+		loginSuccess: "Sikeres bejelentkezés.",
+		logoutSuccess: "Sikeres kijelentkezés.",
+		invalidLogin: "Hibás felhasználónév vagy jelszó.",
+		welcomeRegistered: "Welcome, {username}!",
+		appDownloaded: "Az app letöltve.",
+		appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
+		deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
+		loginFirst: "Először jelentkezz be.",
+		entrySaved: "A tétel elmentve.",
+		entryUpdated: "A tétel frissítve.",
+		entryDeleted: "A tétel törölve.",
+		invalidAmount: "Adj meg 0-nál nagyobb összeget.",
+		confirmDelete: "Biztosan törölni szeretnéd ezt a tételt?",
+		deleteScopeTitle: "Ismétlődő tétel törlése",
+		deleteScopeMessage: "Válaszd ki, honnan töröljük a tételt.",
+		deleteOnlyThisMonthButton: "Törlés csak ebből a hónapból",
+		deleteAllMonthsButton: "Törlés minden hónapból",
+		cancelModalButton: "Mégse",
+		confirmDeleteAllMonths: "Biztos törlöd minden hónapból?",
+		confirmDeleteThisMonth: "Biztos törlöd ebből a hónapból?",
+		emptyEntries: "Nincs rögzített tétel a megadott időszakra.",
+		exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
+		exportDone: "A CSV export letöltése elindult.",
+		editAction: "Szerkesztés",
+		deleteAction: "Törlés",
+		repeatMonthlyAction: "Megjelenít minden hónapban",
+		stopRepeatMonthlyAction: "Ismétlés kikapcsolása",
+		repeatMonthlyBadge: "Ismétlődő",
+		moreActionsLabel: "További műveletek",
+		csvType: "Típus",
+		csvCategory: "Kategória",
+		csvAmount: "Összeg",
+		csvDate: "Dátum",
+		typeIncome: "Bevétel",
+		typeExpense: "Kiadás",
+		categories: {
+			fizetes: "Fizetés",
+			egyeb: "Egyéb",
+			szamlak: "Számlák",
+			viz: "Víz",
+			gaz: "Gáz",
+			aram: "Áram",
+			auto: "Autó",
+			benzin: "Benzin",
+			elemiszer: "Élelmiszer",
+			ruhak: "Ruhák",
+			rent: "Albérlet",
+			biztositas: "Biztosítás",
+			hitelkartya: "Hitelkártya",
+			council: "Önkormányzat",
+			onkormanyzat: "Önkormányzat",
+			travel: "Travel",
+			zilch: "Zilch",
+			tv: "TV",
+			telefon: "Telefon",
+			internet: "Internet",
+			iskola: "Iskola",
+			suli: "Iskola",
+			"egyeb kiadas": "Egyéb kiadás"
+		}
+	},
+	en: {
+		pageTitle: "Budget",
+		heroTitle: "Budget",
+		heroText: "Save expected income and expenses with exact dates.",
+		menuButton: "Menu",
+		homeLink: "Home",
+		budgetLink: "Budget",
+		summaryLink: "Summary",
+		themeModeLabel: "Theme",
+		versionLabel: "Version",
+		themeModeLight: "Light",
+		themeModeDark: "Dark",
+		contactUs: "Contact us",
+		backAction: "Back",
+		downloadAppButton: "Download App",
+		deleteAccountButton: "Delete account",
+		languageLabel: "Language",
+		languageSelectorAria: "Language selector",
+		themeSwitchAria: "Theme switch",
+		currencySelectorAria: "Currency selector",
+		incomeFiltersAria: "Income date filters",
+		expenseFiltersAria: "Expense date filters",
+		appName: "Budgeting App",
+		currencyLabel: "Currency\nselector",
+		currencyHuf: "HUF (forint)",
+		currencyGbp: "GBP (pound)",
+		currencyUsd: "USD (dollar)",
+		currencyEur: "EUR (euro)",
+		monthLabel: "Selected month",
+		periodLabel: "Selected period",
+		periodFromLabel: "from",
+		periodToLabel: "to",
+		forecastButton: "Budget Forecast Planner",
+		saveAllButton: "Save",
+		saveAllDone: "Changes saved.",
+		registerTitle: "Register",
+		loginTitle: "Sign in",
+		usernameLabel: "Username",
+		emailLabel: "Email address",
+		emailConfirmLabel: "Confirm email address",
+		passwordLabel: "Password",
+		passwordConfirmLabel: "Confirm password",
+		registerButton: "Create account",
+		loginButton: "Sign in",
+		logoutButton: "Sign out",
+		loginRequired: "Please sign in or register to manage entries.",
+		incomeFormTitle: "Income",
+		expenseFormTitle: "Expenses",
+		categoryLabel: "Category",
+		amountLabel: "Amount",
+		incomeDateLabel: "Expected date",
+		expenseDateLabel: "Deduction date",
+		saveIncomeButton: "Save income",
+		saveExpenseButton: "Save expense",
+		updateIncomeButton: "Update income",
+		updateExpenseButton: "Update expense",
+		noteLabel: "Note (optional)",
+		notePlaceholder: "Short note",
+		repeatInEveryMonthLabel: "Show in every month",
+		listFromDateLabel: "From",
+		listToDateLabel: "To",
+		cancelEditButton: "Edit",
+		monthlyIncomeTitle: "Income",
+		monthlyExpenseTitle: "Expenses",
+		spentToDateTitle: "Expected expense",
+		monthEndTitle: "Expected income",
+		incomeEntriesTitle: "Income entries",
+		expenseEntriesTitle: "Expense entries",
+		loggedOut: "No user is signed in.",
+		loggedIn: "Signed in as:",
+		guestUser: "Guest",
+		emailMismatch: "Email addresses do not match.",
+		passwordMismatch: "Passwords do not match.",
+		usernameTaken: "This username is already taken.",
+		registerSuccess: "Registration successful.",
+		loginSuccess: "Signed in successfully.",
+		logoutSuccess: "Signed out successfully.",
+		invalidLogin: "Invalid username or password.",
+		welcomeRegistered: "Welcome, {username}!",
+		appDownloaded: "App downloaded.",
+		appInstallUnavailable: "App install is not available on this device right now.",
+		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
+		loginFirst: "Please sign in first.",
+		entrySaved: "Entry saved.",
+		entryUpdated: "Entry updated.",
+		entryDeleted: "Entry deleted.",
+		invalidAmount: "Enter an amount greater than 0.",
+		confirmDelete: "Delete this entry?",
+		deleteScopeTitle: "Delete recurring entry",
+		deleteScopeMessage: "Choose where to delete this entry.",
+		deleteOnlyThisMonthButton: "Delete only from this month",
+		deleteAllMonthsButton: "Delete from all months",
+		cancelModalButton: "Cancel",
+		confirmDeleteAllMonths: "Are you sure you want to delete from all months?",
+		confirmDeleteThisMonth: "Are you sure you want to delete only from this month?",
+		emptyEntries: "No saved entries for the selected period.",
+		exportEmpty: "There are no entries to export for this month.",
+		exportDone: "CSV export started.",
+		editAction: "Edit",
+		deleteAction: "Delete",
+		repeatMonthlyAction: "Show every month",
+		stopRepeatMonthlyAction: "Stop monthly repeat",
+		repeatMonthlyBadge: "Monthly repeat",
+		moreActionsLabel: "More actions",
+		csvType: "Type",
+		csvCategory: "Category",
+		csvAmount: "Amount",
+		csvDate: "Date",
+		typeIncome: "Income",
+		typeExpense: "Expense",
+		categories: {
+			fizetes: "Salary",
+			egyeb: "Other",
+			szamlak: "Bills",
+			viz: "Water",
+			gaz: "Gas",
+			aram: "Electricity",
+			auto: "Car",
+			benzin: "Fuel",
+			elemiszer: "Groceries",
+			ruhak: "Clothes",
+			rent: "Rent",
+			biztositas: "Insurance",
+			hitelkartya: "Credit card",
+			"hitelkartya 3": "Credit card",
+			council: "Council",
+			onkormanyzat: "Municipality",
+			travel: "Travel",
+			zilch: "Zilch",
+			tv: "TV",
+			telefon: "Phone",
+			internet: "Internet",
+			iskola: "School",
+			suli: "School",
+			"egyeb kiadas": "Other expense"
+		}
+	}
+};
 
-		const today = new Date();
-		let currentUser = localStorage.getItem(SESSION_KEY) || "";
-		let currentProfile = null;
-		let appLanguage = loadLanguage();
-		let appTheme = loadTheme();
-		let appCurrency = loadCurrency();
-		let appState = { incomes: [], expenses: [] };
+const today = new Date();
+let currentUser = localStorage.getItem(SESSION_KEY) || "";
+let currentProfile = null;
+let appLanguage = loadLanguage();
+let appTheme = loadTheme();
+let appCurrency = loadCurrency();
+let appState = { incomes: [], expenses: [] };
 
-		const incomeForm = document.getElementById("income-form");
-		const expenseForm = document.getElementById("expense-form");
-		const summaryToggleButton = document.getElementById("summary-toggle-button");
-		const forecastToggleButton = document.getElementById("forecast-toggle-button");
-		const saveStateButton = document.getElementById("save-state-button");
-		const menuToggle = document.getElementById("menu-toggle");
-		const menuPanel = document.getElementById("menu-panel");
-		const contactUsButton = document.getElementById("contact-us-button");
-		const menuSessionInfo = document.getElementById("menu-session-info");
-		const menuBackButton = document.getElementById("menu-back-button");
-		const installAppButton = document.getElementById("install-app-button");
-		const deleteAccountButton = document.getElementById("delete-account-button");
-		const themeLightButton = document.getElementById("theme-light-button");
-		const themeDarkButton = document.getElementById("theme-dark-button");
-		const menuLogoutButton = document.getElementById("menu-logout-button");
-		const authMessage = document.getElementById("auth-message");
-		const budgetContent = document.getElementById("budget-content");
-		const periodStartInput = document.getElementById("period-start");
-		const periodEndInput = document.getElementById("period-end");
-		const languageSelect = document.getElementById("app-language");
-		const currencySelect = document.getElementById("app-currency");
-		const monthlyIncomeEl = document.getElementById("monthly-income");
-		const monthlyExpenseEl = document.getElementById("monthly-expense");
-		const spentToDateEl = document.getElementById("spent-to-date");
-		const monthEndLeftEl = document.getElementById("month-end-left");
-		const incomeList = document.getElementById("income-list");
-		const expenseList = document.getElementById("expense-list");
-		const incomeSubmitButton = document.getElementById("income-submit-button");
-		const expenseSubmitButton = document.getElementById("expense-submit-button");
-		const incomeCancelEdit = document.getElementById("income-edit");
-		const incomeDeleteButton = document.getElementById("income-delete");
-		const expenseCancelEdit = document.getElementById("expense-edit");
-		const expenseDeleteButton = document.getElementById("expense-delete");
-		const incomeFilterStart = document.getElementById("income-filter-start");
-		const incomeFilterEnd = document.getElementById("income-filter-end");
-		const expenseFilterStart = document.getElementById("expense-filter-start");
-		const expenseFilterEnd = document.getElementById("expense-filter-end");
-		const incomeRepeatMonthlyCheckbox = document.getElementById("income-repeat-monthly");
-		const expenseRepeatMonthlyCheckbox = document.getElementById("expense-repeat-monthly");
-		const deleteScopeModal = document.getElementById("delete-scope-modal");
-		const deleteThisMonthButton = document.getElementById("delete-this-month-btn");
-		const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
-		const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
-		let deleteScopeResolver = null;
-		let inlineDeleteConfirmResolver = null;
-		let inlineDeleteConfirmElement = null;
-		let inlineDeleteConfirmOutsideHandler = null;
-		let deferredInstallPrompt = null;
-		let deleteAccountConfirmArmed = false;
-		let deleteAccountConfirmTimer = null;
+const incomeForm = document.getElementById("income-form");
+const expenseForm = document.getElementById("expense-form");
+const summaryToggleButton = document.getElementById("summary-toggle-button");
+const forecastToggleButton = document.getElementById("forecast-toggle-button");
+const saveStateButton = document.getElementById("save-state-button");
+const menuToggle = document.getElementById("menu-toggle");
+const menuPanel = document.getElementById("menu-panel");
+const contactUsButton = document.getElementById("contact-us-button");
+const menuSessionInfo = document.getElementById("menu-session-info");
+const menuBackButton = document.getElementById("menu-back-button");
+const installAppButton = document.getElementById("install-app-button");
+const deleteAccountButton = document.getElementById("delete-account-button");
+const themeLightButton = document.getElementById("theme-light-button");
+const themeDarkButton = document.getElementById("theme-dark-button");
+const menuLogoutButton = document.getElementById("menu-logout-button");
+const authMessage = document.getElementById("auth-message");
+const budgetContent = document.getElementById("budget-content");
+const periodStartInput = document.getElementById("period-start");
+const periodEndInput = document.getElementById("period-end");
+const languageSelect = document.getElementById("app-language");
+const currencySelect = document.getElementById("app-currency");
+const monthlyIncomeEl = document.getElementById("monthly-income");
+const monthlyExpenseEl = document.getElementById("monthly-expense");
+const spentToDateEl = document.getElementById("spent-to-date");
+const monthEndLeftEl = document.getElementById("month-end-left");
+const incomeList = document.getElementById("income-list");
+const expenseList = document.getElementById("expense-list");
+const incomeSubmitButton = document.getElementById("income-submit-button");
+const expenseSubmitButton = document.getElementById("expense-submit-button");
+const incomeCancelEdit = document.getElementById("income-edit");
+const incomeDeleteButton = document.getElementById("income-delete");
+const expenseCancelEdit = document.getElementById("expense-edit");
+const expenseDeleteButton = document.getElementById("expense-delete");
+const incomeFilterStart = document.getElementById("income-filter-start");
+const incomeFilterEnd = document.getElementById("income-filter-end");
+const expenseFilterStart = document.getElementById("expense-filter-start");
+const expenseFilterEnd = document.getElementById("expense-filter-end");
+const incomeRepeatMonthlyCheckbox = document.getElementById("income-repeat-monthly");
+const expenseRepeatMonthlyCheckbox = document.getElementById("expense-repeat-monthly");
+const deleteScopeModal = document.getElementById("delete-scope-modal");
+const deleteThisMonthButton = document.getElementById("delete-this-month-btn");
+const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
+const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
+let deleteScopeResolver = null;
+let inlineDeleteConfirmResolver = null;
+let inlineDeleteConfirmElement = null;
+let inlineDeleteConfirmOutsideHandler = null;
+let deferredInstallPrompt = null;
+let deleteAccountConfirmArmed = false;
+let deleteAccountConfirmTimer = null;
 
-		void initializePage();
+void initializePage();
 
-		languageSelect.addEventListener("change", () => {
-			appLanguage = languageSelect.value;
-			saveLanguage();
-			applyTranslations();
-			render();
-		});
+languageSelect.addEventListener("change", () => {
+	appLanguage = languageSelect.value;
+	saveLanguage();
+	applyTranslations();
+	render();
+});
 
-		currencySelect.addEventListener("change", () => {
-			appCurrency = currencySelect.value;
-			saveCurrency();
-			render();
-		});
+currencySelect.addEventListener("change", () => {
+	appCurrency = currencySelect.value;
+	saveCurrency();
+	render();
+});
 
-		[periodStartInput, periodEndInput].forEach((input) => {
-			if (!input) {
-				return;
-			}
-			input.addEventListener("change", () => {
-				syncPeriodInputOrder();
-				setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
-				render();
-			});
+[periodStartInput, periodEndInput].forEach((input) => {
+	if (!input) {
+		return;
+	}
+	input.addEventListener("change", () => {
+		syncPeriodInputOrder();
+		setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
+		render();
+	});
  		});
-		[incomeFilterStart, incomeFilterEnd, expenseFilterStart, expenseFilterEnd].forEach((input) => {
-			if (!input) {
-				return;
-			}
-			input.addEventListener("change", render);
+[incomeFilterStart, incomeFilterEnd, expenseFilterStart, expenseFilterEnd].forEach((input) => {
+	if (!input) {
+		return;
+	}
+	input.addEventListener("change", render);
  		});
-		forecastToggleButton.addEventListener("click", () => {
-			const periodStart = periodStartInput?.value || toDateInput(today);
-			const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-			window.location.href = `budget-forecast.html?month=${monthParam}`;
-		});
-		if (summaryToggleButton) {
-			summaryToggleButton.addEventListener("click", () => {
-				const periodStart = periodStartInput?.value || toDateInput(today);
-				const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-				window.location.href = `monthly_budget.html?month=${monthParam}`;
-			});
-		}
+forecastToggleButton.addEventListener("click", () => {
+	const periodStart = periodStartInput?.value || toDateInput(today);
+	const monthParam = encodeURIComponent(periodStart.slice(0, 7));
+	window.location.href = `budget-forecast.html?month=${monthParam}`;
+});
+if (summaryToggleButton) {
+	summaryToggleButton.addEventListener("click", () => {
+		const periodStart = periodStartInput?.value || toDateInput(today);
+		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
+		window.location.href = `monthly_budget.html?month=${monthParam}`;
+	});
+}
 
-		if (saveStateButton) {
-			saveStateButton.addEventListener("click", () => {
-				saveState();
-				showMessage(t("saveAllDone"), false);
-			});
-		}
-		if (menuBackButton) {
-			menuBackButton.addEventListener("click", () => {
-				window.history.back();
-			});
-		}
-		if (installAppButton) {
-			installAppButton.addEventListener("click", async () => {
-				if (isAppInstalled() && !deferredInstallPrompt) {
-					showMessage(t("appDownloaded"), false);
-					return;
-				}
-
-				if (!deferredInstallPrompt) {
-					showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
-					return;
-				}
-
-				menuPanel.classList.remove("is-open");
-				menuToggle.classList.remove("is-open");
-				menuToggle.setAttribute("aria-expanded", "false");
-				deferredInstallPrompt.prompt();
-				const choice = await deferredInstallPrompt.userChoice;
-				if (choice.outcome === "accepted") {
-					localStorage.setItem(INSTALL_STATUS_KEY, "1");
-					showMessage(t("appDownloaded"), false);
-				}
-				deferredInstallPrompt = null;
-				updateInstallButtonState();
-			});
-		}
-		if (menuLogoutButton) {
-			menuLogoutButton.addEventListener("click", handleLogout);
-		}
-		if (deleteAccountButton) {
-			deleteAccountButton.addEventListener("click", handleAccountDelete);
-		}
-		if (themeLightButton) {
-			themeLightButton.addEventListener("click", () => {
-				setTheme("light");
-			});
-		}
-
-		if (themeDarkButton) {
-			themeDarkButton.addEventListener("click", () => {
-				setTheme("dark");
-			});
-		}
-		if (contactUsButton) {
-			contactUsButton.addEventListener("click", () => {
-				window.location.href = "contact.html";
-			});
-		}
-		if (incomeCancelEdit) {
-			incomeCancelEdit.addEventListener("click", resetIncomeForm);
-		}
-		if (incomeDeleteButton) {
-			incomeDeleteButton.addEventListener("click", async (event) => {
-				await handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm, event.currentTarget);
-			});
-		}
-		if (expenseCancelEdit) {
-			expenseCancelEdit.addEventListener("click", resetExpenseForm);
-		}
-		if (expenseDeleteButton) {
-			expenseDeleteButton.addEventListener("click", async (event) => {
-				await handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm, event.currentTarget);
-			});
-		}
-		if (deleteThisMonthButton) {
-			deleteThisMonthButton.addEventListener("click", () => {
-				closeDeleteScopeModal("month");
-			});
-		}
-		if (deleteAllMonthsButton) {
-			deleteAllMonthsButton.addEventListener("click", () => {
-				closeDeleteScopeModal("all");
-			});
-		}
-		if (deleteScopeCancelButton) {
-			deleteScopeCancelButton.addEventListener("click", () => {
-				closeDeleteScopeModal(null);
-			});
-		}
- 		if (deleteScopeModal) {
-			deleteScopeModal.addEventListener("click", (event) => {
-				if (event.target === deleteScopeModal) {
-					closeDeleteScopeModal(null);
-				}
-			});
-		}
-
-		menuToggle.addEventListener("click", () => {
-			const isOpen = menuPanel.classList.toggle("is-open");
-			menuToggle.classList.toggle("is-open", isOpen);
-			menuToggle.setAttribute("aria-expanded", String(isOpen));
-		});
-
-		document.addEventListener("click", (event) => {
-			if (!event.target.closest(".menu-wrap")) {
-				menuPanel.classList.remove("is-open");
-				menuToggle.classList.remove("is-open");
-				menuToggle.setAttribute("aria-expanded", "false");
-			}
-		});
-
-		document.addEventListener("keydown", (event) => {
-			if (event.key === "Escape" && inlineDeleteConfirmResolver) {
-				closeInlineDeleteConfirm(false);
-				return;
-			}
-
-			if (event.key === "Escape" && deleteScopeModal && !deleteScopeModal.classList.contains("hidden")) {
-				closeDeleteScopeModal(null);
-				return;
-			}
-
-			if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
-				menuPanel.classList.remove("is-open");
-				menuToggle.classList.remove("is-open");
-				menuToggle.setAttribute("aria-expanded", "false");
-				menuToggle.focus();
-			}
-		});
-
-		window.addEventListener("beforeinstallprompt", (event) => {
-			deferredInstallPrompt = event;
-			localStorage.setItem(INSTALL_STATUS_KEY, "0");
-			updateInstallButtonState();
-		});
-
-		window.addEventListener("appinstalled", () => {
-			localStorage.setItem(INSTALL_STATUS_KEY, "1");
-			deferredInstallPrompt = null;
+if (saveStateButton) {
+	saveStateButton.addEventListener("click", () => {
+		saveState();
+		showMessage(t("saveAllDone"), false);
+	});
+}
+if (menuBackButton) {
+	menuBackButton.addEventListener("click", () => {
+		window.history.back();
+	});
+}
+if (installAppButton) {
+	installAppButton.addEventListener("click", async () => {
+		if (isAppInstalled() && !deferredInstallPrompt) {
 			showMessage(t("appDownloaded"), false);
-			updateInstallButtonState();
+			return;
+		}
+
+		if (!deferredInstallPrompt) {
+			showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
+			return;
+		}
+
+		menuPanel.classList.remove("is-open");
+		menuToggle.classList.remove("is-open");
+		menuToggle.setAttribute("aria-expanded", "false");
+		deferredInstallPrompt.prompt();
+		const choice = await deferredInstallPrompt.userChoice;
+		if (choice.outcome === "accepted") {
+			localStorage.setItem(INSTALL_STATUS_KEY, "1");
+			showMessage(t("appDownloaded"), false);
+		}
+		deferredInstallPrompt = null;
+		updateInstallButtonState();
+	});
+}
+if (menuLogoutButton) {
+	menuLogoutButton.addEventListener("click", handleLogout);
+}
+if (deleteAccountButton) {
+	deleteAccountButton.addEventListener("click", handleAccountDelete);
+}
+if (themeLightButton) {
+	themeLightButton.addEventListener("click", () => {
+		setTheme("light");
+	});
+}
+
+if (themeDarkButton) {
+	themeDarkButton.addEventListener("click", () => {
+		setTheme("dark");
+	});
+}
+if (contactUsButton) {
+	contactUsButton.addEventListener("click", () => {
+		window.location.href = "contact.html";
+	});
+}
+if (incomeCancelEdit) {
+	incomeCancelEdit.addEventListener("click", resetIncomeForm);
+}
+if (incomeDeleteButton) {
+	incomeDeleteButton.addEventListener("click", async (event) => {
+		await handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm, event.currentTarget);
+	});
+}
+if (expenseCancelEdit) {
+	expenseCancelEdit.addEventListener("click", resetExpenseForm);
+}
+if (expenseDeleteButton) {
+	expenseDeleteButton.addEventListener("click", async (event) => {
+		await handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm, event.currentTarget);
+	});
+}
+if (deleteThisMonthButton) {
+	deleteThisMonthButton.addEventListener("click", () => {
+		closeDeleteScopeModal("month");
+	});
+}
+if (deleteAllMonthsButton) {
+	deleteAllMonthsButton.addEventListener("click", () => {
+		closeDeleteScopeModal("all");
+	});
+}
+if (deleteScopeCancelButton) {
+	deleteScopeCancelButton.addEventListener("click", () => {
+		closeDeleteScopeModal(null);
+	});
+}
+ 		if (deleteScopeModal) {
+	deleteScopeModal.addEventListener("click", (event) => {
+		if (event.target === deleteScopeModal) {
+			closeDeleteScopeModal(null);
+		}
+	});
+}
+
+menuToggle.addEventListener("click", () => {
+	const isOpen = menuPanel.classList.toggle("is-open");
+	menuToggle.classList.toggle("is-open", isOpen);
+	menuToggle.setAttribute("aria-expanded", String(isOpen));
+});
+
+document.addEventListener("click", (event) => {
+	if (!event.target.closest(".menu-wrap")) {
+		menuPanel.classList.remove("is-open");
+		menuToggle.classList.remove("is-open");
+		menuToggle.setAttribute("aria-expanded", "false");
+	}
+});
+
+document.addEventListener("keydown", (event) => {
+	if (event.key === "Escape" && inlineDeleteConfirmResolver) {
+		closeInlineDeleteConfirm(false);
+		return;
+	}
+
+	if (event.key === "Escape" && deleteScopeModal && !deleteScopeModal.classList.contains("hidden")) {
+		closeDeleteScopeModal(null);
+		return;
+	}
+
+	if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
+		menuPanel.classList.remove("is-open");
+		menuToggle.classList.remove("is-open");
+		menuToggle.setAttribute("aria-expanded", "false");
+		menuToggle.focus();
+	}
+});
+
+window.addEventListener("beforeinstallprompt", (event) => {
+	deferredInstallPrompt = event;
+	localStorage.setItem(INSTALL_STATUS_KEY, "0");
+	updateInstallButtonState();
+});
+
+window.addEventListener("appinstalled", () => {
+	localStorage.setItem(INSTALL_STATUS_KEY, "1");
+	deferredInstallPrompt = null;
+	showMessage(t("appDownloaded"), false);
+	updateInstallButtonState();
+});
+
+if ("serviceWorker" in navigator) {
+	window.addEventListener("load", () => {
+		navigator.serviceWorker.register("sw.js").catch(() => {
+			// Service worker errors should not block usage.
 		});
+	});
+}
 
-		if ("serviceWorker" in navigator) {
-			window.addEventListener("load", () => {
-				navigator.serviceWorker.register("sw.js").catch(() => {
-					// Service worker errors should not block usage.
-				});
-			});
-		}
+incomeForm.addEventListener("submit", (event) => {
+	event.preventDefault();
+	if (!requireLogin()) {
+		return;
+	}
 
-		incomeForm.addEventListener("submit", (event) => {
-			event.preventDefault();
-			if (!requireLogin()) {
-				return;
-			}
+	const entry = buildEntryFromForm("income");
+	if (!entry.amount) {
+		showMessage(t("invalidAmount"), true);
+		return;
+	}
+	const editId = document.getElementById("income-edit-id").value;
 
-			const entry = buildEntryFromForm("income");
-			if (!entry.amount) {
-				showMessage(t("invalidAmount"), true);
-				return;
-			}
-			const editId = document.getElementById("income-edit-id").value;
-
-			if (editId) {
-				const existingEntry = appState.incomes.find((item) => item.id === editId);
-				upsertEntry("incomes", {
-					...entry,
-					id: editId,
-					repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
-					excludedMonths: Boolean(incomeRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
-				});
-				showMessage(t("entryUpdated"), false);
-			} else {
-				upsertEntry("incomes", {
-					...entry,
-					id: createEntryId(),
-					repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
-					excludedMonths: []
-				});
-				showMessage(t("entrySaved"), false);
-			}
-
-			saveState();
-			resetIncomeForm();
-			render();
+	if (editId) {
+		const existingEntry = appState.incomes.find((item) => item.id === editId);
+		upsertEntry("incomes", {
+			...entry,
+			id: editId,
+			repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
+			excludedMonths: Boolean(incomeRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
 		});
-
-		expenseForm.addEventListener("submit", (event) => {
-			event.preventDefault();
-			if (!requireLogin()) {
-				return;
-			}
-
-			const entry = buildEntryFromForm("expense");
-			if (!entry.amount) {
-				showMessage(t("invalidAmount"), true);
-				return;
-			}
-			const editId = document.getElementById("expense-edit-id").value;
-
-			if (editId) {
-				const existingEntry = appState.expenses.find((item) => item.id === editId);
-				upsertEntry("expenses", {
-					...entry,
-					id: editId,
-					repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
-					excludedMonths: Boolean(expenseRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
-				});
-				showMessage(t("entryUpdated"), false);
-			} else {
-				upsertEntry("expenses", {
-					...entry,
-					id: createEntryId(),
-					repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
-					excludedMonths: []
-				});
-				showMessage(t("entrySaved"), false);
-			}
-
-			saveState();
-			resetExpenseForm();
-			render();
+		showMessage(t("entryUpdated"), false);
+	} else {
+		upsertEntry("incomes", {
+			...entry,
+			id: createEntryId(),
+			repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
+			excludedMonths: []
 		});
+		showMessage(t("entrySaved"), false);
+	}
 
-		incomeList.addEventListener("click", async (event) => {
-			await handleEntryAction(event, "incomes");
+	saveState();
+	resetIncomeForm();
+	render();
+});
+
+expenseForm.addEventListener("submit", (event) => {
+	event.preventDefault();
+	if (!requireLogin()) {
+		return;
+	}
+
+	const entry = buildEntryFromForm("expense");
+	if (!entry.amount) {
+		showMessage(t("invalidAmount"), true);
+		return;
+	}
+	const editId = document.getElementById("expense-edit-id").value;
+
+	if (editId) {
+		const existingEntry = appState.expenses.find((item) => item.id === editId);
+		upsertEntry("expenses", {
+			...entry,
+			id: editId,
+			repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
+			excludedMonths: Boolean(expenseRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
 		});
-
-		incomeList.addEventListener("change", async (event) => {
-			await handleEntryAction(event, "incomes");
+		showMessage(t("entryUpdated"), false);
+	} else {
+		upsertEntry("expenses", {
+			...entry,
+			id: createEntryId(),
+			repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
+			excludedMonths: []
 		});
+		showMessage(t("entrySaved"), false);
+	}
 
-		expenseList.addEventListener("click", async (event) => {
-			await handleEntryAction(event, "expenses");
-		});
+	saveState();
+	resetExpenseForm();
+	render();
+});
 
-		expenseList.addEventListener("change", async (event) => {
-			await handleEntryAction(event, "expenses");
-		});
+incomeList.addEventListener("click", async (event) => {
+	await handleEntryAction(event, "incomes");
+});
 
-		async function initializePage() {
-			if (currentUser === GUEST_SESSION_VALUE) {
-				appState = loadGuestData();
-			} else {
-				const session = await restoreSession(currentUser);
-				if (!session) {
-					window.location.href = "index.html";
-					return;
-				}
+incomeList.addEventListener("change", async (event) => {
+	await handleEntryAction(event, "incomes");
+});
 
-				applyAuthenticatedState(session);
-				appState = session.data || await loadCurrentUserData();
-			}
+expenseList.addEventListener("click", async (event) => {
+	await handleEntryAction(event, "expenses");
+});
 
-			applyTheme();
-			syncThemeButtons();
-			setDefaultPeriodRange();
-			setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
-			languageSelect.value = appLanguage;
-			currencySelect.value = appCurrency;
-			resetIncomeForm();
-			resetExpenseForm();
-			applyTranslations();
-			updateAccessUI();
-			updateInstallButtonState();
-			render();
-			const flashMessage = shared.consumeFlashMessage();
-			if (flashMessage) {
-				showMessage(flashMessage.message, flashMessage.isError);
-			}
+expenseList.addEventListener("change", async (event) => {
+	await handleEntryAction(event, "expenses");
+});
+
+async function initializePage() {
+	if (currentUser === GUEST_SESSION_VALUE) {
+		appState = loadGuestData();
+	} else {
+		const session = await restoreSession(currentUser);
+		if (!session) {
+			window.location.href = "index.html";
+			return;
 		}
 
-		function applyTranslations() {
-			document.documentElement.lang = appLanguage;
-			document.title = t("pageTitle");
-			document.querySelectorAll("[data-i18n]").forEach((element) => {
-				element.textContent = t(element.dataset.i18n);
-			});
-			menuToggle.setAttribute("aria-label", t("menuButton"));
-			document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-				element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
-			});
-			document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
-				element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
-			});
+		applyAuthenticatedState(session);
+		appState = session.data || await loadCurrentUserData();
+	}
 
-			document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
-				if (option.value === "__separator__") {
-					return;
-				}
-				option.textContent = translateCategory(option.value);
-			});
+	applyTheme();
+	syncThemeButtons();
+	setDefaultPeriodRange();
+	setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
+	languageSelect.value = appLanguage;
+	currencySelect.value = appCurrency;
+	resetIncomeForm();
+	resetExpenseForm();
+	applyTranslations();
+	updateAccessUI();
+	updateInstallButtonState();
+	render();
+	const flashMessage = shared.consumeFlashMessage();
+	if (flashMessage) {
+		showMessage(flashMessage.message, flashMessage.isError);
+	}
+}
 
-			sortExpenseCategoryOptions();
+function applyTranslations() {
+	document.documentElement.lang = appLanguage;
+	document.title = t("pageTitle");
+	document.querySelectorAll("[data-i18n]").forEach((element) => {
+		element.textContent = t(element.dataset.i18n);
+	});
+	menuToggle.setAttribute("aria-label", t("menuButton"));
+	document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+		element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
+	});
+	document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+		element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+	});
 
-			updateFormButtonLabels();
-			updateMenuSessionLabel();
+	document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
+		if (option.value === "__separator__") {
+			return;
 		}
+		option.textContent = translateCategory(option.value);
+	});
 
-		function updateMenuSessionLabel() {
-			if (!menuSessionInfo) {
-				return;
-			}
+	sortExpenseCategoryOptions();
 
-			if (!currentUser) {
-				menuSessionInfo.textContent = t("loggedOut");
-				return;
-			}
+	updateFormButtonLabels();
+	updateMenuSessionLabel();
+}
 
-			const name = getSignedInDisplayName();
-			menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
-		}
+function updateMenuSessionLabel() {
+	if (!menuSessionInfo) {
+		return;
+	}
 
-		function getSignedInDisplayName() {
-			if (!currentUser) {
-				return t("guestUser");
-			}
-			if (currentUser === GUEST_SESSION_VALUE) {
-				return t("guestUser");
-			}
+	if (!currentUser) {
+		menuSessionInfo.textContent = t("loggedOut");
+		return;
+	}
 
-			return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
-		}
+	const name = getSignedInDisplayName();
+	menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
+}
 
-		function sortExpenseCategoryOptions() {
-			const expenseCategorySelect = document.getElementById("expense-category");
-			if (!expenseCategorySelect) {
-				return;
-			}
+function getSignedInDisplayName() {
+	if (!currentUser) {
+		return t("guestUser");
+	}
+	if (currentUser === GUEST_SESSION_VALUE) {
+		return t("guestUser");
+	}
 
-			const selectedValue = expenseCategorySelect.value;
-			const options = Array.from(expenseCategorySelect.options);
-			const regularOptions = options
-				.filter((option) => option.value !== "egyeb kiadas" && option.value !== "__separator__")
-				.sort((left, right) => {
-				const leftLabel = translateCategory(left.value);
-				const rightLabel = translateCategory(right.value);
-				return leftLabel.localeCompare(rightLabel, appLanguage, { sensitivity: "base" });
-			});
-			const otherExpenseOption = options.find((option) => option.value === "egyeb kiadas") || null;
-			const separatorOption = options.find((option) => option.value === "__separator__") || null;
+	return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
+}
 
-			expenseCategorySelect.innerHTML = "";
-			regularOptions.forEach((option) => {
-				expenseCategorySelect.appendChild(option);
-			});
+function sortExpenseCategoryOptions() {
+	const expenseCategorySelect = document.getElementById("expense-category");
+	if (!expenseCategorySelect) {
+		return;
+	}
 
-			if (otherExpenseOption) {
-				const divider = separatorOption || document.createElement("option");
-				divider.value = "__separator__";
-				divider.disabled = true;
-				divider.textContent = "──────────";
-				expenseCategorySelect.appendChild(divider);
-				expenseCategorySelect.appendChild(otherExpenseOption);
-			}
+	const selectedValue = expenseCategorySelect.value;
+	const options = Array.from(expenseCategorySelect.options);
+	const regularOptions = options
+		.filter((option) => option.value !== "egyeb kiadas" && option.value !== "__separator__")
+		.sort((left, right) => {
+		const leftLabel = translateCategory(left.value);
+		const rightLabel = translateCategory(right.value);
+		return leftLabel.localeCompare(rightLabel, appLanguage, { sensitivity: "base" });
+	});
+	const otherExpenseOption = options.find((option) => option.value === "egyeb kiadas") || null;
+	const separatorOption = options.find((option) => option.value === "__separator__") || null;
 
-			expenseCategorySelect.value = selectedValue;
-			if (expenseCategorySelect.value === "__separator__") {
-				expenseCategorySelect.selectedIndex = 0;
-			}
-		}
+	expenseCategorySelect.innerHTML = "";
+	regularOptions.forEach((option) => {
+		expenseCategorySelect.appendChild(option);
+	});
 
-		function render() {
-			if (inlineDeleteConfirmResolver) {
-				closeInlineDeleteConfirm(false);
-			}
+	if (otherExpenseOption) {
+		const divider = separatorOption || document.createElement("option");
+		divider.value = "__separator__";
+		divider.disabled = true;
+		divider.textContent = "──────────";
+		expenseCategorySelect.appendChild(divider);
+		expenseCategorySelect.appendChild(otherExpenseOption);
+	}
 
-			if (!currentUser) {
-				monthlyIncomeEl.textContent = formatCurrency(0);
-				monthlyExpenseEl.textContent = formatCurrency(0);
-				spentToDateEl.textContent = formatCurrency(0);
-				monthEndLeftEl.textContent = formatCurrency(0);
-				paintList(incomeList, []);
-				paintList(expenseList, []);
-				return;
-			}
+	expenseCategorySelect.value = selectedValue;
+	if (expenseCategorySelect.value === "__separator__") {
+		expenseCategorySelect.selectedIndex = 0;
+	}
+}
 
-			const selectedPeriod = getDateRange(periodStartInput?.value, periodEndInput?.value);
-			const todayText = toDateInput(new Date());
-			const anchorMonth = (selectedPeriod.start || selectedPeriod.end || toDateInput(today)).slice(0, 7);
-			const incomes = entriesForListByDateRange(appState.incomes, selectedPeriod.start, selectedPeriod.end, anchorMonth);
-			const expenses = entriesForListByDateRange(appState.expenses, selectedPeriod.start, selectedPeriod.end, anchorMonth);
-			const incomeRange = getDateRange(incomeFilterStart?.value, incomeFilterEnd?.value);
-			const expenseRange = getDateRange(expenseFilterStart?.value, expenseFilterEnd?.value);
-			const filteredIncomes = entriesForListByDateRange(appState.incomes, incomeRange.start, incomeRange.end, anchorMonth);
-			const filteredExpenses = entriesForListByDateRange(appState.expenses, expenseRange.start, expenseRange.end, anchorMonth);
+function render() {
+	if (inlineDeleteConfirmResolver) {
+		closeInlineDeleteConfirm(false);
+	}
 
-			monthlyIncomeEl.textContent = formatCurrency(sumEntries(incomes));
-			monthlyExpenseEl.textContent = formatCurrency(sumEntries(expenses));
-			spentToDateEl.textContent = formatCurrency(sumEntries(expenses.filter((item) => item.date <= todayText)));
-			monthEndLeftEl.textContent = formatCurrency(sumEntries(incomes) - sumEntries(expenses));
+	if (!currentUser) {
+		monthlyIncomeEl.textContent = formatCurrency(0);
+		monthlyExpenseEl.textContent = formatCurrency(0);
+		spentToDateEl.textContent = formatCurrency(0);
+		monthEndLeftEl.textContent = formatCurrency(0);
+		paintList(incomeList, []);
+		paintList(expenseList, []);
+		return;
+	}
 
-			paintList(incomeList, filteredIncomes, "incomes");
-			paintList(expenseList, filteredExpenses, "expenses");
-		}
+	const selectedPeriod = getDateRange(periodStartInput?.value, periodEndInput?.value);
+	const todayText = toDateInput(new Date());
+	const anchorMonth = (selectedPeriod.start || selectedPeriod.end || toDateInput(today)).slice(0, 7);
+	const incomes = entriesForListByDateRange(appState.incomes, selectedPeriod.start, selectedPeriod.end, anchorMonth);
+	const expenses = entriesForListByDateRange(appState.expenses, selectedPeriod.start, selectedPeriod.end, anchorMonth);
+	const incomeRange = getDateRange(incomeFilterStart?.value, incomeFilterEnd?.value);
+	const expenseRange = getDateRange(expenseFilterStart?.value, expenseFilterEnd?.value);
+	const filteredIncomes = entriesForListByDateRange(appState.incomes, incomeRange.start, incomeRange.end, anchorMonth);
+	const filteredExpenses = entriesForListByDateRange(appState.expenses, expenseRange.start, expenseRange.end, anchorMonth);
 
-		function paintList(target, entries, listType) {
-			target.innerHTML = "";
+	monthlyIncomeEl.textContent = formatCurrency(sumEntries(incomes));
+	monthlyExpenseEl.textContent = formatCurrency(sumEntries(expenses));
+	spentToDateEl.textContent = formatCurrency(sumEntries(expenses.filter((item) => item.date <= todayText)));
+	monthEndLeftEl.textContent = formatCurrency(sumEntries(incomes) - sumEntries(expenses));
 
-			if (!entries.length) {
-				const li = document.createElement("li");
-				li.className = "empty";
-				li.textContent = t("emptyEntries");
-				target.appendChild(li);
-				return;
-			}
+	paintList(incomeList, filteredIncomes, "incomes");
+	paintList(expenseList, filteredExpenses, "expenses");
+}
 
-			entries
-				.slice()
-				.sort((left, right) => left.date.localeCompare(right.date))
-				.forEach((entry) => {
-					const li = document.createElement("li");
-					li.className = "entry-row";
-					const inlineNoteText = entry.note ? `<span class="entry-note-inline">(${escapeHtml(entry.note)})</span>` : "";
-					const recurringBadge = entry.repeatMonthly ? `<span class="entry-repeat-badge">${t("repeatMonthlyBadge")}</span>` : "";
-					const repeatChecked = entry.repeatMonthly ? "checked" : "";
-					li.innerHTML = `
-						<div class="entry-main-row entry-main-row-top">
-							<div class="entry-heading">
-								<strong>${translateCategory(entry.category)}</strong>
-								<span class="entry-date">${formatDisplayDate(entry.date)}</span>
-							</div>
-							<div class="entry-repeat-controls">
-								${recurringBadge}
-								<label class="entry-repeat-toggle">
-									<input type="checkbox" data-action="toggle-repeat-monthly" data-id="${entry.id}" data-date="${entry.date}" ${repeatChecked}>
-									<span>${t("repeatMonthlyAction")}</span>
-								</label>
-							</div>
-						</div>
-						<div class="entry-main-row entry-main-row-bottom">
-							<span class="entry-amount">${formatCurrency(entry.amount)} ${inlineNoteText}</span>
-							<div class="row-actions row-actions-icons">
-								<button type="button" class="inline-icon-button" title="${t("editAction")}" aria-label="${t("editAction")}" data-action="edit" data-id="${entry.id}">✎</button>
-								<button type="button" class="inline-icon-button danger" title="${t("deleteAction")}" aria-label="${t("deleteAction")}" data-action="delete" data-id="${entry.id}" data-date="${entry.date}">✖</button>
-							</div>
-							</div>
-						</div>
-					`;
-					target.appendChild(li);
-				});
-		}
+function paintList(target, entries, listType) {
+	target.innerHTML = "";
 
-		async function handleEntryAction(event, listType) {
-			const actionTarget = event.target.closest("[data-action]");
-			if (!actionTarget) {
-				return;
-			}
+	if (!entries.length) {
+		const li = document.createElement("li");
+		li.className = "empty";
+		li.textContent = t("emptyEntries");
+		target.appendChild(li);
+		return;
+	}
 
-			const entryId = actionTarget.dataset.id;
-			const clickedDate = actionTarget.dataset.date || "";
-			const action = actionTarget.dataset.action;
-			const entry = appState[listType].find((item) => item.id === entryId);
-
-			if (!entry) {
-				return;
-			}
-
-			if (action === "edit") {
-				populateFormForEdit(listType, entry);
-				return;
-			}
-
-			if (action === "toggle-repeat-monthly") {
-				entry.repeatMonthly = actionTarget instanceof HTMLInputElement
-					? actionTarget.checked
-					: !entry.repeatMonthly;
-				if (entry.repeatMonthly) {
-					entry.excludedMonths = [];
-				}
-				saveState();
-				render();
-				return;
-			}
-
-			if (action === "delete") {
-				if (!(await handleEntryDelete(listType, entryId, clickedDate, actionTarget))) {
-					return;
-				}
-				if (listType === "incomes") {
-					resetIncomeForm();
-				} else {
-					resetExpenseForm();
-				}
-				showMessage(t("entryDeleted"), false);
-				render();
-			}
-		}
-
-		async function handleEntryDelete(listType, entryId, clickedDate, triggerElement) {
-			const entry = appState[listType].find((item) => item.id === entryId);
-			if (!entry) {
-				return false;
-			}
-
-			if (!entry.repeatMonthly) {
-				const isConfirmed = await openInlineDeleteConfirm(triggerElement, t("confirmDelete"));
-				if (!isConfirmed) {
-					return false;
-				}
-				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
-				saveState();
-				return true;
-			}
-
-			const scope = await openDeleteScopeModal();
-			if (!scope) {
-				return false;
-			}
-
-			if (scope === "all") {
-				appState[listType] = appState[listType].filter((item) => item.id !== entryId);
-				saveState();
-				return true;
-			}
-
-			if (scope === "month") {
-				const monthToExclude = (clickedDate || entry.date || "").slice(0, 7);
-				if (/^\d{4}-\d{2}$/.test(monthToExclude)) {
-					const excludedMonths = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
-					if (!excludedMonths.includes(monthToExclude)) {
-						excludedMonths.push(monthToExclude);
-					}
-					entry.excludedMonths = excludedMonths;
-					saveState();
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		function openDeleteScopeModal() {
-			if (!deleteScopeModal) {
-				return Promise.resolve(null);
-			}
-
-			if (inlineDeleteConfirmResolver) {
-				closeInlineDeleteConfirm(false);
-			}
-
-			deleteScopeModal.classList.remove("hidden");
-			if (deleteThisMonthButton) {
-				deleteThisMonthButton.focus();
-			}
-
-			return new Promise((resolve) => {
-				deleteScopeResolver = resolve;
-			});
-		}
-
-		function closeDeleteScopeModal(choice) {
-			if (deleteScopeModal) {
-				deleteScopeModal.classList.add("hidden");
-			}
-			if (deleteScopeResolver) {
-				const resolver = deleteScopeResolver;
-				deleteScopeResolver = null;
-				resolver(choice);
-			}
-		}
-
-		function openInlineDeleteConfirm(anchorElement, message) {
-			if (!anchorElement || !document.body) {
-				return Promise.resolve(false);
-			}
-
-			if (inlineDeleteConfirmResolver) {
-				closeInlineDeleteConfirm(false);
-			}
-
-			const popover = document.createElement("div");
-			popover.className = "inline-delete-confirm";
-			popover.setAttribute("role", "alertdialog");
-			popover.innerHTML = `
-				<p>${escapeHtml(message)}</p>
-				<div class="inline-delete-confirm-actions">
-					<button type="button" class="btn btn-danger">${escapeHtml(t("deleteAction"))}</button>
-					<button type="button" class="btn btn-outline-info">${escapeHtml(t("cancelModalButton"))}</button>
+	entries
+		.slice()
+		.sort((left, right) => left.date.localeCompare(right.date))
+		.forEach((entry) => {
+			const li = document.createElement("li");
+			li.className = "entry-row";
+			const inlineNoteText = entry.note ? `<span class="entry-note-inline">(${escapeHtml(entry.note)})</span>` : "";
+			const recurringBadge = entry.repeatMonthly ? `<span class="entry-repeat-badge">${t("repeatMonthlyBadge")}</span>` : "";
+			const repeatChecked = entry.repeatMonthly ? "checked" : "";
+			li.innerHTML = `
+				<div class="entry-main-row entry-main-row-top">
+					<div class="entry-heading">
+						<strong>${translateCategory(entry.category)}</strong>
+						<span class="entry-date">${formatDisplayDate(entry.date)}</span>
+					</div>
+					<div class="entry-repeat-controls">
+						${recurringBadge}
+						<label class="entry-repeat-toggle">
+							<input type="checkbox" data-action="toggle-repeat-monthly" data-id="${entry.id}" data-date="${entry.date}" ${repeatChecked}>
+							<span>${t("repeatMonthlyAction")}</span>
+						</label>
+					</div>
+				</div>
+				<div class="entry-main-row entry-main-row-bottom">
+					<span class="entry-amount">${formatCurrency(entry.amount)} ${inlineNoteText}</span>
+					<div class="row-actions row-actions-icons">
+						<button type="button" class="inline-icon-button" title="${t("editAction")}" aria-label="${t("editAction")}" data-action="edit" data-id="${entry.id}">✎</button>
+						<button type="button" class="inline-icon-button danger" title="${t("deleteAction")}" aria-label="${t("deleteAction")}" data-action="delete" data-id="${entry.id}" data-date="${entry.date}">✖</button>
+					</div>
+					</div>
 				</div>
 			`;
+			target.appendChild(li);
+		});
+}
 
-			document.body.appendChild(popover);
-			inlineDeleteConfirmElement = popover;
+async function handleEntryAction(event, listType) {
+	const actionTarget = event.target.closest("[data-action]");
+	if (!actionTarget) {
+		return;
+	}
 
-			const isSmallScreen = window.matchMedia("(max-width: 760px)").matches;
-			if (isSmallScreen) {
-				popover.classList.add("is-mobile");
-			} else {
-				const rect = anchorElement.getBoundingClientRect();
-				const top = window.scrollY + rect.top - popover.offsetHeight - 8;
-				const preferredLeft = window.scrollX + rect.right + 10;
-				const maxLeft = window.scrollX + window.innerWidth - popover.offsetWidth - 10;
-				const safeTop = Math.max(window.scrollY + 10, top);
-				const safeLeft = Math.max(window.scrollX + 10, Math.min(preferredLeft, maxLeft));
-				popover.style.top = `${safeTop}px`;
-				popover.style.left = `${safeLeft}px`;
+	const entryId = actionTarget.dataset.id;
+	const clickedDate = actionTarget.dataset.date || "";
+	const action = actionTarget.dataset.action;
+	const entry = appState[listType].find((item) => item.id === entryId);
+
+	if (!entry) {
+		return;
+	}
+
+	if (action === "edit") {
+		populateFormForEdit(listType, entry);
+		return;
+	}
+
+	if (action === "toggle-repeat-monthly") {
+		entry.repeatMonthly = actionTarget instanceof HTMLInputElement
+			? actionTarget.checked
+			: !entry.repeatMonthly;
+		if (entry.repeatMonthly) {
+			entry.excludedMonths = [];
+		}
+		saveState();
+		render();
+		return;
+	}
+
+	if (action === "delete") {
+		if (!(await handleEntryDelete(listType, entryId, clickedDate, actionTarget))) {
+			return;
+		}
+		if (listType === "incomes") {
+			resetIncomeForm();
+		} else {
+			resetExpenseForm();
+		}
+		showMessage(t("entryDeleted"), false);
+		render();
+	}
+}
+
+async function handleEntryDelete(listType, entryId, clickedDate, triggerElement) {
+	const entry = appState[listType].find((item) => item.id === entryId);
+	if (!entry) {
+		return false;
+	}
+
+	if (!entry.repeatMonthly) {
+		const isConfirmed = await openInlineDeleteConfirm(triggerElement, t("confirmDelete"));
+		if (!isConfirmed) {
+			return false;
+		}
+		appState[listType] = appState[listType].filter((item) => item.id !== entryId);
+		saveState();
+		return true;
+	}
+
+	const scope = await openDeleteScopeModal();
+	if (!scope) {
+		return false;
+	}
+
+	if (scope === "all") {
+		appState[listType] = appState[listType].filter((item) => item.id !== entryId);
+		saveState();
+		return true;
+	}
+
+	if (scope === "month") {
+		const monthToExclude = (clickedDate || entry.date || "").slice(0, 7);
+		if (/^\d{4}-\d{2}$/.test(monthToExclude)) {
+			const excludedMonths = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
+			if (!excludedMonths.includes(monthToExclude)) {
+				excludedMonths.push(monthToExclude);
 			}
+			entry.excludedMonths = excludedMonths;
+			saveState();
+			return true;
+		}
+	}
 
-			const buttons = popover.querySelectorAll("button");
-			const confirmButton = buttons[0];
-			const cancelButton = buttons[1];
+	return false;
+}
 
-			confirmButton?.addEventListener("click", () => closeInlineDeleteConfirm(true));
-			cancelButton?.addEventListener("click", () => closeInlineDeleteConfirm(false));
+function openDeleteScopeModal() {
+	if (!deleteScopeModal) {
+		return Promise.resolve(null);
+	}
 
-			inlineDeleteConfirmOutsideHandler = (event) => {
-				if (!inlineDeleteConfirmElement) {
-					return;
-				}
-				const clickedInsidePopover = inlineDeleteConfirmElement.contains(event.target);
-				const clickedAnchor = anchorElement.contains(event.target);
-				if (!clickedInsidePopover && !clickedAnchor) {
-					closeInlineDeleteConfirm(false);
-				}
-			};
-			document.addEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+	if (inlineDeleteConfirmResolver) {
+		closeInlineDeleteConfirm(false);
+	}
 
-			confirmButton?.focus();
+	deleteScopeModal.classList.remove("hidden");
+	if (deleteThisMonthButton) {
+		deleteThisMonthButton.focus();
+	}
 
-			return new Promise((resolve) => {
-				inlineDeleteConfirmResolver = resolve;
-			});
+	return new Promise((resolve) => {
+		deleteScopeResolver = resolve;
+	});
+}
+
+function closeDeleteScopeModal(choice) {
+	if (deleteScopeModal) {
+		deleteScopeModal.classList.add("hidden");
+	}
+	if (deleteScopeResolver) {
+		const resolver = deleteScopeResolver;
+		deleteScopeResolver = null;
+		resolver(choice);
+	}
+}
+
+function openInlineDeleteConfirm(anchorElement, message) {
+	if (!anchorElement || !document.body) {
+		return Promise.resolve(false);
+	}
+
+	if (inlineDeleteConfirmResolver) {
+		closeInlineDeleteConfirm(false);
+	}
+
+	const popover = document.createElement("div");
+	popover.className = "inline-delete-confirm";
+	popover.setAttribute("role", "alertdialog");
+	popover.innerHTML = `
+		<p>${escapeHtml(message)}</p>
+		<div class="inline-delete-confirm-actions">
+			<button type="button" class="btn btn-danger">${escapeHtml(t("deleteAction"))}</button>
+			<button type="button" class="btn btn-outline-info">${escapeHtml(t("cancelModalButton"))}</button>
+		</div>
+	`;
+
+	document.body.appendChild(popover);
+	inlineDeleteConfirmElement = popover;
+
+	const isSmallScreen = window.matchMedia("(max-width: 760px)").matches;
+	if (isSmallScreen) {
+		popover.classList.add("is-mobile");
+	} else {
+		const rect = anchorElement.getBoundingClientRect();
+		const top = window.scrollY + rect.top - popover.offsetHeight - 8;
+		const preferredLeft = window.scrollX + rect.right + 10;
+		const maxLeft = window.scrollX + window.innerWidth - popover.offsetWidth - 10;
+		const safeTop = Math.max(window.scrollY + 10, top);
+		const safeLeft = Math.max(window.scrollX + 10, Math.min(preferredLeft, maxLeft));
+		popover.style.top = `${safeTop}px`;
+		popover.style.left = `${safeLeft}px`;
+	}
+
+	const buttons = popover.querySelectorAll("button");
+	const confirmButton = buttons[0];
+	const cancelButton = buttons[1];
+
+	confirmButton?.addEventListener("click", () => closeInlineDeleteConfirm(true));
+	cancelButton?.addEventListener("click", () => closeInlineDeleteConfirm(false));
+
+	inlineDeleteConfirmOutsideHandler = (event) => {
+		if (!inlineDeleteConfirmElement) {
+			return;
+		}
+		const clickedInsidePopover = inlineDeleteConfirmElement.contains(event.target);
+		const clickedAnchor = anchorElement.contains(event.target);
+		if (!clickedInsidePopover && !clickedAnchor) {
+			closeInlineDeleteConfirm(false);
+		}
+	};
+	document.addEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+
+	confirmButton?.focus();
+
+	return new Promise((resolve) => {
+		inlineDeleteConfirmResolver = resolve;
+	});
+}
+
+function closeInlineDeleteConfirm(confirmed) {
+	if (inlineDeleteConfirmOutsideHandler) {
+		document.removeEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+		inlineDeleteConfirmOutsideHandler = null;
+	}
+
+	if (inlineDeleteConfirmElement) {
+		inlineDeleteConfirmElement.remove();
+		inlineDeleteConfirmElement = null;
+	}
+
+	if (inlineDeleteConfirmResolver) {
+		const resolver = inlineDeleteConfirmResolver;
+		inlineDeleteConfirmResolver = null;
+		resolver(Boolean(confirmed));
+	}
+}
+
+function populateFormForEdit(listType, entry) {
+	let focusField = null;
+
+	if (listType === "incomes") {
+		document.getElementById("income-edit-id").value = entry.id;
+		document.getElementById("income-category").value = entry.category;
+		document.getElementById("income-amount").value = entry.amount;
+		document.getElementById("income-date").value = entry.date;
+		document.getElementById("income-note").value = entry.note || "";
+		focusField = document.getElementById("income-amount");
+		if (incomeRepeatMonthlyCheckbox) {
+			incomeRepeatMonthlyCheckbox.checked = Boolean(entry.repeatMonthly);
+		}
+		if (incomeCancelEdit) {
+			incomeCancelEdit.classList.remove("hidden");
+		}
+	} else {
+		document.getElementById("expense-edit-id").value = entry.id;
+		document.getElementById("expense-category").value = entry.category;
+		document.getElementById("expense-amount").value = entry.amount;
+		document.getElementById("expense-date").value = entry.date;
+		document.getElementById("expense-note").value = entry.note || "";
+		focusField = document.getElementById("expense-amount");
+		if (expenseRepeatMonthlyCheckbox) {
+			expenseRepeatMonthlyCheckbox.checked = Boolean(entry.repeatMonthly);
+		}
+		expenseCancelEdit.classList.remove("hidden");
+	}
+
+	updateFormButtonLabels();
+	if (focusField) {
+		focusField.scrollIntoView({ behavior: "smooth", block: "center" });
+		window.requestAnimationFrame(() => {
+			focusField.focus();
+			focusField.select?.();
+		});
+	}
+}
+
+function resetIncomeForm() {
+	incomeForm.reset();
+	document.getElementById("income-edit-id").value = "";
+	document.getElementById("income-date").value = toDateInput(today);
+	document.getElementById("income-note").value = "";
+	if (incomeRepeatMonthlyCheckbox) {
+		incomeRepeatMonthlyCheckbox.checked = false;
+	}
+	if (incomeCancelEdit) {
+		incomeCancelEdit.classList.add("hidden");
+	}
+	updateFormButtonLabels();
+}
+
+function resetExpenseForm() {
+	expenseForm.reset();
+	document.getElementById("expense-edit-id").value = "";
+	document.getElementById("expense-date").value = toDateInput(today);
+	document.getElementById("expense-note").value = "";
+	if (expenseRepeatMonthlyCheckbox) {
+		expenseRepeatMonthlyCheckbox.checked = false;
+	}
+	expenseCancelEdit.classList.add("hidden");
+	updateFormButtonLabels();
+}
+
+function updateFormButtonLabels() {
+	incomeSubmitButton.textContent = document.getElementById("income-edit-id").value ? t("updateIncomeButton") : t("saveIncomeButton");
+	expenseSubmitButton.textContent = document.getElementById("expense-edit-id").value ? t("updateExpenseButton") : t("saveExpenseButton");
+}
+
+function buildEntryFromForm(prefix) {
+	const parsedAmount = parseAmountValue(document.getElementById(`${prefix}-amount`).value);
+	return {
+		category: normalizeCategory(document.getElementById(`${prefix}-category`).value),
+		amount: parsedAmount,
+		date: document.getElementById(`${prefix}-date`).value,
+		note: document.getElementById(`${prefix}-note`).value.trim(),
+		repeatMonthly: false
+	};
+}
+
+function parseAmountValue(rawValue) {
+	const normalized = String(rawValue || "").replace(",", ".").trim();
+	const amount = Number(normalized);
+	if (!Number.isFinite(amount) || amount <= 0) {
+		return 0;
+	}
+	return Math.round(amount * 100) / 100;
+}
+
+function getDateRange(startDate, endDate) {
+	if (!startDate || !endDate || startDate <= endDate) {
+		return { start: startDate, end: endDate };
+	}
+	return { start: endDate, end: startDate };
+}
+
+function filterEntriesByRange(entries, startDate, endDate) {
+	return entries.filter((entry) => {
+		if (startDate && entry.date < startDate) {
+			return false;
+		}
+		if (endDate && entry.date > endDate) {
+			return false;
+		}
+		return true;
+	});
+}
+
+function entriesForListByDateRange(entries, startDate, endDate, activeMonth) {
+	const fallbackStart = `${activeMonth}-01`;
+	const fallbackEnd = getMonthEndDate(activeMonth);
+	const range = getDateRange(startDate || fallbackStart, endDate || fallbackEnd);
+
+	const expandedEntries = entries.flatMap((entry) => {
+		const normalizedEntry = {
+			...entry,
+			note: entry.note || "",
+			repeatMonthly: Boolean(entry.repeatMonthly),
+			excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
+		};
+
+		if (!normalizedEntry.repeatMonthly) {
+			return [normalizedEntry];
 		}
 
-		function closeInlineDeleteConfirm(confirmed) {
-			if (inlineDeleteConfirmOutsideHandler) {
-				document.removeEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
-				inlineDeleteConfirmOutsideHandler = null;
-			}
+		return expandRecurringEntries(normalizedEntry, range.start, range.end);
+	});
 
-			if (inlineDeleteConfirmElement) {
-				inlineDeleteConfirmElement.remove();
-				inlineDeleteConfirmElement = null;
-			}
+	return filterEntriesByRange(expandedEntries, range.start, range.end)
+		.sort((left, right) => left.date.localeCompare(right.date));
+}
 
-			if (inlineDeleteConfirmResolver) {
-				const resolver = inlineDeleteConfirmResolver;
-				inlineDeleteConfirmResolver = null;
-				resolver(Boolean(confirmed));
-			}
+function expandRecurringEntries(entry, startDate, endDate) {
+	if (!startDate || !endDate) {
+		return [entry];
+	}
+
+	const sourceMonth = (entry.date || "").slice(0, 7);
+	if (!/^\d{4}-\d{2}$/.test(sourceMonth)) {
+		return [entry];
+	}
+
+	const rangeStartMonth = startDate.slice(0, 7);
+	const rangeEndMonth = endDate.slice(0, 7);
+	let cursorMonth = rangeStartMonth < sourceMonth ? sourceMonth : rangeStartMonth;
+	const expanded = [];
+
+	while (cursorMonth <= rangeEndMonth) {
+		const dateInMonth = alignDateToMonth(entry.date, cursorMonth);
+		if (
+			dateInMonth >= startDate &&
+			dateInMonth <= endDate &&
+			dateInMonth >= entry.date &&
+			!entry.excludedMonths.includes(cursorMonth)
+		) {
+			expanded.push({ ...entry, date: dateInMonth });
 		}
+		cursorMonth = getNextMonth(cursorMonth);
+	}
 
-		function populateFormForEdit(listType, entry) {
-			let focusField = null;
+	return expanded;
+}
 
-			if (listType === "incomes") {
-				document.getElementById("income-edit-id").value = entry.id;
-				document.getElementById("income-category").value = entry.category;
-				document.getElementById("income-amount").value = entry.amount;
-				document.getElementById("income-date").value = entry.date;
-				document.getElementById("income-note").value = entry.note || "";
-				focusField = document.getElementById("income-amount");
-				if (incomeRepeatMonthlyCheckbox) {
-					incomeRepeatMonthlyCheckbox.checked = Boolean(entry.repeatMonthly);
-				}
-				if (incomeCancelEdit) {
-					incomeCancelEdit.classList.remove("hidden");
-				}
-			} else {
-				document.getElementById("expense-edit-id").value = entry.id;
-				document.getElementById("expense-category").value = entry.category;
-				document.getElementById("expense-amount").value = entry.amount;
-				document.getElementById("expense-date").value = entry.date;
-				document.getElementById("expense-note").value = entry.note || "";
-				focusField = document.getElementById("expense-amount");
-				if (expenseRepeatMonthlyCheckbox) {
-					expenseRepeatMonthlyCheckbox.checked = Boolean(entry.repeatMonthly);
-				}
-				expenseCancelEdit.classList.remove("hidden");
-			}
+function getNextMonth(monthValue) {
+	const [yearText, monthText] = monthValue.split("-");
+	let year = Number(yearText);
+	let month = Number(monthText);
+	if (!Number.isFinite(year) || !Number.isFinite(month)) {
+		return monthValue;
+	}
+	month += 1;
+	if (month > 12) {
+		year += 1;
+		month = 1;
+	}
+	return `${year}-${String(month).padStart(2, "0")}`;
+}
 
-			updateFormButtonLabels();
-			if (focusField) {
-				focusField.scrollIntoView({ behavior: "smooth", block: "center" });
-				window.requestAnimationFrame(() => {
-					focusField.focus();
-					focusField.select?.();
-				});
-			}
+function setDefaultListDateFilters(startDate, endDate) {
+	const range = getDateRange(startDate, endDate);
+	const start = range.start || toDateInput(today);
+	const end = range.end || start;
+	if (incomeFilterStart) {
+		incomeFilterStart.value = start;
+	}
+	if (incomeFilterEnd) {
+		incomeFilterEnd.value = end;
+	}
+	if (expenseFilterStart) {
+		expenseFilterStart.value = start;
+	}
+	if (expenseFilterEnd) {
+		expenseFilterEnd.value = end;
+	}
+}
+
+function setDefaultPeriodRange() {
+	const month = toMonthInput(today);
+	const start = `${month}-01`;
+	const end = getMonthEndDate(month);
+	if (periodStartInput) {
+		periodStartInput.value = start;
+	}
+	if (periodEndInput) {
+		periodEndInput.value = end;
+	}
+}
+
+function syncPeriodInputOrder() {
+	const range = getDateRange(periodStartInput?.value, periodEndInput?.value);
+	if (periodStartInput && range.start) {
+		periodStartInput.value = range.start;
+	}
+	if (periodEndInput && range.end) {
+		periodEndInput.value = range.end;
+	}
+}
+
+function alignDateToMonth(sourceDate, targetMonth) {
+	const dayPart = Number((sourceDate || "").split("-")[2]);
+	const safeDay = Number.isFinite(dayPart) && dayPart > 0 ? dayPart : 1;
+	const monthEndDay = Number(getMonthEndDate(targetMonth).split("-")[2]);
+	const day = Math.min(safeDay, monthEndDay);
+	return `${targetMonth}-${String(day).padStart(2, "0")}`;
+}
+
+function escapeHtml(text) {
+	return String(text || "")
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#39;");
+}
+
+function upsertEntry(collectionName, entry) {
+	const existingIndex = appState[collectionName].findIndex((item) => item.id === entry.id);
+	if (existingIndex >= 0) {
+		appState[collectionName][existingIndex] = entry;
+		return;
+	}
+
+	appState[collectionName].push(entry);
+}
+
+async function handleDeleteFromForm(collectionName, editIdField, resetForm, triggerElement) {
+	const editId = document.getElementById(editIdField).value;
+	if (!editId) {
+		resetForm();
+		return;
+	}
+
+	const sourceDateField = collectionName === "incomes" ? "income-date" : "expense-date";
+	const sourceDate = document.getElementById(sourceDateField)?.value || "";
+	if (!(await handleEntryDelete(collectionName, editId, sourceDate, triggerElement))) {
+		return;
+	}
+
+	resetForm();
+	showMessage(t("entryDeleted"), false);
+	render();
+}
+
+async function handleLogout() {
+	menuPanel.classList.remove("is-open");
+	menuToggle.classList.remove("is-open");
+	menuToggle.setAttribute("aria-expanded", "false");
+	if (currentUser && currentUser !== GUEST_SESSION_VALUE) {
+		await logoutCurrentUser().catch(() => null);
+	}
+	currentUser = "";
+	currentProfile = null;
+	appState = { incomes: [], expenses: [] };
+	localStorage.removeItem(SESSION_KEY);
+	window.location.href = "index.html";
+}
+
+async function handleAccountDelete() {
+	if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
+		resetDeleteAccountConfirmState();
+		showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE), true);
+		return;
+	}
+
+	if (!deleteAccountConfirmArmed) {
+		deleteAccountConfirmArmed = true;
+		if (deleteAccountConfirmTimer) {
+			window.clearTimeout(deleteAccountConfirmTimer);
 		}
-
-		function resetIncomeForm() {
-			incomeForm.reset();
-			document.getElementById("income-edit-id").value = "";
-			document.getElementById("income-date").value = toDateInput(today);
-			document.getElementById("income-note").value = "";
-			if (incomeRepeatMonthlyCheckbox) {
-				incomeRepeatMonthlyCheckbox.checked = false;
-			}
-			if (incomeCancelEdit) {
-				incomeCancelEdit.classList.add("hidden");
-			}
-			updateFormButtonLabels();
-		}
-
-		function resetExpenseForm() {
-			expenseForm.reset();
-			document.getElementById("expense-edit-id").value = "";
-			document.getElementById("expense-date").value = toDateInput(today);
-			document.getElementById("expense-note").value = "";
-			if (expenseRepeatMonthlyCheckbox) {
-				expenseRepeatMonthlyCheckbox.checked = false;
-			}
-			expenseCancelEdit.classList.add("hidden");
-			updateFormButtonLabels();
-		}
-
-		function updateFormButtonLabels() {
-			incomeSubmitButton.textContent = document.getElementById("income-edit-id").value ? t("updateIncomeButton") : t("saveIncomeButton");
-			expenseSubmitButton.textContent = document.getElementById("expense-edit-id").value ? t("updateExpenseButton") : t("saveExpenseButton");
-		}
-
-		function buildEntryFromForm(prefix) {
-			const parsedAmount = parseAmountValue(document.getElementById(`${prefix}-amount`).value);
-			return {
-				category: normalizeCategory(document.getElementById(`${prefix}-category`).value),
-				amount: parsedAmount,
-				date: document.getElementById(`${prefix}-date`).value,
-				note: document.getElementById(`${prefix}-note`).value.trim(),
-				repeatMonthly: false
-			};
-		}
-
-		function parseAmountValue(rawValue) {
-			const normalized = String(rawValue || "").replace(",", ".").trim();
-			const amount = Number(normalized);
-			if (!Number.isFinite(amount) || amount <= 0) {
-				return 0;
-			}
-			return Math.round(amount * 100) / 100;
-		}
-
-		function getDateRange(startDate, endDate) {
-			if (!startDate || !endDate || startDate <= endDate) {
-				return { start: startDate, end: endDate };
-			}
-			return { start: endDate, end: startDate };
-		}
-
-		function filterEntriesByRange(entries, startDate, endDate) {
-			return entries.filter((entry) => {
-				if (startDate && entry.date < startDate) {
-					return false;
-				}
-				if (endDate && entry.date > endDate) {
-					return false;
-				}
-				return true;
-			});
-		}
-
-		function entriesForListByDateRange(entries, startDate, endDate, activeMonth) {
-			const fallbackStart = `${activeMonth}-01`;
-			const fallbackEnd = getMonthEndDate(activeMonth);
-			const range = getDateRange(startDate || fallbackStart, endDate || fallbackEnd);
-
-			const expandedEntries = entries.flatMap((entry) => {
-				const normalizedEntry = {
-					...entry,
-					note: entry.note || "",
-					repeatMonthly: Boolean(entry.repeatMonthly),
-					excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
-				};
-
-				if (!normalizedEntry.repeatMonthly) {
-					return [normalizedEntry];
-				}
-
-				return expandRecurringEntries(normalizedEntry, range.start, range.end);
-			});
-
-			return filterEntriesByRange(expandedEntries, range.start, range.end)
-				.sort((left, right) => left.date.localeCompare(right.date));
-		}
-
-		function expandRecurringEntries(entry, startDate, endDate) {
-			if (!startDate || !endDate) {
-				return [entry];
-			}
-
-			const sourceMonth = (entry.date || "").slice(0, 7);
-			if (!/^\d{4}-\d{2}$/.test(sourceMonth)) {
-				return [entry];
-			}
-
-			const rangeStartMonth = startDate.slice(0, 7);
-			const rangeEndMonth = endDate.slice(0, 7);
-			let cursorMonth = rangeStartMonth < sourceMonth ? sourceMonth : rangeStartMonth;
-			const expanded = [];
-
-			while (cursorMonth <= rangeEndMonth) {
-				const dateInMonth = alignDateToMonth(entry.date, cursorMonth);
-				if (
-					dateInMonth >= startDate &&
-					dateInMonth <= endDate &&
-					dateInMonth >= entry.date &&
-					!entry.excludedMonths.includes(cursorMonth)
-				) {
-					expanded.push({ ...entry, date: dateInMonth });
-				}
-				cursorMonth = getNextMonth(cursorMonth);
-			}
-
-			return expanded;
-		}
-
-		function getNextMonth(monthValue) {
-			const [yearText, monthText] = monthValue.split("-");
-			let year = Number(yearText);
-			let month = Number(monthText);
-			if (!Number.isFinite(year) || !Number.isFinite(month)) {
-				return monthValue;
-			}
-			month += 1;
-			if (month > 12) {
-				year += 1;
-				month = 1;
-			}
-			return `${year}-${String(month).padStart(2, "0")}`;
-		}
-
-		function setDefaultListDateFilters(startDate, endDate) {
-			const range = getDateRange(startDate, endDate);
-			const start = range.start || toDateInput(today);
-			const end = range.end || start;
-			if (incomeFilterStart) {
-				incomeFilterStart.value = start;
-			}
-			if (incomeFilterEnd) {
-				incomeFilterEnd.value = end;
-			}
-			if (expenseFilterStart) {
-				expenseFilterStart.value = start;
-			}
-			if (expenseFilterEnd) {
-				expenseFilterEnd.value = end;
-			}
-		}
-
-		function setDefaultPeriodRange() {
-			const month = toMonthInput(today);
-			const start = `${month}-01`;
-			const end = getMonthEndDate(month);
-			if (periodStartInput) {
-				periodStartInput.value = start;
-			}
-			if (periodEndInput) {
-				periodEndInput.value = end;
-			}
-		}
-
-		function syncPeriodInputOrder() {
-			const range = getDateRange(periodStartInput?.value, periodEndInput?.value);
-			if (periodStartInput && range.start) {
-				periodStartInput.value = range.start;
-			}
-			if (periodEndInput && range.end) {
-				periodEndInput.value = range.end;
-			}
-		}
-
-		function alignDateToMonth(sourceDate, targetMonth) {
-			const dayPart = Number((sourceDate || "").split("-")[2]);
-			const safeDay = Number.isFinite(dayPart) && dayPart > 0 ? dayPart : 1;
-			const monthEndDay = Number(getMonthEndDate(targetMonth).split("-")[2]);
-			const day = Math.min(safeDay, monthEndDay);
-			return `${targetMonth}-${String(day).padStart(2, "0")}`;
-		}
-
-		function escapeHtml(text) {
-			return String(text || "")
-				.replaceAll("&", "&amp;")
-				.replaceAll("<", "&lt;")
-				.replaceAll(">", "&gt;")
-				.replaceAll('"', "&quot;")
-				.replaceAll("'", "&#39;");
-		}
-
-		function upsertEntry(collectionName, entry) {
-			const existingIndex = appState[collectionName].findIndex((item) => item.id === entry.id);
-			if (existingIndex >= 0) {
-				appState[collectionName][existingIndex] = entry;
-				return;
-			}
-
-			appState[collectionName].push(entry);
-		}
-
-		async function handleDeleteFromForm(collectionName, editIdField, resetForm, triggerElement) {
-			const editId = document.getElementById(editIdField).value;
-			if (!editId) {
-				resetForm();
-				return;
-			}
-
-			const sourceDateField = collectionName === "incomes" ? "income-date" : "expense-date";
-			const sourceDate = document.getElementById(sourceDateField)?.value || "";
-			if (!(await handleEntryDelete(collectionName, editId, sourceDate, triggerElement))) {
-				return;
-			}
-
-			resetForm();
-			showMessage(t("entryDeleted"), false);
-			render();
-		}
-
-		async function handleLogout() {
-			menuPanel.classList.remove("is-open");
-			menuToggle.classList.remove("is-open");
-			menuToggle.setAttribute("aria-expanded", "false");
-			if (currentUser && currentUser !== GUEST_SESSION_VALUE) {
-				await logoutCurrentUser().catch(() => null);
-			}
-			currentUser = "";
-			currentProfile = null;
-			appState = { incomes: [], expenses: [] };
-			localStorage.removeItem(SESSION_KEY);
-			window.location.href = "index.html";
-		}
-
-		async function handleAccountDelete() {
-			if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
-				resetDeleteAccountConfirmState();
-				showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE), true);
-				return;
-			}
-
-			if (!deleteAccountConfirmArmed) {
-				deleteAccountConfirmArmed = true;
-				if (deleteAccountConfirmTimer) {
-					window.clearTimeout(deleteAccountConfirmTimer);
-				}
-				deleteAccountConfirmTimer = window.setTimeout(() => {
-					resetDeleteAccountConfirmState();
-				}, 7000);
-				showMessage(t("deleteAccountNeedsSecondClick"), true);
-				return;
-			}
-
+		deleteAccountConfirmTimer = window.setTimeout(() => {
 			resetDeleteAccountConfirmState();
+		}, 7000);
+		showMessage(t("deleteAccountNeedsSecondClick"), true);
+		return;
+	}
 
-			const email = currentProfile?.email || "";
-			try {
-				showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
-				await deleteCurrentAccount();
-				await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
-				await logoutCurrentUser().catch(() => null);
-				shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-				currentUser = "";
-				currentProfile = null;
-				localStorage.removeItem(SESSION_KEY);
-				localStorage.removeItem(DISPLAY_NAME_KEY);
-				showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-				window.setTimeout(() => {
-					window.location.href = "index.html";
-				}, 500);
-			} catch (error) {
-				showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
-			}
-		}
+	resetDeleteAccountConfirmState();
 
-		function resetDeleteAccountConfirmState() {
-			deleteAccountConfirmArmed = false;
-			if (deleteAccountConfirmTimer) {
-				window.clearTimeout(deleteAccountConfirmTimer);
-				deleteAccountConfirmTimer = null;
-			}
-		}
+	const email = currentProfile?.email || "";
+	try {
+		showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
+		await deleteCurrentAccount();
+		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+		await logoutCurrentUser().catch(() => null);
+		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+		currentUser = "";
+		currentProfile = null;
+		localStorage.removeItem(SESSION_KEY);
+		localStorage.removeItem(DISPLAY_NAME_KEY);
+		showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+		window.setTimeout(() => {
+			window.location.href = "index.html";
+		}, 500);
+	} catch (error) {
+		showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
+	}
+}
 
-		function updateAccessUI() {
-			if (budgetContent) {
-				budgetContent.classList.remove("hidden");
-			}
-			menuToggle.disabled = false;
-		}
+function resetDeleteAccountConfirmState() {
+	deleteAccountConfirmArmed = false;
+	if (deleteAccountConfirmTimer) {
+		window.clearTimeout(deleteAccountConfirmTimer);
+		deleteAccountConfirmTimer = null;
+	}
+}
 
-		function requireLogin() {
-			return Boolean(currentUser);
-		}
+function updateAccessUI() {
+	if (budgetContent) {
+		budgetContent.classList.remove("hidden");
+	}
+	menuToggle.disabled = false;
+}
 
-		function monthEntries(entries, activeMonth) {
-			return entries.flatMap((item) => {
-				const excludedMonths = normalizeExcludedMonths(item.excludedMonths);
-				if (item.date.startsWith(activeMonth)) {
-					if (excludedMonths.includes(activeMonth)) {
-						return [];
-					}
-					return [{ ...item, repeatMonthly: Boolean(item.repeatMonthly), note: item.note || "", excludedMonths }];
-				}
+function requireLogin() {
+	return Boolean(currentUser);
+}
 
-				if (item.repeatMonthly) {
-					const recurringDate = alignDateToMonth(item.date, activeMonth);
-					if (recurringDate >= item.date && !excludedMonths.includes(activeMonth)) {
-						return [{ ...item, date: recurringDate, repeatMonthly: true, note: item.note || "", excludedMonths }];
-					}
-				}
-
-				return [];
-			});
-		}
-
-		function sumEntries(entries) {
-			return entries.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-		}
-
-		function translateCategory(value) {
-			const normalizedValue = normalizeCategory(value);
-			return t(`categories.${normalizedValue}`) || normalizedValue;
-		}
-
-		function normalizeCategory(value) {
-			if (value === "hitelkartya 3") {
-				return "hitelkartya";
-			}
-			if (value === "suli") {
-				return "iskola";
-			}
-			return value;
-		}
-
-		function t(key) {
-			const parts = key.split(".");
-			let current = dictionary[appLanguage] || dictionary.hu;
-			for (const part of parts) {
-				current = current ? current[part] : undefined;
-			}
-			return current || key;
-		}
-
-		function loadTheme() {
-			return shared.loadTheme();
-		}
-
-		function applyTheme() {
-			document.documentElement.setAttribute("data-theme", appTheme);
-		}
-
-		function setTheme(mode) {
-			appTheme = mode === "dark" ? "dark" : "light";
-			shared.saveTheme(appTheme);
-			applyTheme();
-			syncThemeButtons();
-		}
-
-		function syncThemeButtons() {
-			if (themeLightButton) {
-				const isLight = appTheme === "light";
-				themeLightButton.classList.toggle("is-active", isLight);
-				themeLightButton.setAttribute("aria-pressed", String(isLight));
-			}
-			if (themeDarkButton) {
-				const isDark = appTheme === "dark";
-				themeDarkButton.classList.toggle("is-active", isDark);
-				themeDarkButton.setAttribute("aria-pressed", String(isDark));
-			}
-		}
-
-		function showMessage(message, isError) {
-			if (!authMessage) {
-				return;
-			}
-			authMessage.textContent = message;
-			authMessage.classList.toggle("hidden", !message);
-			authMessage.classList.toggle("error", isError);
-			authMessage.classList.toggle("ok", !isError);
-		}
-
-		function formatCurrency(amount) {
-			const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
-			const symbols = {
-				HUF: "Ft",
-				GBP: "£",
-				USD: "$",
-				EUR: "€"
-			};
-			const numericAmount = Number(amount) || 0;
-			const valueText = new Intl.NumberFormat(locale, {
-				minimumFractionDigits: 0,
-				maximumFractionDigits: 2
-			}).format(numericAmount);
-			return `${valueText} ${symbols[appCurrency] || appCurrency}`;
-		}
-
-		function formatDisplayDate(isoDate) {
-			if (!isoDate) {
-				return "";
-			}
-
-			const dateObj = new Date(`${isoDate}T00:00:00`);
-			if (Number.isNaN(dateObj.getTime())) {
-				return isoDate;
-			}
-
-			if (appLanguage === "en") {
-				return dateObj.toLocaleDateString("en-US", {
-					year: "numeric",
-					month: "long",
-					day: "numeric"
-				});
-			}
-
-			return dateObj.toLocaleDateString("hu-HU");
-		}
-
-		function isAppInstalled() {
-			return shared.isAppInstalled();
-		}
-
-		function updateInstallButtonState() {
-			if (!installAppButton) {
-				return;
-			}
-			const installed = isAppInstalled();
-			if (installed && !deferredInstallPrompt) {
-				installAppButton.textContent = t("appDownloaded");
-				installAppButton.disabled = true;
-				return;
-			}
-
-			installAppButton.textContent = t("downloadAppButton");
-			installAppButton.disabled = false;
-		}
-
-		function loadCurrency() {
-			return shared.loadCurrency();
-		}
-
-		function saveCurrency() {
-			shared.saveCurrency(appCurrency);
-		}
-
-		function toMonthInput(dateObj) {
-			return shared.toMonthInput(dateObj);
-		}
-
-		function toDateInput(dateObj) {
-			return shared.toDateInput(dateObj);
-		}
-
-		function getMonthEndDate(monthValue) {
-			return shared.getMonthEndDate(monthValue, today);
-		}
-
-		function createEntryId() {
-			return shared.createEntryId();
-		}
-
-		function applyAuthenticatedState(session) {
-			currentUser = String(session?.profile?.username || currentUser || "").trim();
-			currentProfile = session?.profile || null;
-			if (!currentUser) {
-				return;
-			}
-			localStorage.setItem(SESSION_KEY, currentUser);
-		}
-
-		function normalizeEntriesData(data) {
-			return {
-				incomes: normalizeEntries(data && data.incomes),
-				expenses: normalizeEntries(data && data.expenses)
-			};
-		}
-
-		function normalizeEntries(entries) {
-			if (!Array.isArray(entries)) {
+function monthEntries(entries, activeMonth) {
+	return entries.flatMap((item) => {
+		const excludedMonths = normalizeExcludedMonths(item.excludedMonths);
+		if (item.date.startsWith(activeMonth)) {
+			if (excludedMonths.includes(activeMonth)) {
 				return [];
 			}
-
-			return entries
-				.filter((entry) => entry && entry.id && entry.category && entry.date)
-				.map((entry) => ({
-					...entry,
-					category: normalizeCategory(entry.category),
-					amount: parseAmountValue(entry.amount),
-					note: typeof entry.note === "string" ? entry.note : "",
-					repeatMonthly: Boolean(entry.repeatMonthly),
-					excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
-				}));
+			return [{ ...item, repeatMonthly: Boolean(item.repeatMonthly), note: item.note || "", excludedMonths }];
 		}
 
-		function normalizeExcludedMonths(value) {
-			if (!Array.isArray(value)) {
-				return [];
+		if (item.repeatMonthly) {
+			const recurringDate = alignDateToMonth(item.date, activeMonth);
+			if (recurringDate >= item.date && !excludedMonths.includes(activeMonth)) {
+				return [{ ...item, date: recurringDate, repeatMonthly: true, note: item.note || "", excludedMonths }];
 			}
-			return value.filter((monthText) => typeof monthText === "string" && /^\d{4}-\d{2}$/.test(monthText));
 		}
 
-		function saveState() {
-			if (currentUser === GUEST_SESSION_VALUE) {
-				saveGuestData(appState);
-				return;
-			}
+		return [];
+	});
+}
 
-			if (!currentUser) {
-				return;
-			}
+function sumEntries(entries) {
+	return entries.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+}
 
-			void saveCurrentUserData(appState)
-				.then((savedState) => {
-					appState = normalizeEntriesData(savedState);
-				})
-				.catch((error) => {
-					showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
-				});
-		}
+function translateCategory(value) {
+	const normalizedValue = normalizeCategory(value);
+	return t(`categories.${normalizedValue}`) || normalizedValue;
+}
 
-		function loadLanguage() {
-			return shared.loadLanguage();
-		}
+function normalizeCategory(value) {
+	if (value === "hitelkartya 3") {
+		return "hitelkartya";
+	}
+	if (value === "suli") {
+		return "iskola";
+	}
+	return value;
+}
 
-		function saveLanguage() {
-			shared.saveLanguage(appLanguage);
-		}
+function t(key) {
+	const parts = key.split(".");
+	let current = dictionary[appLanguage] || dictionary.hu;
+	for (const part of parts) {
+		current = current ? current[part] : undefined;
+	}
+	return current || key;
+}
 
-		function loadGuestData() {
-			return shared.loadGuestData();
-		}
+function loadTheme() {
+	return shared.loadTheme();
+}
 
-		function saveGuestData(data) {
-			shared.saveGuestData(data);
-		}
+function applyTheme() {
+	document.documentElement.setAttribute("data-theme", appTheme);
+}
+
+function setTheme(mode) {
+	appTheme = mode === "dark" ? "dark" : "light";
+	shared.saveTheme(appTheme);
+	applyTheme();
+	syncThemeButtons();
+}
+
+function syncThemeButtons() {
+	if (themeLightButton) {
+		const isLight = appTheme === "light";
+		themeLightButton.classList.toggle("is-active", isLight);
+		themeLightButton.setAttribute("aria-pressed", String(isLight));
+	}
+	if (themeDarkButton) {
+		const isDark = appTheme === "dark";
+		themeDarkButton.classList.toggle("is-active", isDark);
+		themeDarkButton.setAttribute("aria-pressed", String(isDark));
+	}
+}
+
+function showMessage(message, isError) {
+	if (!authMessage) {
+		return;
+	}
+	authMessage.textContent = message;
+	authMessage.classList.toggle("hidden", !message);
+	authMessage.classList.toggle("error", isError);
+	authMessage.classList.toggle("ok", !isError);
+}
+
+function formatCurrency(amount) {
+	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
+	const symbols = {
+		HUF: "Ft",
+		GBP: "£",
+		USD: "$",
+		EUR: "€"
+	};
+	const numericAmount = Number(amount) || 0;
+	const valueText = new Intl.NumberFormat(locale, {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 2
+	}).format(numericAmount);
+	return `${valueText} ${symbols[appCurrency] || appCurrency}`;
+}
+
+function formatDisplayDate(isoDate) {
+	if (!isoDate) {
+		return "";
+	}
+
+	const dateObj = new Date(`${isoDate}T00:00:00`);
+	if (Number.isNaN(dateObj.getTime())) {
+		return isoDate;
+	}
+
+	if (appLanguage === "en") {
+		return dateObj.toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "long",
+			day: "numeric"
+		});
+	}
+
+	return dateObj.toLocaleDateString("hu-HU");
+}
+
+function isAppInstalled() {
+	return shared.isAppInstalled();
+}
+
+function updateInstallButtonState() {
+	if (!installAppButton) {
+		return;
+	}
+	const installed = isAppInstalled();
+	if (installed && !deferredInstallPrompt) {
+		installAppButton.textContent = t("appDownloaded");
+		installAppButton.disabled = true;
+		return;
+	}
+
+	installAppButton.textContent = t("downloadAppButton");
+	installAppButton.disabled = false;
+}
+
+function loadCurrency() {
+	return shared.loadCurrency();
+}
+
+function saveCurrency() {
+	shared.saveCurrency(appCurrency);
+}
+
+function toMonthInput(dateObj) {
+	return shared.toMonthInput(dateObj);
+}
+
+function toDateInput(dateObj) {
+	return shared.toDateInput(dateObj);
+}
+
+function getMonthEndDate(monthValue) {
+	return shared.getMonthEndDate(monthValue, today);
+}
+
+function createEntryId() {
+	return shared.createEntryId();
+}
+
+function applyAuthenticatedState(session) {
+	currentUser = String(session?.profile?.username || currentUser || "").trim();
+	currentProfile = session?.profile || null;
+	if (!currentUser) {
+		return;
+	}
+	localStorage.setItem(SESSION_KEY, currentUser);
+}
+
+function normalizeEntriesData(data) {
+	return {
+		incomes: normalizeEntries(data && data.incomes),
+		expenses: normalizeEntries(data && data.expenses)
+	};
+}
+
+function normalizeEntries(entries) {
+	if (!Array.isArray(entries)) {
+		return [];
+	}
+
+	return entries
+		.filter((entry) => entry && entry.id && entry.category && entry.date)
+		.map((entry) => ({
+			...entry,
+			category: normalizeCategory(entry.category),
+			amount: parseAmountValue(entry.amount),
+			note: typeof entry.note === "string" ? entry.note : "",
+			repeatMonthly: Boolean(entry.repeatMonthly),
+			excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
+		}));
+}
+
+function normalizeExcludedMonths(value) {
+	if (!Array.isArray(value)) {
+		return [];
+	}
+	return value.filter((monthText) => typeof monthText === "string" && /^\d{4}-\d{2}$/.test(monthText));
+}
+
+function saveState() {
+	if (currentUser === GUEST_SESSION_VALUE) {
+		saveGuestData(appState);
+		return;
+	}
+
+	if (!currentUser) {
+		return;
+	}
+
+	void saveCurrentUserData(appState)
+		.then((savedState) => {
+			appState = normalizeEntriesData(savedState);
+		})
+		.catch((error) => {
+			showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
+		});
+}
+
+function loadLanguage() {
+	return shared.loadLanguage();
+}
+
+function saveLanguage() {
+	shared.saveLanguage(appLanguage);
+}
+
+function loadGuestData() {
+	return shared.loadGuestData();
+}
+
+function saveGuestData(data) {
+	shared.saveGuestData(data);
+}

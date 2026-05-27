@@ -1,658 +1,658 @@
-		import {
-			deleteCurrentAccount,
-			getFirebaseErrorMessage,
-			logoutCurrentUser,
-			restoreSession
-		} from "./firebase-service.js";
+﻿import {
+	deleteCurrentAccount,
+	getFirebaseErrorMessage,
+	logoutCurrentUser,
+	restoreSession
+} from "./firebase-service.js";
 
-		const shared = window.BudgetAppShared;
-		const {
-			SESSION_KEY,
-			DISPLAY_NAME_KEY,
-			THEME_KEY,
-			INSTALL_STATUS_KEY
-		} = shared.KEYS;
-		const { GUEST_SESSION_VALUE } = shared;
+const shared = window.BudgetAppShared;
+const {
+	SESSION_KEY,
+	DISPLAY_NAME_KEY,
+	THEME_KEY,
+	INSTALL_STATUS_KEY
+} = shared.KEYS;
+const { GUEST_SESSION_VALUE } = shared;
 
-		const dictionary = {
-			hu: {
-				pageTitle: "Összesítés",
-				heroTitle: "Összesítés",
-				heroText: "Bevételek és kiadások összesítése választott időszakra.",
-				menuButton: "Menü",
-				homeLink: "Kezdőlap",
-				budgetLink: "Költségvetés",
-				forecastButton: "Költségvetési előrejelző",
-				monthlyLink: "Összesítés",
-				versionLabel: "Verzió",
-				themeModeLabel: "Téma",
-				themeModeLight: "Világos",
-				themeModeDark: "Sötét",
-				contactUs: "Kapcsolat",
-				backAction: "Vissza",
-				downloadAppButton: "App letöltése",
-				deleteAccountButton: "Regisztráció törlése",
-				logoutAction: "Kijelentkezés",
-				languageLabel: "Nyelv",
-				languageSelectorAria: "Nyelv választó",
-				themeSwitchAria: "Téma váltó",
-				currencySelectorAria: "Pénznem választó",
-				appName: "Költségvetési app",
-				currencyLabel: "Pénznem\nválasztó",
-				currencyHuf: "HUF (forint)",
-				currencyGbp: "GBP (font)",
-				currencyUsd: "USD (dollár)",
-				currencyEur: "EUR (euró)",
-				periodLabel: "Választott időszak",
-				periodFromLabel: "-tól",
-				periodToLabel: "-ig",
-				loggedOut: "Nincs bejelentkezett felhasználó.",
-				loggedIn: "Bejelentkezve:",
-				guestUser: "Vendég",
-				loginRequired: "Az összesítéshez jelentkezz be a Költségvetés oldalon.",
-				monthlyIncomeTitle: "Bevétel összesen",
-				monthlyExpenseTitle: "Kiadás összesen",
-				spentToDateTitle: "Kiadás a mai napig",
-				currentBalanceTitle: "Egyenleg az időszakban",
-				upcomingExpensesTitle: "Kiadások dátum szerint",
-				upcomingIncomesTitle: "Bevételek dátum szerint",
-				projectionTitle: "Időszak végi becslés",
-				noData: "Nincs adat.",
-				appDownloaded: "Az app letöltve.",
-				appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
-				deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
-				emptyEntries: "Nincs tétel a kiválasztott időszakban.",
-				projectionText: "Várható egyenleg {date} dátumra: {amount}.",
-				projectionTextNoDate: "Várható egyenleg: {amount}.",
-				categories: {
-					fizetes: "Fizetés",
-					egyeb: "Egyéb",
-					szamlak: "Számlák",
-					viz: "Víz",
-					gaz: "Gáz",
-					aram: "Áram",
-					auto: "Autó",
-					benzin: "Benzin",
-					elemiszer: "Élelmiszer",
-					ruhak: "Ruhák",
-					alberlet: "Albérlet",
-					biztositas: "Biztosítás",
-					hitelkartya: "Hitelkártya",
-					onkormanyzati_ado: "Önkormányzati adó",
-					tv: "TV",
-					telefon: "Telefon",
-					internet: "Internet",
-					iskola: "Iskola",
-					   egyeb_kiadas: "Egyéb kiadás"
-				   }
-			   },
-			   en: {
-				pageTitle: "Summary",
-				heroTitle: "Summary",
-				heroText: "Income and expense summary for a selected date range.",
-				menuButton: "Menu",
-				homeLink: "Home",
-				budgetLink: "Budget",
-				forecastButton: "Budget Forecast Planner",
-				monthlyLink: "Summary",
-				versionLabel: "Version",
-				themeModeLabel: "Theme",
-				themeModeLight: "Light",
-				themeModeDark: "Dark",
-				contactUs: "Contact us",
-				backAction: "Back",
-				downloadAppButton: "Download App",
-				deleteAccountButton: "Delete account",
-				logoutAction: "Sign out",
-				languageLabel: "Language",
-				languageSelectorAria: "Language selector",
-				themeSwitchAria: "Theme switch",
-				currencySelectorAria: "Currency selector",
-				appName: "Budgeting App",
-				currencyLabel: "Currency\nselector",
-				currencyHuf: "HUF (forint)",
-				currencyGbp: "GBP (pound)",
-				currencyUsd: "USD (dollar)",
-				currencyEur: "EUR (euro)",
-				periodLabel: "Selected period",
-				periodFromLabel: "from",
-				periodToLabel: "to",
-				loggedOut: "No user is signed in.",
-				loggedIn: "Signed in as:",
-				guestUser: "Guest",
-				loginRequired: "Please sign in on the Budget page first.",
-				monthlyIncomeTitle: "Total income",
-				monthlyExpenseTitle: "Total expense",
-				spentToDateTitle: "Spent to date",
-				currentBalanceTitle: "Balance in period",
-				upcomingExpensesTitle: "Expenses by date",
-				upcomingIncomesTitle: "Income by date",
-				projectionTitle: "End-of-period projection",
-				noData: "No data.",
-				appDownloaded: "App downloaded.",
-				appInstallUnavailable: "App install is not available on this device right now.",
-				deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
-				emptyEntries: "No entries in the selected period.",
-				projectionText: "Projected balance for {date}: {amount}.",
-				projectionTextNoDate: "Projected balance: {amount}.",
-				categories: {
-					fizetes: "Salary",
-					egyeb: "Other",
-					szamlak: "Bills",
-					viz: "Water",
-					gaz: "Gas",
-					aram: "Electricity",
-					auto: "Car",
-					benzin: "Fuel",
-					elemiszer: "Groceries",
-					ruhak: "Clothes",
-					alberlet: "Rent",
-					biztositas: "Insurance",
-					hitelkartya: "Credit card",
-					onkormanyzati_ado: "Council tax",
-					tv: "TV",
-					telefon: "Phone",
-					internet: "Internet",
-					iskola: "School",
-					egyeb_kiadas: "Other expense"
-				}
-			}
-		};
+const dictionary = {
+	hu: {
+		pageTitle: "Összesítés",
+		heroTitle: "Összesítés",
+		heroText: "Bevételek és kiadások összesítése választott időszakra.",
+		menuButton: "Menü",
+		homeLink: "Kezdőlap",
+		budgetLink: "Költségvetés",
+		forecastButton: "Költségvetési előrejelző",
+		monthlyLink: "Összesítés",
+		versionLabel: "Verzió",
+		themeModeLabel: "Téma",
+		themeModeLight: "Világos",
+		themeModeDark: "Sötét",
+		contactUs: "Kapcsolat",
+		backAction: "Vissza",
+		downloadAppButton: "App letöltése",
+		deleteAccountButton: "Regisztráció törlése",
+		logoutAction: "Kijelentkezés",
+		languageLabel: "Nyelv",
+		languageSelectorAria: "Nyelv választó",
+		themeSwitchAria: "Téma váltó",
+		currencySelectorAria: "Pénznem választó",
+		appName: "Költségvetési app",
+		currencyLabel: "Pénznem\nválasztó",
+		currencyHuf: "HUF (forint)",
+		currencyGbp: "GBP (font)",
+		currencyUsd: "USD (dollár)",
+		currencyEur: "EUR (euró)",
+		periodLabel: "Választott időszak",
+		periodFromLabel: "-tól",
+		periodToLabel: "-ig",
+		loggedOut: "Nincs bejelentkezett felhasználó.",
+		loggedIn: "Bejelentkezve:",
+		guestUser: "Vendég",
+		loginRequired: "Az összesítéshez jelentkezz be a Költségvetés oldalon.",
+		monthlyIncomeTitle: "Bevétel összesen",
+		monthlyExpenseTitle: "Kiadás összesen",
+		spentToDateTitle: "Kiadás a mai napig",
+		currentBalanceTitle: "Egyenleg az időszakban",
+		upcomingExpensesTitle: "Kiadások dátum szerint",
+		upcomingIncomesTitle: "Bevételek dátum szerint",
+		projectionTitle: "Időszak végi becslés",
+		noData: "Nincs adat.",
+		appDownloaded: "Az app letöltve.",
+		appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
+		deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
+		emptyEntries: "Nincs tétel a kiválasztott időszakban.",
+		projectionText: "Várható egyenleg {date} dátumra: {amount}.",
+		projectionTextNoDate: "Várható egyenleg: {amount}.",
+		categories: {
+			fizetes: "Fizetés",
+			egyeb: "Egyéb",
+			szamlak: "Számlák",
+			viz: "Víz",
+			gaz: "Gáz",
+			aram: "Áram",
+			auto: "Autó",
+			benzin: "Benzin",
+			elemiszer: "Élelmiszer",
+			ruhak: "Ruhák",
+			alberlet: "Albérlet",
+			biztositas: "Biztosítás",
+			hitelkartya: "Hitelkártya",
+			onkormanyzati_ado: "Önkormányzati adó",
+			tv: "TV",
+			telefon: "Telefon",
+			internet: "Internet",
+			iskola: "Iskola",
+			   egyeb_kiadas: "Egyéb kiadás"
+		   }
+	   },
+	   en: {
+		pageTitle: "Summary",
+		heroTitle: "Summary",
+		heroText: "Income and expense summary for a selected date range.",
+		menuButton: "Menu",
+		homeLink: "Home",
+		budgetLink: "Budget",
+		forecastButton: "Budget Forecast Planner",
+		monthlyLink: "Summary",
+		versionLabel: "Version",
+		themeModeLabel: "Theme",
+		themeModeLight: "Light",
+		themeModeDark: "Dark",
+		contactUs: "Contact us",
+		backAction: "Back",
+		downloadAppButton: "Download App",
+		deleteAccountButton: "Delete account",
+		logoutAction: "Sign out",
+		languageLabel: "Language",
+		languageSelectorAria: "Language selector",
+		themeSwitchAria: "Theme switch",
+		currencySelectorAria: "Currency selector",
+		appName: "Budgeting App",
+		currencyLabel: "Currency\nselector",
+		currencyHuf: "HUF (forint)",
+		currencyGbp: "GBP (pound)",
+		currencyUsd: "USD (dollar)",
+		currencyEur: "EUR (euro)",
+		periodLabel: "Selected period",
+		periodFromLabel: "from",
+		periodToLabel: "to",
+		loggedOut: "No user is signed in.",
+		loggedIn: "Signed in as:",
+		guestUser: "Guest",
+		loginRequired: "Please sign in on the Budget page first.",
+		monthlyIncomeTitle: "Total income",
+		monthlyExpenseTitle: "Total expense",
+		spentToDateTitle: "Spent to date",
+		currentBalanceTitle: "Balance in period",
+		upcomingExpensesTitle: "Expenses by date",
+		upcomingIncomesTitle: "Income by date",
+		projectionTitle: "End-of-period projection",
+		noData: "No data.",
+		appDownloaded: "App downloaded.",
+		appInstallUnavailable: "App install is not available on this device right now.",
+		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
+		emptyEntries: "No entries in the selected period.",
+		projectionText: "Projected balance for {date}: {amount}.",
+		projectionTextNoDate: "Projected balance: {amount}.",
+		categories: {
+			fizetes: "Salary",
+			egyeb: "Other",
+			szamlak: "Bills",
+			viz: "Water",
+			gaz: "Gas",
+			aram: "Electricity",
+			auto: "Car",
+			benzin: "Fuel",
+			elemiszer: "Groceries",
+			ruhak: "Clothes",
+			alberlet: "Rent",
+			biztositas: "Insurance",
+			hitelkartya: "Credit card",
+			onkormanyzati_ado: "Council tax",
+			tv: "TV",
+			telefon: "Phone",
+			internet: "Internet",
+			iskola: "School",
+			egyeb_kiadas: "Other expense"
+		}
+	}
+};
 
-		const today = new Date();
-		let currentUser = localStorage.getItem(SESSION_KEY) || "";
-		let currentProfile = null;
-		let appLanguage = loadLanguage();
-		let appTheme = loadTheme();
-		let appCurrency = loadCurrency();
-		let appState = { incomes: [], expenses: [] };
+const today = new Date();
+let currentUser = localStorage.getItem(SESSION_KEY) || "";
+let currentProfile = null;
+let appLanguage = loadLanguage();
+let appTheme = loadTheme();
+let appCurrency = loadCurrency();
+let appState = { incomes: [], expenses: [] };
 
-		const menuToggle = document.getElementById("menu-toggle");
-		const menuPanel = document.getElementById("menu-panel");
-		const contactUsButton = document.getElementById("contact-us-button");
-		const menuBackButton = document.getElementById("menu-back-button");
-		const installAppButton = document.getElementById("install-app-button");
-		const deleteAccountButton = document.getElementById("delete-account-button");
-		const summaryToggleButton = document.getElementById("summary-toggle-button");
-		const forecastToggleButton = document.getElementById("forecast-toggle-button");
-		const themeLightButton = document.getElementById("theme-light-button");
-		const themeDarkButton = document.getElementById("theme-dark-button");
-		const menuLogoutButton = document.getElementById("menu-logout-button");
-		const menuSessionInfo = document.getElementById("menu-session-info");
-		const languageSelect = document.getElementById("app-language");
-		const currencySelect = document.getElementById("app-currency");
-		const periodStartInput = document.getElementById("period-start");
-		const periodEndInput = document.getElementById("period-end");
-		const lockedMessage = document.getElementById("locked-message");
-		const summaryContent = document.getElementById("summary-content");
-		const monthlyIncomeEl = document.getElementById("monthly-income");
-		const monthlyExpenseEl = document.getElementById("monthly-expense");
-		const spentToDateEl = document.getElementById("spent-to-date");
-		const currentBalanceEl = document.getElementById("current-balance");
-		const upcomingExpensesEl = document.getElementById("upcoming-expenses");
-		const upcomingIncomesEl = document.getElementById("upcoming-incomes");
-		const projectionTextEl = document.getElementById("projection-text");
-		let deferredInstallPrompt = null;
-		let deleteAccountConfirmArmed = false;
-		let deleteAccountConfirmTimer = null;
+const menuToggle = document.getElementById("menu-toggle");
+const menuPanel = document.getElementById("menu-panel");
+const contactUsButton = document.getElementById("contact-us-button");
+const menuBackButton = document.getElementById("menu-back-button");
+const installAppButton = document.getElementById("install-app-button");
+const deleteAccountButton = document.getElementById("delete-account-button");
+const summaryToggleButton = document.getElementById("summary-toggle-button");
+const forecastToggleButton = document.getElementById("forecast-toggle-button");
+const themeLightButton = document.getElementById("theme-light-button");
+const themeDarkButton = document.getElementById("theme-dark-button");
+const menuLogoutButton = document.getElementById("menu-logout-button");
+const menuSessionInfo = document.getElementById("menu-session-info");
+const languageSelect = document.getElementById("app-language");
+const currencySelect = document.getElementById("app-currency");
+const periodStartInput = document.getElementById("period-start");
+const periodEndInput = document.getElementById("period-end");
+const lockedMessage = document.getElementById("locked-message");
+const summaryContent = document.getElementById("summary-content");
+const monthlyIncomeEl = document.getElementById("monthly-income");
+const monthlyExpenseEl = document.getElementById("monthly-expense");
+const spentToDateEl = document.getElementById("spent-to-date");
+const currentBalanceEl = document.getElementById("current-balance");
+const upcomingExpensesEl = document.getElementById("upcoming-expenses");
+const upcomingIncomesEl = document.getElementById("upcoming-incomes");
+const projectionTextEl = document.getElementById("projection-text");
+let deferredInstallPrompt = null;
+let deleteAccountConfirmArmed = false;
+let deleteAccountConfirmTimer = null;
 
 
-		window.addEventListener('DOMContentLoaded', () => {
-			void initializePage();
-			languageSelect.addEventListener("change", () => {
-				appLanguage = languageSelect.value;
-				shared.saveLanguage(appLanguage);
-				applyTranslations();
-				render();
-			});
-			currencySelect.addEventListener("change", () => {
-				appCurrency = currencySelect.value;
-				shared.saveCurrency(appCurrency);
-				render();
-			});
-		
+window.addEventListener('DOMContentLoaded', () => {
+	void initializePage();
+	languageSelect.addEventListener("change", () => {
+		appLanguage = languageSelect.value;
+		shared.saveLanguage(appLanguage);
+		applyTranslations();
+		render();
+	});
+	currencySelect.addEventListener("change", () => {
+		appCurrency = currencySelect.value;
+		shared.saveCurrency(appCurrency);
+		render();
+	});
+
+});
+
+if (periodStartInput) {
+	periodStartInput.addEventListener("change", render);
+}
+
+if (periodEndInput) {
+	periodEndInput.addEventListener("change", render);
+}
+
+if (forecastToggleButton) {
+	forecastToggleButton.addEventListener("click", () => {
+		const periodStart = periodStartInput?.value || toDateInput(today);
+		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
+		window.location.href = `budget-forecast.html?month=${monthParam}`;
+	});
+}
+
+if (summaryToggleButton) {
+	summaryToggleButton.addEventListener("click", () => {
+		const periodStart = periodStartInput?.value || toDateInput(today);
+		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
+		window.location.href = `monthly_budget.html?month=${monthParam}`;
+	});
+}
+
+menuToggle.addEventListener("click", () => {
+	const isOpen = menuPanel.classList.toggle("is-open");
+	menuToggle.classList.toggle("is-open", isOpen);
+	menuToggle.setAttribute("aria-expanded", String(isOpen));
+});
+
+if (themeLightButton) {
+	themeLightButton.addEventListener("click", () => {
+		setTheme("light");
+	});
+}
+
+if (themeDarkButton) {
+	themeDarkButton.addEventListener("click", () => {
+		setTheme("dark");
+	});
+}
+
+if (contactUsButton) {
+	contactUsButton.addEventListener("click", () => {
+		window.location.href = "contact.html";
+	});
+}
+
+menuLogoutButton.addEventListener("click", handleLogout);
+if (deleteAccountButton) {
+	deleteAccountButton.addEventListener("click", handleAccountDelete);
+}
+menuBackButton.addEventListener("click", () => {
+	window.history.back();
+});
+installAppButton.addEventListener("click", async () => {
+	if (isAppInstalled() && !deferredInstallPrompt) {
+		setMenuInfoMessage(t("appDownloaded"));
+		return;
+	}
+
+	if (!deferredInstallPrompt) {
+		setMenuInfoMessage(shared.getInstallUnavailableMessage(appLanguage));
+		return;
+	}
+
+	menuPanel.classList.remove("is-open");
+	menuToggle.classList.remove("is-open");
+	menuToggle.setAttribute("aria-expanded", "false");
+	deferredInstallPrompt.prompt();
+	const choice = await deferredInstallPrompt.userChoice;
+	if (choice.outcome === "accepted") {
+		localStorage.setItem(INSTALL_STATUS_KEY, "1");
+		setMenuInfoMessage(t("appDownloaded"));
+	}
+	deferredInstallPrompt = null;
+	updateInstallButtonState();
+});
+
+document.addEventListener("click", (event) => {
+	if (!event.target.closest(".menu-wrap")) {
+		menuPanel.classList.remove("is-open");
+		menuToggle.classList.remove("is-open");
+		menuToggle.setAttribute("aria-expanded", "false");
+	}
+});
+
+document.addEventListener("keydown", (event) => {
+	if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
+		menuPanel.classList.remove("is-open");
+		menuToggle.classList.remove("is-open");
+		menuToggle.setAttribute("aria-expanded", "false");
+		menuToggle.focus();
+	}
+});
+
+window.addEventListener("beforeinstallprompt", (event) => {
+	deferredInstallPrompt = event;
+	localStorage.setItem(INSTALL_STATUS_KEY, "0");
+	updateInstallButtonState();
+});
+
+window.addEventListener("appinstalled", () => {
+	localStorage.setItem(INSTALL_STATUS_KEY, "1");
+	deferredInstallPrompt = null;
+	setMenuInfoMessage(t("appDownloaded"));
+	updateInstallButtonState();
+});
+
+if ("serviceWorker" in navigator) {
+	window.addEventListener("load", () => {
+		navigator.serviceWorker.register("sw.js").catch(() => {
+			// Service worker errors should not block usage.
 		});
+	});
+}
 
-		if (periodStartInput) {
-			periodStartInput.addEventListener("change", render);
-		}
-
-		if (periodEndInput) {
-			periodEndInput.addEventListener("change", render);
-		}
-
-		if (forecastToggleButton) {
-			forecastToggleButton.addEventListener("click", () => {
-				const periodStart = periodStartInput?.value || toDateInput(today);
-				const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-				window.location.href = `budget-forecast.html?month=${monthParam}`;
-			});
-		}
-
-		if (summaryToggleButton) {
-			summaryToggleButton.addEventListener("click", () => {
-				const periodStart = periodStartInput?.value || toDateInput(today);
-				const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-				window.location.href = `monthly_budget.html?month=${monthParam}`;
-			});
-		}
-
-		menuToggle.addEventListener("click", () => {
-			const isOpen = menuPanel.classList.toggle("is-open");
-			menuToggle.classList.toggle("is-open", isOpen);
-			menuToggle.setAttribute("aria-expanded", String(isOpen));
-		});
-
-		if (themeLightButton) {
-			themeLightButton.addEventListener("click", () => {
-				setTheme("light");
-			});
-		}
-
-		if (themeDarkButton) {
-			themeDarkButton.addEventListener("click", () => {
-				setTheme("dark");
-			});
-		}
-
-		if (contactUsButton) {
-			contactUsButton.addEventListener("click", () => {
-				window.location.href = "contact.html";
-			});
-		}
-
-		menuLogoutButton.addEventListener("click", handleLogout);
-		if (deleteAccountButton) {
-			deleteAccountButton.addEventListener("click", handleAccountDelete);
-		}
-		menuBackButton.addEventListener("click", () => {
-			window.history.back();
-		});
-		installAppButton.addEventListener("click", async () => {
-			if (isAppInstalled() && !deferredInstallPrompt) {
-				setMenuInfoMessage(t("appDownloaded"));
-				return;
-			}
-
-			if (!deferredInstallPrompt) {
-				setMenuInfoMessage(shared.getInstallUnavailableMessage(appLanguage));
-				return;
-			}
-
-			menuPanel.classList.remove("is-open");
-			menuToggle.classList.remove("is-open");
-			menuToggle.setAttribute("aria-expanded", "false");
-			deferredInstallPrompt.prompt();
-			const choice = await deferredInstallPrompt.userChoice;
-			if (choice.outcome === "accepted") {
-				localStorage.setItem(INSTALL_STATUS_KEY, "1");
-				setMenuInfoMessage(t("appDownloaded"));
-			}
-			deferredInstallPrompt = null;
-			updateInstallButtonState();
-		});
-
-		document.addEventListener("click", (event) => {
-			if (!event.target.closest(".menu-wrap")) {
-				menuPanel.classList.remove("is-open");
-				menuToggle.classList.remove("is-open");
-				menuToggle.setAttribute("aria-expanded", "false");
-			}
-		});
-
-		document.addEventListener("keydown", (event) => {
-			if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
-				menuPanel.classList.remove("is-open");
-				menuToggle.classList.remove("is-open");
-				menuToggle.setAttribute("aria-expanded", "false");
-				menuToggle.focus();
-			}
-		});
-
-		window.addEventListener("beforeinstallprompt", (event) => {
-			deferredInstallPrompt = event;
-			localStorage.setItem(INSTALL_STATUS_KEY, "0");
-			updateInstallButtonState();
-		});
-
-		window.addEventListener("appinstalled", () => {
-			localStorage.setItem(INSTALL_STATUS_KEY, "1");
-			deferredInstallPrompt = null;
-			setMenuInfoMessage(t("appDownloaded"));
-			updateInstallButtonState();
-		});
-
-		if ("serviceWorker" in navigator) {
-			window.addEventListener("load", () => {
-				navigator.serviceWorker.register("sw.js").catch(() => {
-					// Service worker errors should not block usage.
-				});
-			});
-		}
-
-		async function initializePage() {
-			if (currentUser === GUEST_SESSION_VALUE) {
-				appState = loadGuestData();
-			} else {
-				const session = await restoreSession(currentUser);
-				if (!session) {
-					window.location.href = "index.html";
-					return;
-				}
-
-				applyAuthenticatedState(session);
-				appState = session.data || { incomes: [], expenses: [] };
-			}
-
-			applyTheme();
-			syncThemeButtons();
-			languageSelect.value = appLanguage;
-			currencySelect.value = appCurrency;
-			applyTranslations();
-			updateAccessUI();
-			updateInstallButtonState();
-			render();
-		}
-
-		function applyTranslations() {
-			document.documentElement.lang = appLanguage;
-			document.title = t("pageTitle");
-			document.querySelectorAll("[data-i18n]").forEach((element) => {
-				element.textContent = t(element.dataset.i18n);
-			});
-			menuToggle.setAttribute("aria-label", t("menuButton"));
-			document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
-				element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
-			});
-			if (!currentUser) {
-				projectionTextEl.textContent = t("noData");
-			}
-			updateMenuSessionLabel();
-		}
-
-		function updateAccessUI() {
-			if (!currentUser) {
-				lockedMessage.classList.remove("hidden");
-				summaryContent.classList.add("hidden");
-				updateMenuSessionLabel();
-				return;
-			}
-
-			lockedMessage.classList.add("hidden");
-			summaryContent.classList.remove("hidden");
-			updateMenuSessionLabel();
-		}
-
-		function updateMenuSessionLabel() {
-			if (!menuSessionInfo) {
-				return;
-			}
-
-			if (!currentUser) {
-				menuSessionInfo.textContent = t("loggedOut");
-				return;
-			}
-
-			const name = getSignedInDisplayName();
-			menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
-		}
-
-		function getSignedInDisplayName() {
-			if (!currentUser) {
-				return t("guestUser");
-			}
-			if (currentUser === GUEST_SESSION_VALUE) {
-				return t("guestUser");
-			}
-
-			return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
-		}
-
-		function setMenuInfoMessage(message) {
-			if (!menuSessionInfo) {
-				return;
-			}
-			menuSessionInfo.textContent = message;
-		}
-
-		function render() {
-			if (!currentUser) {
-				return;
-			}
-
-			const selectedMonth = (periodStartInput?.value || toDateInput(today)).slice(0, 7);
-			const todayIso = toDateInput(today);
-			const monthIncomes = monthEntries(appState.incomes, selectedMonth);
-			const monthExpenses = monthEntries(appState.expenses, selectedMonth);
-
-			monthlyIncomeEl.textContent = formatCurrency(sumEntries(monthIncomes));
-			monthlyExpenseEl.textContent = formatCurrency(sumEntries(monthExpenses));
-			spentToDateEl.textContent = formatCurrency(sumEntries(monthExpenses.filter((item) => item.date <= todayIso)));
-			currentBalanceEl.textContent = formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses));
-
-			const upcomingExpenses = monthExpenses.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
-			const upcomingIncomes = monthIncomes.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
-
-			paintList(upcomingExpensesEl, upcomingExpenses);
-			paintList(upcomingIncomesEl, upcomingIncomes);
-
-			const projectionAmount = formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses));
-			const selectedEndDate = periodEndInput?.value;
-			if (selectedEndDate) {
-				projectionTextEl.textContent = t("projectionText").replace("{date}", formatDisplayDate(selectedEndDate)).replace("{amount}", projectionAmount);
-			} else {
-				projectionTextEl.textContent = t("projectionTextNoDate").replace("{amount}", projectionAmount);
-			}
-		}
-
-		async function handleLogout() {
-			menuPanel.classList.remove("is-open");
-			menuToggle.classList.remove("is-open");
-			menuToggle.setAttribute("aria-expanded", "false");
-			if (currentUser && currentUser !== GUEST_SESSION_VALUE) {
-				await logoutCurrentUser().catch(() => null);
-			}
-			localStorage.removeItem(SESSION_KEY);
+async function initializePage() {
+	if (currentUser === GUEST_SESSION_VALUE) {
+		appState = loadGuestData();
+	} else {
+		const session = await restoreSession(currentUser);
+		if (!session) {
 			window.location.href = "index.html";
+			return;
 		}
 
-		async function handleAccountDelete() {
-			if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
-				resetDeleteAccountConfirmState();
-				setMenuInfoMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE));
-				return;
-			}
+		applyAuthenticatedState(session);
+		appState = session.data || { incomes: [], expenses: [] };
+	}
 
-			if (!deleteAccountConfirmArmed) {
-				deleteAccountConfirmArmed = true;
-				if (deleteAccountConfirmTimer) {
-					window.clearTimeout(deleteAccountConfirmTimer);
-				}
-				deleteAccountConfirmTimer = window.setTimeout(() => {
-					resetDeleteAccountConfirmState();
-				}, 7000);
-				setMenuInfoMessage(t("deleteAccountNeedsSecondClick"));
-				return;
-			}
+	applyTheme();
+	syncThemeButtons();
+	languageSelect.value = appLanguage;
+	currencySelect.value = appCurrency;
+	applyTranslations();
+	updateAccessUI();
+	updateInstallButtonState();
+	render();
+}
 
+function applyTranslations() {
+	document.documentElement.lang = appLanguage;
+	document.title = t("pageTitle");
+	document.querySelectorAll("[data-i18n]").forEach((element) => {
+		element.textContent = t(element.dataset.i18n);
+	});
+	menuToggle.setAttribute("aria-label", t("menuButton"));
+	document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+		element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+	});
+	if (!currentUser) {
+		projectionTextEl.textContent = t("noData");
+	}
+	updateMenuSessionLabel();
+}
+
+function updateAccessUI() {
+	if (!currentUser) {
+		lockedMessage.classList.remove("hidden");
+		summaryContent.classList.add("hidden");
+		updateMenuSessionLabel();
+		return;
+	}
+
+	lockedMessage.classList.add("hidden");
+	summaryContent.classList.remove("hidden");
+	updateMenuSessionLabel();
+}
+
+function updateMenuSessionLabel() {
+	if (!menuSessionInfo) {
+		return;
+	}
+
+	if (!currentUser) {
+		menuSessionInfo.textContent = t("loggedOut");
+		return;
+	}
+
+	const name = getSignedInDisplayName();
+	menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
+}
+
+function getSignedInDisplayName() {
+	if (!currentUser) {
+		return t("guestUser");
+	}
+	if (currentUser === GUEST_SESSION_VALUE) {
+		return t("guestUser");
+	}
+
+	return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
+}
+
+function setMenuInfoMessage(message) {
+	if (!menuSessionInfo) {
+		return;
+	}
+	menuSessionInfo.textContent = message;
+}
+
+function render() {
+	if (!currentUser) {
+		return;
+	}
+
+	const selectedMonth = (periodStartInput?.value || toDateInput(today)).slice(0, 7);
+	const todayIso = toDateInput(today);
+	const monthIncomes = monthEntries(appState.incomes, selectedMonth);
+	const monthExpenses = monthEntries(appState.expenses, selectedMonth);
+
+	monthlyIncomeEl.textContent = formatCurrency(sumEntries(monthIncomes));
+	monthlyExpenseEl.textContent = formatCurrency(sumEntries(monthExpenses));
+	spentToDateEl.textContent = formatCurrency(sumEntries(monthExpenses.filter((item) => item.date <= todayIso)));
+	currentBalanceEl.textContent = formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses));
+
+	const upcomingExpenses = monthExpenses.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
+	const upcomingIncomes = monthIncomes.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
+
+	paintList(upcomingExpensesEl, upcomingExpenses);
+	paintList(upcomingIncomesEl, upcomingIncomes);
+
+	const projectionAmount = formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses));
+	const selectedEndDate = periodEndInput?.value;
+	if (selectedEndDate) {
+		projectionTextEl.textContent = t("projectionText").replace("{date}", formatDisplayDate(selectedEndDate)).replace("{amount}", projectionAmount);
+	} else {
+		projectionTextEl.textContent = t("projectionTextNoDate").replace("{amount}", projectionAmount);
+	}
+}
+
+async function handleLogout() {
+	menuPanel.classList.remove("is-open");
+	menuToggle.classList.remove("is-open");
+	menuToggle.setAttribute("aria-expanded", "false");
+	if (currentUser && currentUser !== GUEST_SESSION_VALUE) {
+		await logoutCurrentUser().catch(() => null);
+	}
+	localStorage.removeItem(SESSION_KEY);
+	window.location.href = "index.html";
+}
+
+async function handleAccountDelete() {
+	if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
+		resetDeleteAccountConfirmState();
+		setMenuInfoMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE));
+		return;
+	}
+
+	if (!deleteAccountConfirmArmed) {
+		deleteAccountConfirmArmed = true;
+		if (deleteAccountConfirmTimer) {
+			window.clearTimeout(deleteAccountConfirmTimer);
+		}
+		deleteAccountConfirmTimer = window.setTimeout(() => {
 			resetDeleteAccountConfirmState();
+		}, 7000);
+		setMenuInfoMessage(t("deleteAccountNeedsSecondClick"));
+		return;
+	}
 
-			const email = currentProfile?.email || "";
-			try {
-				setMenuInfoMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
-				await deleteCurrentAccount();
-				await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
-				await logoutCurrentUser().catch(() => null);
-				shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-				currentUser = "";
-				currentProfile = null;
-				localStorage.removeItem(SESSION_KEY);
-				localStorage.removeItem(DISPLAY_NAME_KEY);
-				setMenuInfoMessage(shared.getDeleteAccountSuccessMessage(appLanguage));
-				window.setTimeout(() => {
-					window.location.href = "index.html";
-				}, 500);
-			} catch (error) {
-				setMenuInfoMessage(getFirebaseErrorMessage(error, appLanguage, "delete"));
-			}
-		}
+	resetDeleteAccountConfirmState();
 
-		function resetDeleteAccountConfirmState() {
-			deleteAccountConfirmArmed = false;
-			if (deleteAccountConfirmTimer) {
-				window.clearTimeout(deleteAccountConfirmTimer);
-				deleteAccountConfirmTimer = null;
-			}
-		}
+	const email = currentProfile?.email || "";
+	try {
+		setMenuInfoMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
+		await deleteCurrentAccount();
+		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+		await logoutCurrentUser().catch(() => null);
+		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+		currentUser = "";
+		currentProfile = null;
+		localStorage.removeItem(SESSION_KEY);
+		localStorage.removeItem(DISPLAY_NAME_KEY);
+		setMenuInfoMessage(shared.getDeleteAccountSuccessMessage(appLanguage));
+		window.setTimeout(() => {
+			window.location.href = "index.html";
+		}, 500);
+	} catch (error) {
+		setMenuInfoMessage(getFirebaseErrorMessage(error, appLanguage, "delete"));
+	}
+}
 
-		function paintList(target, entries) {
-			target.innerHTML = "";
-			if (!entries.length) {
-				const li = document.createElement("li");
-				li.className = "empty";
-				li.textContent = t("emptyEntries");
-				target.appendChild(li);
-				return;
-			}
+function resetDeleteAccountConfirmState() {
+	deleteAccountConfirmArmed = false;
+	if (deleteAccountConfirmTimer) {
+		window.clearTimeout(deleteAccountConfirmTimer);
+		deleteAccountConfirmTimer = null;
+	}
+}
 
-			entries.forEach((entry) => {
-				const li = document.createElement("li");
-				li.innerHTML = `<div><span>${formatDisplayDate(entry.date)}</span><strong>${translateCategory(entry.category)}</strong></div><span>${formatCurrency(entry.amount)}</span>`;
-				target.appendChild(li);
-			});
-		}
+function paintList(target, entries) {
+	target.innerHTML = "";
+	if (!entries.length) {
+		const li = document.createElement("li");
+		li.className = "empty";
+		li.textContent = t("emptyEntries");
+		target.appendChild(li);
+		return;
+	}
 
-		function monthEntries(entries, activeMonth) {
-			return shared.monthEntries(entries, activeMonth);
-		}
+	entries.forEach((entry) => {
+		const li = document.createElement("li");
+		li.innerHTML = `<div><span>${formatDisplayDate(entry.date)}</span><strong>${translateCategory(entry.category)}</strong></div><span>${formatCurrency(entry.amount)}</span>`;
+		target.appendChild(li);
+	});
+}
 
-		function sumEntries(entries) {
-			return shared.sumEntries(entries);
-		}
+function monthEntries(entries, activeMonth) {
+	return shared.monthEntries(entries, activeMonth);
+}
 
-		function translateCategory(value) {
-			return t(`categories.${value}`) || value;
-		}
+function sumEntries(entries) {
+	return shared.sumEntries(entries);
+}
 
-		function t(key) {
-			const parts = key.split(".");
-			let current = dictionary[appLanguage] || dictionary.hu;
-			for (const part of parts) {
-				current = current ? current[part] : undefined;
-			}
-			return current || key;
-		}
+function translateCategory(value) {
+	return t(`categories.${value}`) || value;
+}
 
-		function loadTheme() {
-			return shared.loadTheme();
-		}
+function t(key) {
+	const parts = key.split(".");
+	let current = dictionary[appLanguage] || dictionary.hu;
+	for (const part of parts) {
+		current = current ? current[part] : undefined;
+	}
+	return current || key;
+}
 
-		function applyTheme() {
-			document.documentElement.setAttribute("data-theme", appTheme);
-		}
+function loadTheme() {
+	return shared.loadTheme();
+}
 
-		function setTheme(mode) {
-			appTheme = mode === "dark" ? "dark" : "light";
-			shared.saveTheme(appTheme);
-			applyTheme();
-			syncThemeButtons();
-		}
+function applyTheme() {
+	document.documentElement.setAttribute("data-theme", appTheme);
+}
 
-		function syncThemeButtons() {
-			if (themeLightButton) {
-				const isLight = appTheme === "light";
-				themeLightButton.classList.toggle("is-active", isLight);
-				themeLightButton.setAttribute("aria-pressed", String(isLight));
-			}
-			if (themeDarkButton) {
-				const isDark = appTheme === "dark";
-				themeDarkButton.classList.toggle("is-active", isDark);
-				themeDarkButton.setAttribute("aria-pressed", String(isDark));
-			}
-		}
+function setTheme(mode) {
+	appTheme = mode === "dark" ? "dark" : "light";
+	shared.saveTheme(appTheme);
+	applyTheme();
+	syncThemeButtons();
+}
 
-		function formatCurrency(amount) {
-			const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
-			const symbols = {
-				HUF: "Ft",
-				GBP: "£",
-				USD: "$",
-				EUR: "€"
-			};
-			const numericAmount = Number(amount) || 0;
-			const valueText = new Intl.NumberFormat(locale, {
-				minimumFractionDigits: 0,
-				maximumFractionDigits: 0
-			}).format(numericAmount);
-			return `${valueText} ${symbols[appCurrency] || appCurrency}`;
-		}
+function syncThemeButtons() {
+	if (themeLightButton) {
+		const isLight = appTheme === "light";
+		themeLightButton.classList.toggle("is-active", isLight);
+		themeLightButton.setAttribute("aria-pressed", String(isLight));
+	}
+	if (themeDarkButton) {
+		const isDark = appTheme === "dark";
+		themeDarkButton.classList.toggle("is-active", isDark);
+		themeDarkButton.setAttribute("aria-pressed", String(isDark));
+	}
+}
 
-		function formatDisplayDate(isoDate) {
-			if (!isoDate) {
-				return "";
-			}
+function formatCurrency(amount) {
+	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
+	const symbols = {
+		HUF: "Ft",
+		GBP: "£",
+		USD: "$",
+		EUR: "€"
+	};
+	const numericAmount = Number(amount) || 0;
+	const valueText = new Intl.NumberFormat(locale, {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0
+	}).format(numericAmount);
+	return `${valueText} ${symbols[appCurrency] || appCurrency}`;
+}
 
-			const dateObj = new Date(`${isoDate}T00:00:00`);
-			if (Number.isNaN(dateObj.getTime())) {
-				return isoDate;
-			}
+function formatDisplayDate(isoDate) {
+	if (!isoDate) {
+		return "";
+	}
 
-			if (appLanguage === "en") {
-				return dateObj.toLocaleDateString("en-US", {
-					year: "numeric",
-					month: "long",
-					day: "numeric"
-				});
-			}
+	const dateObj = new Date(`${isoDate}T00:00:00`);
+	if (Number.isNaN(dateObj.getTime())) {
+		return isoDate;
+	}
 
-			return dateObj.toLocaleDateString("hu-HU");
-		}
+	if (appLanguage === "en") {
+		return dateObj.toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "long",
+			day: "numeric"
+		});
+	}
 
-		function loadCurrency() {
-			return shared.loadCurrency();
-		}
+	return dateObj.toLocaleDateString("hu-HU");
+}
 
-		function isAppInstalled() {
-			return shared.isAppInstalled();
-		}
+function loadCurrency() {
+	return shared.loadCurrency();
+}
 
-		function updateInstallButtonState() {
-			const installed = isAppInstalled();
-			if (installed && !deferredInstallPrompt) {
-				installAppButton.textContent = t("appDownloaded");
-				installAppButton.disabled = true;
-				return;
-			}
+function isAppInstalled() {
+	return shared.isAppInstalled();
+}
 
-			installAppButton.textContent = t("downloadAppButton");
-			installAppButton.disabled = false;
-		}
+function updateInstallButtonState() {
+	const installed = isAppInstalled();
+	if (installed && !deferredInstallPrompt) {
+		installAppButton.textContent = t("appDownloaded");
+		installAppButton.disabled = true;
+		return;
+	}
 
-		function applyAuthenticatedState(session) {
-			currentUser = String(session?.profile?.username || currentUser || "").trim();
-			currentProfile = session?.profile || null;
-			if (!currentUser) {
-				return;
-			}
-			localStorage.setItem(SESSION_KEY, currentUser);
-		}
+	installAppButton.textContent = t("downloadAppButton");
+	installAppButton.disabled = false;
+}
 
-		function loadLanguage() {
-			return shared.loadLanguage();
-		}
+function applyAuthenticatedState(session) {
+	currentUser = String(session?.profile?.username || currentUser || "").trim();
+	currentProfile = session?.profile || null;
+	if (!currentUser) {
+		return;
+	}
+	localStorage.setItem(SESSION_KEY, currentUser);
+}
 
-		function toMonthInput(dateObj) {
-			return shared.toMonthInput(dateObj);
-		}
+function loadLanguage() {
+	return shared.loadLanguage();
+}
 
-		function toDateInput(dateObj) {
-			return shared.toDateInput(dateObj);
-		}
+function toMonthInput(dateObj) {
+	return shared.toMonthInput(dateObj);
+}
 
-		function getMonthEndDate(monthValue) {
-			return shared.getMonthEndDate(monthValue, today);
-		}
+function toDateInput(dateObj) {
+	return shared.toDateInput(dateObj);
+}
 
-		function loadGuestData() {
-			return shared.loadGuestData();
-		}
+function getMonthEndDate(monthValue) {
+	return shared.getMonthEndDate(monthValue, today);
+}
+
+function loadGuestData() {
+	return shared.loadGuestData();
+}
