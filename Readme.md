@@ -54,7 +54,7 @@ Based on these extra planned items, the app recalculates expected results for th
 - `index.html` - start page (auth, language, theme, menu)
 - `budget.html` - main budgeting page (CRUD + stats + lists)
 - `budget-forecast.html` - forecast planner with what-if scenarios
-- `monthly_budget.html` - monthly summary
+- `summary.html` - monthly summary
 - `contact.html` - contact page
 
 ## Tech stack
