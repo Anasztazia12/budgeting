@@ -93,4 +93,10 @@ választó</label>
         <header class="debt type">
             <div class="debt-header">
                 <h2 data-i18n="contactTitle">Hitel</h2>
-                 <div class="contact-actions">
+                 <div class="debt-actions">
+                    <form id="debt-form" class="stack">
+                        <input type="text" id="debt-name" name="debt-name" required maxlength="100" placeholder="Hitel neve...">
+                        <input type="number" id="debt-amount" name="debt-amount" required min="0" step="0.01" placeholder="Összeg...">
+                        <input type="date" id="debt-due-date" name="debt-due-date" required>
+                        <input type="end-date" class="btn btn-primary" value="Lejárati dátum hozzáadása">
+                        <button type="submit" class="btn btn-primary">Hozzáadás</button>
