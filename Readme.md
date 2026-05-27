@@ -10,6 +10,7 @@ Responsive design
 
 This is my budgeting app project.
 
+I built this app for my husband for help him to manage  income, expenses
 The goal was to build a simple and clear money-tracking web app that works in both Hungarian and English.
 
 It is still evolving, but I have already added many UX improvements recently, including mobile usability updates.
