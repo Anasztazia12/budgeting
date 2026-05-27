@@ -251,7 +251,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	if (summaryToggleButton) {
 		summaryToggleButton.addEventListener("click", () => {
 			const start = periodStartInput?.value || shared.toDateInput(today);
-			window.location.href = `summary.html?month=${encodeURIComponent(start.slice(0, 7))}`;
+			window.location.href = `budget.html?month=${encodeURIComponent(start.slice(0, 7))}`;
 		});
 	}
 

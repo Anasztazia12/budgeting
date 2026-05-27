@@ -6,11 +6,7 @@ import {
 } from "./firebase-service.js";
 
 const shared = window.BudgetAppShared;
-const {
-	SESSION_KEY,
-	DISPLAY_NAME_KEY,
-	INSTALL_STATUS_KEY
-} = shared.KEYS;
+const { SESSION_KEY, DISPLAY_NAME_KEY, INSTALL_STATUS_KEY } = shared.KEYS;
 const { GUEST_SESSION_VALUE } = shared;
 
 const dictionary = {
@@ -83,7 +79,6 @@ const dictionary = {
 		guestUser: "Vendég",
 		appDownloaded: "Az app letöltve.",
 		editAction: "Szerkesztés",
-		deleteAction: "Törlés",
 		typeIncome: "Bevétel",
 		typeExpense: "Kiadás"
 	},
@@ -156,13 +151,11 @@ const dictionary = {
 		guestUser: "Guest",
 		appDownloaded: "App downloaded.",
 		editAction: "Edit",
-		deleteAction: "Delete",
 		typeIncome: "Income",
 		typeExpense: "Expense"
 	}
 };
 
-// --- State ---
 const today = new Date();
 const pageParams = new URLSearchParams(window.location.search);
 let currentUser = localStorage.getItem(SESSION_KEY) || "";
@@ -177,7 +170,6 @@ let deferredInstallPrompt = null;
 let forecastScenarios = [];
 let activeForecastScenarioId = "";
 
-// --- DOM refs ---
 const summaryToggleButton = document.getElementById("summary-toggle-button");
 const forecastToggleButton = document.getElementById("forecast-toggle-button");
 const menuToggle = document.getElementById("menu-toggle");
@@ -205,14 +197,11 @@ const forecastWithPurchaseEl = document.getElementById("forecast-with-purchase")
 const forecastDifferenceEl = document.getElementById("forecast-difference");
 const forecastMonthEndEl = document.getElementById("forecast-month-end");
 
-// Apply theme immediately so there's no flash before async init resolves
+// Apply theme before async init to prevent flash
 applyTheme();
 syncThemeButtons();
 
-// --- Boot ---
 void initializePage();
-
-// --- Event listeners ---
 
 languageSelect.addEventListener("change", () => {
 	appLanguage = languageSelect.value;
@@ -235,39 +224,25 @@ currencySelect.addEventListener("change", () => {
 	});
 });
 
-if (forecastToggleButton) {
-	forecastToggleButton.addEventListener("click", () => {
-		window.location.href = "budget.html";
-	});
-}
-
+if (forecastToggleButton) forecastToggleButton.addEventListener("click", () => { window.location.href = "budget.html"; });
 if (summaryToggleButton) {
 	summaryToggleButton.addEventListener("click", () => {
 		const periodStart = periodStartInput?.value || shared.toDateInput(today);
-		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-		window.location.href = `summary.html?month=${monthParam}`;
+		window.location.href = `summary.html?month=${encodeURIComponent(periodStart.slice(0, 7))}`;
 	});
 }
 
 addWhatIfRowButton.addEventListener("click", () => {
-	// Only one manually-added row at a time
 	const existing = whatIfRowsContainer.querySelector(".whatif-row[data-manual='true']");
 	if (existing) existing.remove();
-	// Pass empty amount AND empty date so hasData=false → row always opens in edit mode
-	appendWhatIfRow(
-		{ type: "expense", amount: "", date: "", note: "", planName: "", rowId: shared.createEntryId(), manual: true },
-		true
-	);
+	appendWhatIfRow({ type: "expense", amount: "", date: "", note: "", planName: "", rowId: shared.createEntryId(), manual: true }, true);
 	renderForecastPlanner();
 });
 
-if (forecastLoadScenarioButton) {
-	forecastLoadScenarioButton.addEventListener("click", loadSelectedForecastScenarios);
-}
+if (forecastLoadScenarioButton) forecastLoadScenarioButton.addEventListener("click", loadSelectedForecastScenarios);
 
 whatIfRowsContainer.addEventListener("input", renderForecastPlanner);
 whatIfRowsContainer.addEventListener("change", (event) => {
-	// Keep the type select styled based on its current value
 	const sel = event.target;
 	if (sel.classList.contains("forecast-whatif-type")) {
 		sel.classList.remove("type-expense", "type-income");
@@ -275,6 +250,7 @@ whatIfRowsContainer.addEventListener("change", (event) => {
 	}
 	renderForecastPlanner();
 });
+
 whatIfRowsContainer.addEventListener("click", (event) => {
 	const actionButton = event.target.closest("button[data-action]");
 	if (!actionButton) return;
@@ -283,7 +259,6 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 	const action = actionButton.dataset.action;
 
 	if (action === "remove-whatif") {
-		// Remove this row from the current view ONLY — saved plan in localStorage is NOT touched
 		rowElement.remove();
 		showMessage(t("forecastRowRemoved"), false);
 		renderForecastPlanner();
@@ -291,13 +266,11 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 	}
 
 	if (action === "delete-plan") {
-		// Completely delete the saved plan (all its rows) from localStorage
 		const planName = rowElement.dataset.planName;
 		if (planName) {
 			forecastScenarios = forecastScenarios.filter((s) => s.name !== planName);
 			saveForecastScenarios();
 			renderScenarioList();
-			// Remove all rows in the view that belong to this plan
 			whatIfRowsContainer.querySelectorAll(".whatif-row").forEach((row) => {
 				if (row.dataset.planName === planName) row.remove();
 			});
@@ -308,8 +281,6 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 	}
 
 	if (action === "cancel-edit") {
-		// If the row already had saved data in its dataset, go back to display mode.
-		// If it was a brand-new empty row (no amount, no date), just remove it.
 		const hasData = Number(rowElement.dataset.amount) > 0 || Boolean(rowElement.dataset.date);
 		if (hasData) {
 			rowElement.classList.remove("edit-mode");
@@ -368,7 +339,6 @@ document.addEventListener("click", (event) => {
 		menuToggle.classList.remove("is-open");
 		menuToggle.setAttribute("aria-expanded", "false");
 	}
-	// Close saved-plans dropdown when clicking outside it
 	if (!event.target.closest(".saved-plans-dropdown")) {
 		document.querySelector(".saved-plans-dropdown")?.removeAttribute("open");
 	}
@@ -397,14 +367,15 @@ window.addEventListener("appinstalled", () => {
 });
 
 if ("serviceWorker" in navigator) {
-	window.addEventListener("load", () => {
-		navigator.serviceWorker.register("sw.js").catch(() => {});
-	});
+	window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
 }
 
-if (menuBackButton) {
-	menuBackButton.addEventListener("click", () => window.history.back());
-}
+if (menuBackButton) menuBackButton.addEventListener("click", () => window.history.back());
+if (menuLogoutButton) menuLogoutButton.addEventListener("click", handleLogout);
+if (deleteAccountButton) deleteAccountButton.addEventListener("click", handleAccountDelete);
+if (themeLightButton) themeLightButton.addEventListener("click", () => setTheme("light"));
+if (themeDarkButton) themeDarkButton.addEventListener("click", () => setTheme("dark"));
+if (contactUsButton) contactUsButton.addEventListener("click", () => { window.location.href = "contact.html"; });
 
 if (installAppButton) {
 	installAppButton.addEventListener("click", async () => {
@@ -430,41 +401,18 @@ if (installAppButton) {
 	});
 }
 
-if (menuLogoutButton) {
-	menuLogoutButton.addEventListener("click", handleLogout);
-}
-if (deleteAccountButton) {
-	deleteAccountButton.addEventListener("click", handleAccountDelete);
-}
-if (themeLightButton) {
-	themeLightButton.addEventListener("click", () => setTheme("light"));
-}
-if (themeDarkButton) {
-	themeDarkButton.addEventListener("click", () => setTheme("dark"));
-}
-if (contactUsButton) {
-	contactUsButton.addEventListener("click", () => {
-		window.location.href = "contact.html";
-	});
-}
-
-// --- Page init ---
-
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
 		appState = shared.loadGuestData();
 	} else {
 		const session = await restoreSession(currentUser);
-		if (!session) {
-			window.location.href = "index.html";
-			return;
-		}
-		applyAuthenticatedState(session);
+		if (!session) { window.location.href = "index.html"; return; }
+		currentUser = String(session?.profile?.username || currentUser || "").trim();
+		currentProfile = session?.profile || null;
+		if (currentUser) localStorage.setItem(SESSION_KEY, currentUser);
 		appState = session.data || { incomes: [], expenses: [] };
 	}
-
-	const queryMonth = pageParams.get("month");
-	setDefaultPeriodRange(queryMonth);
+	setDefaultPeriodRange(pageParams.get("month"));
 	languageSelect.value = appLanguage;
 	currencySelect.value = appCurrency;
 	whatIfRowsContainer.innerHTML = "";
@@ -479,9 +427,7 @@ async function initializePage() {
 function applyTranslations() {
 	document.documentElement.lang = appLanguage;
 	document.title = t("pageTitle");
-	document.querySelectorAll("[data-i18n]").forEach((el) => {
-		el.textContent = t(el.dataset.i18n);
-	});
+	document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
 	menuToggle.setAttribute("aria-label", t("menuButton"));
 	document.querySelectorAll("[data-i18n-aria-label]").forEach((el) => {
 		el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel));
@@ -493,8 +439,6 @@ function applyTranslations() {
 	renderScenarioList();
 	updateMenuSessionLabel();
 }
-
-// --- Forecast scenarios ---
 
 function getForecastScenarioStorageKey() {
 	const key = currentUser === GUEST_SESSION_VALUE ? "guest" : (currentUser || "anon");
@@ -512,6 +456,7 @@ function normalizeScenarioRows(rows) {
 }
 
 function loadForecastScenarios() {
+	if (currentUser === GUEST_SESSION_VALUE) { forecastScenarios = []; return; }
 	const raw = localStorage.getItem(getForecastScenarioStorageKey());
 	if (!raw) { forecastScenarios = []; return; }
 	try {
@@ -530,6 +475,7 @@ function loadForecastScenarios() {
 }
 
 function saveForecastScenarios() {
+	if (currentUser === GUEST_SESSION_VALUE) return;
 	localStorage.setItem(getForecastScenarioStorageKey(), JSON.stringify(forecastScenarios));
 }
 
@@ -576,7 +522,6 @@ function loadSelectedForecastScenarios() {
 			});
 		}
 	});
-	// Close the dropdown after loading
 	document.querySelector(".saved-plans-dropdown")?.removeAttribute("open");
 	showMessage(t("forecastScenarioLoaded"), false);
 	renderForecastPlanner();
@@ -608,21 +553,11 @@ function saveWhatIfRow(rowElement) {
 	const rowId = rowElement.dataset.rowId || shared.createEntryId();
 	rowElement.dataset.rowId = rowId;
 
-	const type = isEdit
-		? (rowElement.querySelector(".forecast-whatif-type")?.value || "expense")
-		: (rowElement.dataset.type || "expense");
-	const amount = isEdit
-		? Number(rowElement.querySelector(".forecast-whatif-amount")?.value || 0)
-		: Number(rowElement.dataset.amount || 0);
-	const date = isEdit
-		? (rowElement.querySelector(".forecast-whatif-date")?.value || "")
-		: (rowElement.dataset.date || "");
-	const note = isEdit
-		? String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80)
-		: (rowElement.dataset.note || "");
-	const planName = isEdit
-		? String(rowElement.querySelector(".forecast-whatif-plan-name")?.value || "").trim().slice(0, 50)
-		: (rowElement.dataset.planName || "");
+	const type = isEdit ? (rowElement.querySelector(".forecast-whatif-type")?.value || "expense") : (rowElement.dataset.type || "expense");
+	const amount = isEdit ? Number(rowElement.querySelector(".forecast-whatif-amount")?.value || 0) : Number(rowElement.dataset.amount || 0);
+	const date = isEdit ? (rowElement.querySelector(".forecast-whatif-date")?.value || "") : (rowElement.dataset.date || "");
+	const note = isEdit ? String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80) : (rowElement.dataset.note || "");
+	const planName = isEdit ? String(rowElement.querySelector(".forecast-whatif-plan-name")?.value || "").trim().slice(0, 50) : (rowElement.dataset.planName || "");
 
 	if (!planName) { showMessage(t("forecastScenarioNameRequired"), true); return; }
 	if (!(amount > 0 && date)) { showMessage(t("forecastScenarioEmpty"), true); return; }
@@ -635,8 +570,8 @@ function saveWhatIfRow(rowElement) {
 		rowElement.dataset.planName = planName;
 	}
 
-	const rowData = { rowId, type, amount, date, note, planName };
 	const scenario = ensureActiveScenario(planName);
+	const rowData = { rowId, type, amount, date, note, planName };
 	const idx = scenario.rows.findIndex((r) => r.rowId === rowId);
 	if (idx >= 0) {
 		scenario.rows[idx] = rowData;
@@ -654,8 +589,6 @@ function saveWhatIfRow(rowElement) {
 		rowElement.innerHTML = buildWhatIfRowDisplayHTML(rowElement);
 	}
 }
-
-// --- What-if rows ---
 
 function appendWhatIfRow(row, prepend = false) {
 	const wrapper = document.createElement("div");
@@ -678,11 +611,8 @@ function appendWhatIfRow(row, prepend = false) {
 		if (typeSelect) typeSelect.value = wrapper.dataset.type || "expense";
 	}
 
-	if (prepend) {
-		whatIfRowsContainer.insertBefore(wrapper, whatIfRowsContainer.firstChild);
-	} else {
-		whatIfRowsContainer.appendChild(wrapper);
-	}
+	if (prepend) whatIfRowsContainer.insertBefore(wrapper, whatIfRowsContainer.firstChild);
+	else whatIfRowsContainer.appendChild(wrapper);
 }
 
 function buildWhatIfRowDisplayHTML(wrapper) {
@@ -716,8 +646,8 @@ function buildWhatIfRowEditHTML(wrapper) {
 	const date = wrapper.dataset.date || "";
 	const note = wrapper.dataset.note || "";
 	const planName = wrapper.dataset.planName || "";
-	// Pre-fill date with period end as a UI suggestion if no date is set yet
 	const dateValue = date || periodEndInput?.value || "";
+	const typeClass = `type-${wrapper.dataset.type || "expense"}`;
 	return `
 		<div class="whatif-row-fields">
 			<div class="whatif-field">
@@ -728,15 +658,14 @@ function buildWhatIfRowEditHTML(wrapper) {
 			</div>
 			<div class="whatif-field whatif-field-type">
 				<label>${t("forecastRowTypeLabel")}</label>
-				<select class="forecast-whatif-type type-${wrapper.dataset.type || "expense"}">
-					<option value="expense">${t("forecastTypeExpense")}</option>
-					<option value="income">${t("forecastTypeIncome")}</option>
+				<select class="forecast-whatif-type ${typeClass}">
+					<option value="expense" style="color:#b7203d;font-weight:700">${t("forecastTypeExpense")}</option>
+					<option value="income" style="color:#1a7a4e;font-weight:700">${t("forecastTypeIncome")}</option>
 				</select>
 			</div>
 			<div class="whatif-field whatif-field-amount">
 				<label>${t("forecastRowAmountLabel")}</label>
-				<input type="number" class="forecast-whatif-amount" min="0" step="1"
-					inputmode="decimal" value="${amount}">
+				<input type="number" class="forecast-whatif-amount" min="0" step="1" inputmode="decimal" value="${amount}">
 			</div>
 			<div class="whatif-field whatif-field-date">
 				<label>${t("forecastRowDateLabel")}</label>
@@ -792,14 +721,9 @@ function collectWhatIfRows(periodStart, periodEnd) {
 			amount = Number(row.dataset.amount || 0);
 			date = row.dataset.date || "";
 		}
-		return {
-			type, amount, date,
-			valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd
-		};
+		return { type, amount, date, valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd };
 	});
 }
-
-// --- Forecast calculation ---
 
 function renderForecastPlanner() {
 	const zero = formatCurrency(0);
@@ -810,46 +734,34 @@ function renderForecastPlanner() {
 		if (forecastMonthEndEl) forecastMonthEndEl.textContent = zero;
 		return;
 	}
-
 	const period = getSelectedPeriod();
-	const incomes = periodEntries(appState.incomes, period.start, period.end);
-	const expenses = periodEntries(appState.expenses, period.start, period.end);
-	const targetDate = period.end;
-
+	const incomes = (appState.incomes || []).filter((e) => e.date >= period.start && e.date <= period.end);
+	const expenses = (appState.expenses || []).filter((e) => e.date >= period.start && e.date <= period.end);
 	const whatIfRows = collectWhatIfRows(period.start, period.end);
 
 	const baseUntil =
-		shared.sumEntries(incomes.filter((e) => e.date <= targetDate)) -
-		shared.sumEntries(expenses.filter((e) => e.date <= targetDate));
-
+		shared.sumEntries(incomes.filter((e) => e.date <= period.end)) -
+		shared.sumEntries(expenses.filter((e) => e.date <= period.end));
 	const adjustUntil = whatIfRows
-		.filter((r) => r.valid && r.date <= targetDate)
+		.filter((r) => r.valid && r.date <= period.end)
 		.reduce((sum, r) => sum + (r.type === "income" ? r.amount : -r.amount), 0);
-
 	const withPurchase = baseUntil + adjustUntil;
-	const difference = withPurchase - baseUntil;
-
 	const baseMonthEnd = shared.sumEntries(incomes) - shared.sumEntries(expenses);
 	const allAdjust = whatIfRows
 		.filter((r) => r.valid)
 		.reduce((sum, r) => sum + (r.type === "income" ? r.amount : -r.amount), 0);
-	const monthEnd = baseMonthEnd + allAdjust;
 
 	if (forecastBaseUntilEl) forecastBaseUntilEl.textContent = formatCurrency(baseUntil);
 	if (forecastWithPurchaseEl) forecastWithPurchaseEl.textContent = formatCurrency(withPurchase);
-	if (forecastDifferenceEl) forecastDifferenceEl.textContent = formatCurrency(difference);
-	if (forecastMonthEndEl) forecastMonthEndEl.textContent = formatCurrency(monthEnd);
+	if (forecastDifferenceEl) forecastDifferenceEl.textContent = formatCurrency(withPurchase - baseUntil);
+	if (forecastMonthEndEl) forecastMonthEndEl.textContent = formatCurrency(baseMonthEnd + allAdjust);
 }
-
-// --- Auth / account ---
 
 async function handleLogout() {
 	menuPanel.classList.remove("is-open");
 	menuToggle.classList.remove("is-open");
 	menuToggle.setAttribute("aria-expanded", "false");
-	if (currentUser && currentUser !== GUEST_SESSION_VALUE) {
-		await logoutCurrentUser().catch(() => null);
-	}
+	if (currentUser && currentUser !== GUEST_SESSION_VALUE) await logoutCurrentUser().catch(() => null);
 	currentUser = "";
 	currentProfile = null;
 	appState = { incomes: [], expenses: [] };
@@ -871,11 +783,10 @@ async function handleAccountDelete() {
 		return;
 	}
 	resetDeleteAccountConfirmState();
-	const email = currentProfile?.email || "";
 	try {
 		showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
 		await deleteCurrentAccount();
-		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+		await shared.sendAccountDeletionEmail(appLanguage, currentProfile?.email || "", currentUser);
 		await logoutCurrentUser().catch(() => null);
 		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
 		currentUser = "";
@@ -901,18 +812,6 @@ function updateAccessUI() {
 	menuToggle.disabled = false;
 }
 
-function applyAuthenticatedState(session) {
-	currentUser = String(session?.profile?.username || currentUser || "").trim();
-	currentProfile = session?.profile || null;
-	if (currentUser) localStorage.setItem(SESSION_KEY, currentUser);
-}
-
-// --- Period helpers ---
-
-function periodEntries(entries, startDate, endDate) {
-	return (entries || []).filter((item) => item.date >= startDate && item.date <= endDate);
-}
-
 function getDateRange(startDate, endDate) {
 	if (!startDate || !endDate || startDate <= endDate) return { start: startDate, end: endDate };
 	return { start: endDate, end: startDate };
@@ -934,22 +833,15 @@ function normalizePeriodInputs() {
 }
 
 function setDefaultPeriodRange(queryMonth) {
-	const monthValue =
-		queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : shared.toMonthInput(today);
-	const start = `${monthValue}-01`;
-	const end = shared.getMonthEndDate(monthValue);
-	if (periodStartInput) periodStartInput.value = start;
-	if (periodEndInput) periodEndInput.value = end;
+	const monthValue = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : shared.toMonthInput(today);
+	if (periodStartInput) periodStartInput.value = `${monthValue}-01`;
+	if (periodEndInput) periodEndInput.value = shared.getMonthEndDate(monthValue);
 }
-
-// --- UI helpers ---
 
 function t(key) {
 	const parts = key.split(".");
 	let current = dictionary[appLanguage] || dictionary.hu;
-	for (const part of parts) {
-		current = current ? current[part] : undefined;
-	}
+	for (const part of parts) current = current ? current[part] : undefined;
 	return current !== undefined ? current : key;
 }
 
@@ -966,14 +858,12 @@ function setTheme(mode) {
 
 function syncThemeButtons() {
 	if (themeLightButton) {
-		const isLight = appTheme === "light";
-		themeLightButton.classList.toggle("is-active", isLight);
-		themeLightButton.setAttribute("aria-pressed", String(isLight));
+		themeLightButton.classList.toggle("is-active", appTheme === "light");
+		themeLightButton.setAttribute("aria-pressed", String(appTheme === "light"));
 	}
 	if (themeDarkButton) {
-		const isDark = appTheme === "dark";
-		themeDarkButton.classList.toggle("is-active", isDark);
-		themeDarkButton.setAttribute("aria-pressed", String(isDark));
+		themeDarkButton.classList.toggle("is-active", appTheme === "dark");
+		themeDarkButton.setAttribute("aria-pressed", String(appTheme === "dark"));
 	}
 }
 
@@ -988,10 +878,7 @@ function showMessage(message, isError) {
 function formatCurrency(amount) {
 	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
 	const symbols = { HUF: "Ft", GBP: "£", USD: "$", EUR: "€" };
-	const value = new Intl.NumberFormat(locale, {
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0
-	}).format(Number(amount) || 0);
+	const value = new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(amount) || 0);
 	return `${value} ${symbols[appCurrency] || appCurrency}`;
 }
 
@@ -999,10 +886,9 @@ function formatDisplayDate(isoDate) {
 	if (!isoDate) return "";
 	const d = new Date(`${isoDate}T00:00:00`);
 	if (Number.isNaN(d.getTime())) return isoDate;
-	if (appLanguage === "en") {
-		return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-	}
-	return d.toLocaleDateString("hu-HU");
+	return appLanguage === "en"
+		? d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+		: d.toLocaleDateString("hu-HU");
 }
 
 function escapeHtml(text) {
@@ -1016,13 +902,9 @@ function escapeHtml(text) {
 
 function updateInstallButtonState() {
 	if (!installAppButton) return;
-	if (shared.isAppInstalled() && !deferredInstallPrompt) {
-		installAppButton.textContent = t("appDownloaded");
-		installAppButton.disabled = true;
-		return;
-	}
-	installAppButton.textContent = t("downloadAppButton");
-	installAppButton.disabled = false;
+	const installed = shared.isAppInstalled() && !deferredInstallPrompt;
+	installAppButton.textContent = t(installed ? "appDownloaded" : "downloadAppButton");
+	installAppButton.disabled = installed;
 }
 
 function updateMenuSessionLabel() {
