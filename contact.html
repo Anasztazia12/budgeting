@@ -58,6 +58,7 @@
             serverTimestamp
         } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
+        const WEB3FORMS_KEY = "b4c66ee3-69e7-4c59-a8c9-77d96ad55ca9";
         const db = getFirestore(app);
         const form = document.getElementById("contact-form");
         const feedback = document.getElementById("contact-feedback");
@@ -65,19 +66,39 @@
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
             const btn = form.querySelector("button[type=submit]");
+            const originalText = btn.textContent;
             btn.disabled = true;
+            btn.textContent = "Sending...";
             feedback.textContent = "";
             feedback.className = "auth-message";
 
+            const name    = document.getElementById("contact-name").value.trim();
+            const username = document.getElementById("contact-username").value.trim() || "";
+            const email   = document.getElementById("contact-email").value.trim();
+            const message = document.getElementById("contact-message").value.trim();
+
             try {
+                // 1) Send email via Web3Forms
+                const formData = new FormData();
+                formData.append("access_key", WEB3FORMS_KEY);
+                formData.append("name", name);
+                formData.append("email", email);
+                formData.append("message", username ? `[${username}]\n\n${message}` : message);
+
+                const res = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || "Web3Forms error");
+
+                // 2) Save to Firestore as archive
                 await addDoc(collection(db, "contacts"), {
-                    name: document.getElementById("contact-name").value.trim(),
-                    username: document.getElementById("contact-username").value.trim() || "",
-                    email: document.getElementById("contact-email").value.trim(),
-                    message: document.getElementById("contact-message").value.trim(),
+                    name, username, email, message,
                     sentAt: serverTimestamp(),
                     status: "new"
-                });
+                }).catch(() => {}); // Firestore failure does not block the user
+
                 feedback.textContent = "Message sent successfully!";
                 feedback.className = "auth-message ok";
                 form.reset();
@@ -87,6 +108,7 @@
                 feedback.className = "auth-message error";
             } finally {
                 btn.disabled = false;
+                btn.textContent = originalText;
             }
         });
     </script>
