@@ -220,9 +220,6 @@ body {
 	grid-template-columns: repeat(3, minmax(0,1fr));
 	gap: 1rem;
 	align-items: center;
-	max-width: 980px;
-	margin-left: auto;
-	margin-right: auto;
 }
  
 /* ── Budget controls ── */
@@ -378,6 +375,7 @@ input[type="month"]::-webkit-calendar-picker-indicator {
 .menu-panel button,
 .top-nav a,
 .btn-link,
+.btn,
 button:not(.btn):not([class*="btn-"]) {
 	position: relative; overflow: hidden; isolation: isolate;
 }
@@ -385,6 +383,7 @@ button:not(.btn):not([class*="btn-"]) {
 .menu-panel button::after,
 .top-nav a::after,
 .btn-link::after,
+.btn::after,
 button:not(.btn):not([class*="btn-"])::after {
 	content: "";
 	position: absolute;
@@ -400,6 +399,7 @@ button:not(.btn):not([class*="btn-"])::after {
 .menu-panel button:hover::after,
 .top-nav a:hover::after,
 .btn-link:hover::after,
+.btn:hover::after,
 button:not(.btn):not([class*="btn-"]):hover::after { left: 130%; }
  
 button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
@@ -664,10 +664,12 @@ button.secondary:hover, button.secondary:focus-visible { filter: brightness(1.08
 [data-theme="dark"] .stat:has(#monthly-expense) h3 { color: #ffb0c4; }
 [data-theme="dark"] .stat:has(#monthly-expense) #monthly-expense { color: #c63e5e; text-shadow: none; }
  
-.stat:has(#monthly-income) h3 { color: #1f8f62; }
-#monthly-income { color: #1f8f62; }
-[data-theme="dark"] #monthly-income { color: #79e3b3; }
+.stat:has(#monthly-income) { background: linear-gradient(155deg, #f0fbf5, #e3f7ed 70%); border-color: #8ecfb0; box-shadow: 0 12px 24px rgba(20,110,70,.18); }
+.stat:has(#monthly-income) h3 { color: #1a7a4e; font-weight: 700; }
+.stat:has(#monthly-income) #monthly-income { color: #1f8f62; text-shadow: 0 1px 0 rgba(255,255,255,.45); }
+[data-theme="dark"] .stat:has(#monthly-income) { background: linear-gradient(155deg, #0e2b1e, #091e15 70%); border-color: #2a7a54; box-shadow: 0 12px 24px rgba(0,0,0,.28); }
 [data-theme="dark"] .stat:has(#monthly-income) h3 { color: #79e3b3; }
+[data-theme="dark"] .stat:has(#monthly-income) #monthly-income { color: #79e3b3; text-shadow: none; }
  
 #monthly-expense, #spent-to-date { color: #c63e5e; }
 #spent-to-date, #month-end-left { color: #111; }
@@ -770,6 +772,7 @@ label { font-weight: 600; color: var(--muted-strong); font-size: 0.92rem; }
 .stack { display: grid; gap: 0.55rem; }
 .controls { margin-top: 0.9rem; }
 .session-card { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
+.session-card.hidden { display: none; }
 .session-card p { margin: 0; }
 .auth-message { width: 100%; font-weight: 600; }
 .auth-message.error { color: var(--danger); }

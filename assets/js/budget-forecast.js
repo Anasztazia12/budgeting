@@ -340,7 +340,6 @@ const incomeDeleteButton = document.getElementById("income-delete");
 const expenseCancelEdit = document.getElementById("expense-cancel-edit");
 const expenseDeleteButton = document.getElementById("expense-delete");
 const forecastPlanner = document.getElementById("forecast-planner");
-const forecastTargetDateInput = document.getElementById("forecast-target-date");
 const addWhatIfRowButton = document.getElementById("add-whatif-row");
 const whatIfRowsContainer = document.getElementById("whatif-rows");
 const forecastScenarioNameInput = document.getElementById("forecast-scenario-name");
@@ -388,9 +387,9 @@ if (summaryToggleButton) {
 		window.location.href = `monthly_budget.html?month=${monthParam}`;
 	});
 }
-forecastTargetDateInput.addEventListener("change", renderForecastPlanner);
 addWhatIfRowButton.addEventListener("click", () => {
-	appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "", rowId: shared.createEntryId() });
+	const date = periodEndInput?.value || shared.toDateInput(today);
+	appendWhatIfRow({ type: "expense", amount: "", date, note: "", rowId: shared.createEntryId() }, true);
 	renderForecastPlanner();
 });
 if (forecastLoadScenarioButton) {
@@ -429,7 +428,7 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 		}
 		rowElement.remove();
 		if (!whatIfRowsContainer.children.length) {
-			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "", rowId: shared.createEntryId() });
+			appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
 		}
 		renderForecastPlanner();
 		return;
@@ -626,7 +625,6 @@ async function initializePage() {
 	currencySelect.value = appCurrency;
 	resetIncomeForm();
 	resetExpenseForm();
-	setDefaultForecastDates();
 	setDefaultWhatIfRows();
 	loadForecastScenarios();
 	renderScenarioList();
@@ -743,7 +741,7 @@ function getWhatIfRowsForScenario() {
 }
 
 function ensureActiveScenario(scenarioName) {
-	const targetDate = forecastTargetDateInput?.value || "";
+	const targetDate = periodEndInput?.value || "";
 	if (activeForecastScenarioId) {
 		const existing = forecastScenarios.find((scenario) => scenario.id === activeForecastScenarioId);
 		if (existing && existing.name === scenarioName) {
@@ -794,7 +792,7 @@ function loadSelectedForecastScenarios() {
 	});
 
 	if (!whatIfRowsContainer.children.length) {
-		appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
+		appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
 	}
 
 	if (selectedScenarios.length === 1) {
@@ -844,7 +842,7 @@ function saveWhatIfRow(rowElement) {
 		showMessage(t("forecastRowSaved"), false);
 	}
 
-	scenario.targetDate = forecastTargetDateInput?.value || scenario.targetDate;
+	scenario.targetDate = periodEndInput?.value || scenario.targetDate;
 	saveForecastScenarios();
 	renderScenarioList();
 	if (forecastScenarioNameInput) {
@@ -903,17 +901,12 @@ function render() {
 	renderForecastPlanner();
 }
 
-function setDefaultForecastDates() {
-	const period = getSelectedPeriod();
-	forecastTargetDateInput.value = period.end;
-}
-
 function setDefaultWhatIfRows() {
 	whatIfRowsContainer.innerHTML = "";
-	appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
+	appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
 }
 
-function appendWhatIfRow(row) {
+function appendWhatIfRow(row, prepend = false) {
 	const wrapper = document.createElement("div");
 	wrapper.className = "grid forecast-grid whatif-row";
 	wrapper.dataset.rowId = String(row.rowId || shared.createEntryId());
@@ -951,7 +944,11 @@ function appendWhatIfRow(row) {
 	if (noteInput) {
 		noteInput.value = String(row.note || "").slice(0, 80);
 	}
-	whatIfRowsContainer.appendChild(wrapper);
+	if (prepend) {
+		whatIfRowsContainer.insertBefore(wrapper, whatIfRowsContainer.firstChild);
+	} else {
+		whatIfRowsContainer.appendChild(wrapper);
+	}
 }
 
 function refreshWhatIfRowLabels() {
@@ -1025,9 +1022,7 @@ function renderForecastPlanner() {
 	const period = getSelectedPeriod();
 	const incomes = periodEntries(appState.incomes, period.start, period.end);
 	const expenses = periodEntries(appState.expenses, period.start, period.end);
-	let targetDate = forecastTargetDateInput.value || period.end;
-	targetDate = clampDateToRange(targetDate, period.start, period.end);
-	forecastTargetDateInput.value = targetDate;
+	const targetDate = period.end;
 
 	const whatIfRows = collectWhatIfRows(period.start, period.end);
 	const baseUntil = shared.sumEntries(incomes.filter((item) => item.date <= targetDate)) - shared.sumEntries(expenses.filter((item) => item.date <= targetDate));

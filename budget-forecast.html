@@ -181,20 +181,14 @@
 			<section id="forecast-planner" class="card">
 				<h2 data-i18n="forecastTitle">Költségvetési előrejelző</h2>
 				<p id="auth-message" class="auth-message hidden" aria-live="polite"></p>
-				<div class="grid forecast-grid">
-					<div>
-						<label for="forecast-target-date" data-i18n="forecastTargetDateLabel">Elemzés dátuma</label>
-						<input type="date" id="forecast-target-date">
-					</div>
-				</div>
 				<div class="grid forecast-scenario-grid">
-					<div>
-						<label for="forecast-scenario-name" data-i18n="forecastScenarioNameLabel">Terv neve</label>
-						<input type="text" id="forecast-scenario-name" maxlength="50" data-i18n-placeholder="forecastScenarioNamePlaceholder" placeholder="Pl. Nyári terv">
-					</div>
 					<div>
 						<label data-i18n="forecastScenarioSavedLabel">Mentett tervek</label>
 						<div id="forecast-scenario-list" class="forecast-scenario-list" role="group" aria-label="Saved plans"></div>
+					</div>
+					<div>
+						<label for="forecast-scenario-name" data-i18n="forecastScenarioNameLabel">Terv neve</label>
+						<input type="text" id="forecast-scenario-name" maxlength="50" data-i18n-placeholder="forecastScenarioNamePlaceholder" placeholder="Pl. Nyári terv">
 					</div>
 					<div class="control-action forecast-scenario-actions">
 						<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
