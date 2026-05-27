@@ -90,131 +90,33 @@
 		</section>
 
 		<section id="budget-content">
-			<section class="grid forms-grid hidden always-hidden">
-				<article class="card">
-					<h2 data-i18n="incomeFormTitle">Bevétel hozzáadása</h2>
-					<form id="income-form" class="stack">
-						<input type="hidden" id="income-edit-id">
-						<label for="income-category" data-i18n="categoryLabel">Kategória</label>
-						<select id="income-category" required>
-							<option value="fizetes">Fizetés</option>
-							<option value="egyeb">Egyéb</option>
-						</select>
-
-						<label for="income-amount" data-i18n="amountLabel">Összeg</label>
-						<input type="number" id="income-amount" min="1" step="1" required>
-
-						<label for="income-date" data-i18n="incomeDateLabel">Mikor várható? (dátum)</label>
-						<input type="date" id="income-date" required>
-
-						<div class="form-actions">
-							<button type="submit" id="income-submit-button" class="btn btn-outline-info">Bevétel mentése</button>
-							<button type="button" id="income-cancel-edit" class="btn btn-outline-info secondary hidden">Szerkesztés</button>
-							<button type="button" id="income-delete" class="btn btn-danger" data-i18n="deleteAction">Törlés</button>
-						</div>
-					</form>
-				</article>
-
-				<article class="card">
-					<h2 data-i18n="expenseFormTitle">Kiadás hozzáadása</h2>
-					<form id="expense-form" class="stack">
-						<input type="hidden" id="expense-edit-id">
-						<label for="expense-category" data-i18n="categoryLabel">Kategória</label>
-						<select id="expense-category" required>
-							<option value="szamlak">Számlák</option>
-							<option value="viz">Víz</option>
-							<option value="gaz">Gáz</option>
-							<option value="aram">Áram</option>
-							<option value="auto">Autó</option>
-							<option value="benzin">Benzin</option>
-							<option value="elemiszer">Élelmiszer</option>
-							<option value="ruhak">Ruhák</option>
-							<option value="rent">Albérlet</option>
-							<option value="biztositas">Biztosítás</option>
-							<option value="hitelkartya 3">Hitelkártyák</option>
-							<option value="onkormanyzat">Önkormányzat</option>
-							<option value="zilch">Zilch</option>
-							<option value="tv">TV</option>
-							<option value="telefon">Telefon</option>
-							<option value="internet">Internet</option>
-							<option value="iskola">Iskola</option>
-							<option value="egyeb kiadas">Egyéb kiadás</option>
-						</select>
-
-						<label for="expense-amount" data-i18n="amountLabel">Összeg</label>
-						<input type="number" id="expense-amount" min="1" step="1" required>
-
-						<label for="expense-date" data-i18n="expenseDateLabel">Mikor lesz levonás? (dátum)</label>
-						<input type="date" id="expense-date" required>
-
-						<div class="form-actions">
-							<button type="submit" id="expense-submit-button" class="btn btn-outline-info">Kiadás mentése</button>
-							<button type="button" id="expense-cancel-edit" class="btn btn-outline-info secondary hidden">Szerkesztés</button>
-							<button type="button" id="expense-delete" class="btn btn-danger" data-i18n="deleteAction">Törlés</button>
-						</div>
-					</form>
-				</article>
-			</section>
-
-			<section class="grid stats-grid hidden always-hidden">
-				<article class="card stat">
-					<h3 data-i18n="monthlyIncomeTitle">Összes bevétel</h3>
-					<p id="monthly-income">0</p>
-				</article>
-
-				<article class="card stat">
-					<h3 data-i18n="monthEndTitle">Várható bevétel</h3>
-					<p id="month-end-left">0</p>
-				</article>
-
-				<article class="card stat">
-					<h3 data-i18n="monthlyExpenseTitle">Összes kiadás</h3>
-					<p id="monthly-expense">0</p>
-				</article>
-
-				<article class="card stat">
-					<h3 data-i18n="spentToDateTitle">Kiadás mai napig</h3>
-					<p id="spent-to-date">0</p>
-				</article>
-			</section>
-
 			<section id="forecast-planner" class="card">
 				<h2 data-i18n="forecastTitle">Költségvetési előrejelző</h2>
 				<p id="auth-message" class="auth-message hidden" aria-live="polite"></p>
-				<div class="forecast-top-bar">
-					<div class="scenario-selector" id="scenario-selector">
-						<button type="button" id="scenario-dropdown-toggle" class="scenario-selector-btn" aria-expanded="false" aria-haspopup="listbox">
-							<span id="scenario-selected-name">–</span>
-							<span class="scenario-dropdown-arrow" aria-hidden="true">▾</span>
-						</button>
-						<div id="forecast-scenario-list" class="scenario-dropdown-list hidden" role="listbox" aria-label="Saved plans"></div>
+
+				<!-- Mentett tervek -->
+				<div class="saved-plans-section">
+					<div class="saved-plans-header">
+						<span class="saved-plans-title" data-i18n="forecastScenarioSavedLabel">Mentett tervek</span>
+						<div class="saved-plans-actions">
+							<button id="forecast-load-scenario" type="button" class="secondary" data-i18n="forecastLoadButton">Betöltés</button>
+							<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
+						</div>
 					</div>
-					<button id="forecast-load-scenario" type="button" class="secondary" data-i18n="forecastLoadButton">Betöltés</button>
-					<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
+					<!-- JS tölti be a pipálható terveket -->
+					<div id="forecast-scenario-list" class="saved-plans-list" role="group" aria-label="Mentett tervek"></div>
 				</div>
-				<div class="forecast-plan-name-bar">
-					<label for="forecast-scenario-name" data-i18n="forecastScenarioNameLabel">Terv neve</label>
-					<input type="text" id="forecast-scenario-name" maxlength="50" data-i18n-placeholder="forecastScenarioNamePlaceholder" placeholder="Pl. Nyári terv">
-				</div>
+
+				<!-- Dinamikus sorok – alapból üres, JS generálja -->
 				<div id="whatif-rows" class="forecast-rows"></div>
+
+				<!-- Előrejelzés összesítő -->
 				<div class="forecast-results">
 					<p><strong data-i18n="forecastBaseUntilLabel">Egyenleg eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
 					<p><strong data-i18n="forecastWithPurchaseLabel">Egyenleg a tervezett tételekkel:</strong> <span id="forecast-with-purchase">0</span></p>
 					<p><strong data-i18n="forecastDifferenceLabel">Különbség:</strong> <span id="forecast-difference">0</span></p>
 					<p><strong data-i18n="forecastMonthEndImpactLabel">Egyenleg új állapotban:</strong> <span id="forecast-month-end">0</span></p>
 				</div>
-			</section>
-
-			<section class="grid summary-grid hidden always-hidden">
-				<article class="card">
-					<h2 data-i18n="incomeEntriesTitle">Bevételek ebben az időszakban</h2>
-					<ul id="income-list" class="entry-list action-list"></ul>
-				</article>
-
-				<article class="card">
-					<h2 data-i18n="expenseEntriesTitle">Kiadások ebben az időszakban</h2>
-					<ul id="expense-list" class="entry-list action-list"></ul>
-				</article>
 			</section>
 		</section>
 	</main>

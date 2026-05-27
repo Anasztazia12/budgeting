@@ -1,16 +1,14 @@
-﻿import {
+import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	logoutCurrentUser,
-	restoreSession,
-	saveCurrentUserData
+	restoreSession
 } from "./firebase-service.js";
 
 const shared = window.BudgetAppShared;
 const {
 	SESSION_KEY,
 	DISPLAY_NAME_KEY,
-	THEME_KEY,
 	INSTALL_STATUS_KEY
 } = shared.KEYS;
 const { GUEST_SESSION_VALUE } = shared;
@@ -25,7 +23,6 @@ const dictionary = {
 		budgetLink: "Költségvetés",
 		summaryLink: "Összesítés",
 		versionLabel: "Verzió",
-		themeModeLabel: "Téma",
 		themeModeLight: "Világos",
 		themeModeDark: "Sötét",
 		contactUs: "Kapcsolat",
@@ -36,7 +33,6 @@ const dictionary = {
 		languageSelectorAria: "Nyelv választó",
 		themeSwitchAria: "Téma váltó",
 		currencySelectorAria: "Pénznem választó",
-		appName: "Költségvetési app",
 		currencyLabel: "Pénznem\nválasztó",
 		currencyHuf: "HUF (forint)",
 		currencyGbp: "GBP (font)",
@@ -47,7 +43,6 @@ const dictionary = {
 		periodToLabel: "-ig",
 		forecastButton: "Vissza a Költségvetéshez",
 		forecastTitle: "Költségvetési előrejelző",
-		forecastTargetDateLabel: "Elemzés dátuma",
 		forecastAddRowButton: "+ Extra, váratlan tétel hozzáadása",
 		forecastRowTypeLabel: "Típus",
 		forecastRowAmountLabel: "Összeg",
@@ -68,7 +63,7 @@ const dictionary = {
 		forecastScenarioNone: "Nincs mentett terv",
 		forecastLoadButton: "Betöltés",
 		forecastScenarioNameRequired: "Adj nevet a tervnek.",
-		forecastScenarioEmpty: "Nincs menthető forecast sor.",
+		forecastScenarioEmpty: "Tölts ki egy összeget és dátumot.",
 		forecastScenarioSaved: "A terv elmentve.",
 		forecastScenarioUpdated: "A terv frissítve.",
 		forecastScenarioLoaded: "A kiválasztott terv(ek) betöltve.",
@@ -78,85 +73,15 @@ const dictionary = {
 		forecastRowRemoved: "A sor törölve.",
 		forecastRowConfirmed: "A sor mentve.",
 		deleteAccountNeedsSecondClick: "Kattints újra 7 másodpercen belül a fiók törléséhez.",
-		registerTitle: "Regisztráció",
-		loginTitle: "Bejelentkezés",
-		usernameLabel: "Felhasználónév",
-		emailLabel: "Email cím",
-		emailConfirmLabel: "Email cím megerősítése",
-		passwordLabel: "Jelszó",
-		passwordConfirmLabel: "Jelszó megerősítése",
-		registerButton: "Regisztrálok",
-		loginButton: "Belépés",
 		logoutButton: "Kijelentkezés",
-		loginRequired: "A rögzítéshez jelentkezz be vagy regisztrálj.",
-		incomeFormTitle: "Bevétel hozzáadása",
-		expenseFormTitle: "Kiadás hozzáadása",
-		categoryLabel: "Kategória",
-		amountLabel: "Összeg",
-		incomeDateLabel: "Mikor várható? (dátum)",
-		expenseDateLabel: "Mikor lesz levonás? (dátum)",
-		saveIncomeButton: "Bevétel mentése",
-		saveExpenseButton: "Kiadás mentése",
-		updateIncomeButton: "Bevétel frissítése",
-		updateExpenseButton: "Kiadás frissítése",
-		cancelEditButton: "Szerkesztés",
-		monthlyIncomeTitle: "Bevétel",
-		monthlyExpenseTitle: "Kiadás",
-		spentToDateTitle: "Kiadás mai napig",
-		monthEndTitle: "Várható bevétel",
-		incomeEntriesTitle: "Bevételek",
-		expenseEntriesTitle: "Kiadások",
 		loggedOut: "Nincs bejelentkezett felhasználó.",
 		loggedIn: "Bejelentkezve:",
 		guestUser: "Vendég",
-		emailMismatch: "Az email címek nem egyeznek.",
-		passwordMismatch: "A jelszavak nem egyeznek.",
-		usernameTaken: "Ez a felhasználónév már foglalt.",
-		registerSuccess: "Sikeres regisztráció.",
-		loginSuccess: "Sikeres bejelentkezés.",
-		logoutSuccess: "Sikeres kijelentkezés.",
-		invalidLogin: "Hibás felhasználónév vagy jelszó.",
 		appDownloaded: "Az app letöltve.",
-		appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
-		loginFirst: "Először jelentkezz be.",
-		entrySaved: "A tétel elmentve.",
-		entryUpdated: "A tétel frissítve.",
-		entryDeleted: "A tétel törölve.",
-		confirmDelete: "Biztosan törölni szeretnéd ezt a tételt?",
-		emptyEntries: "Nincs rögzített tétel erre a hónapra.",
-		exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
-		exportDone: "A CSV export letöltése elindult.",
 		editAction: "Szerkesztés",
 		deleteAction: "Törlés",
-		csvType: "Típus",
-		csvCategory: "Kategória",
-		csvAmount: "Összeg",
-		csvDate: "Dátum",
 		typeIncome: "Bevétel",
-		typeExpense: "Kiadás",
-		categories: {
-			fizetes: "Fizetés",
-			egyeb: "Egyéb",
-			szamlak: "Számlák",
-			viz: "Víz",
-			gaz: "Gáz",
-			aram: "Áram",
-			auto: "Autó",
-			benzin: "Benzin",
-			elemiszer: "Élelmiszer",
-			ruhak: "Ruhák",
-			rent: "Albérlet",
-			biztositas: "Biztosítás",
-			"hitelkartya 3": "Hitelkártya 3",
-			onkormanyzat: "Önkormányzat",
-			zilch: "Zilch",
-			tv: "TV",
-			telefon: "Telefon",
-			internet: "Internet",
-			iskola: "Iskola",
-			suli: "Iskola",
-			"egyeb kiadas": "Egyéb kiadás"
-		}
+		typeExpense: "Kiadás"
 	},
 	en: {
 		pageTitle: "Budget Forecast Planner",
@@ -167,7 +92,6 @@ const dictionary = {
 		budgetLink: "Budget",
 		summaryLink: "Summary",
 		versionLabel: "Version",
-		themeModeLabel: "Theme",
 		themeModeLight: "Light",
 		themeModeDark: "Dark",
 		contactUs: "Contact us",
@@ -178,7 +102,6 @@ const dictionary = {
 		languageSelectorAria: "Language selector",
 		themeSwitchAria: "Theme switch",
 		currencySelectorAria: "Currency selector",
-		appName: "Budgeting App",
 		currencyLabel: "Currency\nselector",
 		currencyHuf: "HUF (forint)",
 		currencyGbp: "GBP (pound)",
@@ -189,7 +112,6 @@ const dictionary = {
 		periodToLabel: "to",
 		forecastButton: "Back to Budget",
 		forecastTitle: "Budget Forecast Planner",
-		forecastTargetDateLabel: "Analysis date",
 		forecastAddRowButton: "+ Add an extra unexpected item",
 		forecastRowTypeLabel: "Type",
 		forecastRowAmountLabel: "Amount",
@@ -210,7 +132,7 @@ const dictionary = {
 		forecastScenarioNone: "No saved plan",
 		forecastLoadButton: "Load",
 		forecastScenarioNameRequired: "Please provide a plan name.",
-		forecastScenarioEmpty: "There are no forecast rows to save.",
+		forecastScenarioEmpty: "Please enter an amount and date.",
 		forecastScenarioSaved: "Plan saved.",
 		forecastScenarioUpdated: "Plan updated.",
 		forecastScenarioLoaded: "Selected plan(s) loaded.",
@@ -220,88 +142,19 @@ const dictionary = {
 		forecastRowRemoved: "Row removed.",
 		forecastRowConfirmed: "Row saved.",
 		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete the account.",
-		registerTitle: "Register",
-		loginTitle: "Sign in",
-		usernameLabel: "Username",
-		emailLabel: "Email address",
-		emailConfirmLabel: "Confirm email address",
-		passwordLabel: "Password",
-		passwordConfirmLabel: "Confirm password",
-		registerButton: "Create account",
-		loginButton: "Sign in",
 		logoutButton: "Sign out",
-		loginRequired: "Please sign in or register to manage entries.",
-		incomeFormTitle: "Add income",
-		expenseFormTitle: "Add expense",
-		categoryLabel: "Category",
-		amountLabel: "Amount",
-		incomeDateLabel: "Expected date",
-		expenseDateLabel: "Deduction date",
-		saveIncomeButton: "Save income",
-		saveExpenseButton: "Save expense",
-		updateIncomeButton: "Update income",
-		updateExpenseButton: "Update expense",
-		cancelEditButton: "Edit",
-		monthlyIncomeTitle: "Income",
-		monthlyExpenseTitle: "Expenses",
-		spentToDateTitle: "Spent to date",
-		monthEndTitle: "Expected income",
-		incomeEntriesTitle: "Income entries",
-		expenseEntriesTitle: "Expense entries",
 		loggedOut: "No user is signed in.",
 		loggedIn: "Signed in as:",
 		guestUser: "Guest",
-		emailMismatch: "Email addresses do not match.",
-		passwordMismatch: "Passwords do not match.",
-		usernameTaken: "This username is already taken.",
-		registerSuccess: "Registration successful.",
-		loginSuccess: "Signed in successfully.",
-		logoutSuccess: "Signed out successfully.",
-		invalidLogin: "Invalid username or password.",
 		appDownloaded: "App downloaded.",
-		appInstallUnavailable: "App install is not available on this device right now.",
-		loginFirst: "Please sign in first.",
-		entrySaved: "Entry saved.",
-		entryUpdated: "Entry updated.",
-		entryDeleted: "Entry deleted.",
-		confirmDelete: "Delete this entry?",
-		emptyEntries: "No saved entries for this month.",
-		exportEmpty: "There are no entries to export for this month.",
-		exportDone: "CSV export started.",
 		editAction: "Edit",
 		deleteAction: "Delete",
-		csvType: "Type",
-		csvCategory: "Category",
-		csvAmount: "Amount",
-		csvDate: "Date",
 		typeIncome: "Income",
-		typeExpense: "Expense",
-		categories: {
-			fizetes: "Salary",
-			egyeb: "Other",
-			szamlak: "Bills",
-			viz: "Water",
-			gaz: "Gas",
-			aram: "Electricity",
-			auto: "Car",
-			benzin: "Fuel",
-			elemiszer: "Groceries",
-			ruhak: "Clothes",
-			rent: "Rent",
-			biztositas: "Insurance",
-			"hitelkartya 3": "Credit card 3",
-			onkormanyzat: "Municipality",
-			zilch: "Zilch",
-			tv: "TV",
-			telefon: "Phone",
-			internet: "Internet",
-			iskola: "School",
-			suli: "School",
-			"egyeb kiadas": "Other expense"
-		}
+		typeExpense: "Expense"
 	}
 };
 
+// --- State ---
 const today = new Date();
 const pageParams = new URLSearchParams(window.location.search);
 let currentUser = localStorage.getItem(SESSION_KEY) || "";
@@ -312,9 +165,11 @@ let appCurrency = shared.loadCurrency();
 let appState = { incomes: [], expenses: [] };
 let deleteAccountConfirmArmed = false;
 let deleteAccountConfirmTimer = null;
+let deferredInstallPrompt = null;
+let forecastScenarios = [];
+let activeForecastScenarioId = "";
 
-const incomeForm = document.getElementById("income-form");
-const expenseForm = document.getElementById("expense-form");
+// --- DOM refs ---
 const summaryToggleButton = document.getElementById("summary-toggle-button");
 const forecastToggleButton = document.getElementById("forecast-toggle-button");
 const menuToggle = document.getElementById("menu-toggle");
@@ -333,62 +188,51 @@ const periodStartInput = document.getElementById("period-start");
 const periodEndInput = document.getElementById("period-end");
 const languageSelect = document.getElementById("app-language");
 const currencySelect = document.getElementById("app-currency");
-const monthlyIncomeEl = document.getElementById("monthly-income");
-const monthlyExpenseEl = document.getElementById("monthly-expense");
-const spentToDateEl = document.getElementById("spent-to-date");
-const monthEndLeftEl = document.getElementById("month-end-left");
-const incomeList = document.getElementById("income-list");
-const expenseList = document.getElementById("expense-list");
-const incomeSubmitButton = document.getElementById("income-submit-button");
-const expenseSubmitButton = document.getElementById("expense-submit-button");
-const incomeCancelEdit = document.getElementById("income-cancel-edit");
-const incomeDeleteButton = document.getElementById("income-delete");
-const expenseCancelEdit = document.getElementById("expense-cancel-edit");
-const expenseDeleteButton = document.getElementById("expense-delete");
-const forecastPlanner = document.getElementById("forecast-planner");
 const addWhatIfRowButton = document.getElementById("add-whatif-row");
 const whatIfRowsContainer = document.getElementById("whatif-rows");
-const forecastScenarioNameInput = document.getElementById("forecast-scenario-name");
 const forecastScenarioList = document.getElementById("forecast-scenario-list");
 const forecastLoadScenarioButton = document.getElementById("forecast-load-scenario");
 const forecastBaseUntilEl = document.getElementById("forecast-base-until");
 const forecastWithPurchaseEl = document.getElementById("forecast-with-purchase");
 const forecastDifferenceEl = document.getElementById("forecast-difference");
 const forecastMonthEndEl = document.getElementById("forecast-month-end");
-const scenarioDropdownToggle = document.getElementById("scenario-dropdown-toggle");
-const scenarioSelectedNameEl = document.getElementById("scenario-selected-name");
-const scenarioSelector = document.getElementById("scenario-selector");
-let deferredInstallPrompt = null;
-let forecastScenarios = [];
-let activeForecastScenarioId = "";
 
+// Apply theme immediately so there's no flash before async init resolves
+applyTheme();
+syncThemeButtons();
+
+// --- Boot ---
 void initializePage();
+
+// --- Event listeners ---
 
 languageSelect.addEventListener("change", () => {
 	appLanguage = languageSelect.value;
 	shared.saveLanguage(appLanguage);
 	applyTranslations();
-	render();
+	renderForecastPlanner();
 });
 
 currencySelect.addEventListener("change", () => {
 	appCurrency = currencySelect.value;
 	shared.saveCurrency(appCurrency);
-	render();
+	renderForecastPlanner();
 });
 
 [periodStartInput, periodEndInput].forEach((input) => {
-	if (!input) {
-		return;
-	}
+	if (!input) return;
 	input.addEventListener("change", () => {
 		normalizePeriodInputs();
-		render();
+		renderForecastPlanner();
 	});
 });
-forecastToggleButton.addEventListener("click", () => {
-	window.location.href = "budget.html";
-});
+
+if (forecastToggleButton) {
+	forecastToggleButton.addEventListener("click", () => {
+		window.location.href = "budget.html";
+	});
+}
+
 if (summaryToggleButton) {
 	summaryToggleButton.addEventListener("click", () => {
 		const periodStart = periodStartInput?.value || shared.toDateInput(today);
@@ -396,40 +240,32 @@ if (summaryToggleButton) {
 		window.location.href = `summary.html?month=${monthParam}`;
 	});
 }
+
 addWhatIfRowButton.addEventListener("click", () => {
-	// Remove any existing manually-added row so only 1 is shown at a time
+	// Only one manually-added row at a time
 	const existing = whatIfRowsContainer.querySelector(".whatif-row[data-manual='true']");
 	if (existing) existing.remove();
 	const date = periodEndInput?.value || shared.toDateInput(today);
-	appendWhatIfRow({ type: "expense", amount: "", date, note: "", rowId: shared.createEntryId(), manual: true }, true);
+	appendWhatIfRow(
+		{ type: "expense", amount: "", date, note: "", rowId: shared.createEntryId(), manual: true },
+		true
+	);
 	renderForecastPlanner();
 });
+
 if (forecastLoadScenarioButton) {
 	forecastLoadScenarioButton.addEventListener("click", loadSelectedForecastScenarios);
 }
-if (scenarioDropdownToggle && forecastScenarioList) {
-	scenarioDropdownToggle.addEventListener("click", (event) => {
-		event.stopPropagation();
-		const isNowHidden = forecastScenarioList.classList.toggle("hidden");
-		const nowOpen = !isNowHidden;
-		scenarioDropdownToggle.setAttribute("aria-expanded", String(nowOpen));
-		scenarioSelector?.classList.toggle("is-open", nowOpen);
-	});
-}
+
 whatIfRowsContainer.addEventListener("input", renderForecastPlanner);
 whatIfRowsContainer.addEventListener("change", renderForecastPlanner);
 whatIfRowsContainer.addEventListener("click", (event) => {
 	const actionButton = event.target.closest("button[data-action]");
-	if (!actionButton) {
-		return;
-	}
-
+	if (!actionButton) return;
 	const rowElement = actionButton.closest(".whatif-row");
-	if (!rowElement) {
-		return;
-	}
-
+	if (!rowElement) return;
 	const action = actionButton.dataset.action;
+
 	if (action === "remove-whatif") {
 		const removedRowId = rowElement.dataset.rowId;
 		if (removedRowId) {
@@ -455,15 +291,15 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 
 	if (action === "save-whatif") {
 		saveWhatIfRow(rowElement);
+		return;
 	}
 
 	if (action === "edit-whatif") {
 		rowElement.classList.add("edit-mode");
 		rowElement.innerHTML = buildWhatIfRowEditHTML(rowElement);
 		const typeSelect = rowElement.querySelector(".forecast-whatif-type");
-		if (typeSelect) {
-			typeSelect.value = rowElement.dataset.type || "expense";
-		}
+		if (typeSelect) typeSelect.value = rowElement.dataset.type || "expense";
+		return;
 	}
 
 	if (action === "confirm-edit") {
@@ -471,6 +307,7 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 		const amount = rowElement.querySelector(".forecast-whatif-amount")?.value || "";
 		const date = rowElement.querySelector(".forecast-whatif-date")?.value || "";
 		const note = String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
+		const planName = String(rowElement.querySelector(".forecast-whatif-plan-name")?.value || "").trim().slice(0, 50);
 		if (!Number(amount) || !date) {
 			showMessage(t("forecastScenarioEmpty"), true);
 			return;
@@ -479,80 +316,13 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 		rowElement.dataset.amount = amount;
 		rowElement.dataset.date = date;
 		rowElement.dataset.note = note;
+		rowElement.dataset.planName = planName;
 		rowElement.classList.remove("edit-mode");
 		rowElement.innerHTML = buildWhatIfRowDisplayHTML(rowElement);
 		showMessage(t("forecastRowConfirmed"), false);
 		renderForecastPlanner();
 	}
 });
-if (menuBackButton) {
-	menuBackButton.addEventListener("click", () => {
-		window.history.back();
-	});
-}
-if (installAppButton) {
-	installAppButton.addEventListener("click", async () => {
-		if (shared.isAppInstalled() && !deferredInstallPrompt) {
-			showMessage(t("appDownloaded"), false);
-			return;
-		}
-
-		if (!deferredInstallPrompt) {
-			showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
-			return;
-		}
-
-		menuPanel.classList.remove("is-open");
-		menuToggle.classList.remove("is-open");
-		menuToggle.setAttribute("aria-expanded", "false");
-		deferredInstallPrompt.prompt();
-		const choice = await deferredInstallPrompt.userChoice;
-		if (choice.outcome === "accepted") {
-			localStorage.setItem(INSTALL_STATUS_KEY, "1");
-			showMessage(t("appDownloaded"), false);
-		}
-		deferredInstallPrompt = null;
-		updateInstallButtonState();
-	});
-}
-if (menuLogoutButton) {
-	menuLogoutButton.addEventListener("click", handleLogout);
-}
-if (deleteAccountButton) {
-	deleteAccountButton.addEventListener("click", handleAccountDelete);
-}
-if (themeLightButton) {
-	themeLightButton.addEventListener("click", () => {
-		setTheme("light");
-	});
-}
-
-if (themeDarkButton) {
-	themeDarkButton.addEventListener("click", () => {
-		setTheme("dark");
-	});
-}
-if (contactUsButton) {
-	contactUsButton.addEventListener("click", () => {
-		window.location.href = "contact.html";
-	});
-}
-if (incomeCancelEdit) {
-	incomeCancelEdit.addEventListener("click", resetIncomeForm);
-}
-if (incomeDeleteButton) {
-	incomeDeleteButton.addEventListener("click", () => {
-		handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm);
-	});
-}
-if (expenseCancelEdit) {
-	expenseCancelEdit.addEventListener("click", resetExpenseForm);
-}
-if (expenseDeleteButton) {
-	expenseDeleteButton.addEventListener("click", () => {
-		handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm);
-	});
-}
 
 menuToggle.addEventListener("click", () => {
 	const isOpen = menuPanel.classList.toggle("is-open");
@@ -566,24 +336,14 @@ document.addEventListener("click", (event) => {
 		menuToggle.classList.remove("is-open");
 		menuToggle.setAttribute("aria-expanded", "false");
 	}
-	if (!event.target.closest("#scenario-selector")) {
-		forecastScenarioList?.classList.add("hidden");
-		scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
-		scenarioSelector?.classList.remove("is-open");
-	}
 });
 
 document.addEventListener("keydown", (event) => {
-	if (event.key === "Escape") {
-		if (menuPanel.classList.contains("is-open")) {
-			menuPanel.classList.remove("is-open");
-			menuToggle.classList.remove("is-open");
-			menuToggle.setAttribute("aria-expanded", "false");
-			menuToggle.focus();
-		}
-		forecastScenarioList?.classList.add("hidden");
-		scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
-		scenarioSelector?.classList.remove("is-open");
+	if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
+		menuPanel.classList.remove("is-open");
+		menuToggle.classList.remove("is-open");
+		menuToggle.setAttribute("aria-expanded", "false");
+		menuToggle.focus();
 	}
 });
 
@@ -602,63 +362,57 @@ window.addEventListener("appinstalled", () => {
 
 if ("serviceWorker" in navigator) {
 	window.addEventListener("load", () => {
-		navigator.serviceWorker.register("sw.js").catch(() => {
-			// Service worker errors should not block usage.
-		});
+		navigator.serviceWorker.register("sw.js").catch(() => {});
 	});
 }
 
-incomeForm.addEventListener("submit", (event) => {
-	event.preventDefault();
-	if (!requireLogin()) {
-		return;
-	}
+if (menuBackButton) {
+	menuBackButton.addEventListener("click", () => window.history.back());
+}
 
-	const entry = buildEntryFromForm("income");
-	const editId = document.getElementById("income-edit-id").value;
+if (installAppButton) {
+	installAppButton.addEventListener("click", async () => {
+		if (shared.isAppInstalled() && !deferredInstallPrompt) {
+			showMessage(t("appDownloaded"), false);
+			return;
+		}
+		if (!deferredInstallPrompt) {
+			showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
+			return;
+		}
+		menuPanel.classList.remove("is-open");
+		menuToggle.classList.remove("is-open");
+		menuToggle.setAttribute("aria-expanded", "false");
+		deferredInstallPrompt.prompt();
+		const choice = await deferredInstallPrompt.userChoice;
+		if (choice.outcome === "accepted") {
+			localStorage.setItem(INSTALL_STATUS_KEY, "1");
+			showMessage(t("appDownloaded"), false);
+		}
+		deferredInstallPrompt = null;
+		updateInstallButtonState();
+	});
+}
 
-	if (editId) {
-		upsertEntry("incomes", { ...entry, id: editId });
-		showMessage(t("entryUpdated"), false);
-	} else {
-		upsertEntry("incomes", { ...entry, id: shared.createEntryId() });
-		showMessage(t("entrySaved"), false);
-	}
+if (menuLogoutButton) {
+	menuLogoutButton.addEventListener("click", handleLogout);
+}
+if (deleteAccountButton) {
+	deleteAccountButton.addEventListener("click", handleAccountDelete);
+}
+if (themeLightButton) {
+	themeLightButton.addEventListener("click", () => setTheme("light"));
+}
+if (themeDarkButton) {
+	themeDarkButton.addEventListener("click", () => setTheme("dark"));
+}
+if (contactUsButton) {
+	contactUsButton.addEventListener("click", () => {
+		window.location.href = "contact.html";
+	});
+}
 
-	saveState();
-	resetIncomeForm();
-	render();
-});
-
-expenseForm.addEventListener("submit", (event) => {
-	event.preventDefault();
-	if (!requireLogin()) {
-		return;
-	}
-
-	const entry = buildEntryFromForm("expense");
-	const editId = document.getElementById("expense-edit-id").value;
-
-	if (editId) {
-		upsertEntry("expenses", { ...entry, id: editId });
-		showMessage(t("entryUpdated"), false);
-	} else {
-		upsertEntry("expenses", { ...entry, id: shared.createEntryId() });
-		showMessage(t("entrySaved"), false);
-	}
-
-	saveState();
-	resetExpenseForm();
-	render();
-});
-
-incomeList.addEventListener("click", (event) => {
-	handleEntryAction(event, "incomes");
-});
-
-expenseList.addEventListener("click", (event) => {
-	handleEntryAction(event, "expenses");
-});
+// --- Page init ---
 
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
@@ -669,84 +423,72 @@ async function initializePage() {
 			window.location.href = "index.html";
 			return;
 		}
-
 		applyAuthenticatedState(session);
 		appState = session.data || { incomes: [], expenses: [] };
 	}
 
-	applyTheme();
-	syncThemeButtons();
 	const queryMonth = pageParams.get("month");
 	setDefaultPeriodRange(queryMonth);
 	languageSelect.value = appLanguage;
 	currencySelect.value = appCurrency;
-	resetIncomeForm();
-	resetExpenseForm();
-	setDefaultWhatIfRows();
+	whatIfRowsContainer.innerHTML = "";
 	loadForecastScenarios();
 	renderScenarioList();
 	applyTranslations();
 	updateAccessUI();
 	updateInstallButtonState();
-	render();
+	renderForecastPlanner();
 }
 
 function applyTranslations() {
 	document.documentElement.lang = appLanguage;
 	document.title = t("pageTitle");
-	document.querySelectorAll("[data-i18n]").forEach((element) => {
-		element.textContent = t(element.dataset.i18n);
+	document.querySelectorAll("[data-i18n]").forEach((el) => {
+		el.textContent = t(el.dataset.i18n);
 	});
 	menuToggle.setAttribute("aria-label", t("menuButton"));
-	document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
-		element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+	document.querySelectorAll("[data-i18n-aria-label]").forEach((el) => {
+		el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel));
 	});
-	document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-		element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
+	document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+		el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder));
 	});
-
-	document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
-		option.textContent = translateCategory(option.value);
-	});
-
-	updateFormButtonLabels();
 	refreshWhatIfRowLabels();
 	renderScenarioList();
 	updateMenuSessionLabel();
 }
 
+// --- Forecast scenarios ---
+
 function getForecastScenarioStorageKey() {
-	const sessionKey = currentUser === GUEST_SESSION_VALUE ? "guest" : (currentUser || "anon");
-	return `budgetAppForecastScenarios:${sessionKey}`;
+	const key = currentUser === GUEST_SESSION_VALUE ? "guest" : (currentUser || "anon");
+	return `budgetAppForecastScenarios:${key}`;
 }
 
 function normalizeScenarioRows(rows) {
-	return (Array.isArray(rows) ? rows : []).map((row) => {
-		const rowId = String(row?.rowId || shared.createEntryId());
-		const type = row?.type === "income" ? "income" : "expense";
-		const amount = Number(row?.amount || 0);
-		const date = String(row?.date || "");
-		const note = String(row?.note || "").trim().slice(0, 80);
-		return { rowId, type, amount, date, note };
-	});
+	return (Array.isArray(rows) ? rows : []).map((row) => ({
+		rowId: String(row?.rowId || shared.createEntryId()),
+		type: row?.type === "income" ? "income" : "expense",
+		amount: Number(row?.amount || 0),
+		date: String(row?.date || ""),
+		note: String(row?.note || "").trim().slice(0, 80)
+	}));
 }
 
 function loadForecastScenarios() {
 	const raw = localStorage.getItem(getForecastScenarioStorageKey());
-	if (!raw) {
-		forecastScenarios = [];
-		return;
-	}
-
+	if (!raw) { forecastScenarios = []; return; }
 	try {
 		const parsed = JSON.parse(raw);
-		forecastScenarios = (Array.isArray(parsed) ? parsed : []).map((scenario) => ({
-			id: String(scenario?.id || shared.createEntryId()),
-			name: String(scenario?.name || "").trim().slice(0, 50),
-			targetDate: String(scenario?.targetDate || ""),
-			rows: normalizeScenarioRows(scenario?.rows)
-		})).filter((scenario) => scenario.name);
-	} catch (_error) {
+		forecastScenarios = (Array.isArray(parsed) ? parsed : [])
+			.map((s) => ({
+				id: String(s?.id || shared.createEntryId()),
+				name: String(s?.name || "").trim().slice(0, 50),
+				targetDate: String(s?.targetDate || ""),
+				rows: normalizeScenarioRows(s?.rows)
+			}))
+			.filter((s) => s.name);
+	} catch (_e) {
 		forecastScenarios = [];
 	}
 }
@@ -756,16 +498,7 @@ function saveForecastScenarios() {
 }
 
 function renderScenarioList() {
-	if (!forecastScenarioList) {
-		return;
-	}
-
-	if (scenarioSelectedNameEl) {
-		const active = forecastScenarios.find((s) => s.id === activeForecastScenarioId);
-		const last = forecastScenarios[forecastScenarios.length - 1];
-		scenarioSelectedNameEl.textContent = (active || last)?.name || t("forecastScenarioNone");
-	}
-
+	if (!forecastScenarioList) return;
 	forecastScenarioList.innerHTML = "";
 	if (!forecastScenarios.length) {
 		const empty = document.createElement("p");
@@ -774,205 +507,117 @@ function renderScenarioList() {
 		forecastScenarioList.appendChild(empty);
 		return;
 	}
-
 	forecastScenarios.forEach((scenario) => {
-		const item = document.createElement("button");
-		item.type = "button";
-		item.className = "scenario-dropdown-item";
-		if (scenario.id === activeForecastScenarioId) {
-			item.classList.add("is-selected");
-		}
-		item.dataset.scenarioId = scenario.id;
-		item.textContent = scenario.name;
-		item.addEventListener("click", () => {
-			activeForecastScenarioId = scenario.id;
-			loadSpecificScenario(scenario);
-			forecastScenarioList.classList.add("hidden");
-			scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
-			scenarioSelector?.classList.remove("is-open");
-			renderScenarioList();
-			showMessage(t("forecastScenarioLoaded"), false);
-		});
-		forecastScenarioList.appendChild(item);
+		const label = document.createElement("label");
+		label.className = "saved-plan-item";
+		label.title = scenario.name;
+		const cb = document.createElement("input");
+		cb.type = "checkbox";
+		cb.className = "saved-plan-checkbox";
+		cb.value = scenario.id;
+		const span = document.createElement("span");
+		span.textContent = scenario.name;
+		label.appendChild(cb);
+		label.appendChild(span);
+		forecastScenarioList.appendChild(label);
 	});
 }
 
-function getWhatIfRowsForScenario() {
-	return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => {
-		const rowId = row.dataset.rowId || shared.createEntryId();
-		let type, amount, date, note;
-		if (row.classList.contains("edit-mode")) {
-			type = row.querySelector(".forecast-whatif-type")?.value || "expense";
-			amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
-			date = row.querySelector(".forecast-whatif-date")?.value || "";
-			note = String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
-		} else {
-			type = row.dataset.type || "expense";
-			amount = Number(row.dataset.amount || 0);
-			date = row.dataset.date || "";
-			note = row.dataset.note || "";
+function loadSelectedForecastScenarios() {
+	const checkedIds = Array.from(
+		forecastScenarioList?.querySelectorAll(".saved-plan-checkbox:checked") || []
+	).map((cb) => cb.value);
+	if (!checkedIds.length) {
+		showMessage(t("forecastScenarioSelectRequired"), true);
+		return;
+	}
+	whatIfRowsContainer.innerHTML = "";
+	checkedIds.forEach((id) => {
+		const scenario = forecastScenarios.find((s) => s.id === id);
+		if (scenario) {
+			normalizeScenarioRows(scenario.rows).forEach((row) => {
+				appendWhatIfRow({ ...row, planName: scenario.name });
+			});
 		}
-		return { rowId, type, amount, date, note };
-	}).filter((row) => row.amount > 0 || row.date || row.note);
+	});
+	showMessage(t("forecastScenarioLoaded"), false);
+	renderForecastPlanner();
 }
 
 function ensureActiveScenario(scenarioName) {
 	const targetDate = periodEndInput?.value || "";
 	if (activeForecastScenarioId) {
-		const existing = forecastScenarios.find((scenario) => scenario.id === activeForecastScenarioId);
+		const existing = forecastScenarios.find((s) => s.id === activeForecastScenarioId);
 		if (existing && existing.name === scenarioName) {
-			existing.name = scenarioName;
 			existing.targetDate = targetDate;
 			return existing;
 		}
 	}
-
-	const byName = forecastScenarios.find((scenario) => scenario.name === scenarioName);
+	const byName = forecastScenarios.find((s) => s.name === scenarioName);
 	if (byName) {
 		byName.targetDate = targetDate;
 		activeForecastScenarioId = byName.id;
 		return byName;
 	}
-
-	const created = {
-		id: shared.createEntryId(),
-		name: scenarioName,
-		targetDate,
-		rows: []
-	};
+	const created = { id: shared.createEntryId(), name: scenarioName, targetDate, rows: [] };
 	forecastScenarios.push(created);
 	activeForecastScenarioId = created.id;
 	return created;
 }
 
-function loadSelectedForecastScenarios() {
-	if (!activeForecastScenarioId) {
-		showMessage(t("forecastScenarioSelectRequired"), true);
-		return;
-	}
-	const scenario = forecastScenarios.find((s) => s.id === activeForecastScenarioId);
-	if (!scenario) {
-		showMessage(t("forecastScenarioSelectRequired"), true);
-		return;
-	}
-	loadSpecificScenario(scenario);
-	showMessage(t("forecastScenarioLoaded"), false);
-}
-
-function loadSpecificScenario(scenario) {
-	whatIfRowsContainer.innerHTML = "";
-	normalizeScenarioRows(scenario.rows).forEach((row) => {
-		appendWhatIfRow(row);
-	});
-	if (!whatIfRowsContainer.children.length) {
-		appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
-	}
-	activeForecastScenarioId = scenario.id;
-	if (forecastScenarioNameInput) {
-		forecastScenarioNameInput.value = scenario.name;
-	}
-	renderForecastPlanner();
-}
-
 function saveWhatIfRow(rowElement) {
-	const scenarioName = String(forecastScenarioNameInput?.value || "").trim();
-	if (!scenarioName) {
-		showMessage(t("forecastScenarioNameRequired"), true);
-		return;
-	}
-
 	const isEdit = rowElement.classList.contains("edit-mode");
 	const rowId = rowElement.dataset.rowId || shared.createEntryId();
 	rowElement.dataset.rowId = rowId;
 
-	const type = isEdit ? (rowElement.querySelector(".forecast-whatif-type")?.value || "expense") : (rowElement.dataset.type || "expense");
-	const amount = isEdit ? Number(rowElement.querySelector(".forecast-whatif-amount")?.value || 0) : Number(rowElement.dataset.amount || 0);
-	const date = isEdit ? (rowElement.querySelector(".forecast-whatif-date")?.value || "") : (rowElement.dataset.date || "");
-	const note = isEdit ? String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80) : (rowElement.dataset.note || "");
+	const type = isEdit
+		? (rowElement.querySelector(".forecast-whatif-type")?.value || "expense")
+		: (rowElement.dataset.type || "expense");
+	const amount = isEdit
+		? Number(rowElement.querySelector(".forecast-whatif-amount")?.value || 0)
+		: Number(rowElement.dataset.amount || 0);
+	const date = isEdit
+		? (rowElement.querySelector(".forecast-whatif-date")?.value || "")
+		: (rowElement.dataset.date || "");
+	const note = isEdit
+		? String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80)
+		: (rowElement.dataset.note || "");
+	const planName = isEdit
+		? String(rowElement.querySelector(".forecast-whatif-plan-name")?.value || "").trim().slice(0, 50)
+		: (rowElement.dataset.planName || "");
+
+	if (!planName) { showMessage(t("forecastScenarioNameRequired"), true); return; }
+	if (!(amount > 0 && date)) { showMessage(t("forecastScenarioEmpty"), true); return; }
 
 	if (isEdit) {
 		rowElement.dataset.type = type;
 		rowElement.dataset.amount = String(amount);
 		rowElement.dataset.date = date;
 		rowElement.dataset.note = note;
+		rowElement.dataset.planName = planName;
 	}
 
-	const rowData = { rowId, type, amount, date, note };
-
-	if (!(rowData.amount > 0 && rowData.date)) {
-		showMessage(t("forecastScenarioEmpty"), true);
-		return;
-	}
-
-	const scenario = ensureActiveScenario(scenarioName);
-	const rowIndex = scenario.rows.findIndex((row) => row.rowId === rowData.rowId);
-	if (rowIndex >= 0) {
-		scenario.rows[rowIndex] = rowData;
+	const rowData = { rowId, type, amount, date, note, planName };
+	const scenario = ensureActiveScenario(planName);
+	const idx = scenario.rows.findIndex((r) => r.rowId === rowId);
+	if (idx >= 0) {
+		scenario.rows[idx] = rowData;
 		showMessage(t("forecastScenarioUpdated"), false);
 	} else {
 		scenario.rows.push(rowData);
 		showMessage(t("forecastRowSaved"), false);
 	}
-
 	scenario.targetDate = periodEndInput?.value || scenario.targetDate;
 	saveForecastScenarios();
 	renderScenarioList();
+
+	if (isEdit) {
+		rowElement.classList.remove("edit-mode");
+		rowElement.innerHTML = buildWhatIfRowDisplayHTML(rowElement);
+	}
 }
 
-function updateMenuSessionLabel() {
-	if (!menuSessionInfo) {
-		return;
-	}
-
-	if (!currentUser) {
-		menuSessionInfo.textContent = t("loggedOut");
-		return;
-	}
-
-	const name = getSignedInDisplayName();
-	menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
-}
-
-function getSignedInDisplayName() {
-	if (!currentUser) {
-		return t("guestUser");
-	}
-	if (currentUser === GUEST_SESSION_VALUE) {
-		return t("guestUser");
-	}
-
-	return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
-}
-
-function render() {
-	if (!currentUser) {
-		monthlyIncomeEl.textContent = formatCurrency(0);
-		monthlyExpenseEl.textContent = formatCurrency(0);
-		spentToDateEl.textContent = formatCurrency(0);
-		monthEndLeftEl.textContent = formatCurrency(0);
-		paintList(incomeList, []);
-		paintList(expenseList, []);
-		return;
-	}
-
-	const period = getSelectedPeriod();
-	const todayText = shared.toDateInput(new Date());
-	const incomes = periodEntries(appState.incomes, period.start, period.end);
-	const expenses = periodEntries(appState.expenses, period.start, period.end);
-
-	monthlyIncomeEl.textContent = formatCurrency(shared.sumEntries(incomes));
-	monthlyExpenseEl.textContent = formatCurrency(shared.sumEntries(expenses));
-	spentToDateEl.textContent = formatCurrency(shared.sumEntries(expenses.filter((item) => item.date <= todayText)));
-	monthEndLeftEl.textContent = formatCurrency(shared.sumEntries(incomes) - shared.sumEntries(expenses));
-
-	paintList(incomeList, incomes, "incomes");
-	paintList(expenseList, expenses, "expenses");
-	renderForecastPlanner();
-}
-
-function setDefaultWhatIfRows() {
-	whatIfRowsContainer.innerHTML = "";
-}
+// --- What-if rows ---
 
 function appendWhatIfRow(row, prepend = false) {
 	const wrapper = document.createElement("div");
@@ -982,6 +627,7 @@ function appendWhatIfRow(row, prepend = false) {
 	wrapper.dataset.amount = String(row.amount ?? "");
 	wrapper.dataset.date = row.date || "";
 	wrapper.dataset.note = String(row.note || "").slice(0, 80);
+	wrapper.dataset.planName = String(row.planName || "").slice(0, 50);
 	if (row.manual) wrapper.dataset.manual = "true";
 
 	const hasData = Number(row.amount) > 0 || Boolean(row.date);
@@ -991,9 +637,7 @@ function appendWhatIfRow(row, prepend = false) {
 		wrapper.classList.add("edit-mode");
 		wrapper.innerHTML = buildWhatIfRowEditHTML(wrapper);
 		const typeSelect = wrapper.querySelector(".forecast-whatif-type");
-		if (typeSelect) {
-			typeSelect.value = wrapper.dataset.type;
-		}
+		if (typeSelect) typeSelect.value = wrapper.dataset.type || "expense";
 	}
 
 	if (prepend) {
@@ -1008,19 +652,21 @@ function buildWhatIfRowDisplayHTML(wrapper) {
 	const amount = Number(wrapper.dataset.amount || 0);
 	const date = wrapper.dataset.date || "";
 	const note = wrapper.dataset.note || "";
+	const planName = wrapper.dataset.planName || "";
 	const typeLabel = type === "income" ? t("forecastTypeIncome") : t("forecastTypeExpense");
 	const displayAmount = amount > 0 ? formatCurrency(amount) : "–";
 	const displayDate = date ? formatDisplayDate(date) : "–";
 	return `
 		<div class="whatif-row-display">
 			<span class="whatif-type-tag ${type}">${typeLabel}</span>
+			${planName ? `<span class="whatif-plan-name">${escapeHtml(planName)}</span>` : ""}
 			<span class="whatif-amount">${displayAmount}</span>
 			<span class="whatif-date">${displayDate}</span>
-			${note ? `<span class="whatif-note">${note}</span>` : ""}
+			${note ? `<span class="whatif-note">${escapeHtml(note)}</span>` : ""}
 		</div>
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
-			<button type="button" class="icon-btn confirm-edit" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
+			<button type="button" class="icon-btn" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
 			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
 		</div>
 	`;
@@ -1030,6 +676,7 @@ function buildWhatIfRowEditHTML(wrapper) {
 	const amount = wrapper.dataset.amount || "";
 	const date = wrapper.dataset.date || "";
 	const note = wrapper.dataset.note || "";
+	const planName = wrapper.dataset.planName || "";
 	return `
 		<div class="whatif-row-fields">
 			<div class="whatif-field whatif-field-type">
@@ -1040,12 +687,21 @@ function buildWhatIfRowEditHTML(wrapper) {
 				</select>
 			</div>
 			<div class="whatif-field">
+				<label>${t("forecastScenarioNameLabel")}</label>
+				<input type="text" class="forecast-whatif-plan-name" maxlength="50"
+					placeholder="${t("forecastScenarioNamePlaceholder")}"
+					value="${escapeHtml(planName)}">
+			</div>
+			<div class="whatif-field">
 				<label>${t("forecastRowNoteLabel")}</label>
-				<input type="text" class="forecast-whatif-note" maxlength="80" placeholder="${t("forecastRowNotePlaceholder")}" value="${note}">
+				<input type="text" class="forecast-whatif-note" maxlength="80"
+					placeholder="${t("forecastRowNotePlaceholder")}"
+					value="${escapeHtml(note)}">
 			</div>
 			<div class="whatif-field whatif-field-amount">
 				<label>${t("forecastRowAmountLabel")}</label>
-				<input type="number" class="forecast-whatif-amount" min="0" step="1" inputmode="decimal" value="${amount}">
+				<input type="number" class="forecast-whatif-amount" min="0" step="1"
+					inputmode="decimal" value="${amount}">
 			</div>
 			<div class="whatif-field whatif-field-date">
 				<label>${t("forecastRowDateLabel")}</label>
@@ -1054,6 +710,7 @@ function buildWhatIfRowEditHTML(wrapper) {
 		</div>
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">💾</button>
+			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
 			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
 		</div>
 	`;
@@ -1066,10 +723,12 @@ function refreshWhatIfRowLabels() {
 			const amount = row.querySelector(".forecast-whatif-amount")?.value;
 			const date = row.querySelector(".forecast-whatif-date")?.value;
 			const note = row.querySelector(".forecast-whatif-note")?.value;
+			const planName = row.querySelector(".forecast-whatif-plan-name")?.value;
 			if (type !== undefined) row.dataset.type = type;
 			if (amount !== undefined) row.dataset.amount = amount;
 			if (date !== undefined) row.dataset.date = date;
 			if (note !== undefined) row.dataset.note = note;
+			if (planName !== undefined) row.dataset.planName = planName;
 			row.innerHTML = buildWhatIfRowEditHTML(row);
 			const typeSelect = row.querySelector(".forecast-whatif-type");
 			if (typeSelect) typeSelect.value = row.dataset.type || "expense";
@@ -1081,28 +740,32 @@ function refreshWhatIfRowLabels() {
 
 function collectWhatIfRows(periodStart, periodEnd) {
 	return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => {
-		let type, amount, date, note;
+		let type, amount, date;
 		if (row.classList.contains("edit-mode")) {
 			type = row.querySelector(".forecast-whatif-type")?.value || "expense";
 			amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
 			date = row.querySelector(".forecast-whatif-date")?.value || "";
-			note = String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
 		} else {
 			type = row.dataset.type || "expense";
 			amount = Number(row.dataset.amount || 0);
 			date = row.dataset.date || "";
-			note = row.dataset.note || "";
 		}
-		return { type, amount, date, note, valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd };
+		return {
+			type, amount, date,
+			valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd
+		};
 	});
 }
 
+// --- Forecast calculation ---
+
 function renderForecastPlanner() {
+	const zero = formatCurrency(0);
 	if (!currentUser) {
-		forecastBaseUntilEl.textContent = formatCurrency(0);
-		forecastWithPurchaseEl.textContent = formatCurrency(0);
-		forecastDifferenceEl.textContent = formatCurrency(0);
-		forecastMonthEndEl.textContent = formatCurrency(0);
+		if (forecastBaseUntilEl) forecastBaseUntilEl.textContent = zero;
+		if (forecastWithPurchaseEl) forecastWithPurchaseEl.textContent = zero;
+		if (forecastDifferenceEl) forecastDifferenceEl.textContent = zero;
+		if (forecastMonthEndEl) forecastMonthEndEl.textContent = zero;
 		return;
 	}
 
@@ -1112,160 +775,31 @@ function renderForecastPlanner() {
 	const targetDate = period.end;
 
 	const whatIfRows = collectWhatIfRows(period.start, period.end);
-	const baseUntil = shared.sumEntries(incomes.filter((item) => item.date <= targetDate)) - shared.sumEntries(expenses.filter((item) => item.date <= targetDate));
-	const adjustmentsUntilTarget = whatIfRows
-		.filter((item) => item.valid && item.date <= targetDate)
-		.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
-	const simulatedUntil = baseUntil + adjustmentsUntilTarget;
-	const difference = adjustmentsUntilTarget;
 
-	const monthIncomeTotal = shared.sumEntries(incomes);
-	const monthExpenseTotal = shared.sumEntries(expenses);
-	const allAdjustmentsInPeriod = whatIfRows
-		.filter((item) => item.valid)
-		.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
-	const monthEndWithWhatIf = monthIncomeTotal - monthExpenseTotal + allAdjustmentsInPeriod;
+	const baseUntil =
+		shared.sumEntries(incomes.filter((e) => e.date <= targetDate)) -
+		shared.sumEntries(expenses.filter((e) => e.date <= targetDate));
 
-	forecastBaseUntilEl.textContent = formatCurrency(baseUntil);
-	forecastWithPurchaseEl.textContent = formatCurrency(simulatedUntil);
-	forecastDifferenceEl.textContent = formatCurrency(difference);
-	forecastMonthEndEl.textContent = formatCurrency(monthEndWithWhatIf);
+	const adjustUntil = whatIfRows
+		.filter((r) => r.valid && r.date <= targetDate)
+		.reduce((sum, r) => sum + (r.type === "income" ? r.amount : -r.amount), 0);
+
+	const withPurchase = baseUntil + adjustUntil;
+	const difference = withPurchase - baseUntil;
+
+	const baseMonthEnd = shared.sumEntries(incomes) - shared.sumEntries(expenses);
+	const allAdjust = whatIfRows
+		.filter((r) => r.valid)
+		.reduce((sum, r) => sum + (r.type === "income" ? r.amount : -r.amount), 0);
+	const monthEnd = baseMonthEnd + allAdjust;
+
+	if (forecastBaseUntilEl) forecastBaseUntilEl.textContent = formatCurrency(baseUntil);
+	if (forecastWithPurchaseEl) forecastWithPurchaseEl.textContent = formatCurrency(withPurchase);
+	if (forecastDifferenceEl) forecastDifferenceEl.textContent = formatCurrency(difference);
+	if (forecastMonthEndEl) forecastMonthEndEl.textContent = formatCurrency(monthEnd);
 }
 
-function paintList(target, entries, listType) {
-	target.innerHTML = "";
-
-	if (!entries.length) {
-		const li = document.createElement("li");
-		li.className = "empty";
-		li.textContent = t("emptyEntries");
-		target.appendChild(li);
-		return;
-	}
-
-	entries
-		.slice()
-		.sort((left, right) => left.date.localeCompare(right.date))
-		.forEach((entry) => {
-			const li = document.createElement("li");
-			li.className = "entry-row";
-			li.innerHTML = `
-				<div>
-					<span>${formatDisplayDate(entry.date)}</span>
-					<strong>${translateCategory(entry.category)}</strong>
-				</div>
-				<span>${formatCurrency(entry.amount)}</span>
-				<div class="row-actions">
-					<button type="button" class="inline-button" data-action="edit" data-id="${entry.id}">${t("editAction")}</button>
-					<button type="button" class="inline-button danger" data-action="delete" data-id="${entry.id}">${t("deleteAction")}</button>
-				</div>
-			`;
-			target.appendChild(li);
-		});
-}
-
-function handleEntryAction(event, listType) {
-	const button = event.target.closest("button[data-action]");
-	if (!button) {
-		return;
-	}
-
-	const entryId = button.dataset.id;
-	const action = button.dataset.action;
-	const entry = appState[listType].find((item) => item.id === entryId);
-
-	if (!entry) {
-		return;
-	}
-
-	if (action === "edit") {
-		populateFormForEdit(listType, entry);
-		return;
-	}
-
-	if (action === "delete") {
-		appState[listType] = appState[listType].filter((item) => item.id !== entryId);
-		saveState();
-		if (listType === "incomes") {
-			resetIncomeForm();
-		} else {
-			resetExpenseForm();
-		}
-		showMessage(t("entryDeleted"), false);
-		render();
-	}
-}
-
-function populateFormForEdit(listType, entry) {
-	if (listType === "incomes") {
-		document.getElementById("income-edit-id").value = entry.id;
-		document.getElementById("income-category").value = entry.category;
-		document.getElementById("income-amount").value = entry.amount;
-		document.getElementById("income-date").value = entry.date;
-		incomeCancelEdit.classList.remove("hidden");
-	} else {
-		document.getElementById("expense-edit-id").value = entry.id;
-		document.getElementById("expense-category").value = entry.category;
-		document.getElementById("expense-amount").value = entry.amount;
-		document.getElementById("expense-date").value = entry.date;
-		expenseCancelEdit.classList.remove("hidden");
-	}
-
-	updateFormButtonLabels();
-}
-
-function resetIncomeForm() {
-	incomeForm.reset();
-	document.getElementById("income-edit-id").value = "";
-	document.getElementById("income-date").value = shared.toDateInput(today);
-	incomeCancelEdit.classList.add("hidden");
-	updateFormButtonLabels();
-}
-
-function resetExpenseForm() {
-	expenseForm.reset();
-	document.getElementById("expense-edit-id").value = "";
-	document.getElementById("expense-date").value = shared.toDateInput(today);
-	expenseCancelEdit.classList.add("hidden");
-	updateFormButtonLabels();
-}
-
-function updateFormButtonLabels() {
-	incomeSubmitButton.textContent = document.getElementById("income-edit-id").value ? t("updateIncomeButton") : t("saveIncomeButton");
-	expenseSubmitButton.textContent = document.getElementById("expense-edit-id").value ? t("updateExpenseButton") : t("saveExpenseButton");
-}
-
-function buildEntryFromForm(prefix) {
-	return {
-		category: document.getElementById(`${prefix}-category`).value,
-		amount: Number(document.getElementById(`${prefix}-amount`).value),
-		date: document.getElementById(`${prefix}-date`).value
-	};
-}
-
-function upsertEntry(collectionName, entry) {
-	const existingIndex = appState[collectionName].findIndex((item) => item.id === entry.id);
-	if (existingIndex >= 0) {
-		appState[collectionName][existingIndex] = entry;
-		return;
-	}
-
-	appState[collectionName].push(entry);
-}
-
-function handleDeleteFromForm(collectionName, editIdField, resetForm) {
-	const editId = document.getElementById(editIdField).value;
-	if (!editId) {
-		resetForm();
-		return;
-	}
-
-	appState[collectionName] = appState[collectionName].filter((item) => item.id !== editId);
-	saveState();
-	resetForm();
-	showMessage(t("entryDeleted"), false);
-	render();
-}
+// --- Auth / account ---
 
 async function handleLogout() {
 	menuPanel.classList.remove("is-open");
@@ -1287,21 +821,14 @@ async function handleAccountDelete() {
 		showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE), true);
 		return;
 	}
-
 	if (!deleteAccountConfirmArmed) {
 		deleteAccountConfirmArmed = true;
-		if (deleteAccountConfirmTimer) {
-			window.clearTimeout(deleteAccountConfirmTimer);
-		}
-		deleteAccountConfirmTimer = window.setTimeout(() => {
-			resetDeleteAccountConfirmState();
-		}, 7000);
+		if (deleteAccountConfirmTimer) window.clearTimeout(deleteAccountConfirmTimer);
+		deleteAccountConfirmTimer = window.setTimeout(resetDeleteAccountConfirmState, 7000);
 		showMessage(t("deleteAccountNeedsSecondClick"), true);
 		return;
 	}
-
 	resetDeleteAccountConfirmState();
-
 	const email = currentProfile?.email || "";
 	try {
 		showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
@@ -1313,10 +840,7 @@ async function handleAccountDelete() {
 		currentProfile = null;
 		localStorage.removeItem(SESSION_KEY);
 		localStorage.removeItem(DISPLAY_NAME_KEY);
-		showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-		window.setTimeout(() => {
-			window.location.href = "index.html";
-		}, 500);
+		window.setTimeout(() => { window.location.href = "index.html"; }, 500);
 	} catch (error) {
 		showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
 	}
@@ -1331,24 +855,24 @@ function resetDeleteAccountConfirmState() {
 }
 
 function updateAccessUI() {
-	if (budgetContent) {
-		budgetContent.classList.remove("hidden");
-	}
+	if (budgetContent) budgetContent.classList.remove("hidden");
 	menuToggle.disabled = false;
 }
 
-function requireLogin() {
-	return Boolean(currentUser);
+function applyAuthenticatedState(session) {
+	currentUser = String(session?.profile?.username || currentUser || "").trim();
+	currentProfile = session?.profile || null;
+	if (currentUser) localStorage.setItem(SESSION_KEY, currentUser);
 }
 
+// --- Period helpers ---
+
 function periodEntries(entries, startDate, endDate) {
-	return entries.filter((item) => item.date >= startDate && item.date <= endDate);
+	return (entries || []).filter((item) => item.date >= startDate && item.date <= endDate);
 }
 
 function getDateRange(startDate, endDate) {
-	if (!startDate || !endDate || startDate <= endDate) {
-		return { start: startDate, end: endDate };
-	}
+	if (!startDate || !endDate || startDate <= endDate) return { start: startDate, end: endDate };
 	return { start: endDate, end: startDate };
 }
 
@@ -1361,43 +885,22 @@ function getSelectedPeriod() {
 }
 
 function normalizePeriodInputs() {
-	if (!periodStartInput || !periodEndInput) {
-		return;
-	}
+	if (!periodStartInput || !periodEndInput) return;
 	const range = getDateRange(periodStartInput.value, periodEndInput.value);
-	if (range.start) {
-		periodStartInput.value = range.start;
-	}
-	if (range.end) {
-		periodEndInput.value = range.end;
-	}
+	if (range.start) periodStartInput.value = range.start;
+	if (range.end) periodEndInput.value = range.end;
 }
 
 function setDefaultPeriodRange(queryMonth) {
-	const monthValue = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : shared.toMonthInput(today);
+	const monthValue =
+		queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : shared.toMonthInput(today);
 	const start = `${monthValue}-01`;
 	const end = shared.getMonthEndDate(monthValue);
-	if (periodStartInput) {
-		periodStartInput.value = start;
-	}
-	if (periodEndInput) {
-		periodEndInput.value = end;
-	}
+	if (periodStartInput) periodStartInput.value = start;
+	if (periodEndInput) periodEndInput.value = end;
 }
 
-function clampDateToRange(dateText, startDate, endDate) {
-	if (!dateText || dateText < startDate) {
-		return startDate;
-	}
-	if (dateText > endDate) {
-		return endDate;
-	}
-	return dateText;
-}
-
-function translateCategory(value) {
-	return t(`categories.${value}`) || value;
-}
+// --- UI helpers ---
 
 function t(key) {
 	const parts = key.split(".");
@@ -1405,7 +908,7 @@ function t(key) {
 	for (const part of parts) {
 		current = current ? current[part] : undefined;
 	}
-	return current || key;
+	return current !== undefined ? current : key;
 }
 
 function applyTheme() {
@@ -1433,92 +936,58 @@ function syncThemeButtons() {
 }
 
 function showMessage(message, isError) {
-	if (!authMessage) {
-		return;
-	}
+	if (!authMessage) return;
 	authMessage.textContent = String(message || "");
 	authMessage.classList.toggle("hidden", !message);
-	authMessage.classList.toggle("error", isError);
+	authMessage.classList.toggle("error", Boolean(isError));
 	authMessage.classList.toggle("ok", !isError);
 }
 
 function formatCurrency(amount) {
 	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
-	const symbols = {
-		HUF: "Ft",
-		GBP: "£",
-		USD: "$",
-		EUR: "€"
-	};
-	const numericAmount = Number(amount) || 0;
-	const valueText = new Intl.NumberFormat(locale, {
+	const symbols = { HUF: "Ft", GBP: "£", USD: "$", EUR: "€" };
+	const value = new Intl.NumberFormat(locale, {
 		minimumFractionDigits: 0,
 		maximumFractionDigits: 0
-	}).format(numericAmount);
-	return `${valueText} ${symbols[appCurrency] || appCurrency}`;
+	}).format(Number(amount) || 0);
+	return `${value} ${symbols[appCurrency] || appCurrency}`;
 }
 
 function formatDisplayDate(isoDate) {
-	if (!isoDate) {
-		return "";
-	}
-
-	const dateObj = new Date(`${isoDate}T00:00:00`);
-	if (Number.isNaN(dateObj.getTime())) {
-		return isoDate;
-	}
-
+	if (!isoDate) return "";
+	const d = new Date(`${isoDate}T00:00:00`);
+	if (Number.isNaN(d.getTime())) return isoDate;
 	if (appLanguage === "en") {
-		return dateObj.toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "long",
-			day: "numeric"
-		});
+		return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 	}
+	return d.toLocaleDateString("hu-HU");
+}
 
-	return dateObj.toLocaleDateString("hu-HU");
+function escapeHtml(text) {
+	return String(text || "")
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#39;");
 }
 
 function updateInstallButtonState() {
-	if (!installAppButton) {
-		return;
-	}
-	const installed = shared.isAppInstalled();
-	if (installed && !deferredInstallPrompt) {
+	if (!installAppButton) return;
+	if (shared.isAppInstalled() && !deferredInstallPrompt) {
 		installAppButton.textContent = t("appDownloaded");
 		installAppButton.disabled = true;
 		return;
 	}
-
 	installAppButton.textContent = t("downloadAppButton");
 	installAppButton.disabled = false;
 }
 
-function applyAuthenticatedState(session) {
-	currentUser = String(session?.profile?.username || currentUser || "").trim();
-	currentProfile = session?.profile || null;
-	if (!currentUser) {
-		return;
-	}
-	localStorage.setItem(SESSION_KEY, currentUser);
+function updateMenuSessionLabel() {
+	if (!menuSessionInfo) return;
+	if (!currentUser) { menuSessionInfo.textContent = t("loggedOut"); return; }
+	const name = currentUser === GUEST_SESSION_VALUE
+		? t("guestUser")
+		: (localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser);
+	menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
 }
-
-function saveState() {
-	if (currentUser === GUEST_SESSION_VALUE) {
-		shared.saveGuestData(appState);
-		return;
-	}
-
-	if (!currentUser) {
-		return;
-	}
-
-	void saveCurrentUserData(appState)
-		.then((savedState) => {
-			appState = savedState || appState;
-		})
-		.catch((error) => {
-			showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
-		});
-}
-

@@ -793,7 +793,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .whatif-row { border: 1px solid #d5e2f8; border-radius: var(--control-radius); padding: 0.65rem 0.75rem; display: flex; align-items: flex-start; gap: 0.65rem; flex-wrap: wrap; justify-content: space-between; background: #fafcff; }
 [data-theme="dark"] .whatif-row { border-color: #3d5487; background: #12203a; }
 .whatif-row-display { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; flex: 1; min-width: 0; }
-.whatif-row-fields { display: grid; grid-template-columns: repeat(4, minmax(80px,1fr)); gap: 0.45rem; flex: 1; min-width: 0; }
+.whatif-row-fields { display: grid; grid-template-columns: minmax(90px,0.9fr) minmax(110px,1.2fr) minmax(110px,1.2fr) minmax(80px,0.8fr) minmax(110px,1fr); gap: 0.45rem; flex: 1; min-width: 0; }
 .whatif-field { display: flex; flex-direction: column; gap: 0.12rem; }
 .whatif-field label { font-size: 0.78rem; line-height: 1.15; margin: 0; color: var(--muted); }
 .whatif-field input, .whatif-field select { min-height: 2rem; padding: 0.32rem 0.45rem; font-size: 0.86rem; line-height: 1.1; width: 100%; }
@@ -821,31 +821,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .icon-btn.confirm-edit:hover, .icon-btn.confirm-edit:focus-visible { background: linear-gradient(125deg, #22aa9c, #1a8878); }
 [data-theme="dark"] .icon-btn.confirm-edit { background: linear-gradient(125deg, #2f9f92, #217a70); border-color: #71d0c3; }
 
-/* ── Forecast top bar & plan name bar ── */
-.forecast-top-bar { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
-.forecast-plan-name-bar { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
-.forecast-plan-name-bar label { white-space: nowrap; font-size: 0.9rem; font-weight: 600; margin: 0; }
-.forecast-plan-name-bar input { flex: 1; min-width: 180px; }
-
-/* ── Scenario dropdown ── */
-.scenario-selector { position: relative; flex: 0 0 auto; min-width: 180px; }
-.scenario-selector-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.48rem 0.7rem; background: #f5f8ff; border: 1px solid #c4d5f2; border-radius: var(--control-radius); cursor: pointer; font-size: 0.9rem; text-align: left; color: inherit; }
-.scenario-selector-btn:hover, .scenario-selector-btn:focus-visible { background: #edf4ff; border-color: #84a9e8; }
-[data-theme="dark"] .scenario-selector-btn { background: #13213d; border-color: #3f568d; color: #e8efff; }
-[data-theme="dark"] .scenario-selector-btn:hover { background: #1a2d4d; }
-.scenario-dropdown-arrow { flex-shrink: 0; font-size: 0.75em; transition: transform 0.2s ease; }
-.scenario-selector.is-open .scenario-dropdown-arrow { transform: rotate(180deg); }
-.scenario-dropdown-list { position: absolute; top: calc(100% + 3px); left: 0; min-width: 100%; background: #fff; border: 1px solid #c4d5f2; border-radius: var(--control-radius); box-shadow: 0 8px 20px rgba(24,58,122,.16); z-index: 50; max-height: 220px; overflow-y: auto; }
-[data-theme="dark"] .scenario-dropdown-list { background: #17223d; border-color: #3f568d; box-shadow: 0 8px 20px rgba(0,0,0,.3); }
-.scenario-dropdown-item { display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; font-size: 0.9rem; background: transparent; border: none; border-bottom: 1px solid #edf2fb; cursor: pointer; color: inherit; border-radius: 0; }
-.scenario-dropdown-item:hover { background: #edf4ff; }
-.scenario-dropdown-item.is-selected { background: #dce9ff; font-weight: 700; }
-.scenario-dropdown-item:last-child { border-bottom: none; }
-[data-theme="dark"] .scenario-dropdown-item { border-bottom-color: #2a3d66; }
-[data-theme="dark"] .scenario-dropdown-item:hover { background: #1e3360; }
-[data-theme="dark"] .scenario-dropdown-item.is-selected { background: #263d70; }
-.forecast-scenario-empty { margin: 0.35rem 0.75rem; color: var(--muted); font-size: 0.9rem; }
+/* ── Saved plans section ── */
+.saved-plans-section { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.85rem; padding: 0.7rem 0.85rem; border: 1px solid #c4d5f2; border-radius: var(--control-radius); background: #f5f8ff; }
+[data-theme="dark"] .saved-plans-section { background: #111e38; border-color: #3a5282; }
+.saved-plans-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+.saved-plans-title { font-weight: 700; font-size: 0.92rem; color: var(--text); }
+.saved-plans-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }
+.saved-plans-list { display: flex; flex-wrap: wrap; gap: 0.35rem 0.6rem; min-height: 1.6rem; }
+.saved-plan-item { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.88rem; font-weight: 500; cursor: pointer; padding: 0.28rem 0.6rem; border-radius: var(--control-radius); border: 1px solid #c4d5f2; background: #fff; user-select: none; transition: background 0.15s, border-color 0.15s; }
+.saved-plan-item:hover { background: #edf4ff; border-color: #84a9e8; }
+[data-theme="dark"] .saved-plan-item { background: #17223d; border-color: #3f568d; color: #e8efff; }
+[data-theme="dark"] .saved-plan-item:hover { background: #1e3360; }
+.saved-plan-item input[type="checkbox"] { width: 0.92rem; height: 0.92rem; cursor: pointer; accent-color: var(--accent); }
+.forecast-scenario-empty { margin: 0; color: var(--muted); font-size: 0.88rem; }
 [data-theme="dark"] .forecast-scenario-empty { color: #c8d7fb; }
+.whatif-plan-name { font-size: 0.8rem; font-weight: 700; color: #1a4ea9; background: #dce9ff; border-radius: 999px; padding: 0.1rem 0.5rem; white-space: nowrap; }
+[data-theme="dark"] .whatif-plan-name { background: #1e3360; color: #aacbff; }
 
 .forecast-results { border: 1px solid #c4d5f2; border-radius: var(--panel-radius); padding: 0.8rem 0.9rem; background: #eef4ff; display: grid; gap: 0.4rem; }
 .forecast-results p { margin: 0; }
@@ -1007,8 +998,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 		padding: 0.28rem 0.3rem;
 	}
 	.whatif-row-fields { grid-template-columns: repeat(2, minmax(0,1fr)); }
-	.forecast-top-bar { flex-direction: column; align-items: stretch; }
-	.scenario-selector { min-width: 0; }
+	.saved-plans-header { flex-direction: column; align-items: stretch; }
+	.saved-plans-actions { justify-content: flex-start; }
  
 	.auth-action-bar { grid-template-columns: 1fr; }
  
