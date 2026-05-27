@@ -49,54 +49,46 @@
         <p>@ 2026 Amethyst Nexalune.</p>
     </footer>
 
-    <script>
-    (function () {
-        // Sign up at https://web3forms.com with kickstartfitness.co.uk@gmail.com to get your key
-        var WEB3FORMS_KEY = "YOUR_WEB3FORMS_ACCESS_KEY";
+    <script type="module">
+        import { app } from "./assets/js/firebase-init.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
 
-        var form = document.getElementById("contact-form");
-        var feedback = document.getElementById("contact-feedback");
-        if (!form || !feedback) return;
+        const db = getFirestore(app);
+        const form = document.getElementById("contact-form");
+        const feedback = document.getElementById("contact-feedback");
 
         form.addEventListener("submit", async function (e) {
             e.preventDefault();
-            var btn = form.querySelector("button[type=submit]");
+            const btn = form.querySelector("button[type=submit]");
             btn.disabled = true;
             feedback.textContent = "";
             feedback.className = "auth-message";
 
-            var payload = {
-                access_key: WEB3FORMS_KEY,
-                subject: "New contact form message",
-                name: document.getElementById("contact-name").value,
-                username: document.getElementById("contact-username").value,
-                email: document.getElementById("contact-email").value,
-                message: document.getElementById("contact-message").value
-            };
-
             try {
-                var res = await fetch("https://api.web3forms.com/submit", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+                await addDoc(collection(db, "contacts"), {
+                    name: document.getElementById("contact-name").value.trim(),
+                    username: document.getElementById("contact-username").value.trim() || "",
+                    email: document.getElementById("contact-email").value.trim(),
+                    message: document.getElementById("contact-message").value.trim(),
+                    sentAt: serverTimestamp(),
+                    status: "new"
                 });
-                var result = await res.json();
-                if (result.success) {
-                    feedback.textContent = "Message sent successfully!";
-                    feedback.className = "auth-message ok";
-                    form.reset();
-                } else {
-                    feedback.textContent = "Failed to send. Please try again.";
-                    feedback.className = "auth-message error";
-                }
-            } catch (_err) {
-                feedback.textContent = "Network error. Please try again.";
+                feedback.textContent = "Message sent successfully!";
+                feedback.className = "auth-message ok";
+                form.reset();
+            } catch (err) {
+                console.error("Contact form error:", err);
+                feedback.textContent = "Failed to send. Please try again.";
                 feedback.className = "auth-message error";
             } finally {
                 btn.disabled = false;
             }
         });
-    })();
     </script>
 </body>
 </html>
