@@ -393,8 +393,11 @@ if (summaryToggleButton) {
 	});
 }
 addWhatIfRowButton.addEventListener("click", () => {
+	// Remove any existing manually-added row so only 1 is shown at a time
+	const existing = whatIfRowsContainer.querySelector(".whatif-row[data-manual='true']");
+	if (existing) existing.remove();
 	const date = periodEndInput?.value || shared.toDateInput(today);
-	appendWhatIfRow({ type: "expense", amount: "", date, note: "", rowId: shared.createEntryId() }, true);
+	appendWhatIfRow({ type: "expense", amount: "", date, note: "", rowId: shared.createEntryId(), manual: true }, true);
 	renderForecastPlanner();
 });
 if (forecastLoadScenarioButton) {
@@ -441,9 +444,6 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 			}
 		}
 		rowElement.remove();
-		if (!whatIfRowsContainer.children.length) {
-			appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
-		}
 		renderForecastPlanner();
 		return;
 	}
@@ -962,7 +962,6 @@ function render() {
 
 function setDefaultWhatIfRows() {
 	whatIfRowsContainer.innerHTML = "";
-	appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
 }
 
 function appendWhatIfRow(row, prepend = false) {
@@ -973,6 +972,7 @@ function appendWhatIfRow(row, prepend = false) {
 	wrapper.dataset.amount = String(row.amount ?? "");
 	wrapper.dataset.date = row.date || "";
 	wrapper.dataset.note = String(row.note || "").slice(0, 80);
+	if (row.manual) wrapper.dataset.manual = "true";
 
 	const hasData = Number(row.amount) > 0 || Boolean(row.date);
 	if (hasData) {
@@ -1022,7 +1022,7 @@ function buildWhatIfRowEditHTML(wrapper) {
 	const note = wrapper.dataset.note || "";
 	return `
 		<div class="whatif-row-fields">
-			<div class="whatif-field">
+			<div class="whatif-field whatif-field-type">
 				<label>${t("forecastRowTypeLabel")}</label>
 				<select class="forecast-whatif-type">
 					<option value="expense">${t("forecastTypeExpense")}</option>
@@ -1030,20 +1030,20 @@ function buildWhatIfRowEditHTML(wrapper) {
 				</select>
 			</div>
 			<div class="whatif-field">
-				<label>${t("forecastRowAmountLabel")}</label>
-				<input type="number" class="forecast-whatif-amount" min="0" step="1" value="${amount}">
-			</div>
-			<div class="whatif-field">
-				<label>${t("forecastRowDateLabel")}</label>
-				<input type="date" class="forecast-whatif-date" value="${date}">
-			</div>
-			<div class="whatif-field">
 				<label>${t("forecastRowNoteLabel")}</label>
 				<input type="text" class="forecast-whatif-note" maxlength="80" placeholder="${t("forecastRowNotePlaceholder")}" value="${note}">
 			</div>
+			<div class="whatif-field whatif-field-amount">
+				<label>${t("forecastRowAmountLabel")}</label>
+				<input type="number" class="forecast-whatif-amount" min="0" step="1" inputmode="decimal" value="${amount}">
+			</div>
+			<div class="whatif-field whatif-field-date">
+				<label>${t("forecastRowDateLabel")}</label>
+				<input type="date" class="forecast-whatif-date" value="${date}">
+			</div>
 		</div>
 		<div class="whatif-row-actions">
-			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">✓</button>
+			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">💾</button>
 			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
 		</div>
 	`;
