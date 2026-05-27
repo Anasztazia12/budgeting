@@ -46,7 +46,7 @@
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
 						<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
 						<a href="summary.html" data-i18n="summaryLink">Összesítés</a>
-						<a href="managing-debt.html" data-i18n="managingDebtLink">Adósságkezelő</a>
+                        <a href="managing-debt.html" data-i18n="managingDebtLink">Adósságkezelő</a>
 						<button id="menu-back-button" type="button" data-i18n="backAction">Vissza</button>
 						<button id="install-app-button" type="button" data-i18n="downloadAppButton">App letöltése</button>
 						<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
@@ -55,11 +55,9 @@
 					</div>
 				</nav>
 			</div>
-			<h1 data-i18n="heroTitle">Költségvetési előrejelző</h1>
-			<p data-i18n="heroText">Tervezd meg előre a kiadásaidat dátum és előrejelzés alapján.</p>
-		</header>
-
-		<section class="card controls compact-controls budget-controls">
+			<h1 data-i18n="heroTitle">Adósságkezelés</h1>
+			<p data-i18n="heroText">Kezeld hatékonyan az adósságaidat és tervezd meg a visszafizetést.</p>
+		</header><section class="card controls compact-controls budget-controls">
 			<div class="period-control">
 				<label for="period-start" data-i18n="periodLabel">Választott időszak</label>
 				<div class="period-range-inputs">
@@ -74,7 +72,8 @@
 				</div>
 			</div>
 			<div class="currency-control">
-				<label for="app-currency" data-i18n="currencyLabel">Pénznem választó</label>
+				<label for="app-currency" data-i18n="currencyLabel">Pénznem
+választó</label>
 				<select id="app-currency" data-i18n-aria-label="currencySelectorAria" aria-label="Pénznem választó">
 					<option value="HUF" data-i18n="currencyHuf">HUF (forint)</option>
 					<option value="GBP" data-i18n="currencyGbp">GBP (font)</option>
@@ -85,46 +84,13 @@
 			<div class="control-action">
 				<div class="stack">
 					<button id="summary-toggle-button" type="button" class="btn btn-primary" data-i18n="summaryLink">Összesítés</button>
-					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Vissza a Költségvetéshez</button>
-					<button id="managing-debt-toggle-button" type="button" class="btn btn-primary" data-i18n="managingDebtLink">Adósságkezelő</button>
+					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Költségvetési előrejelző</button>
+                    <button id="managing-debt-toggle-button" type="button" class="btn btn-primary" data-i18n="managingDebtLink">Adósságkezelő</button>
 				</div>
 			</div>
 		</section>
 
-		<section id="budget-content">
-			<section id="forecast-planner" class="card">
-				<h2 data-i18n="forecastTitle">Költségvetési előrejelző</h2>
-				<p id="auth-message" class="auth-message hidden" aria-live="polite"></p>
-
-				<div class="saved-plans-section">
-					<div class="saved-plans-header">
-						<details class="saved-plans-dropdown">
-							<summary class="saved-plans-dropdown-trigger">
-								<span data-i18n="forecastScenarioSavedLabel">Mentett tervek</span>
-								<span class="saved-plans-dropdown-arrow" aria-hidden="true">▾</span>
-							</summary>
-							<div id="forecast-scenario-list" class="saved-plans-dropdown-content" role="group" aria-label="Mentett tervek"></div>
-						</details>
-						<div class="saved-plans-actions">
-							<button id="forecast-load-scenario" type="button" class="secondary" data-i18n="forecastLoadButton">Betöltés</button>
-							<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
-						</div>
-					</div>
-				</div>
-
-				
-				<div id="whatif-rows" class="forecast-rows"></div>
-				<div class="forecast-results">
-					<p><strong data-i18n="forecastBaseUntilLabel">Egyenleg eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
-					<p><strong data-i18n="forecastWithPurchaseLabel">Egyenleg a tervezett tételekkel:</strong> <span id="forecast-with-purchase">0</span></p>
-					<p><strong data-i18n="forecastDifferenceLabel">Különbség:</strong> <span id="forecast-difference">0</span></p>
-					<p><strong data-i18n="forecastMonthEndImpactLabel">Egyenleg új állapotban:</strong> <span id="forecast-month-end">0</span></p>
-				</div>
-			</section>
-		</section>
-	</main>
-
-	<script src="assets/js/app-shared.js"></script>
-	<script type="module" src="assets/js/forecast.js"></script>
-</body>
-</html>
+        <header class="debt type">
+            <div class="debt-header">
+                <h2 data-i18n="contactTitle">Hitel</h2>
+                 <div class="contact-actions">

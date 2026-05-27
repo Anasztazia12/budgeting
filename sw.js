@@ -1,4 +1,4 @@
-const CACHE_NAME = "budgeting-app-v4";
+const CACHE_NAME = "budgeting-app-v6";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -37,14 +37,14 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// FETCH → HTML: always network first, others: cache first
+// FETCH → HTML + JS: always network first; images/fonts: cache first
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
+  const isNetworkFirst = url.pathname.endsWith(".html") || url.pathname.endsWith(".js");
 
-  // HTML → mindig friss
-  if (url.pathname.endsWith(".html")) {
+  if (isNetworkFirst) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -57,7 +57,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Minden más → cache first
+  // Minden más (CSS, képek) → cache first
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;

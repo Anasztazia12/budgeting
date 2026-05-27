@@ -87,6 +87,7 @@ választó</label>
 				<div class="stack">
 					<button id="summary-toggle-button" type="button" class="btn btn-primary" data-i18n="summaryLink">Összesítés</button>
 					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Költségvetési előrejelző</button>
+					 <button id="managing-debt-toggle-button" type="button" class="btn btn-primary" data-i18n="managingDebtLink">Adósságkezelő</button>
 				</div>
 			</div>
 		</section>
@@ -226,6 +227,25 @@ választó</label>
 					<ul id="expense-list" class="entry-list action-list"></ul>
 				</article>
 			</section>
+
+			<section id="chart-section" class="card hidden">
+				<div class="chart-header">
+					<h2 id="chart-title-el">Diagram</h2>
+					<div class="chart-type-selector">
+						<label for="chart-type" id="chart-type-label-el">Típus</label>
+						<select id="chart-type">
+							<option value="pie" id="chart-opt-pie">Kördiagram</option>
+							<option value="bar" id="chart-opt-bar">Oszlopdiagram</option>
+						</select>
+					</div>
+				</div>
+				<div class="chart-body">
+					<div class="chart-canvas-wrap">
+						<canvas id="budget-chart"></canvas>
+					</div>
+					<div id="chart-legend" class="chart-legend"></div>
+				</div>
+			</section>
 		</section>
 	</main>
 
@@ -241,6 +261,7 @@ választó</label>
 		</div>
 	</div>
 
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 	<script src="assets/js/app-shared.js"></script>
 	<script type="module" src="assets/js/budget.js"></script>
 </body>

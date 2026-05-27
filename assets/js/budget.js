@@ -92,6 +92,11 @@ const dictionary = {
 		repeatMonthlyBadge: "Ismétlődő",
 		repeatEnabled: "Ismétlődő megjelenítés bekapcsolva.",
 		repeatDisabled: "Ismétlődő megjelenítés kikapcsolva.",
+		chartTitle: "Diagram",
+		chartDescription: "Bevételek és kiadások kategóriánként",
+		chartTypeLabel: "Típus",
+		chartTypePie: "Kördiagram",
+		chartTypeBar: "Oszlopdiagram",
 		categories: {
 			fizetes: "Fizetés",
 			egyeb: "Egyéb",
@@ -193,6 +198,11 @@ const dictionary = {
 		repeatMonthlyBadge: "Monthly repeat",
 		repeatEnabled: "Monthly repeat enabled.",
 		repeatDisabled: "Monthly repeat disabled.",
+		chartTitle: "Chart",
+		chartDescription: "Income and expenses by category",
+		chartTypeLabel: "Type",
+		chartTypePie: "Pie chart",
+		chartTypeBar: "Bar chart",
 		categories: {
 			fizetes: "Salary",
 			egyeb: "Other",
@@ -271,6 +281,8 @@ const deleteScopeModal = document.getElementById("delete-scope-modal");
 const deleteThisMonthButton = document.getElementById("delete-this-month-btn");
 const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
 const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
+const chartTypeSelect = document.getElementById("chart-type");
+let chartInstance = null;
 let deleteScopeResolver = null;
 let inlineDeleteConfirmResolver = null;
 let inlineDeleteConfirmElement = null;
@@ -307,6 +319,10 @@ currencySelect.addEventListener("change", () => {
 	if (!input) return;
 	input.addEventListener("change", render);
 });
+
+if (chartTypeSelect) {
+	chartTypeSelect.addEventListener("change", render);
+}
 
 forecastToggleButton.addEventListener("click", () => {
 	const periodStart = periodStartInput?.value || shared.toDateInput(today);
@@ -694,6 +710,9 @@ function render() {
 		monthEndLeftEl.textContent = formatCurrency(0);
 		paintList(incomeList, []);
 		paintList(expenseList, []);
+		const chartSection = document.getElementById("chart-section");
+		if (chartSection) chartSection.classList.add("hidden");
+		if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 		return;
 	}
 
@@ -714,6 +733,7 @@ function render() {
 
 	paintList(incomeList, filteredIncomes, "incomes");
 	paintList(expenseList, filteredExpenses, "expenses");
+	renderChart(incomes, expenses);
 }
 
 function paintList(target, entries, listType) {
@@ -760,6 +780,102 @@ function paintList(target, entries, listType) {
 			`;
 			target.appendChild(li);
 		});
+}
+
+const CHART_PALETTE = [
+	"#3b82f6","#ef4444","#22c55e","#f59e0b","#8b5cf6",
+	"#ec4899","#14b8a6","#f97316","#06b6d4","#84cc16",
+	"#a78bfa","#fb923c","#34d399","#60a5fa","#f472b6"
+];
+
+function renderChart(incomes, expenses) {
+	const section = document.getElementById("chart-section");
+	const canvas = document.getElementById("budget-chart");
+	const legendEl = document.getElementById("chart-legend");
+	if (!section || !canvas || typeof Chart === "undefined") return;
+
+	const dataMap = {};
+	[...incomes, ...expenses].forEach((e) => {
+		const cat = translateCategory(e.category);
+		dataMap[cat] = (dataMap[cat] || 0) + e.amount;
+	});
+
+	const entries = Object.entries(dataMap).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+
+	if (!entries.length) {
+		section.classList.add("hidden");
+		if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+		return;
+	}
+
+	const labels = entries.map(([k]) => k);
+	const amounts = entries.map(([, v]) => v);
+	const bgColors = labels.map((_, i) => CHART_PALETTE[i % CHART_PALETTE.length]);
+	const chartType = chartTypeSelect?.value || "pie";
+
+	// Build legend immediately (doesn't need layout)
+	if (legendEl) {
+		legendEl.innerHTML = "";
+		entries.forEach(([label, amount], i) => {
+			const item = document.createElement("div");
+			item.className = "chart-legend-item";
+			item.innerHTML = `
+				<span class="chart-legend-color" style="background:${bgColors[i]}"></span>
+				<span class="chart-legend-label">${escapeHtml(label)}: <strong>${formatCurrency(amount)}</strong></span>
+			`;
+			legendEl.appendChild(item);
+		});
+	}
+
+	// Show section and set labels directly (no data-i18n, no applyTranslations dependency)
+	section.classList.remove("hidden");
+	const titleEl = document.getElementById("chart-title-el");
+	const typeLabelEl = document.getElementById("chart-type-label-el");
+	const pieOpt = document.getElementById("chart-opt-pie");
+	const barOpt = document.getElementById("chart-opt-bar");
+	if (titleEl) titleEl.textContent = t("chartTitle");
+	if (typeLabelEl) typeLabelEl.textContent = t("chartTypeLabel");
+	if (pieOpt) pieOpt.textContent = t("chartTypePie");
+	if (barOpt) barOpt.textContent = t("chartTypeBar");
+	if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+	requestAnimationFrame(() => {
+		if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+		chartInstance = new Chart(canvas.getContext("2d"), {
+			type: chartType,
+			data: {
+				labels,
+				datasets: [{
+					data: amounts,
+					backgroundColor: bgColors,
+					borderWidth: chartType === "bar" ? 0 : 2,
+					borderColor: "#fff"
+				}]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: true,
+				plugins: {
+					legend: { display: false },
+					tooltip: {
+						callbacks: {
+							label: (ctx) => ` ${formatCurrency(ctx.raw)}`
+						}
+					}
+				},
+				...(chartType === "bar" ? {
+					scales: {
+						y: {
+							beginAtZero: true,
+							ticks: {
+								callback: (v) => new Intl.NumberFormat(appLanguage === "en" ? "en-GB" : "hu-HU", { maximumFractionDigits: 0 }).format(v)
+							}
+						}
+					}
+				} : {})
+			}
+		});
+	});
 }
 
 async function handleEntryAction(event, listType) {

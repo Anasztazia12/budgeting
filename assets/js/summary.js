@@ -25,7 +25,6 @@ const dictionary = {
 		homeLink: "Kezdőlap",
 		budgetLink: "Költségvetés",
 		forecastButton: "Költségvetési előrejelző",
-		monthlyLink: "Összesítés",
 		versionLabel: "Verzió",
 		themeModeLight: "Világos",
 		themeModeDark: "Sötét",
@@ -102,7 +101,6 @@ const dictionary = {
 		homeLink: "Home",
 		budgetLink: "Budget",
 		forecastButton: "Budget Forecast Planner",
-		monthlyLink: "Summary",
 		versionLabel: "Version",
 		themeModeLight: "Light",
 		themeModeDark: "Dark",
@@ -300,8 +298,7 @@ window.addEventListener("DOMContentLoaded", () => {
 		deferredInstallPrompt = null;
 		updateInstallButtonState();
 	});
-
-	// Delete scope modal buttons
+// Delete scope modal buttons
 	if (deleteThisMonthButton) deleteThisMonthButton.addEventListener("click", () => closeDeleteScopeModal("month"));
 	if (deleteAllMonthsButton) deleteAllMonthsButton.addEventListener("click", () => closeDeleteScopeModal("all"));
 	if (deleteScopeCancelButton) deleteScopeCancelButton.addEventListener("click", () => closeDeleteScopeModal(null));
@@ -350,7 +347,9 @@ async function initializePage() {
 	} else {
 		const session = await restoreSession(currentUser);
 		if (!session) { window.location.href = "index.html"; return; }
-		applyAuthenticatedState(session);
+		currentUser = String(session?.profile?.username || currentUser || "").trim();
+		currentProfile = session?.profile || null;
+		if (currentUser) localStorage.setItem(SESSION_KEY, currentUser);
 		appState = session.data || { incomes: [], expenses: [] };
 	}
 
@@ -842,12 +841,6 @@ function updateInstallButtonState() {
 	const installed = shared.isAppInstalled();
 	installAppButton.textContent = installed && !deferredInstallPrompt ? t("appDownloaded") : t("downloadAppButton");
 	installAppButton.disabled = Boolean(installed && !deferredInstallPrompt);
-}
-
-function applyAuthenticatedState(session) {
-	currentUser = String(session?.profile?.username || currentUser || "").trim();
-	currentProfile = session?.profile || null;
-	if (currentUser) localStorage.setItem(SESSION_KEY, currentUser);
 }
 
 function t(key) {
