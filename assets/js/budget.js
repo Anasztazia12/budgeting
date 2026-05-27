@@ -340,6 +340,11 @@ if (summaryToggleButton) {
 	});
 }
 
+const managingDebtToggleButton = document.getElementById("managing-debt-toggle-button");
+if (managingDebtToggleButton) {
+	managingDebtToggleButton.addEventListener("click", () => { window.location.href = "managing-debt.html"; });
+}
+
 if (saveStateButton) {
 	saveStateButton.addEventListener("click", () => {
 		saveState();
