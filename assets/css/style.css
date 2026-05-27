@@ -820,6 +820,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .icon-btn.confirm-edit { background: linear-gradient(125deg, #1b9d8f, #167f73); border-color: #1b7c71; color: #fff; }
 .icon-btn.confirm-edit:hover, .icon-btn.confirm-edit:focus-visible { background: linear-gradient(125deg, #22aa9c, #1a8878); }
 [data-theme="dark"] .icon-btn.confirm-edit { background: linear-gradient(125deg, #2f9f92, #217a70); border-color: #71d0c3; }
+.icon-btn-divider { display: inline-block; width: 1px; height: 1.8rem; background: #c4d5f2; margin: 0 0.1rem; flex-shrink: 0; align-self: center; }
+[data-theme="dark"] .icon-btn-divider { background: #3d5487; }
 
 /* ── Saved plans section ── */
 .saved-plans-section { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.85rem; padding: 0.7rem 0.85rem; border: 1px solid #c4d5f2; border-radius: var(--control-radius); background: #f5f8ff; }

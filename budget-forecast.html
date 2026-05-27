@@ -94,7 +94,6 @@
 				<h2 data-i18n="forecastTitle">Költségvetési előrejelző</h2>
 				<p id="auth-message" class="auth-message hidden" aria-live="polite"></p>
 
-				<!-- Mentett tervek -->
 				<div class="saved-plans-section">
 					<div class="saved-plans-header">
 						<span class="saved-plans-title" data-i18n="forecastScenarioSavedLabel">Mentett tervek</span>
@@ -103,14 +102,11 @@
 							<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
 						</div>
 					</div>
-					<!-- JS tölti be a pipálható terveket -->
 					<div id="forecast-scenario-list" class="saved-plans-list" role="group" aria-label="Mentett tervek"></div>
 				</div>
 
-				<!-- Dinamikus sorok – alapból üres, JS generálja -->
+				
 				<div id="whatif-rows" class="forecast-rows"></div>
-
-				<!-- Előrejelzés összesítő -->
 				<div class="forecast-results">
 					<p><strong data-i18n="forecastBaseUntilLabel">Egyenleg eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
 					<p><strong data-i18n="forecastWithPurchaseLabel">Egyenleg a tervezett tételekkel:</strong> <span id="forecast-with-purchase">0</span></p>

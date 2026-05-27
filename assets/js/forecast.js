@@ -72,6 +72,8 @@ const dictionary = {
 		forecastRowDone: "Kész",
 		forecastRowRemoved: "A sor törölve.",
 		forecastRowConfirmed: "A sor mentve.",
+		forecastDeletePlan: "Terv törlése",
+		forecastPlanDeleted: "A mentett terv törölve.",
 		deleteAccountNeedsSecondClick: "Kattints újra 7 másodpercen belül a fiók törléséhez.",
 		logoutButton: "Kijelentkezés",
 		loggedOut: "Nincs bejelentkezett felhasználó.",
@@ -141,6 +143,8 @@ const dictionary = {
 		forecastRowDone: "Done",
 		forecastRowRemoved: "Row removed.",
 		forecastRowConfirmed: "Row saved.",
+		forecastDeletePlan: "Delete plan",
+		forecastPlanDeleted: "Saved plan deleted.",
 		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete the account.",
 		logoutButton: "Sign out",
 		loggedOut: "No user is signed in.",
@@ -245,9 +249,9 @@ addWhatIfRowButton.addEventListener("click", () => {
 	// Only one manually-added row at a time
 	const existing = whatIfRowsContainer.querySelector(".whatif-row[data-manual='true']");
 	if (existing) existing.remove();
-	const date = periodEndInput?.value || shared.toDateInput(today);
+	// Pass empty amount AND empty date so hasData=false → row always opens in edit mode
 	appendWhatIfRow(
-		{ type: "expense", amount: "", date, note: "", rowId: shared.createEntryId(), manual: true },
+		{ type: "expense", amount: "", date: "", note: "", planName: "", rowId: shared.createEntryId(), manual: true },
 		true
 	);
 	renderForecastPlanner();
@@ -267,25 +271,41 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 	const action = actionButton.dataset.action;
 
 	if (action === "remove-whatif") {
-		const removedRowId = rowElement.dataset.rowId;
-		if (removedRowId) {
-			let changed = false;
-			forecastScenarios = forecastScenarios.map((scenario) => {
-				const nextRows = scenario.rows.filter((row) => row.rowId !== removedRowId);
-				if (nextRows.length !== scenario.rows.length) {
-					changed = true;
-					return { ...scenario, rows: nextRows };
-				}
-				return scenario;
-			});
-			if (changed) {
-				saveForecastScenarios();
-				renderScenarioList();
-			}
-		}
+		// Remove this row from the current view ONLY — saved plan in localStorage is NOT touched
 		rowElement.remove();
 		showMessage(t("forecastRowRemoved"), false);
 		renderForecastPlanner();
+		return;
+	}
+
+	if (action === "delete-plan") {
+		// Completely delete the saved plan (all its rows) from localStorage
+		const planName = rowElement.dataset.planName;
+		if (planName) {
+			forecastScenarios = forecastScenarios.filter((s) => s.name !== planName);
+			saveForecastScenarios();
+			renderScenarioList();
+			// Remove all rows in the view that belong to this plan
+			whatIfRowsContainer.querySelectorAll(".whatif-row").forEach((row) => {
+				if (row.dataset.planName === planName) row.remove();
+			});
+			showMessage(t("forecastPlanDeleted"), false);
+			renderForecastPlanner();
+		}
+		return;
+	}
+
+	if (action === "cancel-edit") {
+		// If the row already had saved data in its dataset, go back to display mode.
+		// If it was a brand-new empty row (no amount, no date), just remove it.
+		const hasData = Number(rowElement.dataset.amount) > 0 || Boolean(rowElement.dataset.date);
+		if (hasData) {
+			rowElement.classList.remove("edit-mode");
+			rowElement.innerHTML = buildWhatIfRowDisplayHTML(rowElement);
+		} else {
+			rowElement.remove();
+			renderForecastPlanner();
+		}
 		return;
 	}
 
@@ -667,7 +687,8 @@ function buildWhatIfRowDisplayHTML(wrapper) {
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
 			<button type="button" class="icon-btn" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
-			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
+			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">🗑</button>
+			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastDeletePlan")}">🗑</button>` : ""}
 		</div>
 	`;
 }
@@ -677,26 +698,22 @@ function buildWhatIfRowEditHTML(wrapper) {
 	const date = wrapper.dataset.date || "";
 	const note = wrapper.dataset.note || "";
 	const planName = wrapper.dataset.planName || "";
+	// Pre-fill date with period end as a UI suggestion if no date is set yet
+	const dateValue = date || periodEndInput?.value || "";
 	return `
 		<div class="whatif-row-fields">
-			<div class="whatif-field whatif-field-type">
-				<label>${t("forecastRowTypeLabel")}</label>
-				<select class="forecast-whatif-type">
-					<option value="expense">${t("forecastTypeExpense")}</option>
-					<option value="income">${t("forecastTypeIncome")}</option>
-				</select>
-			</div>
 			<div class="whatif-field">
 				<label>${t("forecastScenarioNameLabel")}</label>
 				<input type="text" class="forecast-whatif-plan-name" maxlength="50"
 					placeholder="${t("forecastScenarioNamePlaceholder")}"
 					value="${escapeHtml(planName)}">
 			</div>
-			<div class="whatif-field">
-				<label>${t("forecastRowNoteLabel")}</label>
-				<input type="text" class="forecast-whatif-note" maxlength="80"
-					placeholder="${t("forecastRowNotePlaceholder")}"
-					value="${escapeHtml(note)}">
+			<div class="whatif-field whatif-field-type">
+				<label>${t("forecastRowTypeLabel")}</label>
+				<select class="forecast-whatif-type">
+					<option value="expense">${t("forecastTypeExpense")}</option>
+					<option value="income">${t("forecastTypeIncome")}</option>
+				</select>
 			</div>
 			<div class="whatif-field whatif-field-amount">
 				<label>${t("forecastRowAmountLabel")}</label>
@@ -705,13 +722,20 @@ function buildWhatIfRowEditHTML(wrapper) {
 			</div>
 			<div class="whatif-field whatif-field-date">
 				<label>${t("forecastRowDateLabel")}</label>
-				<input type="date" class="forecast-whatif-date" value="${date}">
+				<input type="date" class="forecast-whatif-date" value="${dateValue}">
+			</div>
+			<div class="whatif-field">
+				<label>${t("forecastRowNoteLabel")}</label>
+				<input type="text" class="forecast-whatif-note" maxlength="80"
+					placeholder="${t("forecastRowNotePlaceholder")}"
+					value="${escapeHtml(note)}">
 			</div>
 		</div>
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">💾</button>
-			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
-			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
+			<button type="button" class="icon-btn" data-action="cancel-edit" title="${t("editAction")}">✎</button>
+			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">🗑</button>
+			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastDeletePlan")}">🗑</button>` : ""}
 		</div>
 	`;
 }
