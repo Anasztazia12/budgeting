@@ -45,7 +45,6 @@
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
 						<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
 						<a href="budget-forecast.html" data-i18n="forecastButton">Költségvetési előrejelző</a>
-						<a href="monthly_budget.html" data-i18n="monthlyLink">Összesítés</a>
 						<button id="menu-back-button" type="button" data-i18n="backAction">Vissza</button>
 						<button id="install-app-button" type="button" data-i18n="downloadAppButton">App letöltése</button>
 						<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutAction">Kijelentkezés</button>
@@ -115,18 +114,19 @@ választó</label>
 					<h3 data-i18n="spentToDateTitle">Mai napig kiadás</h3>
 					<p id="spent-to-date">0</p>
 				</article>
-
 			</section>
+
+			<p id="entry-status-message" class="auth-message hidden" aria-live="polite"></p>
 
 			<section class="grid summary-grid">
 				<article class="card">
-					<h2 data-i18n="upcomingExpensesTitle">Várható kiadások dátum szerint</h2>
-					<ul id="upcoming-expenses" class="entry-list"></ul>
+					<h2 data-i18n="incomeEntriesTitle">Bevételek ebben az időszakban</h2>
+					<ul id="income-list" class="entry-list action-list"></ul>
 				</article>
 
 				<article class="card">
-					<h2 data-i18n="upcomingIncomesTitle">Várható bevételek dátum szerint</h2>
-					<ul id="upcoming-incomes" class="entry-list"></ul>
+					<h2 data-i18n="expenseEntriesTitle">Kiadások ebben az időszakban</h2>
+					<ul id="expense-list" class="entry-list action-list"></ul>
 				</article>
 			</section>
 
@@ -136,6 +136,50 @@ választó</label>
 			</section>
 		</section>
 	</main>
+
+	<div id="delete-scope-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="delete-scope-title">
+		<div class="modal-card">
+			<h3 id="delete-scope-title" data-i18n="deleteScopeTitle">Ismétlődő tétel törlése</h3>
+			<p data-i18n="deleteScopeMessage">Válaszd ki, honnan töröljük a tételt.</p>
+			<div class="modal-actions-split">
+				<button type="button" id="delete-this-month-btn" class="btn btn-outline-info" data-i18n="deleteOnlyThisMonthButton">Törlés csak ebből a hónapból</button>
+				<button type="button" id="delete-all-months-btn" class="btn btn-danger" data-i18n="deleteAllMonthsButton">Törlés minden hónapból</button>
+			</div>
+			<button type="button" id="delete-scope-cancel" class="btn btn-outline-info" data-i18n="cancelModalButton">Mégse</button>
+		</div>
+	</div>
+
+	<div id="edit-entry-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="edit-entry-title">
+		<div class="modal-card">
+			<h3 id="edit-entry-title" data-i18n="editEntryTitle">Tétel szerkesztése</h3>
+			<form id="edit-entry-form" class="stack">
+				<input type="hidden" id="edit-entry-id">
+				<input type="hidden" id="edit-entry-type">
+
+				<label for="edit-entry-category" data-i18n="categoryLabel">Kategória</label>
+				<select id="edit-entry-category" required></select>
+
+				<label for="edit-entry-amount" data-i18n="amountLabel">Összeg</label>
+				<input type="number" id="edit-entry-amount" min="0.01" step="0.01" inputmode="decimal" required>
+
+				<label for="edit-entry-date" data-i18n="incomeDateLabel">Dátum</label>
+				<input type="date" id="edit-entry-date" required>
+
+				<label for="edit-entry-note" data-i18n="noteLabel">Megjegyzés (opcionális)</label>
+				<textarea id="edit-entry-note" rows="2" maxlength="280"></textarea>
+
+				<label class="inline-check">
+					<input type="checkbox" id="edit-entry-repeat">
+					<span data-i18n="repeatInEveryMonthLabel">Megjelenítés minden hónapban</span>
+				</label>
+
+				<div class="modal-actions-split">
+					<button type="submit" class="btn btn-outline-info" data-i18n="saveEntryButton">Mentés</button>
+					<button type="button" id="edit-entry-cancel" class="btn btn-outline-info" data-i18n="cancelModalButton">Mégse</button>
+				</div>
+			</form>
+		</div>
+	</div>
 
 	<script src="assets/js/app-shared.js"></script>
 	<script type="module" src="assets/js/monthly_budget.js"></script>

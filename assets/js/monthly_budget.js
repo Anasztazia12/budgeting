@@ -1,18 +1,20 @@
-﻿import {
+import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	logoutCurrentUser,
-	restoreSession
+	restoreSession,
+	saveCurrentUserData
 } from "./firebase-service.js";
 
 const shared = window.BudgetAppShared;
-const {
-	SESSION_KEY,
-	DISPLAY_NAME_KEY,
-	THEME_KEY,
-	INSTALL_STATUS_KEY
-} = shared.KEYS;
+const { SESSION_KEY, DISPLAY_NAME_KEY, INSTALL_STATUS_KEY } = shared.KEYS;
 const { GUEST_SESSION_VALUE } = shared;
+
+const INCOME_CATEGORIES = ["fizetes", "egyeb"];
+const EXPENSE_CATEGORIES = [
+	"auto","aram","benzin","biztositas","council","elemiszer","gaz","hitelkartya",
+	"internet","iskola","rent","ruhak","szamlak","telefon","travel","tv","viz","egyeb kiadas"
+];
 
 const dictionary = {
 	hu: {
@@ -25,7 +27,6 @@ const dictionary = {
 		forecastButton: "Költségvetési előrejelző",
 		monthlyLink: "Összesítés",
 		versionLabel: "Verzió",
-		themeModeLabel: "Téma",
 		themeModeLight: "Világos",
 		themeModeDark: "Sötét",
 		contactUs: "Kapcsolat",
@@ -37,7 +38,6 @@ const dictionary = {
 		languageSelectorAria: "Nyelv választó",
 		themeSwitchAria: "Téma váltó",
 		currencySelectorAria: "Pénznem választó",
-		appName: "Költségvetési app",
 		currencyLabel: "Pénznem\nválasztó",
 		currencyHuf: "HUF (forint)",
 		currencyGbp: "GBP (font)",
@@ -54,8 +54,8 @@ const dictionary = {
 		monthlyExpenseTitle: "Kiadás összesen",
 		spentToDateTitle: "Kiadás a mai napig",
 		currentBalanceTitle: "Egyenleg az időszakban",
-		upcomingExpensesTitle: "Kiadások dátum szerint",
-		upcomingIncomesTitle: "Bevételek dátum szerint",
+		incomeEntriesTitle: "Bevételek ebben az időszakban",
+		expenseEntriesTitle: "Kiadások ebben az időszakban",
 		projectionTitle: "Időszak végi becslés",
 		noData: "Nincs adat.",
 		appDownloaded: "Az app letöltve.",
@@ -64,29 +64,35 @@ const dictionary = {
 		emptyEntries: "Nincs tétel a kiválasztott időszakban.",
 		projectionText: "Várható egyenleg {date} dátumra: {amount}.",
 		projectionTextNoDate: "Várható egyenleg: {amount}.",
+		editEntryTitle: "Tétel szerkesztése",
+		saveEntryButton: "Mentés",
+		cancelModalButton: "Mégse",
+		editAction: "Szerkesztés",
+		deleteAction: "Törlés",
+		repeatMonthlyAction: "Megjelenítés minden hónapban",
+		repeatMonthlyBadge: "Ismétlődő",
+		repeatInEveryMonthLabel: "Megjelenítés minden hónapban",
+		entryUpdated: "A tétel frissítve.",
+		entryDeleted: "A tétel törölve.",
+		confirmDelete: "Biztosan törölni szeretnéd ezt a tételt?",
+		deleteScopeTitle: "Ismétlődő tétel törlése",
+		deleteScopeMessage: "Válaszd ki, honnan töröljük a tételt.",
+		deleteOnlyThisMonthButton: "Törlés csak ebből a hónapból",
+		deleteAllMonthsButton: "Törlés minden hónapból",
+		noteLabel: "Megjegyzés (opcionális)",
+		amountLabel: "Összeg",
+		categoryLabel: "Kategória",
+		incomeDateLabel: "Dátum",
 		categories: {
-			fizetes: "Fizetés",
-			egyeb: "Egyéb",
-			szamlak: "Számlák",
-			viz: "Víz",
-			gaz: "Gáz",
-			aram: "Áram",
-			auto: "Autó",
-			benzin: "Benzin",
-			elemiszer: "Élelmiszer",
-			ruhak: "Ruhák",
-			alberlet: "Albérlet",
-			biztositas: "Biztosítás",
-			hitelkartya: "Hitelkártya",
-			onkormanyzati_ado: "Önkormányzati adó",
-			tv: "TV",
-			telefon: "Telefon",
-			internet: "Internet",
-			iskola: "Iskola",
-			   egyeb_kiadas: "Egyéb kiadás"
-		   }
-	   },
-	   en: {
+			fizetes: "Fizetés", egyeb: "Egyéb",
+			szamlak: "Számlák", viz: "Víz", gaz: "Gáz", aram: "Áram",
+			auto: "Autó", benzin: "Benzin", elemiszer: "Élelmiszer", ruhak: "Ruhák",
+			rent: "Albérlet", biztositas: "Biztosítás", hitelkartya: "Hitelkártya",
+			council: "Önkormányzat", tv: "TV", telefon: "Telefon", internet: "Internet",
+			iskola: "Iskola", travel: "Utazás", "egyeb kiadas": "Egyéb kiadás"
+		}
+	},
+	en: {
 		pageTitle: "Summary",
 		heroTitle: "Summary",
 		heroText: "Income and expense summary for a selected date range.",
@@ -96,7 +102,6 @@ const dictionary = {
 		forecastButton: "Budget Forecast Planner",
 		monthlyLink: "Summary",
 		versionLabel: "Version",
-		themeModeLabel: "Theme",
 		themeModeLight: "Light",
 		themeModeDark: "Dark",
 		contactUs: "Contact us",
@@ -108,7 +113,6 @@ const dictionary = {
 		languageSelectorAria: "Language selector",
 		themeSwitchAria: "Theme switch",
 		currencySelectorAria: "Currency selector",
-		appName: "Budgeting App",
 		currencyLabel: "Currency\nselector",
 		currencyHuf: "HUF (forint)",
 		currencyGbp: "GBP (pound)",
@@ -125,8 +129,8 @@ const dictionary = {
 		monthlyExpenseTitle: "Total expense",
 		spentToDateTitle: "Spent to date",
 		currentBalanceTitle: "Balance in period",
-		upcomingExpensesTitle: "Expenses by date",
-		upcomingIncomesTitle: "Income by date",
+		incomeEntriesTitle: "Income in this period",
+		expenseEntriesTitle: "Expenses in this period",
 		projectionTitle: "End-of-period projection",
 		noData: "No data.",
 		appDownloaded: "App downloaded.",
@@ -135,26 +139,32 @@ const dictionary = {
 		emptyEntries: "No entries in the selected period.",
 		projectionText: "Projected balance for {date}: {amount}.",
 		projectionTextNoDate: "Projected balance: {amount}.",
+		editEntryTitle: "Edit entry",
+		saveEntryButton: "Save",
+		cancelModalButton: "Cancel",
+		editAction: "Edit",
+		deleteAction: "Delete",
+		repeatMonthlyAction: "Show every month",
+		repeatMonthlyBadge: "Monthly repeat",
+		repeatInEveryMonthLabel: "Show in every month",
+		entryUpdated: "Entry updated.",
+		entryDeleted: "Entry deleted.",
+		confirmDelete: "Delete this entry?",
+		deleteScopeTitle: "Delete recurring entry",
+		deleteScopeMessage: "Choose where to delete this entry.",
+		deleteOnlyThisMonthButton: "Delete only from this month",
+		deleteAllMonthsButton: "Delete from all months",
+		noteLabel: "Note (optional)",
+		amountLabel: "Amount",
+		categoryLabel: "Category",
+		incomeDateLabel: "Date",
 		categories: {
-			fizetes: "Salary",
-			egyeb: "Other",
-			szamlak: "Bills",
-			viz: "Water",
-			gaz: "Gas",
-			aram: "Electricity",
-			auto: "Car",
-			benzin: "Fuel",
-			elemiszer: "Groceries",
-			ruhak: "Clothes",
-			alberlet: "Rent",
-			biztositas: "Insurance",
-			hitelkartya: "Credit card",
-			onkormanyzati_ado: "Council tax",
-			tv: "TV",
-			telefon: "Phone",
-			internet: "Internet",
-			iskola: "School",
-			egyeb_kiadas: "Other expense"
+			fizetes: "Salary", egyeb: "Other",
+			szamlak: "Bills", viz: "Water", gaz: "Gas", aram: "Electricity",
+			auto: "Car", benzin: "Fuel", elemiszer: "Groceries", ruhak: "Clothes",
+			rent: "Rent", biztositas: "Insurance", hitelkartya: "Credit card",
+			council: "Council tax", tv: "TV", telefon: "Phone", internet: "Internet",
+			iskola: "School", travel: "Travel", "egyeb kiadas": "Other expense"
 		}
 	}
 };
@@ -166,7 +176,15 @@ let appLanguage = shared.loadLanguage();
 let appTheme = shared.loadTheme();
 let appCurrency = shared.loadCurrency();
 let appState = { incomes: [], expenses: [] };
+let deleteScopeResolver = null;
+let inlineDeleteConfirmResolver = null;
+let inlineDeleteConfirmElement = null;
+let inlineDeleteConfirmOutsideHandler = null;
+let deferredInstallPrompt = null;
+let deleteAccountConfirmArmed = false;
+let deleteAccountConfirmTimer = null;
 
+// DOM refs
 const menuToggle = document.getElementById("menu-toggle");
 const menuPanel = document.getElementById("menu-panel");
 const contactUsButton = document.getElementById("contact-us-button");
@@ -189,16 +207,23 @@ const monthlyIncomeEl = document.getElementById("monthly-income");
 const monthlyExpenseEl = document.getElementById("monthly-expense");
 const spentToDateEl = document.getElementById("spent-to-date");
 const currentBalanceEl = document.getElementById("current-balance");
-const upcomingExpensesEl = document.getElementById("upcoming-expenses");
-const upcomingIncomesEl = document.getElementById("upcoming-incomes");
+const incomeListEl = document.getElementById("income-list");
+const expenseListEl = document.getElementById("expense-list");
 const projectionTextEl = document.getElementById("projection-text");
-let deferredInstallPrompt = null;
-let deleteAccountConfirmArmed = false;
-let deleteAccountConfirmTimer = null;
+const entryStatusMsg = document.getElementById("entry-status-message");
+const deleteScopeModal = document.getElementById("delete-scope-modal");
+const deleteThisMonthButton = document.getElementById("delete-this-month-btn");
+const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
+const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
+const editEntryModal = document.getElementById("edit-entry-modal");
+const editEntryForm = document.getElementById("edit-entry-form");
+const editEntryCancelButton = document.getElementById("edit-entry-cancel");
 
+// ── Init ──────────────────────────────────────────────────────────────────────
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener("DOMContentLoaded", () => {
 	void initializePage();
+
 	languageSelect.addEventListener("change", () => {
 		appLanguage = languageSelect.value;
 		shared.saveLanguage(appLanguage);
@@ -210,142 +235,124 @@ window.addEventListener('DOMContentLoaded', () => {
 		shared.saveCurrency(appCurrency);
 		render();
 	});
+	if (periodStartInput) periodStartInput.addEventListener("change", render);
+	if (periodEndInput) periodEndInput.addEventListener("change", render);
 
-});
-
-if (periodStartInput) {
-	periodStartInput.addEventListener("change", render);
-}
-
-if (periodEndInput) {
-	periodEndInput.addEventListener("change", render);
-}
-
-if (forecastToggleButton) {
-	forecastToggleButton.addEventListener("click", () => {
-		const periodStart = periodStartInput?.value || shared.toDateInput(today);
-		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-		window.location.href = `budget-forecast.html?month=${monthParam}`;
-	});
-}
-
-if (summaryToggleButton) {
-	summaryToggleButton.addEventListener("click", () => {
-		const periodStart = periodStartInput?.value || shared.toDateInput(today);
-		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-		window.location.href = `monthly_budget.html?month=${monthParam}`;
-	});
-}
-
-menuToggle.addEventListener("click", () => {
-	const isOpen = menuPanel.classList.toggle("is-open");
-	menuToggle.classList.toggle("is-open", isOpen);
-	menuToggle.setAttribute("aria-expanded", String(isOpen));
-});
-
-if (themeLightButton) {
-	themeLightButton.addEventListener("click", () => {
-		setTheme("light");
-	});
-}
-
-if (themeDarkButton) {
-	themeDarkButton.addEventListener("click", () => {
-		setTheme("dark");
-	});
-}
-
-if (contactUsButton) {
-	contactUsButton.addEventListener("click", () => {
-		window.location.href = "contact.html";
-	});
-}
-
-menuLogoutButton.addEventListener("click", handleLogout);
-if (deleteAccountButton) {
-	deleteAccountButton.addEventListener("click", handleAccountDelete);
-}
-menuBackButton.addEventListener("click", () => {
-	window.history.back();
-});
-installAppButton.addEventListener("click", async () => {
-	if (shared.isAppInstalled() && !deferredInstallPrompt) {
-		setMenuInfoMessage(t("appDownloaded"));
-		return;
-	}
-
-	if (!deferredInstallPrompt) {
-		setMenuInfoMessage(shared.getInstallUnavailableMessage(appLanguage));
-		return;
-	}
-
-	menuPanel.classList.remove("is-open");
-	menuToggle.classList.remove("is-open");
-	menuToggle.setAttribute("aria-expanded", "false");
-	deferredInstallPrompt.prompt();
-	const choice = await deferredInstallPrompt.userChoice;
-	if (choice.outcome === "accepted") {
-		localStorage.setItem(INSTALL_STATUS_KEY, "1");
-		setMenuInfoMessage(t("appDownloaded"));
-	}
-	deferredInstallPrompt = null;
-	updateInstallButtonState();
-});
-
-document.addEventListener("click", (event) => {
-	if (!event.target.closest(".menu-wrap")) {
-		menuPanel.classList.remove("is-open");
-		menuToggle.classList.remove("is-open");
-		menuToggle.setAttribute("aria-expanded", "false");
-	}
-});
-
-document.addEventListener("keydown", (event) => {
-	if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
-		menuPanel.classList.remove("is-open");
-		menuToggle.classList.remove("is-open");
-		menuToggle.setAttribute("aria-expanded", "false");
-		menuToggle.focus();
-	}
-});
-
-window.addEventListener("beforeinstallprompt", (event) => {
-	deferredInstallPrompt = event;
-	localStorage.setItem(INSTALL_STATUS_KEY, "0");
-	updateInstallButtonState();
-});
-
-window.addEventListener("appinstalled", () => {
-	localStorage.setItem(INSTALL_STATUS_KEY, "1");
-	deferredInstallPrompt = null;
-	setMenuInfoMessage(t("appDownloaded"));
-	updateInstallButtonState();
-});
-
-if ("serviceWorker" in navigator) {
-	window.addEventListener("load", () => {
-		navigator.serviceWorker.register("sw.js").catch(() => {
-			// Service worker errors should not block usage.
+	if (forecastToggleButton) {
+		forecastToggleButton.addEventListener("click", () => {
+			const start = periodStartInput?.value || shared.toDateInput(today);
+			window.location.href = `budget-forecast.html?month=${encodeURIComponent(start.slice(0, 7))}`;
 		});
+	}
+	if (summaryToggleButton) {
+		summaryToggleButton.addEventListener("click", () => {
+			const start = periodStartInput?.value || shared.toDateInput(today);
+			window.location.href = `summary.html?month=${encodeURIComponent(start.slice(0, 7))}`;
+		});
+	}
+
+	menuToggle.addEventListener("click", () => {
+		const isOpen = menuPanel.classList.toggle("is-open");
+		menuToggle.classList.toggle("is-open", isOpen);
+		menuToggle.setAttribute("aria-expanded", String(isOpen));
 	});
-}
+	document.addEventListener("click", (e) => {
+		if (!e.target.closest(".menu-wrap")) {
+			menuPanel.classList.remove("is-open");
+			menuToggle.classList.remove("is-open");
+			menuToggle.setAttribute("aria-expanded", "false");
+		}
+	});
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") {
+			if (inlineDeleteConfirmResolver) { closeInlineDeleteConfirm(false); return; }
+			if (deleteScopeModal && !deleteScopeModal.classList.contains("hidden")) { closeDeleteScopeModal(null); return; }
+			if (editEntryModal && !editEntryModal.classList.contains("hidden")) { closeEditModal(); return; }
+			if (menuPanel.classList.contains("is-open")) {
+				menuPanel.classList.remove("is-open");
+				menuToggle.classList.remove("is-open");
+				menuToggle.setAttribute("aria-expanded", "false");
+				menuToggle.focus();
+			}
+		}
+	});
+
+	if (themeLightButton) themeLightButton.addEventListener("click", () => setTheme("light"));
+	if (themeDarkButton) themeDarkButton.addEventListener("click", () => setTheme("dark"));
+	if (contactUsButton) contactUsButton.addEventListener("click", () => { window.location.href = "contact.html"; });
+	menuLogoutButton.addEventListener("click", handleLogout);
+	if (deleteAccountButton) deleteAccountButton.addEventListener("click", handleAccountDelete);
+	menuBackButton.addEventListener("click", () => { window.history.back(); });
+
+	installAppButton.addEventListener("click", async () => {
+		if (shared.isAppInstalled() && !deferredInstallPrompt) { setMenuInfoMessage(t("appDownloaded")); return; }
+		if (!deferredInstallPrompt) { setMenuInfoMessage(shared.getInstallUnavailableMessage(appLanguage)); return; }
+		menuPanel.classList.remove("is-open");
+		menuToggle.classList.remove("is-open");
+		menuToggle.setAttribute("aria-expanded", "false");
+		deferredInstallPrompt.prompt();
+		const choice = await deferredInstallPrompt.userChoice;
+		if (choice.outcome === "accepted") { localStorage.setItem(INSTALL_STATUS_KEY, "1"); setMenuInfoMessage(t("appDownloaded")); }
+		deferredInstallPrompt = null;
+		updateInstallButtonState();
+	});
+
+	// Delete scope modal buttons
+	if (deleteThisMonthButton) deleteThisMonthButton.addEventListener("click", () => closeDeleteScopeModal("month"));
+	if (deleteAllMonthsButton) deleteAllMonthsButton.addEventListener("click", () => closeDeleteScopeModal("all"));
+	if (deleteScopeCancelButton) deleteScopeCancelButton.addEventListener("click", () => closeDeleteScopeModal(null));
+	if (deleteScopeModal) {
+		deleteScopeModal.addEventListener("click", (e) => { if (e.target === deleteScopeModal) closeDeleteScopeModal(null); });
+	}
+
+	// Edit modal
+	if (editEntryForm) editEntryForm.addEventListener("submit", saveEditEntry);
+	if (editEntryCancelButton) editEntryCancelButton.addEventListener("click", closeEditModal);
+	if (editEntryModal) {
+		editEntryModal.addEventListener("click", (e) => { if (e.target === editEntryModal) closeEditModal(); });
+	}
+
+	// Entry list actions (click + change for checkboxes)
+	if (incomeListEl) {
+		incomeListEl.addEventListener("click", (e) => handleEntryAction(e, "incomes"));
+		incomeListEl.addEventListener("change", (e) => handleEntryAction(e, "incomes"));
+	}
+	if (expenseListEl) {
+		expenseListEl.addEventListener("click", (e) => handleEntryAction(e, "expenses"));
+		expenseListEl.addEventListener("change", (e) => handleEntryAction(e, "expenses"));
+	}
+
+	window.addEventListener("beforeinstallprompt", (e) => {
+		deferredInstallPrompt = e;
+		localStorage.setItem(INSTALL_STATUS_KEY, "0");
+		updateInstallButtonState();
+	});
+	window.addEventListener("appinstalled", () => {
+		localStorage.setItem(INSTALL_STATUS_KEY, "1");
+		deferredInstallPrompt = null;
+		setMenuInfoMessage(t("appDownloaded"));
+		updateInstallButtonState();
+	});
+	if ("serviceWorker" in navigator) {
+		window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+	}
+});
+
+// ── Page init ─────────────────────────────────────────────────────────────────
 
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
 		appState = shared.loadGuestData();
 	} else {
 		const session = await restoreSession(currentUser);
-		if (!session) {
-			window.location.href = "index.html";
-			return;
-		}
-
+		if (!session) { window.location.href = "index.html"; return; }
 		applyAuthenticatedState(session);
 		appState = session.data || { incomes: [], expenses: [] };
 	}
 
 	applyTheme();
 	syncThemeButtons();
+	setDefaultPeriodRange();
 	languageSelect.value = appLanguage;
 	currencySelect.value = appCurrency;
 	applyTranslations();
@@ -354,159 +361,39 @@ async function initializePage() {
 	render();
 }
 
-function applyTranslations() {
-	document.documentElement.lang = appLanguage;
-	document.title = t("pageTitle");
-	document.querySelectorAll("[data-i18n]").forEach((element) => {
-		element.textContent = t(element.dataset.i18n);
-	});
-	menuToggle.setAttribute("aria-label", t("menuButton"));
-	document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
-		element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
-	});
-	if (!currentUser) {
-		projectionTextEl.textContent = t("noData");
-	}
-	updateMenuSessionLabel();
-}
-
-function updateAccessUI() {
-	if (!currentUser) {
-		lockedMessage.classList.remove("hidden");
-		summaryContent.classList.add("hidden");
-		updateMenuSessionLabel();
-		return;
-	}
-
-	lockedMessage.classList.add("hidden");
-	summaryContent.classList.remove("hidden");
-	updateMenuSessionLabel();
-}
-
-function updateMenuSessionLabel() {
-	if (!menuSessionInfo) {
-		return;
-	}
-
-	if (!currentUser) {
-		menuSessionInfo.textContent = t("loggedOut");
-		return;
-	}
-
-	const name = getSignedInDisplayName();
-	menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
-}
-
-function getSignedInDisplayName() {
-	if (!currentUser) {
-		return t("guestUser");
-	}
-	if (currentUser === GUEST_SESSION_VALUE) {
-		return t("guestUser");
-	}
-
-	return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
-}
-
-function setMenuInfoMessage(message) {
-	if (!menuSessionInfo) {
-		return;
-	}
-	menuSessionInfo.textContent = message;
-}
+// ── Render ────────────────────────────────────────────────────────────────────
 
 function render() {
-	if (!currentUser) {
-		return;
-	}
+	if (!currentUser) return;
 
-	const selectedMonth = (periodStartInput?.value || shared.toDateInput(today)).slice(0, 7);
 	const todayIso = shared.toDateInput(today);
-	const monthIncomes = shared.monthEntries(appState.incomes, selectedMonth);
-	const monthExpenses = shared.monthEntries(appState.expenses, selectedMonth);
+	const anchorMonth = (periodStartInput?.value || todayIso).slice(0, 7);
+	const range = getDateRange(periodStartInput?.value, periodEndInput?.value);
+	const periodStart = range.start || `${anchorMonth}-01`;
+	const periodEnd = range.end || shared.getMonthEndDate(anchorMonth);
 
-	monthlyIncomeEl.textContent = formatCurrency(shared.sumEntries(monthIncomes));
-	monthlyExpenseEl.textContent = formatCurrency(shared.sumEntries(monthExpenses));
-	spentToDateEl.textContent = formatCurrency(shared.sumEntries(monthExpenses.filter((item) => item.date <= todayIso)));
-	currentBalanceEl.textContent = formatCurrency(shared.sumEntries(monthIncomes) - shared.sumEntries(monthExpenses));
+	const incomes = entriesForPeriod(appState.incomes, periodStart, periodEnd, anchorMonth);
+	const expenses = entriesForPeriod(appState.expenses, periodStart, periodEnd, anchorMonth);
 
-	const upcomingExpenses = monthExpenses.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
-	const upcomingIncomes = monthIncomes.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
+	monthlyIncomeEl.textContent = formatCurrency(shared.sumEntries(incomes));
+	monthlyExpenseEl.textContent = formatCurrency(shared.sumEntries(expenses));
+	spentToDateEl.textContent = formatCurrency(shared.sumEntries(expenses.filter((e) => e.date <= todayIso)));
+	currentBalanceEl.textContent = formatCurrency(shared.sumEntries(incomes) - shared.sumEntries(expenses));
 
-	paintList(upcomingExpensesEl, upcomingExpenses);
-	paintList(upcomingIncomesEl, upcomingIncomes);
+	paintList(incomeListEl, incomes, "incomes");
+	paintList(expenseListEl, expenses, "expenses");
 
-	const projectionAmount = formatCurrency(shared.sumEntries(monthIncomes) - shared.sumEntries(monthExpenses));
-	const selectedEndDate = periodEndInput?.value;
-	if (selectedEndDate) {
-		projectionTextEl.textContent = t("projectionText").replace("{date}", formatDisplayDate(selectedEndDate)).replace("{amount}", projectionAmount);
+	const balance = formatCurrency(shared.sumEntries(incomes) - shared.sumEntries(expenses));
+	if (range.end) {
+		projectionTextEl.textContent = t("projectionText").replace("{date}", formatDisplayDate(range.end)).replace("{amount}", balance);
 	} else {
-		projectionTextEl.textContent = t("projectionTextNoDate").replace("{amount}", projectionAmount);
+		projectionTextEl.textContent = t("projectionTextNoDate").replace("{amount}", balance);
 	}
 }
 
-async function handleLogout() {
-	menuPanel.classList.remove("is-open");
-	menuToggle.classList.remove("is-open");
-	menuToggle.setAttribute("aria-expanded", "false");
-	if (currentUser && currentUser !== GUEST_SESSION_VALUE) {
-		await logoutCurrentUser().catch(() => null);
-	}
-	localStorage.removeItem(SESSION_KEY);
-	window.location.href = "index.html";
-}
-
-async function handleAccountDelete() {
-	if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
-		resetDeleteAccountConfirmState();
-		setMenuInfoMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE));
-		return;
-	}
-
-	if (!deleteAccountConfirmArmed) {
-		deleteAccountConfirmArmed = true;
-		if (deleteAccountConfirmTimer) {
-			window.clearTimeout(deleteAccountConfirmTimer);
-		}
-		deleteAccountConfirmTimer = window.setTimeout(() => {
-			resetDeleteAccountConfirmState();
-		}, 7000);
-		setMenuInfoMessage(t("deleteAccountNeedsSecondClick"));
-		return;
-	}
-
-	resetDeleteAccountConfirmState();
-
-	const email = currentProfile?.email || "";
-	try {
-		setMenuInfoMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
-		await deleteCurrentAccount();
-		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
-		await logoutCurrentUser().catch(() => null);
-		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-		currentUser = "";
-		currentProfile = null;
-		localStorage.removeItem(SESSION_KEY);
-		localStorage.removeItem(DISPLAY_NAME_KEY);
-		setMenuInfoMessage(shared.getDeleteAccountSuccessMessage(appLanguage));
-		window.setTimeout(() => {
-			window.location.href = "index.html";
-		}, 500);
-	} catch (error) {
-		setMenuInfoMessage(getFirebaseErrorMessage(error, appLanguage, "delete"));
-	}
-}
-
-function resetDeleteAccountConfirmState() {
-	deleteAccountConfirmArmed = false;
-	if (deleteAccountConfirmTimer) {
-		window.clearTimeout(deleteAccountConfirmTimer);
-		deleteAccountConfirmTimer = null;
-	}
-}
-
-function paintList(target, entries) {
+function paintList(target, entries, listType) {
 	target.innerHTML = "";
+
 	if (!entries.length) {
 		const li = document.createElement("li");
 		li.className = "empty";
@@ -517,22 +404,395 @@ function paintList(target, entries) {
 
 	entries.forEach((entry) => {
 		const li = document.createElement("li");
-		li.innerHTML = `<div><span>${formatDisplayDate(entry.date)}</span><strong>${translateCategory(entry.category)}</strong></div><span>${formatCurrency(entry.amount)}</span>`;
+		li.className = "entry-row";
+		const noteHtml = entry.note ? `<span class="entry-note-inline">(${escapeHtml(entry.note)})</span>` : "";
+		const badge = entry.repeatMonthly ? `<span class="entry-repeat-badge">${t("repeatMonthlyBadge")}</span>` : "";
+		const checked = entry.repeatMonthly ? "checked" : "";
+		li.innerHTML = `
+			<div class="entry-main-row entry-main-row-top">
+				<div class="entry-heading">
+					<strong>${translateCategory(entry.category)}</strong>
+					<span class="entry-date">${formatDisplayDate(entry.date)}</span>
+				</div>
+				<div class="entry-repeat-controls">
+					${badge}
+					<label class="entry-repeat-toggle">
+						<input type="checkbox" data-action="toggle-repeat" data-id="${entry.id}" data-date="${entry.date}" ${checked}>
+						<span>${t("repeatMonthlyAction")}</span>
+					</label>
+				</div>
+			</div>
+			<div class="entry-main-row">
+				<span class="entry-amount">${formatCurrency(entry.amount)} ${noteHtml}</span>
+				<div class="row-actions row-actions-icons">
+					<button type="button" class="inline-icon-button"
+						title="${t("editAction")}" aria-label="${t("editAction")}"
+						data-action="edit" data-id="${entry.id}" data-type="${listType}">✎</button>
+					<button type="button" class="inline-icon-button danger"
+						title="${t("deleteAction")}" aria-label="${t("deleteAction")}"
+						data-action="delete" data-id="${entry.id}" data-date="${entry.date}" data-type="${listType}">✖</button>
+				</div>
+			</div>
+		`;
 		target.appendChild(li);
 	});
 }
 
-function translateCategory(value) {
-	return t(`categories.${value}`) || value;
+// ── Entry actions ─────────────────────────────────────────────────────────────
+
+async function handleEntryAction(event, listType) {
+	const target = event.target.closest("[data-action]");
+	if (!target) return;
+
+	const action = target.dataset.action;
+	const entryId = target.dataset.id;
+	const clickedDate = target.dataset.date || "";
+	const type = target.dataset.type || listType;
+	const entry = appState[type].find((e) => e.id === entryId);
+	if (!entry) return;
+
+	if (action === "edit") {
+		openEditModal(type, entry);
+		return;
+	}
+
+	if (action === "toggle-repeat") {
+		entry.repeatMonthly = target instanceof HTMLInputElement ? target.checked : !entry.repeatMonthly;
+		if (entry.repeatMonthly) entry.excludedMonths = [];
+		await saveState();
+		render();
+		return;
+	}
+
+	if (action === "delete") {
+		const deleted = await handleEntryDelete(type, entryId, clickedDate, target);
+		if (deleted) {
+			showMessage(t("entryDeleted"), false);
+			render();
+		}
+	}
 }
 
-function t(key) {
-	const parts = key.split(".");
-	let current = dictionary[appLanguage] || dictionary.hu;
-	for (const part of parts) {
-		current = current ? current[part] : undefined;
+async function handleEntryDelete(listType, entryId, clickedDate, triggerEl) {
+	const entry = appState[listType].find((e) => e.id === entryId);
+	if (!entry) return false;
+
+	if (!entry.repeatMonthly) {
+		const confirmed = await openInlineDeleteConfirm(triggerEl, t("confirmDelete"));
+		if (!confirmed) return false;
+		appState[listType] = appState[listType].filter((e) => e.id !== entryId);
+		await saveState();
+		return true;
 	}
-	return current || key;
+
+	const scope = await openDeleteScopeModal();
+	if (!scope) return false;
+
+	if (scope === "all") {
+		appState[listType] = appState[listType].filter((e) => e.id !== entryId);
+		await saveState();
+		return true;
+	}
+
+	if (scope === "month") {
+		const monthToExclude = (clickedDate || entry.date || "").slice(0, 7);
+		if (/^\d{4}-\d{2}$/.test(monthToExclude)) {
+			const excl = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
+			if (!excl.includes(monthToExclude)) excl.push(monthToExclude);
+			entry.excludedMonths = excl;
+			await saveState();
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// ── Edit modal ────────────────────────────────────────────────────────────────
+
+function openEditModal(listType, entry) {
+	if (!editEntryModal) return;
+	document.getElementById("edit-entry-id").value = entry.id;
+	document.getElementById("edit-entry-type").value = listType;
+
+	// populate category select
+	const catSelect = document.getElementById("edit-entry-category");
+	catSelect.innerHTML = "";
+	const cats = listType === "incomes" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+	cats.forEach((val) => {
+		const opt = document.createElement("option");
+		opt.value = val;
+		opt.textContent = translateCategory(val);
+		catSelect.appendChild(opt);
+	});
+	catSelect.value = normalizeCategory(entry.category);
+
+	document.getElementById("edit-entry-amount").value = entry.amount;
+	document.getElementById("edit-entry-date").value = entry.date;
+	document.getElementById("edit-entry-note").value = entry.note || "";
+	document.getElementById("edit-entry-repeat").checked = Boolean(entry.repeatMonthly);
+
+	editEntryModal.classList.remove("hidden");
+	setTimeout(() => document.getElementById("edit-entry-amount").focus(), 50);
+}
+
+function closeEditModal() {
+	if (editEntryModal) editEntryModal.classList.add("hidden");
+}
+
+async function saveEditEntry(event) {
+	event.preventDefault();
+	const listType = document.getElementById("edit-entry-type").value;
+	const entryId = document.getElementById("edit-entry-id").value;
+	const rawAmount = document.getElementById("edit-entry-amount").value;
+	const amount = Math.round(Number(String(rawAmount).replace(",", ".")) * 100) / 100;
+	if (!amount || amount <= 0) return;
+
+	const idx = appState[listType].findIndex((e) => e.id === entryId);
+	if (idx < 0) return;
+
+	const existing = appState[listType][idx];
+	const repeat = document.getElementById("edit-entry-repeat").checked;
+	appState[listType][idx] = {
+		...existing,
+		category: normalizeCategory(document.getElementById("edit-entry-category").value),
+		amount,
+		date: document.getElementById("edit-entry-date").value,
+		note: document.getElementById("edit-entry-note").value.trim(),
+		repeatMonthly: repeat,
+		excludedMonths: repeat ? [] : normalizeExcludedMonths(existing.excludedMonths)
+	};
+
+	await saveState();
+	closeEditModal();
+	showMessage(t("entryUpdated"), false);
+	render();
+}
+
+// ── Delete scope modal ────────────────────────────────────────────────────────
+
+function openDeleteScopeModal() {
+	if (!deleteScopeModal) return Promise.resolve(null);
+	if (inlineDeleteConfirmResolver) closeInlineDeleteConfirm(false);
+	deleteScopeModal.classList.remove("hidden");
+	if (deleteThisMonthButton) deleteThisMonthButton.focus();
+	return new Promise((resolve) => { deleteScopeResolver = resolve; });
+}
+
+function closeDeleteScopeModal(choice) {
+	if (deleteScopeModal) deleteScopeModal.classList.add("hidden");
+	if (deleteScopeResolver) {
+		const res = deleteScopeResolver;
+		deleteScopeResolver = null;
+		res(choice);
+	}
+}
+
+// ── Inline delete confirm ─────────────────────────────────────────────────────
+
+function openInlineDeleteConfirm(anchorEl, message) {
+	if (!anchorEl || !document.body) return Promise.resolve(false);
+	if (inlineDeleteConfirmResolver) closeInlineDeleteConfirm(false);
+
+	const pop = document.createElement("div");
+	pop.className = "inline-delete-confirm";
+	pop.setAttribute("role", "alertdialog");
+	pop.innerHTML = `
+		<p>${escapeHtml(message)}</p>
+		<div class="inline-delete-confirm-actions">
+			<button type="button" class="btn btn-danger">${escapeHtml(t("deleteAction"))}</button>
+			<button type="button" class="btn btn-outline-info">${escapeHtml(t("cancelModalButton"))}</button>
+		</div>
+	`;
+	document.body.appendChild(pop);
+	inlineDeleteConfirmElement = pop;
+
+	const isSmall = window.matchMedia("(max-width: 760px)").matches;
+	if (isSmall) {
+		pop.classList.add("is-mobile");
+	} else {
+		const rect = anchorEl.getBoundingClientRect();
+		const top = Math.max(window.scrollY + 10, window.scrollY + rect.top - pop.offsetHeight - 8);
+		const left = Math.min(
+			Math.max(window.scrollX + 10, window.scrollX + rect.right + 10),
+			window.scrollX + window.innerWidth - pop.offsetWidth - 10
+		);
+		pop.style.top = `${top}px`;
+		pop.style.left = `${left}px`;
+	}
+
+	const [confirmBtn, cancelBtn] = pop.querySelectorAll("button");
+	confirmBtn.addEventListener("click", () => closeInlineDeleteConfirm(true));
+	cancelBtn.addEventListener("click", () => closeInlineDeleteConfirm(false));
+
+	inlineDeleteConfirmOutsideHandler = (e) => {
+		if (!inlineDeleteConfirmElement) return;
+		if (!inlineDeleteConfirmElement.contains(e.target) && !anchorEl.contains(e.target)) {
+			closeInlineDeleteConfirm(false);
+		}
+	};
+	document.addEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+	confirmBtn.focus();
+
+	return new Promise((resolve) => { inlineDeleteConfirmResolver = resolve; });
+}
+
+function closeInlineDeleteConfirm(confirmed) {
+	if (inlineDeleteConfirmOutsideHandler) {
+		document.removeEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+		inlineDeleteConfirmOutsideHandler = null;
+	}
+	if (inlineDeleteConfirmElement) {
+		inlineDeleteConfirmElement.remove();
+		inlineDeleteConfirmElement = null;
+	}
+	if (inlineDeleteConfirmResolver) {
+		const res = inlineDeleteConfirmResolver;
+		inlineDeleteConfirmResolver = null;
+		res(Boolean(confirmed));
+	}
+}
+
+// ── Data helpers ──────────────────────────────────────────────────────────────
+
+async function saveState() {
+	if (currentUser === GUEST_SESSION_VALUE) {
+		shared.saveGuestData(appState);
+	} else if (currentUser) {
+		await saveCurrentUserData(appState).catch(() => {});
+	}
+}
+
+function getDateRange(start, end) {
+	if (!start || !end || start <= end) return { start, end };
+	return { start: end, end: start };
+}
+
+function entriesForPeriod(entries, startDate, endDate, anchorMonth) {
+	const expanded = entries.flatMap((entry) => {
+		const norm = {
+			...entry,
+			note: entry.note || "",
+			repeatMonthly: Boolean(entry.repeatMonthly),
+			excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
+		};
+		return norm.repeatMonthly ? expandRecurring(norm, startDate, endDate) : [norm];
+	});
+	return expanded.filter((e) => e.date >= startDate && e.date <= endDate)
+		.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function expandRecurring(entry, startDate, endDate) {
+	const sourceMonth = (entry.date || "").slice(0, 7);
+	if (!/^\d{4}-\d{2}$/.test(sourceMonth)) return [entry];
+	const rangeStart = startDate.slice(0, 7);
+	const rangeEnd = endDate.slice(0, 7);
+	let cursor = rangeStart < sourceMonth ? sourceMonth : rangeStart;
+	const result = [];
+
+	while (cursor <= rangeEnd) {
+		const dateInMonth = alignDateToMonth(entry.date, cursor);
+		if (
+			dateInMonth >= startDate &&
+			dateInMonth <= endDate &&
+			dateInMonth >= entry.date &&
+			!entry.excludedMonths.includes(cursor)
+		) {
+			result.push({ ...entry, date: dateInMonth });
+		}
+		cursor = nextMonth(cursor);
+	}
+	return result;
+}
+
+function alignDateToMonth(sourceDate, targetMonth) {
+	const day = Number((sourceDate || "").split("-")[2]);
+	const safeDay = Number.isFinite(day) && day > 0 ? day : 1;
+	const endDay = Number(shared.getMonthEndDate(targetMonth).split("-")[2]);
+	return `${targetMonth}-${String(Math.min(safeDay, endDay)).padStart(2, "0")}`;
+}
+
+function nextMonth(month) {
+	let [y, m] = month.split("-").map(Number);
+	m += 1;
+	if (m > 12) { y += 1; m = 1; }
+	return `${y}-${String(m).padStart(2, "0")}`;
+}
+
+function normalizeExcludedMonths(value) {
+	if (!Array.isArray(value)) return [];
+	return value.filter((v) => typeof v === "string" && /^\d{4}-\d{2}$/.test(v));
+}
+
+function normalizeCategory(value) {
+	if (value === "hitelkartya 3") return "hitelkartya";
+	if (value === "suli") return "iskola";
+	return value;
+}
+
+function translateCategory(value) {
+	return t(`categories.${normalizeCategory(value)}`) || value;
+}
+
+function escapeHtml(text) {
+	return String(text || "")
+		.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+
+function showMessage(message, isError) {
+	if (!entryStatusMsg) return;
+	entryStatusMsg.textContent = message;
+	entryStatusMsg.classList.toggle("hidden", !message);
+	entryStatusMsg.classList.toggle("error", Boolean(isError));
+	entryStatusMsg.classList.toggle("ok", !isError);
+	if (message) window.setTimeout(() => { if (entryStatusMsg) entryStatusMsg.classList.add("hidden"); }, 3500);
+}
+
+function setDefaultPeriodRange() {
+	const month = shared.toMonthInput(today);
+	if (periodStartInput) periodStartInput.value = `${month}-01`;
+	if (periodEndInput) periodEndInput.value = shared.getMonthEndDate(month);
+}
+
+function applyTranslations() {
+	document.documentElement.lang = appLanguage;
+	document.title = t("pageTitle");
+	document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+	menuToggle.setAttribute("aria-label", t("menuButton"));
+	document.querySelectorAll("[data-i18n-aria-label]").forEach((el) => {
+		el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel));
+	});
+	if (!currentUser) projectionTextEl.textContent = t("noData");
+	updateMenuSessionLabel();
+}
+
+function updateAccessUI() {
+	if (!currentUser) {
+		lockedMessage.classList.remove("hidden");
+		summaryContent.classList.add("hidden");
+	} else {
+		lockedMessage.classList.add("hidden");
+		summaryContent.classList.remove("hidden");
+	}
+	updateMenuSessionLabel();
+}
+
+function updateMenuSessionLabel() {
+	if (!menuSessionInfo) return;
+	if (!currentUser) { menuSessionInfo.textContent = t("loggedOut"); return; }
+	menuSessionInfo.textContent = `${t("loggedIn")} ${getSignedInDisplayName()}`;
+}
+
+function getSignedInDisplayName() {
+	if (!currentUser || currentUser === GUEST_SESSION_VALUE) return t("guestUser");
+	return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
+}
+
+function setMenuInfoMessage(message) {
+	if (menuSessionInfo) menuSessionInfo.textContent = message;
 }
 
 function applyTheme() {
@@ -548,72 +808,93 @@ function setTheme(mode) {
 
 function syncThemeButtons() {
 	if (themeLightButton) {
-		const isLight = appTheme === "light";
-		themeLightButton.classList.toggle("is-active", isLight);
-		themeLightButton.setAttribute("aria-pressed", String(isLight));
+		themeLightButton.classList.toggle("is-active", appTheme === "light");
+		themeLightButton.setAttribute("aria-pressed", String(appTheme === "light"));
 	}
 	if (themeDarkButton) {
-		const isDark = appTheme === "dark";
-		themeDarkButton.classList.toggle("is-active", isDark);
-		themeDarkButton.setAttribute("aria-pressed", String(isDark));
+		themeDarkButton.classList.toggle("is-active", appTheme === "dark");
+		themeDarkButton.setAttribute("aria-pressed", String(appTheme === "dark"));
 	}
 }
 
 function formatCurrency(amount) {
 	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
-	const symbols = {
-		HUF: "Ft",
-		GBP: "£",
-		USD: "$",
-		EUR: "€"
-	};
-	const numericAmount = Number(amount) || 0;
-	const valueText = new Intl.NumberFormat(locale, {
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0
-	}).format(numericAmount);
-	return `${valueText} ${symbols[appCurrency] || appCurrency}`;
+	const symbols = { HUF: "Ft", GBP: "£", USD: "$", EUR: "€" };
+	const value = new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(amount) || 0);
+	return `${value} ${symbols[appCurrency] || appCurrency}`;
 }
 
 function formatDisplayDate(isoDate) {
-	if (!isoDate) {
-		return "";
-	}
-
-	const dateObj = new Date(`${isoDate}T00:00:00`);
-	if (Number.isNaN(dateObj.getTime())) {
-		return isoDate;
-	}
-
-	if (appLanguage === "en") {
-		return dateObj.toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "long",
-			day: "numeric"
-		});
-	}
-
-	return dateObj.toLocaleDateString("hu-HU");
+	if (!isoDate) return "";
+	const d = new Date(`${isoDate}T00:00:00`);
+	if (Number.isNaN(d.getTime())) return isoDate;
+	return appLanguage === "en"
+		? d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+		: d.toLocaleDateString("hu-HU");
 }
 
 function updateInstallButtonState() {
 	const installed = shared.isAppInstalled();
-	if (installed && !deferredInstallPrompt) {
-		installAppButton.textContent = t("appDownloaded");
-		installAppButton.disabled = true;
-		return;
-	}
-
-	installAppButton.textContent = t("downloadAppButton");
-	installAppButton.disabled = false;
+	installAppButton.textContent = installed && !deferredInstallPrompt ? t("appDownloaded") : t("downloadAppButton");
+	installAppButton.disabled = Boolean(installed && !deferredInstallPrompt);
 }
 
 function applyAuthenticatedState(session) {
 	currentUser = String(session?.profile?.username || currentUser || "").trim();
 	currentProfile = session?.profile || null;
-	if (!currentUser) {
-		return;
-	}
-	localStorage.setItem(SESSION_KEY, currentUser);
+	if (currentUser) localStorage.setItem(SESSION_KEY, currentUser);
 }
 
+function t(key) {
+	const parts = key.split(".");
+	let cur = dictionary[appLanguage] || dictionary.hu;
+	for (const part of parts) cur = cur ? cur[part] : undefined;
+	return cur || key;
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+async function handleLogout() {
+	menuPanel.classList.remove("is-open");
+	menuToggle.classList.remove("is-open");
+	menuToggle.setAttribute("aria-expanded", "false");
+	if (currentUser && currentUser !== GUEST_SESSION_VALUE) await logoutCurrentUser().catch(() => null);
+	localStorage.removeItem(SESSION_KEY);
+	window.location.href = "index.html";
+}
+
+async function handleAccountDelete() {
+	if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
+		resetDeleteAccountConfirmState();
+		setMenuInfoMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE));
+		return;
+	}
+	if (!deleteAccountConfirmArmed) {
+		deleteAccountConfirmArmed = true;
+		if (deleteAccountConfirmTimer) window.clearTimeout(deleteAccountConfirmTimer);
+		deleteAccountConfirmTimer = window.setTimeout(resetDeleteAccountConfirmState, 7000);
+		setMenuInfoMessage(t("deleteAccountNeedsSecondClick"));
+		return;
+	}
+	resetDeleteAccountConfirmState();
+	const email = currentProfile?.email || "";
+	try {
+		setMenuInfoMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
+		await deleteCurrentAccount();
+		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+		await logoutCurrentUser().catch(() => null);
+		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+		currentUser = "";
+		currentProfile = null;
+		localStorage.removeItem(SESSION_KEY);
+		localStorage.removeItem(DISPLAY_NAME_KEY);
+		window.setTimeout(() => { window.location.href = "index.html"; }, 500);
+	} catch (error) {
+		setMenuInfoMessage(getFirebaseErrorMessage(error, appLanguage, "delete"));
+	}
+}
+
+function resetDeleteAccountConfirmState() {
+	deleteAccountConfirmArmed = false;
+	if (deleteAccountConfirmTimer) { window.clearTimeout(deleteAccountConfirmTimer); deleteAccountConfirmTimer = null; }
+}

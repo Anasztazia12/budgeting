@@ -391,7 +391,7 @@ if (summaryToggleButton) {
 	summaryToggleButton.addEventListener("click", () => {
 		const periodStart = periodStartInput?.value || shared.toDateInput(today);
 		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-		window.location.href = `monthly_budget.html?month=${monthParam}`;
+		window.location.href = `summary.html?month=${monthParam}`;
 	});
 }
 

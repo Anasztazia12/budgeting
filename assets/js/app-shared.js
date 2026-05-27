@@ -229,11 +229,33 @@
         return openEmailDraft(email, subject, body);
     }
 
+    // EmailJS credentials — sign up at https://emailjs.com, create a Gmail service,
+    // and add a template with variables: {{to_email}}, {{to_name}}, {{message}}
+    const EMAILJS_SERVICE_ID = "YOUR_EMAILJS_SERVICE_ID";
+    const EMAILJS_TEMPLATE_ID = "YOUR_EMAILJS_TEMPLATE_ID";
+    const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";
+
     async function sendAccountDeletionEmail(_language, email, username) {
         const name = username || "";
-        const subject = "Account deleted";
-        const body = `Hello ${name},\n\nYour account has been deleted successfully.\n\nBudgeting App`;
-        return openEmailDraft(email, subject, body);
+        try {
+            const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    service_id: EMAILJS_SERVICE_ID,
+                    template_id: EMAILJS_TEMPLATE_ID,
+                    user_id: EMAILJS_PUBLIC_KEY,
+                    template_params: {
+                        to_email: email,
+                        to_name: name,
+                        message: `Hello ${name},\n\nYour account has been deleted successfully.\n\nBudgeting App`
+                    }
+                })
+            });
+            return res.ok;
+        } catch (_err) {
+            return false;
+        }
     }
 
     function getDeleteAccountConfirmMessage(language, username) {
