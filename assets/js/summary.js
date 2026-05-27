@@ -1,4 +1,4 @@
-﻿import {
+import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	logoutCurrentUser,
@@ -7,36 +7,37 @@
 } from "./firebase-service.js";
 
 const shared = window.BudgetAppShared;
-const {
-	SESSION_KEY,
-	DISPLAY_NAME_KEY,
-	THEME_KEY,
-	INSTALL_STATUS_KEY
-} = shared.KEYS;
+const { SESSION_KEY, DISPLAY_NAME_KEY, INSTALL_STATUS_KEY } = shared.KEYS;
 const { GUEST_SESSION_VALUE } = shared;
+
+const INCOME_CATEGORIES = ["fizetes", "egyeb"];
+const EXPENSE_CATEGORIES = [
+	"auto","aram","benzin","biztositas","council","elemiszer","gaz","hitelkartya",
+	"internet","iskola","rent","ruhak","szamlak","telefon","travel","tv","viz","egyeb kiadas"
+];
 
 const dictionary = {
 	hu: {
-		pageTitle: "Költségvetési előrejelző",
-		heroTitle: "Költségvetési előrejelző",
-		heroText: "Tervezd meg előre a kiadásaidat dátum és előrejelzés alapján.",
+		pageTitle: "Összesítés",
+		heroTitle: "Összesítés",
+		heroText: "Bevételek és kiadások összesítése választott időszakra.",
 		menuButton: "Menü",
 		homeLink: "Kezdőlap",
 		budgetLink: "Költségvetés",
-		summaryLink: "Összesítés",
+		forecastButton: "Költségvetési előrejelző",
+		monthlyLink: "Összesítés",
 		versionLabel: "Verzió",
-		themeModeLabel: "Téma",
 		themeModeLight: "Világos",
 		themeModeDark: "Sötét",
 		contactUs: "Kapcsolat",
 		backAction: "Vissza",
 		downloadAppButton: "App letöltése",
 		deleteAccountButton: "Regisztráció törlése",
+		logoutAction: "Kijelentkezés",
 		languageLabel: "Nyelv",
 		languageSelectorAria: "Nyelv választó",
 		themeSwitchAria: "Téma váltó",
 		currencySelectorAria: "Pénznem választó",
-		appName: "Költségvetési app",
 		currencyLabel: "Pénznem\nválasztó",
 		currencyHuf: "HUF (forint)",
 		currencyGbp: "GBP (font)",
@@ -45,138 +46,73 @@ const dictionary = {
 		periodLabel: "Választott időszak",
 		periodFromLabel: "-tól",
 		periodToLabel: "-ig",
-		forecastButton: "Vissza a Költségvetéshez",
-		forecastTitle: "Költségvetési előrejelző",
-		forecastTargetDateLabel: "Elemzés dátuma",
-		forecastAddRowButton: "+ Extra, váratlan tétel hozzáadása",
-		forecastRowTypeLabel: "Típus",
-		forecastRowAmountLabel: "Összeg",
-		forecastRowDateLabel: "Dátum",
-		forecastRowNoteLabel: "Megjegyzés",
-		forecastRowNotePlaceholder: "Rövid megjegyzés (opcionális)",
-		forecastTypeExpense: "Extra kiadás",
-		forecastTypeIncome: "Extra bevétel",
-		forecastRemoveRow: "Törlés",
-		forecastSaveRow: "Mentés",
-		forecastBaseUntilLabel: "Egyenleg eddig a dátumig:",
-		forecastWithPurchaseLabel: "Egyenleg tervezett tételekkel:",
-		forecastDifferenceLabel: "Különbség:",
-		forecastMonthEndImpactLabel: "Egyenleg új állapotban:",
-		forecastScenarioNameLabel: "Terv neve",
-		forecastScenarioNamePlaceholder: "Pl. Nyári terv",
-		forecastScenarioSavedLabel: "Mentett tervek",
-		forecastScenarioNone: "Nincs mentett terv",
-		forecastLoadButton: "Betöltés",
-		forecastScenarioNameRequired: "Adj nevet a tervnek.",
-		forecastScenarioEmpty: "Nincs menthető forecast sor.",
-		forecastScenarioSaved: "A terv elmentve.",
-		forecastScenarioUpdated: "A terv frissítve.",
-		forecastScenarioLoaded: "A kiválasztott terv(ek) betöltve.",
-		forecastScenarioSelectRequired: "Válassz ki legalább egy mentett tervet.",
-		forecastRowSaved: "A sor elmentve a tervhez.",
-		forecastRowDone: "Kész",
-		deleteAccountNeedsSecondClick: "Kattints újra 7 másodpercen belül a fiók törléséhez.",
-		registerTitle: "Regisztráció",
-		loginTitle: "Bejelentkezés",
-		usernameLabel: "Felhasználónév",
-		emailLabel: "Email cím",
-		emailConfirmLabel: "Email cím megerősítése",
-		passwordLabel: "Jelszó",
-		passwordConfirmLabel: "Jelszó megerősítése",
-		registerButton: "Regisztrálok",
-		loginButton: "Belépés",
-		logoutButton: "Kijelentkezés",
-		loginRequired: "A rögzítéshez jelentkezz be vagy regisztrálj.",
-		incomeFormTitle: "Bevétel hozzáadása",
-		expenseFormTitle: "Kiadás hozzáadása",
-		categoryLabel: "Kategória",
-		amountLabel: "Összeg",
-		incomeDateLabel: "Mikor várható? (dátum)",
-		expenseDateLabel: "Mikor lesz levonás? (dátum)",
-		saveIncomeButton: "Bevétel mentése",
-		saveExpenseButton: "Kiadás mentése",
-		updateIncomeButton: "Bevétel frissítése",
-		updateExpenseButton: "Kiadás frissítése",
-		cancelEditButton: "Szerkesztés",
-		monthlyIncomeTitle: "Bevétel",
-		monthlyExpenseTitle: "Kiadás",
-		spentToDateTitle: "Kiadás mai napig",
-		monthEndTitle: "Várható bevétel",
-		incomeEntriesTitle: "Bevételek",
-		expenseEntriesTitle: "Kiadások",
 		loggedOut: "Nincs bejelentkezett felhasználó.",
 		loggedIn: "Bejelentkezve:",
 		guestUser: "Vendég",
-		emailMismatch: "Az email címek nem egyeznek.",
-		passwordMismatch: "A jelszavak nem egyeznek.",
-		usernameTaken: "Ez a felhasználónév már foglalt.",
-		registerSuccess: "Sikeres regisztráció.",
-		loginSuccess: "Sikeres bejelentkezés.",
-		logoutSuccess: "Sikeres kijelentkezés.",
-		invalidLogin: "Hibás felhasználónév vagy jelszó.",
+		loginRequired: "Az összesítéshez jelentkezz be a Költségvetés oldalon.",
+		monthlyIncomeTitle: "Bevétel összesen",
+		monthlyExpenseTitle: "Kiadás összesen",
+		spentToDateTitle: "Kiadás a mai napig",
+		currentBalanceTitle: "Egyenleg az időszakban",
+		incomeEntriesTitle: "Bevételek ebben az időszakban",
+		expenseEntriesTitle: "Kiadások ebben az időszakban",
+		projectionTitle: "Időszak végi becslés",
+		noData: "Nincs adat.",
 		appDownloaded: "Az app letöltve.",
 		appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
-		loginFirst: "Először jelentkezz be.",
-		entrySaved: "A tétel elmentve.",
+		deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
+		emptyEntries: "Nincs tétel a kiválasztott időszakban.",
+		projectionText: "Várható egyenleg {date} dátumra: {amount}.",
+		projectionTextNoDate: "Várható egyenleg: {amount}.",
+		editEntryTitle: "Tétel szerkesztése",
+		saveEntryButton: "Mentés",
+		cancelModalButton: "Mégse",
+		editAction: "Szerkesztés",
+		deleteAction: "Törlés",
+		repeatMonthlyAction: "Megjelenítés minden hónapban",
+		repeatMonthlyBadge: "Ismétlődő",
+		repeatInEveryMonthLabel: "Megjelenítés minden hónapban",
 		entryUpdated: "A tétel frissítve.",
 		entryDeleted: "A tétel törölve.",
 		confirmDelete: "Biztosan törölni szeretnéd ezt a tételt?",
-		emptyEntries: "Nincs rögzített tétel erre a hónapra.",
-		exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
-		exportDone: "A CSV export letöltése elindult.",
-		editAction: "Szerkesztés",
-		deleteAction: "Törlés",
-		csvType: "Típus",
-		csvCategory: "Kategória",
-		csvAmount: "Összeg",
-		csvDate: "Dátum",
-		typeIncome: "Bevétel",
-		typeExpense: "Kiadás",
+		deleteScopeTitle: "Ismétlődő tétel törlése",
+		deleteScopeMessage: "Válaszd ki, honnan töröljük a tételt.",
+		deleteOnlyThisMonthButton: "Törlés csak ebből a hónapból",
+		deleteAllMonthsButton: "Törlés minden hónapból",
+		noteLabel: "Megjegyzés (opcionális)",
+		amountLabel: "Összeg",
+		categoryLabel: "Kategória",
+		incomeDateLabel: "Dátum",
 		categories: {
-			fizetes: "Fizetés",
-			egyeb: "Egyéb",
-			szamlak: "Számlák",
-			viz: "Víz",
-			gaz: "Gáz",
-			aram: "Áram",
-			auto: "Autó",
-			benzin: "Benzin",
-			elemiszer: "Élelmiszer",
-			ruhak: "Ruhák",
-			rent: "Albérlet",
-			biztositas: "Biztosítás",
-			"hitelkartya 3": "Hitelkártya 3",
-			onkormanyzat: "Önkormányzat",
-			zilch: "Zilch",
-			tv: "TV",
-			telefon: "Telefon",
-			internet: "Internet",
-			iskola: "Iskola",
-			suli: "Iskola",
-			"egyeb kiadas": "Egyéb kiadás"
+			fizetes: "Fizetés", egyeb: "Egyéb",
+			szamlak: "Számlák", viz: "Víz", gaz: "Gáz", aram: "Áram",
+			auto: "Autó", benzin: "Benzin", elemiszer: "Élelmiszer", ruhak: "Ruhák",
+			rent: "Albérlet", biztositas: "Biztosítás", hitelkartya: "Hitelkártya",
+			council: "Önkormányzat", tv: "TV", telefon: "Telefon", internet: "Internet",
+			iskola: "Iskola", travel: "Utazás", "egyeb kiadas": "Egyéb kiadás"
 		}
 	},
 	en: {
-		pageTitle: "Budget Forecast Planner",
-		heroTitle: "Budget Forecast Planner",
-		heroText: "Plan your upcoming expenses by date with forecast scenarios.",
+		pageTitle: "Summary",
+		heroTitle: "Summary",
+		heroText: "Income and expense summary for a selected date range.",
 		menuButton: "Menu",
 		homeLink: "Home",
 		budgetLink: "Budget",
-		summaryLink: "Summary",
+		forecastButton: "Budget Forecast Planner",
+		monthlyLink: "Summary",
 		versionLabel: "Version",
-		themeModeLabel: "Theme",
 		themeModeLight: "Light",
 		themeModeDark: "Dark",
 		contactUs: "Contact us",
 		backAction: "Back",
 		downloadAppButton: "Download App",
 		deleteAccountButton: "Delete account",
+		logoutAction: "Sign out",
 		languageLabel: "Language",
 		languageSelectorAria: "Language selector",
 		themeSwitchAria: "Theme switch",
 		currencySelectorAria: "Currency selector",
-		appName: "Budgeting App",
 		currencyLabel: "Currency\nselector",
 		currencyHuf: "HUF (forint)",
 		currencyGbp: "GBP (pound)",
@@ -185,941 +121,274 @@ const dictionary = {
 		periodLabel: "Selected period",
 		periodFromLabel: "from",
 		periodToLabel: "to",
-		forecastButton: "Back to Budget",
-		forecastTitle: "Budget Forecast Planner",
-		forecastTargetDateLabel: "Analysis date",
-		forecastAddRowButton: "+ Add an extra unexpected item",
-		forecastRowTypeLabel: "Type",
-		forecastRowAmountLabel: "Amount",
-		forecastRowDateLabel: "Date",
-		forecastRowNoteLabel: "Note",
-		forecastRowNotePlaceholder: "Short note (optional)",
-		forecastTypeExpense: "Extra expense",
-		forecastTypeIncome: "Extra income",
-		forecastRemoveRow: "Delete",
-		forecastSaveRow: "Save",
-		forecastBaseUntilLabel: "Balance up to selected date:",
-		forecastWithPurchaseLabel: "Balance with planned items:",
-		forecastDifferenceLabel: "Difference:",
-		forecastMonthEndImpactLabel: "Updated period-end balance:",
-		forecastScenarioNameLabel: "Plan name",
-		forecastScenarioNamePlaceholder: "e.g. Summer plan",
-		forecastScenarioSavedLabel: "Saved plans",
-		forecastScenarioNone: "No saved plan",
-		forecastLoadButton: "Load",
-		forecastScenarioNameRequired: "Please provide a plan name.",
-		forecastScenarioEmpty: "There are no forecast rows to save.",
-		forecastScenarioSaved: "Plan saved.",
-		forecastScenarioUpdated: "Plan updated.",
-		forecastScenarioLoaded: "Selected plan(s) loaded.",
-		forecastScenarioSelectRequired: "Select at least one saved plan.",
-		forecastRowSaved: "Row saved to plan.",
-		forecastRowDone: "Done",
-		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete the account.",
-		registerTitle: "Register",
-		loginTitle: "Sign in",
-		usernameLabel: "Username",
-		emailLabel: "Email address",
-		emailConfirmLabel: "Confirm email address",
-		passwordLabel: "Password",
-		passwordConfirmLabel: "Confirm password",
-		registerButton: "Create account",
-		loginButton: "Sign in",
-		logoutButton: "Sign out",
-		loginRequired: "Please sign in or register to manage entries.",
-		incomeFormTitle: "Add income",
-		expenseFormTitle: "Add expense",
-		categoryLabel: "Category",
-		amountLabel: "Amount",
-		incomeDateLabel: "Expected date",
-		expenseDateLabel: "Deduction date",
-		saveIncomeButton: "Save income",
-		saveExpenseButton: "Save expense",
-		updateIncomeButton: "Update income",
-		updateExpenseButton: "Update expense",
-		cancelEditButton: "Edit",
-		monthlyIncomeTitle: "Income",
-		monthlyExpenseTitle: "Expenses",
-		spentToDateTitle: "Spent to date",
-		monthEndTitle: "Expected income",
-		incomeEntriesTitle: "Income entries",
-		expenseEntriesTitle: "Expense entries",
 		loggedOut: "No user is signed in.",
 		loggedIn: "Signed in as:",
 		guestUser: "Guest",
-		emailMismatch: "Email addresses do not match.",
-		passwordMismatch: "Passwords do not match.",
-		usernameTaken: "This username is already taken.",
-		registerSuccess: "Registration successful.",
-		loginSuccess: "Signed in successfully.",
-		logoutSuccess: "Signed out successfully.",
-		invalidLogin: "Invalid username or password.",
+		loginRequired: "Please sign in on the Budget page first.",
+		monthlyIncomeTitle: "Total income",
+		monthlyExpenseTitle: "Total expense",
+		spentToDateTitle: "Spent to date",
+		currentBalanceTitle: "Balance in period",
+		incomeEntriesTitle: "Income in this period",
+		expenseEntriesTitle: "Expenses in this period",
+		projectionTitle: "End-of-period projection",
+		noData: "No data.",
 		appDownloaded: "App downloaded.",
 		appInstallUnavailable: "App install is not available on this device right now.",
-		loginFirst: "Please sign in first.",
-		entrySaved: "Entry saved.",
+		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
+		emptyEntries: "No entries in the selected period.",
+		projectionText: "Projected balance for {date}: {amount}.",
+		projectionTextNoDate: "Projected balance: {amount}.",
+		editEntryTitle: "Edit entry",
+		saveEntryButton: "Save",
+		cancelModalButton: "Cancel",
+		editAction: "Edit",
+		deleteAction: "Delete",
+		repeatMonthlyAction: "Show every month",
+		repeatMonthlyBadge: "Monthly repeat",
+		repeatInEveryMonthLabel: "Show in every month",
 		entryUpdated: "Entry updated.",
 		entryDeleted: "Entry deleted.",
 		confirmDelete: "Delete this entry?",
-		emptyEntries: "No saved entries for this month.",
-		exportEmpty: "There are no entries to export for this month.",
-		exportDone: "CSV export started.",
-		editAction: "Edit",
-		deleteAction: "Delete",
-		csvType: "Type",
-		csvCategory: "Category",
-		csvAmount: "Amount",
-		csvDate: "Date",
-		typeIncome: "Income",
-		typeExpense: "Expense",
+		deleteScopeTitle: "Delete recurring entry",
+		deleteScopeMessage: "Choose where to delete this entry.",
+		deleteOnlyThisMonthButton: "Delete only from this month",
+		deleteAllMonthsButton: "Delete from all months",
+		noteLabel: "Note (optional)",
+		amountLabel: "Amount",
+		categoryLabel: "Category",
+		incomeDateLabel: "Date",
 		categories: {
-			fizetes: "Salary",
-			egyeb: "Other",
-			szamlak: "Bills",
-			viz: "Water",
-			gaz: "Gas",
-			aram: "Electricity",
-			auto: "Car",
-			benzin: "Fuel",
-			elemiszer: "Groceries",
-			ruhak: "Clothes",
-			rent: "Rent",
-			biztositas: "Insurance",
-			"hitelkartya 3": "Credit card 3",
-			onkormanyzat: "Municipality",
-			zilch: "Zilch",
-			tv: "TV",
-			telefon: "Phone",
-			internet: "Internet",
-			iskola: "School",
-			suli: "School",
-			"egyeb kiadas": "Other expense"
+			fizetes: "Salary", egyeb: "Other",
+			szamlak: "Bills", viz: "Water", gaz: "Gas", aram: "Electricity",
+			auto: "Car", benzin: "Fuel", elemiszer: "Groceries", ruhak: "Clothes",
+			rent: "Rent", biztositas: "Insurance", hitelkartya: "Credit card",
+			council: "Council tax", tv: "TV", telefon: "Phone", internet: "Internet",
+			iskola: "School", travel: "Travel", "egyeb kiadas": "Other expense"
 		}
 	}
 };
 
 const today = new Date();
-const pageParams = new URLSearchParams(window.location.search);
 let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
 let appLanguage = shared.loadLanguage();
 let appTheme = shared.loadTheme();
 let appCurrency = shared.loadCurrency();
 let appState = { incomes: [], expenses: [] };
+let deleteScopeResolver = null;
+let inlineDeleteConfirmResolver = null;
+let inlineDeleteConfirmElement = null;
+let inlineDeleteConfirmOutsideHandler = null;
+let deferredInstallPrompt = null;
 let deleteAccountConfirmArmed = false;
 let deleteAccountConfirmTimer = null;
 
-const incomeForm = document.getElementById("income-form");
-const expenseForm = document.getElementById("expense-form");
-const summaryToggleButton = document.getElementById("summary-toggle-button");
-const forecastToggleButton = document.getElementById("forecast-toggle-button");
+// DOM refs
 const menuToggle = document.getElementById("menu-toggle");
 const menuPanel = document.getElementById("menu-panel");
 const contactUsButton = document.getElementById("contact-us-button");
-const menuSessionInfo = document.getElementById("menu-session-info");
 const menuBackButton = document.getElementById("menu-back-button");
 const installAppButton = document.getElementById("install-app-button");
 const deleteAccountButton = document.getElementById("delete-account-button");
+const summaryToggleButton = document.getElementById("summary-toggle-button");
+const forecastToggleButton = document.getElementById("forecast-toggle-button");
 const themeLightButton = document.getElementById("theme-light-button");
 const themeDarkButton = document.getElementById("theme-dark-button");
 const menuLogoutButton = document.getElementById("menu-logout-button");
-const authMessage = document.getElementById("auth-message");
-const budgetContent = document.getElementById("budget-content");
-const periodStartInput = document.getElementById("period-start");
-const periodEndInput = document.getElementById("period-end");
+const menuSessionInfo = document.getElementById("menu-session-info");
 const languageSelect = document.getElementById("app-language");
 const currencySelect = document.getElementById("app-currency");
+const periodStartInput = document.getElementById("period-start");
+const periodEndInput = document.getElementById("period-end");
+const lockedMessage = document.getElementById("locked-message");
+const summaryContent = document.getElementById("summary-content");
 const monthlyIncomeEl = document.getElementById("monthly-income");
 const monthlyExpenseEl = document.getElementById("monthly-expense");
 const spentToDateEl = document.getElementById("spent-to-date");
-const monthEndLeftEl = document.getElementById("month-end-left");
-const incomeList = document.getElementById("income-list");
-const expenseList = document.getElementById("expense-list");
-const incomeSubmitButton = document.getElementById("income-submit-button");
-const expenseSubmitButton = document.getElementById("expense-submit-button");
-const incomeCancelEdit = document.getElementById("income-cancel-edit");
-const incomeDeleteButton = document.getElementById("income-delete");
-const expenseCancelEdit = document.getElementById("expense-cancel-edit");
-const expenseDeleteButton = document.getElementById("expense-delete");
-const forecastPlanner = document.getElementById("forecast-planner");
-const addWhatIfRowButton = document.getElementById("add-whatif-row");
-const whatIfRowsContainer = document.getElementById("whatif-rows");
-const forecastScenarioNameInput = document.getElementById("forecast-scenario-name");
-const forecastScenarioList = document.getElementById("forecast-scenario-list");
-const forecastLoadScenarioButton = document.getElementById("forecast-load-scenario");
-const forecastBaseUntilEl = document.getElementById("forecast-base-until");
-const forecastWithPurchaseEl = document.getElementById("forecast-with-purchase");
-const forecastDifferenceEl = document.getElementById("forecast-difference");
-const forecastMonthEndEl = document.getElementById("forecast-month-end");
-const scenarioDropdownToggle = document.getElementById("scenario-dropdown-toggle");
-const scenarioSelectedNameEl = document.getElementById("scenario-selected-name");
-const scenarioSelector = document.getElementById("scenario-selector");
-let deferredInstallPrompt = null;
-let forecastScenarios = [];
-let activeForecastScenarioId = "";
+const currentBalanceEl = document.getElementById("current-balance");
+const incomeListEl = document.getElementById("income-list");
+const expenseListEl = document.getElementById("expense-list");
+const projectionTextEl = document.getElementById("projection-text");
+const entryStatusMsg = document.getElementById("entry-status-message");
+const deleteScopeModal = document.getElementById("delete-scope-modal");
+const deleteThisMonthButton = document.getElementById("delete-this-month-btn");
+const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
+const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
+const editEntryModal = document.getElementById("edit-entry-modal");
+const editEntryForm = document.getElementById("edit-entry-form");
+const editEntryCancelButton = document.getElementById("edit-entry-cancel");
 
-void initializePage();
+// ── Init ──────────────────────────────────────────────────────────────────────
 
-languageSelect.addEventListener("change", () => {
-	appLanguage = languageSelect.value;
-	shared.saveLanguage(appLanguage);
-	applyTranslations();
-	render();
-});
+window.addEventListener("DOMContentLoaded", () => {
+	void initializePage();
 
-currencySelect.addEventListener("change", () => {
-	appCurrency = currencySelect.value;
-	shared.saveCurrency(appCurrency);
-	render();
-});
-
-[periodStartInput, periodEndInput].forEach((input) => {
-	if (!input) {
-		return;
-	}
-	input.addEventListener("change", () => {
-		normalizePeriodInputs();
+	languageSelect.addEventListener("change", () => {
+		appLanguage = languageSelect.value;
+		shared.saveLanguage(appLanguage);
+		applyTranslations();
 		render();
 	});
-});
-forecastToggleButton.addEventListener("click", () => {
-	window.location.href = "budget.html";
-});
-if (summaryToggleButton) {
-	summaryToggleButton.addEventListener("click", () => {
-		const periodStart = periodStartInput?.value || shared.toDateInput(today);
-		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-		window.location.href = `summary.html?month=${monthParam}`;
+	currencySelect.addEventListener("change", () => {
+		appCurrency = currencySelect.value;
+		shared.saveCurrency(appCurrency);
+		render();
 	});
-}
-addWhatIfRowButton.addEventListener("click", () => {
-	const date = periodEndInput?.value || shared.toDateInput(today);
-	appendWhatIfRow({ type: "expense", amount: "", date, note: "", rowId: shared.createEntryId() }, true);
-	renderForecastPlanner();
-});
-if (forecastLoadScenarioButton) {
-	forecastLoadScenarioButton.addEventListener("click", loadSelectedForecastScenarios);
-}
-if (scenarioDropdownToggle && forecastScenarioList) {
-	scenarioDropdownToggle.addEventListener("click", (event) => {
-		event.stopPropagation();
-		const isNowHidden = forecastScenarioList.classList.toggle("hidden");
-		const nowOpen = !isNowHidden;
-		scenarioDropdownToggle.setAttribute("aria-expanded", String(nowOpen));
-		scenarioSelector?.classList.toggle("is-open", nowOpen);
-	});
-}
-whatIfRowsContainer.addEventListener("input", renderForecastPlanner);
-whatIfRowsContainer.addEventListener("change", renderForecastPlanner);
-whatIfRowsContainer.addEventListener("click", (event) => {
-	const actionButton = event.target.closest("button[data-action]");
-	if (!actionButton) {
-		return;
+	if (periodStartInput) periodStartInput.addEventListener("change", render);
+	if (periodEndInput) periodEndInput.addEventListener("change", render);
+
+	if (forecastToggleButton) {
+		forecastToggleButton.addEventListener("click", () => {
+			const start = periodStartInput?.value || shared.toDateInput(today);
+			window.location.href = `budget-forecast.html?month=${encodeURIComponent(start.slice(0, 7))}`;
+		});
+	}
+	if (summaryToggleButton) {
+		summaryToggleButton.addEventListener("click", () => {
+			const start = periodStartInput?.value || shared.toDateInput(today);
+			window.location.href = `summary.html?month=${encodeURIComponent(start.slice(0, 7))}`;
+		});
 	}
 
-	const rowElement = actionButton.closest(".whatif-row");
-	if (!rowElement) {
-		return;
-	}
-
-	const action = actionButton.dataset.action;
-	if (action === "remove-whatif") {
-		const removedRowId = rowElement.dataset.rowId;
-		if (removedRowId) {
-			let changed = false;
-			forecastScenarios = forecastScenarios.map((scenario) => {
-				const nextRows = scenario.rows.filter((row) => row.rowId !== removedRowId);
-				if (nextRows.length !== scenario.rows.length) {
-					changed = true;
-					return { ...scenario, rows: nextRows };
-				}
-				return scenario;
-			});
-			if (changed) {
-				saveForecastScenarios();
-				renderScenarioList();
+	menuToggle.addEventListener("click", () => {
+		const isOpen = menuPanel.classList.toggle("is-open");
+		menuToggle.classList.toggle("is-open", isOpen);
+		menuToggle.setAttribute("aria-expanded", String(isOpen));
+	});
+	document.addEventListener("click", (e) => {
+		if (!e.target.closest(".menu-wrap")) {
+			menuPanel.classList.remove("is-open");
+			menuToggle.classList.remove("is-open");
+			menuToggle.setAttribute("aria-expanded", "false");
+		}
+	});
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") {
+			if (inlineDeleteConfirmResolver) { closeInlineDeleteConfirm(false); return; }
+			if (deleteScopeModal && !deleteScopeModal.classList.contains("hidden")) { closeDeleteScopeModal(null); return; }
+			if (editEntryModal && !editEntryModal.classList.contains("hidden")) { closeEditModal(); return; }
+			if (menuPanel.classList.contains("is-open")) {
+				menuPanel.classList.remove("is-open");
+				menuToggle.classList.remove("is-open");
+				menuToggle.setAttribute("aria-expanded", "false");
+				menuToggle.focus();
 			}
 		}
-		rowElement.remove();
-		if (!whatIfRowsContainer.children.length) {
-			appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
-		}
-		renderForecastPlanner();
-		return;
-	}
-
-	if (action === "save-whatif") {
-		saveWhatIfRow(rowElement);
-	}
-
-	if (action === "edit-whatif") {
-		rowElement.classList.add("edit-mode");
-		rowElement.innerHTML = buildWhatIfRowEditHTML(rowElement);
-		const typeSelect = rowElement.querySelector(".forecast-whatif-type");
-		if (typeSelect) {
-			typeSelect.value = rowElement.dataset.type || "expense";
-		}
-	}
-
-	if (action === "confirm-edit") {
-		const type = rowElement.querySelector(".forecast-whatif-type")?.value || "expense";
-		const amount = rowElement.querySelector(".forecast-whatif-amount")?.value || "";
-		const date = rowElement.querySelector(".forecast-whatif-date")?.value || "";
-		const note = String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
-		rowElement.dataset.type = type;
-		rowElement.dataset.amount = amount;
-		rowElement.dataset.date = date;
-		rowElement.dataset.note = note;
-		rowElement.classList.remove("edit-mode");
-		rowElement.innerHTML = buildWhatIfRowDisplayHTML(rowElement);
-		renderForecastPlanner();
-	}
-});
-if (menuBackButton) {
-	menuBackButton.addEventListener("click", () => {
-		window.history.back();
 	});
-}
-if (installAppButton) {
+
+	if (themeLightButton) themeLightButton.addEventListener("click", () => setTheme("light"));
+	if (themeDarkButton) themeDarkButton.addEventListener("click", () => setTheme("dark"));
+	if (contactUsButton) contactUsButton.addEventListener("click", () => { window.location.href = "contact.html"; });
+	menuLogoutButton.addEventListener("click", handleLogout);
+	if (deleteAccountButton) deleteAccountButton.addEventListener("click", handleAccountDelete);
+	menuBackButton.addEventListener("click", () => { window.history.back(); });
+
 	installAppButton.addEventListener("click", async () => {
-		if (shared.isAppInstalled() && !deferredInstallPrompt) {
-			showMessage(t("appDownloaded"), false);
-			return;
-		}
-
-		if (!deferredInstallPrompt) {
-			showMessage(shared.getInstallUnavailableMessage(appLanguage), true);
-			return;
-		}
-
+		if (shared.isAppInstalled() && !deferredInstallPrompt) { setMenuInfoMessage(t("appDownloaded")); return; }
+		if (!deferredInstallPrompt) { setMenuInfoMessage(shared.getInstallUnavailableMessage(appLanguage)); return; }
 		menuPanel.classList.remove("is-open");
 		menuToggle.classList.remove("is-open");
 		menuToggle.setAttribute("aria-expanded", "false");
 		deferredInstallPrompt.prompt();
 		const choice = await deferredInstallPrompt.userChoice;
-		if (choice.outcome === "accepted") {
-			localStorage.setItem(INSTALL_STATUS_KEY, "1");
-			showMessage(t("appDownloaded"), false);
-		}
+		if (choice.outcome === "accepted") { localStorage.setItem(INSTALL_STATUS_KEY, "1"); setMenuInfoMessage(t("appDownloaded")); }
 		deferredInstallPrompt = null;
 		updateInstallButtonState();
 	});
-}
-if (menuLogoutButton) {
-	menuLogoutButton.addEventListener("click", handleLogout);
-}
-if (deleteAccountButton) {
-	deleteAccountButton.addEventListener("click", handleAccountDelete);
-}
-if (themeLightButton) {
-	themeLightButton.addEventListener("click", () => {
-		setTheme("light");
+
+	// Delete scope modal buttons
+	if (deleteThisMonthButton) deleteThisMonthButton.addEventListener("click", () => closeDeleteScopeModal("month"));
+	if (deleteAllMonthsButton) deleteAllMonthsButton.addEventListener("click", () => closeDeleteScopeModal("all"));
+	if (deleteScopeCancelButton) deleteScopeCancelButton.addEventListener("click", () => closeDeleteScopeModal(null));
+	if (deleteScopeModal) {
+		deleteScopeModal.addEventListener("click", (e) => { if (e.target === deleteScopeModal) closeDeleteScopeModal(null); });
+	}
+
+	// Edit modal
+	if (editEntryForm) editEntryForm.addEventListener("submit", saveEditEntry);
+	if (editEntryCancelButton) editEntryCancelButton.addEventListener("click", closeEditModal);
+	if (editEntryModal) {
+		editEntryModal.addEventListener("click", (e) => { if (e.target === editEntryModal) closeEditModal(); });
+	}
+
+	// Entry list actions (click + change for checkboxes)
+	if (incomeListEl) {
+		incomeListEl.addEventListener("click", (e) => handleEntryAction(e, "incomes"));
+		incomeListEl.addEventListener("change", (e) => handleEntryAction(e, "incomes"));
+	}
+	if (expenseListEl) {
+		expenseListEl.addEventListener("click", (e) => handleEntryAction(e, "expenses"));
+		expenseListEl.addEventListener("change", (e) => handleEntryAction(e, "expenses"));
+	}
+
+	window.addEventListener("beforeinstallprompt", (e) => {
+		deferredInstallPrompt = e;
+		localStorage.setItem(INSTALL_STATUS_KEY, "0");
+		updateInstallButtonState();
 	});
-}
-
-if (themeDarkButton) {
-	themeDarkButton.addEventListener("click", () => {
-		setTheme("dark");
+	window.addEventListener("appinstalled", () => {
+		localStorage.setItem(INSTALL_STATUS_KEY, "1");
+		deferredInstallPrompt = null;
+		setMenuInfoMessage(t("appDownloaded"));
+		updateInstallButtonState();
 	});
-}
-if (contactUsButton) {
-	contactUsButton.addEventListener("click", () => {
-		window.location.href = "contact.html";
-	});
-}
-if (incomeCancelEdit) {
-	incomeCancelEdit.addEventListener("click", resetIncomeForm);
-}
-if (incomeDeleteButton) {
-	incomeDeleteButton.addEventListener("click", () => {
-		handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm);
-	});
-}
-if (expenseCancelEdit) {
-	expenseCancelEdit.addEventListener("click", resetExpenseForm);
-}
-if (expenseDeleteButton) {
-	expenseDeleteButton.addEventListener("click", () => {
-		handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm);
-	});
-}
-
-menuToggle.addEventListener("click", () => {
-	const isOpen = menuPanel.classList.toggle("is-open");
-	menuToggle.classList.toggle("is-open", isOpen);
-	menuToggle.setAttribute("aria-expanded", String(isOpen));
-});
-
-document.addEventListener("click", (event) => {
-	if (!event.target.closest(".menu-wrap")) {
-		menuPanel.classList.remove("is-open");
-		menuToggle.classList.remove("is-open");
-		menuToggle.setAttribute("aria-expanded", "false");
-	}
-	if (!event.target.closest("#scenario-selector")) {
-		forecastScenarioList?.classList.add("hidden");
-		scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
-		scenarioSelector?.classList.remove("is-open");
+	if ("serviceWorker" in navigator) {
+		window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
 	}
 });
 
-document.addEventListener("keydown", (event) => {
-	if (event.key === "Escape") {
-		if (menuPanel.classList.contains("is-open")) {
-			menuPanel.classList.remove("is-open");
-			menuToggle.classList.remove("is-open");
-			menuToggle.setAttribute("aria-expanded", "false");
-			menuToggle.focus();
-		}
-		forecastScenarioList?.classList.add("hidden");
-		scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
-		scenarioSelector?.classList.remove("is-open");
-	}
-});
-
-window.addEventListener("beforeinstallprompt", (event) => {
-	deferredInstallPrompt = event;
-	localStorage.setItem(INSTALL_STATUS_KEY, "0");
-	updateInstallButtonState();
-});
-
-window.addEventListener("appinstalled", () => {
-	localStorage.setItem(INSTALL_STATUS_KEY, "1");
-	deferredInstallPrompt = null;
-	showMessage(t("appDownloaded"), false);
-	updateInstallButtonState();
-});
-
-if ("serviceWorker" in navigator) {
-	window.addEventListener("load", () => {
-		navigator.serviceWorker.register("sw.js").catch(() => {
-			// Service worker errors should not block usage.
-		});
-	});
-}
-
-incomeForm.addEventListener("submit", (event) => {
-	event.preventDefault();
-	if (!requireLogin()) {
-		return;
-	}
-
-	const entry = buildEntryFromForm("income");
-	const editId = document.getElementById("income-edit-id").value;
-
-	if (editId) {
-		upsertEntry("incomes", { ...entry, id: editId });
-		showMessage(t("entryUpdated"), false);
-	} else {
-		upsertEntry("incomes", { ...entry, id: shared.createEntryId() });
-		showMessage(t("entrySaved"), false);
-	}
-
-	saveState();
-	resetIncomeForm();
-	render();
-});
-
-expenseForm.addEventListener("submit", (event) => {
-	event.preventDefault();
-	if (!requireLogin()) {
-		return;
-	}
-
-	const entry = buildEntryFromForm("expense");
-	const editId = document.getElementById("expense-edit-id").value;
-
-	if (editId) {
-		upsertEntry("expenses", { ...entry, id: editId });
-		showMessage(t("entryUpdated"), false);
-	} else {
-		upsertEntry("expenses", { ...entry, id: shared.createEntryId() });
-		showMessage(t("entrySaved"), false);
-	}
-
-	saveState();
-	resetExpenseForm();
-	render();
-});
-
-incomeList.addEventListener("click", (event) => {
-	handleEntryAction(event, "incomes");
-});
-
-expenseList.addEventListener("click", (event) => {
-	handleEntryAction(event, "expenses");
-});
+// ── Page init ─────────────────────────────────────────────────────────────────
 
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
 		appState = shared.loadGuestData();
 	} else {
 		const session = await restoreSession(currentUser);
-		if (!session) {
-			window.location.href = "index.html";
-			return;
-		}
-
+		if (!session) { window.location.href = "index.html"; return; }
 		applyAuthenticatedState(session);
 		appState = session.data || { incomes: [], expenses: [] };
 	}
 
 	applyTheme();
 	syncThemeButtons();
-	const queryMonth = pageParams.get("month");
-	setDefaultPeriodRange(queryMonth);
+	setDefaultPeriodRange();
 	languageSelect.value = appLanguage;
 	currencySelect.value = appCurrency;
-	resetIncomeForm();
-	resetExpenseForm();
-	setDefaultWhatIfRows();
-	loadForecastScenarios();
-	renderScenarioList();
 	applyTranslations();
 	updateAccessUI();
 	updateInstallButtonState();
 	render();
 }
 
-function applyTranslations() {
-	document.documentElement.lang = appLanguage;
-	document.title = t("pageTitle");
-	document.querySelectorAll("[data-i18n]").forEach((element) => {
-		element.textContent = t(element.dataset.i18n);
-	});
-	menuToggle.setAttribute("aria-label", t("menuButton"));
-	document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
-		element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
-	});
-	document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
-		element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
-	});
-
-	document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
-		option.textContent = translateCategory(option.value);
-	});
-
-	updateFormButtonLabels();
-	refreshWhatIfRowLabels();
-	renderScenarioList();
-	updateMenuSessionLabel();
-}
-
-function getForecastScenarioStorageKey() {
-	const sessionKey = currentUser === GUEST_SESSION_VALUE ? "guest" : (currentUser || "anon");
-	return `budgetAppForecastScenarios:${sessionKey}`;
-}
-
-function normalizeScenarioRows(rows) {
-	return (Array.isArray(rows) ? rows : []).map((row) => {
-		const rowId = String(row?.rowId || shared.createEntryId());
-		const type = row?.type === "income" ? "income" : "expense";
-		const amount = Number(row?.amount || 0);
-		const date = String(row?.date || "");
-		const note = String(row?.note || "").trim().slice(0, 80);
-		return { rowId, type, amount, date, note };
-	});
-}
-
-function loadForecastScenarios() {
-	const raw = localStorage.getItem(getForecastScenarioStorageKey());
-	if (!raw) {
-		forecastScenarios = [];
-		return;
-	}
-
-	try {
-		const parsed = JSON.parse(raw);
-		forecastScenarios = (Array.isArray(parsed) ? parsed : []).map((scenario) => ({
-			id: String(scenario?.id || shared.createEntryId()),
-			name: String(scenario?.name || "").trim().slice(0, 50),
-			targetDate: String(scenario?.targetDate || ""),
-			rows: normalizeScenarioRows(scenario?.rows)
-		})).filter((scenario) => scenario.name);
-	} catch (_error) {
-		forecastScenarios = [];
-	}
-}
-
-function saveForecastScenarios() {
-	localStorage.setItem(getForecastScenarioStorageKey(), JSON.stringify(forecastScenarios));
-}
-
-function renderScenarioList() {
-	if (!forecastScenarioList) {
-		return;
-	}
-
-	if (scenarioSelectedNameEl) {
-		const active = forecastScenarios.find((s) => s.id === activeForecastScenarioId);
-		const last = forecastScenarios[forecastScenarios.length - 1];
-		scenarioSelectedNameEl.textContent = (active || last)?.name || t("forecastScenarioNone");
-	}
-
-	forecastScenarioList.innerHTML = "";
-	if (!forecastScenarios.length) {
-		const empty = document.createElement("p");
-		empty.className = "forecast-scenario-empty";
-		empty.textContent = t("forecastScenarioNone");
-		forecastScenarioList.appendChild(empty);
-		return;
-	}
-
-	forecastScenarios.forEach((scenario) => {
-		const item = document.createElement("button");
-		item.type = "button";
-		item.className = "scenario-dropdown-item";
-		if (scenario.id === activeForecastScenarioId) {
-			item.classList.add("is-selected");
-		}
-		item.dataset.scenarioId = scenario.id;
-		item.textContent = scenario.name;
-		item.addEventListener("click", () => {
-			activeForecastScenarioId = scenario.id;
-			loadSpecificScenario(scenario);
-			forecastScenarioList.classList.add("hidden");
-			scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
-			scenarioSelector?.classList.remove("is-open");
-			renderScenarioList();
-			showMessage(t("forecastScenarioLoaded"), false);
-		});
-		forecastScenarioList.appendChild(item);
-	});
-}
-
-function getWhatIfRowsForScenario() {
-	return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => {
-		const rowId = row.dataset.rowId || shared.createEntryId();
-		let type, amount, date, note;
-		if (row.classList.contains("edit-mode")) {
-			type = row.querySelector(".forecast-whatif-type")?.value || "expense";
-			amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
-			date = row.querySelector(".forecast-whatif-date")?.value || "";
-			note = String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
-		} else {
-			type = row.dataset.type || "expense";
-			amount = Number(row.dataset.amount || 0);
-			date = row.dataset.date || "";
-			note = row.dataset.note || "";
-		}
-		return { rowId, type, amount, date, note };
-	}).filter((row) => row.amount > 0 || row.date || row.note);
-}
-
-function ensureActiveScenario(scenarioName) {
-	const targetDate = periodEndInput?.value || "";
-	if (activeForecastScenarioId) {
-		const existing = forecastScenarios.find((scenario) => scenario.id === activeForecastScenarioId);
-		if (existing && existing.name === scenarioName) {
-			existing.name = scenarioName;
-			existing.targetDate = targetDate;
-			return existing;
-		}
-	}
-
-	const byName = forecastScenarios.find((scenario) => scenario.name === scenarioName);
-	if (byName) {
-		byName.targetDate = targetDate;
-		activeForecastScenarioId = byName.id;
-		return byName;
-	}
-
-	const created = {
-		id: shared.createEntryId(),
-		name: scenarioName,
-		targetDate,
-		rows: []
-	};
-	forecastScenarios.push(created);
-	activeForecastScenarioId = created.id;
-	return created;
-}
-
-function loadSelectedForecastScenarios() {
-	if (!activeForecastScenarioId) {
-		showMessage(t("forecastScenarioSelectRequired"), true);
-		return;
-	}
-	const scenario = forecastScenarios.find((s) => s.id === activeForecastScenarioId);
-	if (!scenario) {
-		showMessage(t("forecastScenarioSelectRequired"), true);
-		return;
-	}
-	loadSpecificScenario(scenario);
-	showMessage(t("forecastScenarioLoaded"), false);
-}
-
-function loadSpecificScenario(scenario) {
-	whatIfRowsContainer.innerHTML = "";
-	normalizeScenarioRows(scenario.rows).forEach((row) => {
-		appendWhatIfRow(row);
-	});
-	if (!whatIfRowsContainer.children.length) {
-		appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
-	}
-	activeForecastScenarioId = scenario.id;
-	if (forecastScenarioNameInput) {
-		forecastScenarioNameInput.value = scenario.name;
-	}
-	renderForecastPlanner();
-}
-
-function saveWhatIfRow(rowElement) {
-	const scenarioName = String(forecastScenarioNameInput?.value || "").trim();
-	if (!scenarioName) {
-		showMessage(t("forecastScenarioNameRequired"), true);
-		return;
-	}
-
-	const isEdit = rowElement.classList.contains("edit-mode");
-	const rowId = rowElement.dataset.rowId || shared.createEntryId();
-	rowElement.dataset.rowId = rowId;
-
-	const type = isEdit ? (rowElement.querySelector(".forecast-whatif-type")?.value || "expense") : (rowElement.dataset.type || "expense");
-	const amount = isEdit ? Number(rowElement.querySelector(".forecast-whatif-amount")?.value || 0) : Number(rowElement.dataset.amount || 0);
-	const date = isEdit ? (rowElement.querySelector(".forecast-whatif-date")?.value || "") : (rowElement.dataset.date || "");
-	const note = isEdit ? String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80) : (rowElement.dataset.note || "");
-
-	if (isEdit) {
-		rowElement.dataset.type = type;
-		rowElement.dataset.amount = String(amount);
-		rowElement.dataset.date = date;
-		rowElement.dataset.note = note;
-	}
-
-	const rowData = { rowId, type, amount, date, note };
-
-	if (!(rowData.amount > 0 && rowData.date)) {
-		showMessage(t("forecastScenarioEmpty"), true);
-		return;
-	}
-
-	const scenario = ensureActiveScenario(scenarioName);
-	const rowIndex = scenario.rows.findIndex((row) => row.rowId === rowData.rowId);
-	if (rowIndex >= 0) {
-		scenario.rows[rowIndex] = rowData;
-		showMessage(t("forecastScenarioUpdated"), false);
-	} else {
-		scenario.rows.push(rowData);
-		showMessage(t("forecastRowSaved"), false);
-	}
-
-	scenario.targetDate = periodEndInput?.value || scenario.targetDate;
-	saveForecastScenarios();
-	renderScenarioList();
-}
-
-function updateMenuSessionLabel() {
-	if (!menuSessionInfo) {
-		return;
-	}
-
-	if (!currentUser) {
-		menuSessionInfo.textContent = t("loggedOut");
-		return;
-	}
-
-	const name = getSignedInDisplayName();
-	menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
-}
-
-function getSignedInDisplayName() {
-	if (!currentUser) {
-		return t("guestUser");
-	}
-	if (currentUser === GUEST_SESSION_VALUE) {
-		return t("guestUser");
-	}
-
-	return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
-}
+// ── Render ────────────────────────────────────────────────────────────────────
 
 function render() {
-	if (!currentUser) {
-		monthlyIncomeEl.textContent = formatCurrency(0);
-		monthlyExpenseEl.textContent = formatCurrency(0);
-		spentToDateEl.textContent = formatCurrency(0);
-		monthEndLeftEl.textContent = formatCurrency(0);
-		paintList(incomeList, []);
-		paintList(expenseList, []);
-		return;
-	}
+	if (!currentUser) return;
 
-	const period = getSelectedPeriod();
-	const todayText = shared.toDateInput(new Date());
-	const incomes = periodEntries(appState.incomes, period.start, period.end);
-	const expenses = periodEntries(appState.expenses, period.start, period.end);
+	const todayIso = shared.toDateInput(today);
+	const anchorMonth = (periodStartInput?.value || todayIso).slice(0, 7);
+	const range = getDateRange(periodStartInput?.value, periodEndInput?.value);
+	const periodStart = range.start || `${anchorMonth}-01`;
+	const periodEnd = range.end || shared.getMonthEndDate(anchorMonth);
+
+	const incomes = entriesForPeriod(appState.incomes, periodStart, periodEnd, anchorMonth);
+	const expenses = entriesForPeriod(appState.expenses, periodStart, periodEnd, anchorMonth);
 
 	monthlyIncomeEl.textContent = formatCurrency(shared.sumEntries(incomes));
 	monthlyExpenseEl.textContent = formatCurrency(shared.sumEntries(expenses));
-	spentToDateEl.textContent = formatCurrency(shared.sumEntries(expenses.filter((item) => item.date <= todayText)));
-	monthEndLeftEl.textContent = formatCurrency(shared.sumEntries(incomes) - shared.sumEntries(expenses));
+	spentToDateEl.textContent = formatCurrency(shared.sumEntries(expenses.filter((e) => e.date <= todayIso)));
+	currentBalanceEl.textContent = formatCurrency(shared.sumEntries(incomes) - shared.sumEntries(expenses));
 
-	paintList(incomeList, incomes, "incomes");
-	paintList(expenseList, expenses, "expenses");
-	renderForecastPlanner();
-}
+	paintList(incomeListEl, incomes, "incomes");
+	paintList(expenseListEl, expenses, "expenses");
 
-function setDefaultWhatIfRows() {
-	whatIfRowsContainer.innerHTML = "";
-	appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
-}
-
-function appendWhatIfRow(row, prepend = false) {
-	const wrapper = document.createElement("div");
-	wrapper.className = "whatif-row";
-	wrapper.dataset.rowId = String(row.rowId || shared.createEntryId());
-	wrapper.dataset.type = row.type || "expense";
-	wrapper.dataset.amount = String(row.amount ?? "");
-	wrapper.dataset.date = row.date || "";
-	wrapper.dataset.note = String(row.note || "").slice(0, 80);
-
-	const hasData = Number(row.amount) > 0 || Boolean(row.date);
-	if (hasData) {
-		wrapper.innerHTML = buildWhatIfRowDisplayHTML(wrapper);
+	const balance = formatCurrency(shared.sumEntries(incomes) - shared.sumEntries(expenses));
+	if (range.end) {
+		projectionTextEl.textContent = t("projectionText").replace("{date}", formatDisplayDate(range.end)).replace("{amount}", balance);
 	} else {
-		wrapper.classList.add("edit-mode");
-		wrapper.innerHTML = buildWhatIfRowEditHTML(wrapper);
-		const typeSelect = wrapper.querySelector(".forecast-whatif-type");
-		if (typeSelect) {
-			typeSelect.value = wrapper.dataset.type;
-		}
+		projectionTextEl.textContent = t("projectionTextNoDate").replace("{amount}", balance);
 	}
-
-	if (prepend) {
-		whatIfRowsContainer.insertBefore(wrapper, whatIfRowsContainer.firstChild);
-	} else {
-		whatIfRowsContainer.appendChild(wrapper);
-	}
-}
-
-function buildWhatIfRowDisplayHTML(wrapper) {
-	const type = wrapper.dataset.type || "expense";
-	const amount = Number(wrapper.dataset.amount || 0);
-	const date = wrapper.dataset.date || "";
-	const note = wrapper.dataset.note || "";
-	const typeLabel = type === "income" ? t("forecastTypeIncome") : t("forecastTypeExpense");
-	const displayAmount = amount > 0 ? formatCurrency(amount) : "–";
-	const displayDate = date ? formatDisplayDate(date) : "–";
-	return `
-		<div class="whatif-row-display">
-			<span class="whatif-type-tag ${type}">${typeLabel}</span>
-			<span class="whatif-amount">${displayAmount}</span>
-			<span class="whatif-date">${displayDate}</span>
-			${note ? `<span class="whatif-note">${note}</span>` : ""}
-		</div>
-		<div class="whatif-row-actions">
-			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
-			<button type="button" class="icon-btn confirm-edit" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
-			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
-		</div>
-	`;
-}
-
-function buildWhatIfRowEditHTML(wrapper) {
-	const amount = wrapper.dataset.amount || "";
-	const date = wrapper.dataset.date || "";
-	const note = wrapper.dataset.note || "";
-	return `
-		<div class="whatif-row-fields">
-			<div class="whatif-field">
-				<label>${t("forecastRowTypeLabel")}</label>
-				<select class="forecast-whatif-type">
-					<option value="expense">${t("forecastTypeExpense")}</option>
-					<option value="income">${t("forecastTypeIncome")}</option>
-				</select>
-			</div>
-			<div class="whatif-field">
-				<label>${t("forecastRowAmountLabel")}</label>
-				<input type="number" class="forecast-whatif-amount" min="0" step="1" value="${amount}">
-			</div>
-			<div class="whatif-field">
-				<label>${t("forecastRowDateLabel")}</label>
-				<input type="date" class="forecast-whatif-date" value="${date}">
-			</div>
-			<div class="whatif-field">
-				<label>${t("forecastRowNoteLabel")}</label>
-				<input type="text" class="forecast-whatif-note" maxlength="80" placeholder="${t("forecastRowNotePlaceholder")}" value="${note}">
-			</div>
-		</div>
-		<div class="whatif-row-actions">
-			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">✓</button>
-			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
-		</div>
-	`;
-}
-
-function refreshWhatIfRowLabels() {
-	whatIfRowsContainer.querySelectorAll(".whatif-row").forEach((row) => {
-		if (row.classList.contains("edit-mode")) {
-			const type = row.querySelector(".forecast-whatif-type")?.value;
-			const amount = row.querySelector(".forecast-whatif-amount")?.value;
-			const date = row.querySelector(".forecast-whatif-date")?.value;
-			const note = row.querySelector(".forecast-whatif-note")?.value;
-			if (type !== undefined) row.dataset.type = type;
-			if (amount !== undefined) row.dataset.amount = amount;
-			if (date !== undefined) row.dataset.date = date;
-			if (note !== undefined) row.dataset.note = note;
-			row.innerHTML = buildWhatIfRowEditHTML(row);
-			const typeSelect = row.querySelector(".forecast-whatif-type");
-			if (typeSelect) typeSelect.value = row.dataset.type || "expense";
-		} else {
-			row.innerHTML = buildWhatIfRowDisplayHTML(row);
-		}
-	});
-}
-
-function collectWhatIfRows(periodStart, periodEnd) {
-	return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => {
-		let type, amount, date, note;
-		if (row.classList.contains("edit-mode")) {
-			type = row.querySelector(".forecast-whatif-type")?.value || "expense";
-			amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
-			date = row.querySelector(".forecast-whatif-date")?.value || "";
-			note = String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
-		} else {
-			type = row.dataset.type || "expense";
-			amount = Number(row.dataset.amount || 0);
-			date = row.dataset.date || "";
-			note = row.dataset.note || "";
-		}
-		return { type, amount, date, note, valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd };
-	});
-}
-
-function renderForecastPlanner() {
-	if (!currentUser) {
-		forecastBaseUntilEl.textContent = formatCurrency(0);
-		forecastWithPurchaseEl.textContent = formatCurrency(0);
-		forecastDifferenceEl.textContent = formatCurrency(0);
-		forecastMonthEndEl.textContent = formatCurrency(0);
-		return;
-	}
-
-	const period = getSelectedPeriod();
-	const incomes = periodEntries(appState.incomes, period.start, period.end);
-	const expenses = periodEntries(appState.expenses, period.start, period.end);
-	const targetDate = period.end;
-
-	const whatIfRows = collectWhatIfRows(period.start, period.end);
-	const baseUntil = shared.sumEntries(incomes.filter((item) => item.date <= targetDate)) - shared.sumEntries(expenses.filter((item) => item.date <= targetDate));
-	const adjustmentsUntilTarget = whatIfRows
-		.filter((item) => item.valid && item.date <= targetDate)
-		.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
-	const simulatedUntil = baseUntil + adjustmentsUntilTarget;
-	const difference = adjustmentsUntilTarget;
-
-	const monthIncomeTotal = shared.sumEntries(incomes);
-	const monthExpenseTotal = shared.sumEntries(expenses);
-	const allAdjustmentsInPeriod = whatIfRows
-		.filter((item) => item.valid)
-		.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
-	const monthEndWithWhatIf = monthIncomeTotal - monthExpenseTotal + allAdjustmentsInPeriod;
-
-	forecastBaseUntilEl.textContent = formatCurrency(baseUntil);
-	forecastWithPurchaseEl.textContent = formatCurrency(simulatedUntil);
-	forecastDifferenceEl.textContent = formatCurrency(difference);
-	forecastMonthEndEl.textContent = formatCurrency(monthEndWithWhatIf);
 }
 
 function paintList(target, entries, listType) {
@@ -1133,269 +402,397 @@ function paintList(target, entries, listType) {
 		return;
 	}
 
-	entries
-		.slice()
-		.sort((left, right) => left.date.localeCompare(right.date))
-		.forEach((entry) => {
-			const li = document.createElement("li");
-			li.className = "entry-row";
-			li.innerHTML = `
-				<div>
-					<span>${formatDisplayDate(entry.date)}</span>
+	entries.forEach((entry) => {
+		const li = document.createElement("li");
+		li.className = "entry-row";
+		const noteHtml = entry.note ? `<span class="entry-note-inline">(${escapeHtml(entry.note)})</span>` : "";
+		const badge = entry.repeatMonthly ? `<span class="entry-repeat-badge">${t("repeatMonthlyBadge")}</span>` : "";
+		const checked = entry.repeatMonthly ? "checked" : "";
+		li.innerHTML = `
+			<div class="entry-main-row entry-main-row-top">
+				<div class="entry-heading">
 					<strong>${translateCategory(entry.category)}</strong>
+					<span class="entry-date">${formatDisplayDate(entry.date)}</span>
 				</div>
-				<span>${formatCurrency(entry.amount)}</span>
-				<div class="row-actions">
-					<button type="button" class="inline-button" data-action="edit" data-id="${entry.id}">${t("editAction")}</button>
-					<button type="button" class="inline-button danger" data-action="delete" data-id="${entry.id}">${t("deleteAction")}</button>
+				<div class="entry-repeat-controls">
+					${badge}
+					<label class="entry-repeat-toggle">
+						<input type="checkbox" data-action="toggle-repeat" data-id="${entry.id}" data-date="${entry.date}" ${checked}>
+						<span>${t("repeatMonthlyAction")}</span>
+					</label>
 				</div>
-			`;
-			target.appendChild(li);
-		});
+			</div>
+			<div class="entry-main-row">
+				<span class="entry-amount">${formatCurrency(entry.amount)} ${noteHtml}</span>
+				<div class="row-actions row-actions-icons">
+					<button type="button" class="inline-icon-button"
+						title="${t("editAction")}" aria-label="${t("editAction")}"
+						data-action="edit" data-id="${entry.id}" data-type="${listType}">✎</button>
+					<button type="button" class="inline-icon-button danger"
+						title="${t("deleteAction")}" aria-label="${t("deleteAction")}"
+						data-action="delete" data-id="${entry.id}" data-date="${entry.date}" data-type="${listType}">✖</button>
+				</div>
+			</div>
+		`;
+		target.appendChild(li);
+	});
 }
 
-function handleEntryAction(event, listType) {
-	const button = event.target.closest("button[data-action]");
-	if (!button) {
-		return;
-	}
+// ── Entry actions ─────────────────────────────────────────────────────────────
 
-	const entryId = button.dataset.id;
-	const action = button.dataset.action;
-	const entry = appState[listType].find((item) => item.id === entryId);
+async function handleEntryAction(event, listType) {
+	const target = event.target.closest("[data-action]");
+	if (!target) return;
 
-	if (!entry) {
-		return;
-	}
+	const action = target.dataset.action;
+	const entryId = target.dataset.id;
+	const clickedDate = target.dataset.date || "";
+	const type = target.dataset.type || listType;
+	const entry = appState[type].find((e) => e.id === entryId);
+	if (!entry) return;
 
 	if (action === "edit") {
-		populateFormForEdit(listType, entry);
+		openEditModal(type, entry);
+		return;
+	}
+
+	if (action === "toggle-repeat") {
+		entry.repeatMonthly = target instanceof HTMLInputElement ? target.checked : !entry.repeatMonthly;
+		if (entry.repeatMonthly) entry.excludedMonths = [];
+		await saveState();
+		render();
 		return;
 	}
 
 	if (action === "delete") {
-		appState[listType] = appState[listType].filter((item) => item.id !== entryId);
-		saveState();
-		if (listType === "incomes") {
-			resetIncomeForm();
-		} else {
-			resetExpenseForm();
+		const deleted = await handleEntryDelete(type, entryId, clickedDate, target);
+		if (deleted) {
+			showMessage(t("entryDeleted"), false);
+			render();
 		}
-		showMessage(t("entryDeleted"), false);
-		render();
 	}
 }
 
-function populateFormForEdit(listType, entry) {
-	if (listType === "incomes") {
-		document.getElementById("income-edit-id").value = entry.id;
-		document.getElementById("income-category").value = entry.category;
-		document.getElementById("income-amount").value = entry.amount;
-		document.getElementById("income-date").value = entry.date;
-		incomeCancelEdit.classList.remove("hidden");
-	} else {
-		document.getElementById("expense-edit-id").value = entry.id;
-		document.getElementById("expense-category").value = entry.category;
-		document.getElementById("expense-amount").value = entry.amount;
-		document.getElementById("expense-date").value = entry.date;
-		expenseCancelEdit.classList.remove("hidden");
+async function handleEntryDelete(listType, entryId, clickedDate, triggerEl) {
+	const entry = appState[listType].find((e) => e.id === entryId);
+	if (!entry) return false;
+
+	if (!entry.repeatMonthly) {
+		const confirmed = await openInlineDeleteConfirm(triggerEl, t("confirmDelete"));
+		if (!confirmed) return false;
+		appState[listType] = appState[listType].filter((e) => e.id !== entryId);
+		await saveState();
+		return true;
 	}
 
-	updateFormButtonLabels();
+	const scope = await openDeleteScopeModal();
+	if (!scope) return false;
+
+	if (scope === "all") {
+		appState[listType] = appState[listType].filter((e) => e.id !== entryId);
+		await saveState();
+		return true;
+	}
+
+	if (scope === "month") {
+		const monthToExclude = (clickedDate || entry.date || "").slice(0, 7);
+		if (/^\d{4}-\d{2}$/.test(monthToExclude)) {
+			const excl = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
+			if (!excl.includes(monthToExclude)) excl.push(monthToExclude);
+			entry.excludedMonths = excl;
+			await saveState();
+			return true;
+		}
+	}
+
+	return false;
 }
 
-function resetIncomeForm() {
-	incomeForm.reset();
-	document.getElementById("income-edit-id").value = "";
-	document.getElementById("income-date").value = shared.toDateInput(today);
-	incomeCancelEdit.classList.add("hidden");
-	updateFormButtonLabels();
+// ── Edit modal ────────────────────────────────────────────────────────────────
+
+function openEditModal(listType, entry) {
+	if (!editEntryModal) return;
+	document.getElementById("edit-entry-id").value = entry.id;
+	document.getElementById("edit-entry-type").value = listType;
+
+	// populate category select
+	const catSelect = document.getElementById("edit-entry-category");
+	catSelect.innerHTML = "";
+	const cats = listType === "incomes" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+	cats.forEach((val) => {
+		const opt = document.createElement("option");
+		opt.value = val;
+		opt.textContent = translateCategory(val);
+		catSelect.appendChild(opt);
+	});
+	catSelect.value = normalizeCategory(entry.category);
+
+	document.getElementById("edit-entry-amount").value = entry.amount;
+	document.getElementById("edit-entry-date").value = entry.date;
+	document.getElementById("edit-entry-note").value = entry.note || "";
+	document.getElementById("edit-entry-repeat").checked = Boolean(entry.repeatMonthly);
+
+	editEntryModal.classList.remove("hidden");
+	setTimeout(() => document.getElementById("edit-entry-amount").focus(), 50);
 }
 
-function resetExpenseForm() {
-	expenseForm.reset();
-	document.getElementById("expense-edit-id").value = "";
-	document.getElementById("expense-date").value = shared.toDateInput(today);
-	expenseCancelEdit.classList.add("hidden");
-	updateFormButtonLabels();
+function closeEditModal() {
+	if (editEntryModal) editEntryModal.classList.add("hidden");
 }
 
-function updateFormButtonLabels() {
-	incomeSubmitButton.textContent = document.getElementById("income-edit-id").value ? t("updateIncomeButton") : t("saveIncomeButton");
-	expenseSubmitButton.textContent = document.getElementById("expense-edit-id").value ? t("updateExpenseButton") : t("saveExpenseButton");
-}
+async function saveEditEntry(event) {
+	event.preventDefault();
+	const listType = document.getElementById("edit-entry-type").value;
+	const entryId = document.getElementById("edit-entry-id").value;
+	const rawAmount = document.getElementById("edit-entry-amount").value;
+	const amount = Math.round(Number(String(rawAmount).replace(",", ".")) * 100) / 100;
+	if (!amount || amount <= 0) return;
 
-function buildEntryFromForm(prefix) {
-	return {
-		category: document.getElementById(`${prefix}-category`).value,
-		amount: Number(document.getElementById(`${prefix}-amount`).value),
-		date: document.getElementById(`${prefix}-date`).value
+	const idx = appState[listType].findIndex((e) => e.id === entryId);
+	if (idx < 0) return;
+
+	const existing = appState[listType][idx];
+	const repeat = document.getElementById("edit-entry-repeat").checked;
+	appState[listType][idx] = {
+		...existing,
+		category: normalizeCategory(document.getElementById("edit-entry-category").value),
+		amount,
+		date: document.getElementById("edit-entry-date").value,
+		note: document.getElementById("edit-entry-note").value.trim(),
+		repeatMonthly: repeat,
+		excludedMonths: repeat ? [] : normalizeExcludedMonths(existing.excludedMonths)
 	};
-}
 
-function upsertEntry(collectionName, entry) {
-	const existingIndex = appState[collectionName].findIndex((item) => item.id === entry.id);
-	if (existingIndex >= 0) {
-		appState[collectionName][existingIndex] = entry;
-		return;
-	}
-
-	appState[collectionName].push(entry);
-}
-
-function handleDeleteFromForm(collectionName, editIdField, resetForm) {
-	const editId = document.getElementById(editIdField).value;
-	if (!editId) {
-		resetForm();
-		return;
-	}
-
-	appState[collectionName] = appState[collectionName].filter((item) => item.id !== editId);
-	saveState();
-	resetForm();
-	showMessage(t("entryDeleted"), false);
+	await saveState();
+	closeEditModal();
+	showMessage(t("entryUpdated"), false);
 	render();
 }
 
-async function handleLogout() {
-	menuPanel.classList.remove("is-open");
-	menuToggle.classList.remove("is-open");
-	menuToggle.setAttribute("aria-expanded", "false");
-	if (currentUser && currentUser !== GUEST_SESSION_VALUE) {
-		await logoutCurrentUser().catch(() => null);
-	}
-	currentUser = "";
-	currentProfile = null;
-	appState = { incomes: [], expenses: [] };
-	localStorage.removeItem(SESSION_KEY);
-	window.location.href = "index.html";
+// ── Delete scope modal ────────────────────────────────────────────────────────
+
+function openDeleteScopeModal() {
+	if (!deleteScopeModal) return Promise.resolve(null);
+	if (inlineDeleteConfirmResolver) closeInlineDeleteConfirm(false);
+	deleteScopeModal.classList.remove("hidden");
+	if (deleteThisMonthButton) deleteThisMonthButton.focus();
+	return new Promise((resolve) => { deleteScopeResolver = resolve; });
 }
 
-async function handleAccountDelete() {
-	if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
-		resetDeleteAccountConfirmState();
-		showMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE), true);
-		return;
+function closeDeleteScopeModal(choice) {
+	if (deleteScopeModal) deleteScopeModal.classList.add("hidden");
+	if (deleteScopeResolver) {
+		const res = deleteScopeResolver;
+		deleteScopeResolver = null;
+		res(choice);
+	}
+}
+
+// ── Inline delete confirm ─────────────────────────────────────────────────────
+
+function openInlineDeleteConfirm(anchorEl, message) {
+	if (!anchorEl || !document.body) return Promise.resolve(false);
+	if (inlineDeleteConfirmResolver) closeInlineDeleteConfirm(false);
+
+	const pop = document.createElement("div");
+	pop.className = "inline-delete-confirm";
+	pop.setAttribute("role", "alertdialog");
+	pop.innerHTML = `
+		<p>${escapeHtml(message)}</p>
+		<div class="inline-delete-confirm-actions">
+			<button type="button" class="btn btn-danger">${escapeHtml(t("deleteAction"))}</button>
+			<button type="button" class="btn btn-outline-info">${escapeHtml(t("cancelModalButton"))}</button>
+		</div>
+	`;
+	document.body.appendChild(pop);
+	inlineDeleteConfirmElement = pop;
+
+	const isSmall = window.matchMedia("(max-width: 760px)").matches;
+	if (isSmall) {
+		pop.classList.add("is-mobile");
+	} else {
+		const rect = anchorEl.getBoundingClientRect();
+		const top = Math.max(window.scrollY + 10, window.scrollY + rect.top - pop.offsetHeight - 8);
+		const left = Math.min(
+			Math.max(window.scrollX + 10, window.scrollX + rect.right + 10),
+			window.scrollX + window.innerWidth - pop.offsetWidth - 10
+		);
+		pop.style.top = `${top}px`;
+		pop.style.left = `${left}px`;
 	}
 
-	if (!deleteAccountConfirmArmed) {
-		deleteAccountConfirmArmed = true;
-		if (deleteAccountConfirmTimer) {
-			window.clearTimeout(deleteAccountConfirmTimer);
+	const [confirmBtn, cancelBtn] = pop.querySelectorAll("button");
+	confirmBtn.addEventListener("click", () => closeInlineDeleteConfirm(true));
+	cancelBtn.addEventListener("click", () => closeInlineDeleteConfirm(false));
+
+	inlineDeleteConfirmOutsideHandler = (e) => {
+		if (!inlineDeleteConfirmElement) return;
+		if (!inlineDeleteConfirmElement.contains(e.target) && !anchorEl.contains(e.target)) {
+			closeInlineDeleteConfirm(false);
 		}
-		deleteAccountConfirmTimer = window.setTimeout(() => {
-			resetDeleteAccountConfirmState();
-		}, 7000);
-		showMessage(t("deleteAccountNeedsSecondClick"), true);
-		return;
+	};
+	document.addEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+	confirmBtn.focus();
+
+	return new Promise((resolve) => { inlineDeleteConfirmResolver = resolve; });
+}
+
+function closeInlineDeleteConfirm(confirmed) {
+	if (inlineDeleteConfirmOutsideHandler) {
+		document.removeEventListener("pointerdown", inlineDeleteConfirmOutsideHandler, true);
+		inlineDeleteConfirmOutsideHandler = null;
 	}
-
-	resetDeleteAccountConfirmState();
-
-	const email = currentProfile?.email || "";
-	try {
-		showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
-		await deleteCurrentAccount();
-		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
-		await logoutCurrentUser().catch(() => null);
-		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-		currentUser = "";
-		currentProfile = null;
-		localStorage.removeItem(SESSION_KEY);
-		localStorage.removeItem(DISPLAY_NAME_KEY);
-		showMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
-		window.setTimeout(() => {
-			window.location.href = "index.html";
-		}, 500);
-	} catch (error) {
-		showMessage(getFirebaseErrorMessage(error, appLanguage, "delete"), true);
+	if (inlineDeleteConfirmElement) {
+		inlineDeleteConfirmElement.remove();
+		inlineDeleteConfirmElement = null;
+	}
+	if (inlineDeleteConfirmResolver) {
+		const res = inlineDeleteConfirmResolver;
+		inlineDeleteConfirmResolver = null;
+		res(Boolean(confirmed));
 	}
 }
 
-function resetDeleteAccountConfirmState() {
-	deleteAccountConfirmArmed = false;
-	if (deleteAccountConfirmTimer) {
-		window.clearTimeout(deleteAccountConfirmTimer);
-		deleteAccountConfirmTimer = null;
+// ── Data helpers ──────────────────────────────────────────────────────────────
+
+async function saveState() {
+	if (currentUser === GUEST_SESSION_VALUE) {
+		shared.saveGuestData(appState);
+	} else if (currentUser) {
+		await saveCurrentUserData(appState).catch(() => {});
 	}
 }
 
-function updateAccessUI() {
-	if (budgetContent) {
-		budgetContent.classList.remove("hidden");
-	}
-	menuToggle.disabled = false;
+function getDateRange(start, end) {
+	if (!start || !end || start <= end) return { start, end };
+	return { start: end, end: start };
 }
 
-function requireLogin() {
-	return Boolean(currentUser);
+function entriesForPeriod(entries, startDate, endDate, anchorMonth) {
+	const expanded = entries.flatMap((entry) => {
+		const norm = {
+			...entry,
+			note: entry.note || "",
+			repeatMonthly: Boolean(entry.repeatMonthly),
+			excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
+		};
+		return norm.repeatMonthly ? expandRecurring(norm, startDate, endDate) : [norm];
+	});
+	return expanded.filter((e) => e.date >= startDate && e.date <= endDate)
+		.sort((a, b) => a.date.localeCompare(b.date));
 }
 
-function periodEntries(entries, startDate, endDate) {
-	return entries.filter((item) => item.date >= startDate && item.date <= endDate);
+function expandRecurring(entry, startDate, endDate) {
+	const sourceMonth = (entry.date || "").slice(0, 7);
+	if (!/^\d{4}-\d{2}$/.test(sourceMonth)) return [entry];
+	const rangeStart = startDate.slice(0, 7);
+	const rangeEnd = endDate.slice(0, 7);
+	let cursor = rangeStart < sourceMonth ? sourceMonth : rangeStart;
+	const result = [];
+
+	while (cursor <= rangeEnd) {
+		const dateInMonth = alignDateToMonth(entry.date, cursor);
+		if (
+			dateInMonth >= startDate &&
+			dateInMonth <= endDate &&
+			dateInMonth >= entry.date &&
+			!entry.excludedMonths.includes(cursor)
+		) {
+			result.push({ ...entry, date: dateInMonth });
+		}
+		cursor = nextMonth(cursor);
+	}
+	return result;
 }
 
-function getDateRange(startDate, endDate) {
-	if (!startDate || !endDate || startDate <= endDate) {
-		return { start: startDate, end: endDate };
-	}
-	return { start: endDate, end: startDate };
+function alignDateToMonth(sourceDate, targetMonth) {
+	const day = Number((sourceDate || "").split("-")[2]);
+	const safeDay = Number.isFinite(day) && day > 0 ? day : 1;
+	const endDay = Number(shared.getMonthEndDate(targetMonth).split("-")[2]);
+	return `${targetMonth}-${String(Math.min(safeDay, endDay)).padStart(2, "0")}`;
 }
 
-function getSelectedPeriod() {
-	normalizePeriodInputs();
-	const fallback = shared.toDateInput(today);
-	const start = periodStartInput?.value || fallback;
-	const end = periodEndInput?.value || start;
-	return getDateRange(start, end);
+function nextMonth(month) {
+	let [y, m] = month.split("-").map(Number);
+	m += 1;
+	if (m > 12) { y += 1; m = 1; }
+	return `${y}-${String(m).padStart(2, "0")}`;
 }
 
-function normalizePeriodInputs() {
-	if (!periodStartInput || !periodEndInput) {
-		return;
-	}
-	const range = getDateRange(periodStartInput.value, periodEndInput.value);
-	if (range.start) {
-		periodStartInput.value = range.start;
-	}
-	if (range.end) {
-		periodEndInput.value = range.end;
-	}
+function normalizeExcludedMonths(value) {
+	if (!Array.isArray(value)) return [];
+	return value.filter((v) => typeof v === "string" && /^\d{4}-\d{2}$/.test(v));
 }
 
-function setDefaultPeriodRange(queryMonth) {
-	const monthValue = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : shared.toMonthInput(today);
-	const start = `${monthValue}-01`;
-	const end = shared.getMonthEndDate(monthValue);
-	if (periodStartInput) {
-		periodStartInput.value = start;
-	}
-	if (periodEndInput) {
-		periodEndInput.value = end;
-	}
-}
-
-function clampDateToRange(dateText, startDate, endDate) {
-	if (!dateText || dateText < startDate) {
-		return startDate;
-	}
-	if (dateText > endDate) {
-		return endDate;
-	}
-	return dateText;
+function normalizeCategory(value) {
+	if (value === "hitelkartya 3") return "hitelkartya";
+	if (value === "suli") return "iskola";
+	return value;
 }
 
 function translateCategory(value) {
-	return t(`categories.${value}`) || value;
+	return t(`categories.${normalizeCategory(value)}`) || value;
 }
 
-function t(key) {
-	const parts = key.split(".");
-	let current = dictionary[appLanguage] || dictionary.hu;
-	for (const part of parts) {
-		current = current ? current[part] : undefined;
+function escapeHtml(text) {
+	return String(text || "")
+		.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+
+function showMessage(message, isError) {
+	if (!entryStatusMsg) return;
+	entryStatusMsg.textContent = message;
+	entryStatusMsg.classList.toggle("hidden", !message);
+	entryStatusMsg.classList.toggle("error", Boolean(isError));
+	entryStatusMsg.classList.toggle("ok", !isError);
+	if (message) window.setTimeout(() => { if (entryStatusMsg) entryStatusMsg.classList.add("hidden"); }, 3500);
+}
+
+function setDefaultPeriodRange() {
+	const month = shared.toMonthInput(today);
+	if (periodStartInput) periodStartInput.value = `${month}-01`;
+	if (periodEndInput) periodEndInput.value = shared.getMonthEndDate(month);
+}
+
+function applyTranslations() {
+	document.documentElement.lang = appLanguage;
+	document.title = t("pageTitle");
+	document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+	menuToggle.setAttribute("aria-label", t("menuButton"));
+	document.querySelectorAll("[data-i18n-aria-label]").forEach((el) => {
+		el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel));
+	});
+	if (!currentUser) projectionTextEl.textContent = t("noData");
+	updateMenuSessionLabel();
+}
+
+function updateAccessUI() {
+	if (!currentUser) {
+		lockedMessage.classList.remove("hidden");
+		summaryContent.classList.add("hidden");
+	} else {
+		lockedMessage.classList.add("hidden");
+		summaryContent.classList.remove("hidden");
 	}
-	return current || key;
+	updateMenuSessionLabel();
+}
+
+function updateMenuSessionLabel() {
+	if (!menuSessionInfo) return;
+	if (!currentUser) { menuSessionInfo.textContent = t("loggedOut"); return; }
+	menuSessionInfo.textContent = `${t("loggedIn")} ${getSignedInDisplayName()}`;
+}
+
+function getSignedInDisplayName() {
+	if (!currentUser || currentUser === GUEST_SESSION_VALUE) return t("guestUser");
+	return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
+}
+
+function setMenuInfoMessage(message) {
+	if (menuSessionInfo) menuSessionInfo.textContent = message;
 }
 
 function applyTheme() {
@@ -1411,104 +808,93 @@ function setTheme(mode) {
 
 function syncThemeButtons() {
 	if (themeLightButton) {
-		const isLight = appTheme === "light";
-		themeLightButton.classList.toggle("is-active", isLight);
-		themeLightButton.setAttribute("aria-pressed", String(isLight));
+		themeLightButton.classList.toggle("is-active", appTheme === "light");
+		themeLightButton.setAttribute("aria-pressed", String(appTheme === "light"));
 	}
 	if (themeDarkButton) {
-		const isDark = appTheme === "dark";
-		themeDarkButton.classList.toggle("is-active", isDark);
-		themeDarkButton.setAttribute("aria-pressed", String(isDark));
+		themeDarkButton.classList.toggle("is-active", appTheme === "dark");
+		themeDarkButton.setAttribute("aria-pressed", String(appTheme === "dark"));
 	}
-}
-
-function showMessage(message, isError) {
-	if (!authMessage) {
-		return;
-	}
-	authMessage.textContent = String(message || "");
-	authMessage.classList.toggle("hidden", !message);
-	authMessage.classList.toggle("error", isError);
-	authMessage.classList.toggle("ok", !isError);
 }
 
 function formatCurrency(amount) {
 	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
-	const symbols = {
-		HUF: "Ft",
-		GBP: "£",
-		USD: "$",
-		EUR: "€"
-	};
-	const numericAmount = Number(amount) || 0;
-	const valueText = new Intl.NumberFormat(locale, {
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0
-	}).format(numericAmount);
-	return `${valueText} ${symbols[appCurrency] || appCurrency}`;
+	const symbols = { HUF: "Ft", GBP: "£", USD: "$", EUR: "€" };
+	const value = new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(amount) || 0);
+	return `${value} ${symbols[appCurrency] || appCurrency}`;
 }
 
 function formatDisplayDate(isoDate) {
-	if (!isoDate) {
-		return "";
-	}
-
-	const dateObj = new Date(`${isoDate}T00:00:00`);
-	if (Number.isNaN(dateObj.getTime())) {
-		return isoDate;
-	}
-
-	if (appLanguage === "en") {
-		return dateObj.toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "long",
-			day: "numeric"
-		});
-	}
-
-	return dateObj.toLocaleDateString("hu-HU");
+	if (!isoDate) return "";
+	const d = new Date(`${isoDate}T00:00:00`);
+	if (Number.isNaN(d.getTime())) return isoDate;
+	return appLanguage === "en"
+		? d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+		: d.toLocaleDateString("hu-HU");
 }
 
 function updateInstallButtonState() {
-	if (!installAppButton) {
-		return;
-	}
 	const installed = shared.isAppInstalled();
-	if (installed && !deferredInstallPrompt) {
-		installAppButton.textContent = t("appDownloaded");
-		installAppButton.disabled = true;
-		return;
-	}
-
-	installAppButton.textContent = t("downloadAppButton");
-	installAppButton.disabled = false;
+	installAppButton.textContent = installed && !deferredInstallPrompt ? t("appDownloaded") : t("downloadAppButton");
+	installAppButton.disabled = Boolean(installed && !deferredInstallPrompt);
 }
 
 function applyAuthenticatedState(session) {
 	currentUser = String(session?.profile?.username || currentUser || "").trim();
 	currentProfile = session?.profile || null;
-	if (!currentUser) {
-		return;
-	}
-	localStorage.setItem(SESSION_KEY, currentUser);
+	if (currentUser) localStorage.setItem(SESSION_KEY, currentUser);
 }
 
-function saveState() {
-	if (currentUser === GUEST_SESSION_VALUE) {
-		shared.saveGuestData(appState);
-		return;
-	}
-
-	if (!currentUser) {
-		return;
-	}
-
-	void saveCurrentUserData(appState)
-		.then((savedState) => {
-			appState = savedState || appState;
-		})
-		.catch((error) => {
-			showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
-		});
+function t(key) {
+	const parts = key.split(".");
+	let cur = dictionary[appLanguage] || dictionary.hu;
+	for (const part of parts) cur = cur ? cur[part] : undefined;
+	return cur || key;
 }
 
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+async function handleLogout() {
+	menuPanel.classList.remove("is-open");
+	menuToggle.classList.remove("is-open");
+	menuToggle.setAttribute("aria-expanded", "false");
+	if (currentUser && currentUser !== GUEST_SESSION_VALUE) await logoutCurrentUser().catch(() => null);
+	localStorage.removeItem(SESSION_KEY);
+	window.location.href = "index.html";
+}
+
+async function handleAccountDelete() {
+	if (!currentUser || currentUser === GUEST_SESSION_VALUE) {
+		resetDeleteAccountConfirmState();
+		setMenuInfoMessage(shared.getDeleteAccountNoSessionMessage(appLanguage, currentUser === GUEST_SESSION_VALUE));
+		return;
+	}
+	if (!deleteAccountConfirmArmed) {
+		deleteAccountConfirmArmed = true;
+		if (deleteAccountConfirmTimer) window.clearTimeout(deleteAccountConfirmTimer);
+		deleteAccountConfirmTimer = window.setTimeout(resetDeleteAccountConfirmState, 7000);
+		setMenuInfoMessage(t("deleteAccountNeedsSecondClick"));
+		return;
+	}
+	resetDeleteAccountConfirmState();
+	const email = currentProfile?.email || "";
+	try {
+		setMenuInfoMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
+		await deleteCurrentAccount();
+		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
+		await logoutCurrentUser().catch(() => null);
+		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
+		currentUser = "";
+		currentProfile = null;
+		localStorage.removeItem(SESSION_KEY);
+		localStorage.removeItem(DISPLAY_NAME_KEY);
+		window.setTimeout(() => { window.location.href = "index.html"; }, 500);
+	} catch (error) {
+		setMenuInfoMessage(getFirebaseErrorMessage(error, appLanguage, "delete"));
+	}
+}
+
+function resetDeleteAccountConfirmState() {
+	deleteAccountConfirmArmed = false;
+	if (deleteAccountConfirmTimer) { window.clearTimeout(deleteAccountConfirmTimer); deleteAccountConfirmTimer = null; }
+}
