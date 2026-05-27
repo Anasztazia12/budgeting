@@ -295,9 +295,9 @@ const dictionary = {
 const today = new Date();
 let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
-let appLanguage = loadLanguage();
-let appTheme = loadTheme();
-let appCurrency = loadCurrency();
+let appLanguage = shared.loadLanguage();
+let appTheme = shared.loadTheme();
+let appCurrency = shared.loadCurrency();
 let appState = { incomes: [], expenses: [] };
 
 const incomeForm = document.getElementById("income-form");
@@ -355,14 +355,14 @@ void initializePage();
 
 languageSelect.addEventListener("change", () => {
 	appLanguage = languageSelect.value;
-	saveLanguage();
+	shared.saveLanguage(appLanguage);
 	applyTranslations();
 	render();
 });
 
 currencySelect.addEventListener("change", () => {
 	appCurrency = currencySelect.value;
-	saveCurrency();
+	shared.saveCurrency(appCurrency);
 	render();
 });
 
@@ -383,13 +383,13 @@ currencySelect.addEventListener("change", () => {
 	input.addEventListener("change", render);
  		});
 forecastToggleButton.addEventListener("click", () => {
-	const periodStart = periodStartInput?.value || toDateInput(today);
+	const periodStart = periodStartInput?.value || shared.toDateInput(today);
 	const monthParam = encodeURIComponent(periodStart.slice(0, 7));
 	window.location.href = `budget-forecast.html?month=${monthParam}`;
 });
 if (summaryToggleButton) {
 	summaryToggleButton.addEventListener("click", () => {
-		const periodStart = periodStartInput?.value || toDateInput(today);
+		const periodStart = periodStartInput?.value || shared.toDateInput(today);
 		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
 		window.location.href = `monthly_budget.html?month=${monthParam}`;
 	});
@@ -408,7 +408,7 @@ if (menuBackButton) {
 }
 if (installAppButton) {
 	installAppButton.addEventListener("click", async () => {
-		if (isAppInstalled() && !deferredInstallPrompt) {
+		if (shared.isAppInstalled() && !deferredInstallPrompt) {
 			showMessage(t("appDownloaded"), false);
 			return;
 		}
@@ -571,7 +571,7 @@ incomeForm.addEventListener("submit", (event) => {
 	} else {
 		upsertEntry("incomes", {
 			...entry,
-			id: createEntryId(),
+			id: shared.createEntryId(),
 			repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
 			excludedMonths: []
 		});
@@ -608,7 +608,7 @@ expenseForm.addEventListener("submit", (event) => {
 	} else {
 		upsertEntry("expenses", {
 			...entry,
-			id: createEntryId(),
+			id: shared.createEntryId(),
 			repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
 			excludedMonths: []
 		});
@@ -638,7 +638,7 @@ expenseList.addEventListener("change", async (event) => {
 
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
-		appState = loadGuestData();
+		appState = shared.loadGuestData();
 	} else {
 		const session = await restoreSession(currentUser);
 		if (!session) {
@@ -774,8 +774,8 @@ function render() {
 	}
 
 	const selectedPeriod = getDateRange(periodStartInput?.value, periodEndInput?.value);
-	const todayText = toDateInput(new Date());
-	const anchorMonth = (selectedPeriod.start || selectedPeriod.end || toDateInput(today)).slice(0, 7);
+	const todayText = shared.toDateInput(new Date());
+	const anchorMonth = (selectedPeriod.start || selectedPeriod.end || shared.toDateInput(today)).slice(0, 7);
 	const incomes = entriesForListByDateRange(appState.incomes, selectedPeriod.start, selectedPeriod.end, anchorMonth);
 	const expenses = entriesForListByDateRange(appState.expenses, selectedPeriod.start, selectedPeriod.end, anchorMonth);
 	const incomeRange = getDateRange(incomeFilterStart?.value, incomeFilterEnd?.value);
@@ -783,10 +783,10 @@ function render() {
 	const filteredIncomes = entriesForListByDateRange(appState.incomes, incomeRange.start, incomeRange.end, anchorMonth);
 	const filteredExpenses = entriesForListByDateRange(appState.expenses, expenseRange.start, expenseRange.end, anchorMonth);
 
-	monthlyIncomeEl.textContent = formatCurrency(sumEntries(incomes));
-	monthlyExpenseEl.textContent = formatCurrency(sumEntries(expenses));
-	spentToDateEl.textContent = formatCurrency(sumEntries(expenses.filter((item) => item.date <= todayText)));
-	monthEndLeftEl.textContent = formatCurrency(sumEntries(incomes) - sumEntries(expenses));
+	monthlyIncomeEl.textContent = formatCurrency(shared.sumEntries(incomes));
+	monthlyExpenseEl.textContent = formatCurrency(shared.sumEntries(expenses));
+	spentToDateEl.textContent = formatCurrency(shared.sumEntries(expenses.filter((item) => item.date <= todayText)));
+	monthEndLeftEl.textContent = formatCurrency(shared.sumEntries(incomes) - shared.sumEntries(expenses));
 
 	paintList(incomeList, filteredIncomes, "incomes");
 	paintList(expenseList, filteredExpenses, "expenses");
@@ -1081,7 +1081,7 @@ function populateFormForEdit(listType, entry) {
 function resetIncomeForm() {
 	incomeForm.reset();
 	document.getElementById("income-edit-id").value = "";
-	document.getElementById("income-date").value = toDateInput(today);
+	document.getElementById("income-date").value = shared.toDateInput(today);
 	document.getElementById("income-note").value = "";
 	if (incomeRepeatMonthlyCheckbox) {
 		incomeRepeatMonthlyCheckbox.checked = false;
@@ -1095,7 +1095,7 @@ function resetIncomeForm() {
 function resetExpenseForm() {
 	expenseForm.reset();
 	document.getElementById("expense-edit-id").value = "";
-	document.getElementById("expense-date").value = toDateInput(today);
+	document.getElementById("expense-date").value = shared.toDateInput(today);
 	document.getElementById("expense-note").value = "";
 	if (expenseRepeatMonthlyCheckbox) {
 		expenseRepeatMonthlyCheckbox.checked = false;
@@ -1150,7 +1150,7 @@ function filterEntriesByRange(entries, startDate, endDate) {
 
 function entriesForListByDateRange(entries, startDate, endDate, activeMonth) {
 	const fallbackStart = `${activeMonth}-01`;
-	const fallbackEnd = getMonthEndDate(activeMonth);
+	const fallbackEnd = shared.getMonthEndDate(activeMonth);
 	const range = getDateRange(startDate || fallbackStart, endDate || fallbackEnd);
 
 	const expandedEntries = entries.flatMap((entry) => {
@@ -1220,7 +1220,7 @@ function getNextMonth(monthValue) {
 
 function setDefaultListDateFilters(startDate, endDate) {
 	const range = getDateRange(startDate, endDate);
-	const start = range.start || toDateInput(today);
+	const start = range.start || shared.toDateInput(today);
 	const end = range.end || start;
 	if (incomeFilterStart) {
 		incomeFilterStart.value = start;
@@ -1237,9 +1237,9 @@ function setDefaultListDateFilters(startDate, endDate) {
 }
 
 function setDefaultPeriodRange() {
-	const month = toMonthInput(today);
+	const month = shared.toMonthInput(today);
 	const start = `${month}-01`;
-	const end = getMonthEndDate(month);
+	const end = shared.getMonthEndDate(month);
 	if (periodStartInput) {
 		periodStartInput.value = start;
 	}
@@ -1261,7 +1261,7 @@ function syncPeriodInputOrder() {
 function alignDateToMonth(sourceDate, targetMonth) {
 	const dayPart = Number((sourceDate || "").split("-")[2]);
 	const safeDay = Number.isFinite(dayPart) && dayPart > 0 ? dayPart : 1;
-	const monthEndDay = Number(getMonthEndDate(targetMonth).split("-")[2]);
+	const monthEndDay = Number(shared.getMonthEndDate(targetMonth).split("-")[2]);
 	const day = Math.min(safeDay, monthEndDay);
 	return `${targetMonth}-${String(day).padStart(2, "0")}`;
 }
@@ -1377,30 +1377,6 @@ function requireLogin() {
 	return Boolean(currentUser);
 }
 
-function monthEntries(entries, activeMonth) {
-	return entries.flatMap((item) => {
-		const excludedMonths = normalizeExcludedMonths(item.excludedMonths);
-		if (item.date.startsWith(activeMonth)) {
-			if (excludedMonths.includes(activeMonth)) {
-				return [];
-			}
-			return [{ ...item, repeatMonthly: Boolean(item.repeatMonthly), note: item.note || "", excludedMonths }];
-		}
-
-		if (item.repeatMonthly) {
-			const recurringDate = alignDateToMonth(item.date, activeMonth);
-			if (recurringDate >= item.date && !excludedMonths.includes(activeMonth)) {
-				return [{ ...item, date: recurringDate, repeatMonthly: true, note: item.note || "", excludedMonths }];
-			}
-		}
-
-		return [];
-	});
-}
-
-function sumEntries(entries) {
-	return entries.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-}
 
 function translateCategory(value) {
 	const normalizedValue = normalizeCategory(value);
@@ -1424,10 +1400,6 @@ function t(key) {
 		current = current ? current[part] : undefined;
 	}
 	return current || key;
-}
-
-function loadTheme() {
-	return shared.loadTheme();
 }
 
 function applyTheme() {
@@ -1501,15 +1473,11 @@ function formatDisplayDate(isoDate) {
 	return dateObj.toLocaleDateString("hu-HU");
 }
 
-function isAppInstalled() {
-	return shared.isAppInstalled();
-}
-
 function updateInstallButtonState() {
 	if (!installAppButton) {
 		return;
 	}
-	const installed = isAppInstalled();
+	const installed = shared.isAppInstalled();
 	if (installed && !deferredInstallPrompt) {
 		installAppButton.textContent = t("appDownloaded");
 		installAppButton.disabled = true;
@@ -1518,30 +1486,6 @@ function updateInstallButtonState() {
 
 	installAppButton.textContent = t("downloadAppButton");
 	installAppButton.disabled = false;
-}
-
-function loadCurrency() {
-	return shared.loadCurrency();
-}
-
-function saveCurrency() {
-	shared.saveCurrency(appCurrency);
-}
-
-function toMonthInput(dateObj) {
-	return shared.toMonthInput(dateObj);
-}
-
-function toDateInput(dateObj) {
-	return shared.toDateInput(dateObj);
-}
-
-function getMonthEndDate(monthValue) {
-	return shared.getMonthEndDate(monthValue, today);
-}
-
-function createEntryId() {
-	return shared.createEntryId();
 }
 
 function applyAuthenticatedState(session) {
@@ -1586,7 +1530,7 @@ function normalizeExcludedMonths(value) {
 
 function saveState() {
 	if (currentUser === GUEST_SESSION_VALUE) {
-		saveGuestData(appState);
+		shared.saveGuestData(appState);
 		return;
 	}
 
@@ -1603,18 +1547,4 @@ function saveState() {
 		});
 }
 
-function loadLanguage() {
-	return shared.loadLanguage();
-}
 
-function saveLanguage() {
-	shared.saveLanguage(appLanguage);
-}
-
-function loadGuestData() {
-	return shared.loadGuestData();
-}
-
-function saveGuestData(data) {
-	shared.saveGuestData(data);
-}

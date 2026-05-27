@@ -162,9 +162,9 @@ const dictionary = {
 const today = new Date();
 let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
-let appLanguage = loadLanguage();
-let appTheme = loadTheme();
-let appCurrency = loadCurrency();
+let appLanguage = shared.loadLanguage();
+let appTheme = shared.loadTheme();
+let appCurrency = shared.loadCurrency();
 let appState = { incomes: [], expenses: [] };
 
 const menuToggle = document.getElementById("menu-toggle");
@@ -223,7 +223,7 @@ if (periodEndInput) {
 
 if (forecastToggleButton) {
 	forecastToggleButton.addEventListener("click", () => {
-		const periodStart = periodStartInput?.value || toDateInput(today);
+		const periodStart = periodStartInput?.value || shared.toDateInput(today);
 		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
 		window.location.href = `budget-forecast.html?month=${monthParam}`;
 	});
@@ -231,7 +231,7 @@ if (forecastToggleButton) {
 
 if (summaryToggleButton) {
 	summaryToggleButton.addEventListener("click", () => {
-		const periodStart = periodStartInput?.value || toDateInput(today);
+		const periodStart = periodStartInput?.value || shared.toDateInput(today);
 		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
 		window.location.href = `monthly_budget.html?month=${monthParam}`;
 	});
@@ -269,7 +269,7 @@ menuBackButton.addEventListener("click", () => {
 	window.history.back();
 });
 installAppButton.addEventListener("click", async () => {
-	if (isAppInstalled() && !deferredInstallPrompt) {
+	if (shared.isAppInstalled() && !deferredInstallPrompt) {
 		setMenuInfoMessage(t("appDownloaded"));
 		return;
 	}
@@ -332,7 +332,7 @@ if ("serviceWorker" in navigator) {
 
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
-		appState = loadGuestData();
+		appState = shared.loadGuestData();
 	} else {
 		const session = await restoreSession(currentUser);
 		if (!session) {
@@ -420,15 +420,15 @@ function render() {
 		return;
 	}
 
-	const selectedMonth = (periodStartInput?.value || toDateInput(today)).slice(0, 7);
-	const todayIso = toDateInput(today);
-	const monthIncomes = monthEntries(appState.incomes, selectedMonth);
-	const monthExpenses = monthEntries(appState.expenses, selectedMonth);
+	const selectedMonth = (periodStartInput?.value || shared.toDateInput(today)).slice(0, 7);
+	const todayIso = shared.toDateInput(today);
+	const monthIncomes = shared.monthEntries(appState.incomes, selectedMonth);
+	const monthExpenses = shared.monthEntries(appState.expenses, selectedMonth);
 
-	monthlyIncomeEl.textContent = formatCurrency(sumEntries(monthIncomes));
-	monthlyExpenseEl.textContent = formatCurrency(sumEntries(monthExpenses));
-	spentToDateEl.textContent = formatCurrency(sumEntries(monthExpenses.filter((item) => item.date <= todayIso)));
-	currentBalanceEl.textContent = formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses));
+	monthlyIncomeEl.textContent = formatCurrency(shared.sumEntries(monthIncomes));
+	monthlyExpenseEl.textContent = formatCurrency(shared.sumEntries(monthExpenses));
+	spentToDateEl.textContent = formatCurrency(shared.sumEntries(monthExpenses.filter((item) => item.date <= todayIso)));
+	currentBalanceEl.textContent = formatCurrency(shared.sumEntries(monthIncomes) - shared.sumEntries(monthExpenses));
 
 	const upcomingExpenses = monthExpenses.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
 	const upcomingIncomes = monthIncomes.filter((item) => item.date > todayIso).sort((left, right) => left.date.localeCompare(right.date));
@@ -436,7 +436,7 @@ function render() {
 	paintList(upcomingExpensesEl, upcomingExpenses);
 	paintList(upcomingIncomesEl, upcomingIncomes);
 
-	const projectionAmount = formatCurrency(sumEntries(monthIncomes) - sumEntries(monthExpenses));
+	const projectionAmount = formatCurrency(shared.sumEntries(monthIncomes) - shared.sumEntries(monthExpenses));
 	const selectedEndDate = periodEndInput?.value;
 	if (selectedEndDate) {
 		projectionTextEl.textContent = t("projectionText").replace("{date}", formatDisplayDate(selectedEndDate)).replace("{amount}", projectionAmount);
@@ -522,14 +522,6 @@ function paintList(target, entries) {
 	});
 }
 
-function monthEntries(entries, activeMonth) {
-	return shared.monthEntries(entries, activeMonth);
-}
-
-function sumEntries(entries) {
-	return shared.sumEntries(entries);
-}
-
 function translateCategory(value) {
 	return t(`categories.${value}`) || value;
 }
@@ -541,10 +533,6 @@ function t(key) {
 		current = current ? current[part] : undefined;
 	}
 	return current || key;
-}
-
-function loadTheme() {
-	return shared.loadTheme();
 }
 
 function applyTheme() {
@@ -608,16 +596,8 @@ function formatDisplayDate(isoDate) {
 	return dateObj.toLocaleDateString("hu-HU");
 }
 
-function loadCurrency() {
-	return shared.loadCurrency();
-}
-
-function isAppInstalled() {
-	return shared.isAppInstalled();
-}
-
 function updateInstallButtonState() {
-	const installed = isAppInstalled();
+	const installed = shared.isAppInstalled();
 	if (installed && !deferredInstallPrompt) {
 		installAppButton.textContent = t("appDownloaded");
 		installAppButton.disabled = true;
@@ -637,22 +617,3 @@ function applyAuthenticatedState(session) {
 	localStorage.setItem(SESSION_KEY, currentUser);
 }
 
-function loadLanguage() {
-	return shared.loadLanguage();
-}
-
-function toMonthInput(dateObj) {
-	return shared.toMonthInput(dateObj);
-}
-
-function toDateInput(dateObj) {
-	return shared.toDateInput(dateObj);
-}
-
-function getMonthEndDate(monthValue) {
-	return shared.getMonthEndDate(monthValue, today);
-}
-
-function loadGuestData() {
-	return shared.loadGuestData();
-}
