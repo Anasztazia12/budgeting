@@ -74,6 +74,8 @@ const dictionary = {
 		forecastRowConfirmed: "A sor mentve.",
 		forecastDeletePlan: "Terv törlése",
 		forecastPlanDeleted: "A mentett terv törölve.",
+		forecastRemoveFromRow: "Törlés a sorból",
+		forecastPermanentDelete: "Végleges törlés",
 		deleteAccountNeedsSecondClick: "Kattints újra 7 másodpercen belül a fiók törléséhez.",
 		logoutButton: "Kijelentkezés",
 		loggedOut: "Nincs bejelentkezett felhasználó.",
@@ -145,6 +147,8 @@ const dictionary = {
 		forecastRowConfirmed: "Row saved.",
 		forecastDeletePlan: "Delete plan",
 		forecastPlanDeleted: "Saved plan deleted.",
+		forecastRemoveFromRow: "Remove from view",
+		forecastPermanentDelete: "Permanently delete plan",
 		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete the account.",
 		logoutButton: "Sign out",
 		loggedOut: "No user is signed in.",
@@ -262,7 +266,15 @@ if (forecastLoadScenarioButton) {
 }
 
 whatIfRowsContainer.addEventListener("input", renderForecastPlanner);
-whatIfRowsContainer.addEventListener("change", renderForecastPlanner);
+whatIfRowsContainer.addEventListener("change", (event) => {
+	// Keep the type select styled based on its current value
+	const sel = event.target;
+	if (sel.classList.contains("forecast-whatif-type")) {
+		sel.classList.remove("type-expense", "type-income");
+		sel.classList.add(`type-${sel.value}`);
+	}
+	renderForecastPlanner();
+});
 whatIfRowsContainer.addEventListener("click", (event) => {
 	const actionButton = event.target.closest("button[data-action]");
 	if (!actionButton) return;
@@ -355,6 +367,10 @@ document.addEventListener("click", (event) => {
 		menuPanel.classList.remove("is-open");
 		menuToggle.classList.remove("is-open");
 		menuToggle.setAttribute("aria-expanded", "false");
+	}
+	// Close saved-plans dropdown when clicking outside it
+	if (!event.target.closest(".saved-plans-dropdown")) {
+		document.querySelector(".saved-plans-dropdown")?.removeAttribute("open");
 	}
 });
 
@@ -560,6 +576,8 @@ function loadSelectedForecastScenarios() {
 			});
 		}
 	});
+	// Close the dropdown after loading
+	document.querySelector(".saved-plans-dropdown")?.removeAttribute("open");
 	showMessage(t("forecastScenarioLoaded"), false);
 	renderForecastPlanner();
 }
@@ -687,8 +705,8 @@ function buildWhatIfRowDisplayHTML(wrapper) {
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
 			<button type="button" class="icon-btn" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
-			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">🗑</button>
-			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastDeletePlan")}">🗑</button>` : ""}
+			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">🗑</button>
+			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">🗑</button>` : ""}
 		</div>
 	`;
 }
@@ -710,7 +728,7 @@ function buildWhatIfRowEditHTML(wrapper) {
 			</div>
 			<div class="whatif-field whatif-field-type">
 				<label>${t("forecastRowTypeLabel")}</label>
-				<select class="forecast-whatif-type">
+				<select class="forecast-whatif-type type-${wrapper.dataset.type || "expense"}">
 					<option value="expense">${t("forecastTypeExpense")}</option>
 					<option value="income">${t("forecastTypeIncome")}</option>
 				</select>
@@ -734,8 +752,8 @@ function buildWhatIfRowEditHTML(wrapper) {
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">💾</button>
 			<button type="button" class="icon-btn" data-action="cancel-edit" title="${t("editAction")}">✎</button>
-			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">🗑</button>
-			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastDeletePlan")}">🗑</button>` : ""}
+			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">🗑</button>
+			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">🗑</button>` : ""}
 		</div>
 	`;
 }

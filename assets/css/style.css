@@ -829,14 +829,30 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .saved-plans-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
 .saved-plans-title { font-weight: 700; font-size: 0.92rem; color: var(--text); }
 .saved-plans-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }
-.saved-plans-list { display: flex; flex-wrap: wrap; gap: 0.35rem 0.6rem; min-height: 1.6rem; }
-.saved-plan-item { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.88rem; font-weight: 500; cursor: pointer; padding: 0.28rem 0.6rem; border-radius: var(--control-radius); border: 1px solid #c4d5f2; background: #fff; user-select: none; transition: background 0.15s, border-color 0.15s; }
+/* Saved plans dropdown trigger */
+.saved-plans-dropdown { position: relative; }
+.saved-plans-dropdown-trigger { cursor: pointer; display: inline-flex; align-items: center; gap: 0.38rem; font-weight: 700; font-size: 0.92rem; color: var(--text); padding: 0.32rem 0.68rem; border-radius: var(--control-radius); border: 1px solid #c4d5f2; background: #fff; user-select: none; list-style: none; transition: background 0.15s, border-color 0.15s; }
+.saved-plans-dropdown-trigger::-webkit-details-marker { display: none; }
+.saved-plans-dropdown-trigger::marker { display: none; content: ""; }
+.saved-plans-dropdown-trigger:hover { background: #edf4ff; border-color: #84a9e8; }
+[data-theme="dark"] .saved-plans-dropdown-trigger { background: #17223d; border-color: #3f568d; color: #e8efff; }
+[data-theme="dark"] .saved-plans-dropdown-trigger:hover { background: #1e3360; }
+.saved-plans-dropdown-arrow { font-size: 0.78rem; line-height: 1; transition: transform 0.18s ease; display: inline-block; }
+.saved-plans-dropdown[open] .saved-plans-dropdown-arrow { transform: rotate(180deg); }
+.saved-plans-dropdown-content { position: absolute; top: calc(100% + 0.35rem); left: 0; z-index: 200; background: #fff; border: 1px solid #c4d5f2; border-radius: var(--control-radius); padding: 0.45rem 0.6rem; min-width: 210px; max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.25rem; box-shadow: 0 4px 18px rgba(20,63,144,0.14); }
+[data-theme="dark"] .saved-plans-dropdown-content { background: #17223d; border-color: #3f568d; box-shadow: 0 4px 18px rgba(0,0,0,0.35); }
+.saved-plan-item { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.88rem; font-weight: 500; cursor: pointer; padding: 0.28rem 0.5rem; border-radius: var(--control-radius); border: 1px solid transparent; background: transparent; user-select: none; transition: background 0.15s, border-color 0.15s; width: 100%; }
 .saved-plan-item:hover { background: #edf4ff; border-color: #84a9e8; }
-[data-theme="dark"] .saved-plan-item { background: #17223d; border-color: #3f568d; color: #e8efff; }
-[data-theme="dark"] .saved-plan-item:hover { background: #1e3360; }
-.saved-plan-item input[type="checkbox"] { width: 0.92rem; height: 0.92rem; cursor: pointer; accent-color: var(--accent); }
+[data-theme="dark"] .saved-plan-item { color: #e8efff; }
+[data-theme="dark"] .saved-plan-item:hover { background: #1e3360; border-color: #5a7bc4; }
+.saved-plan-item input[type="checkbox"] { width: 0.92rem; height: 0.92rem; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 .forecast-scenario-empty { margin: 0; color: var(--muted); font-size: 0.88rem; }
 [data-theme="dark"] .forecast-scenario-empty { color: #c8d7fb; }
+/* Type select color coding */
+.forecast-whatif-type.type-expense { color: #b7203d; font-weight: 700; }
+.forecast-whatif-type.type-income { color: #1a7a4e; font-weight: 700; }
+[data-theme="dark"] .forecast-whatif-type.type-expense { color: #ff8fab; }
+[data-theme="dark"] .forecast-whatif-type.type-income { color: #6ee4ae; }
 .whatif-plan-name { font-size: 0.8rem; font-weight: 700; color: #1a4ea9; background: #dce9ff; border-radius: 999px; padding: 0.1rem 0.5rem; white-space: nowrap; }
 [data-theme="dark"] .whatif-plan-name { background: #1e3360; color: #aacbff; }
 
