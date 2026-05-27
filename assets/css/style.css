@@ -1061,3 +1061,106 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (prefers-reduced-motion: reduce) {
 	*, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ── Debt Manager ── */
+.debt-controls { grid-template-columns: 1fr 1fr; }
+.debt-controls .control-action { grid-column: 2; }
+
+.debt-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+	gap: 1rem;
+	margin-top: 1rem;
+	align-items: start;
+}
+
+.debt-sidebar { display: grid; gap: 1rem; }
+
+.debt-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	gap: 0.6rem;
+}
+
+.debt-row {
+	border: 1px solid var(--line);
+	border-radius: var(--control-radius);
+	padding: 0.75rem;
+	background: #fdfefe;
+	display: grid;
+	gap: 0.4rem;
+}
+[data-theme="dark"] .debt-row { background: #12203a; color: #e8efff; border-color: #3d5487; }
+
+.debt-row-header {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+.debt-name { font-size: 1rem; }
+.debt-note { font-size: 0.82rem; color: var(--muted); }
+
+.debt-progress-wrap {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+.debt-progress-bar {
+	flex: 1;
+	height: 10px;
+	background: var(--line);
+	border-radius: var(--radius-pill);
+	overflow: hidden;
+}
+.debt-progress-fill {
+	height: 100%;
+	background: linear-gradient(90deg, var(--accent), var(--good));
+	border-radius: var(--radius-pill);
+	transition: width 0.4s ease;
+}
+.debt-progress-pct {
+	font-size: 0.82rem;
+	font-weight: 700;
+	color: var(--muted-strong);
+	min-width: 2.8rem;
+	text-align: right;
+}
+
+.debt-row-amounts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem 1rem;
+	font-size: 0.88rem;
+	color: var(--muted);
+}
+.debt-row-amounts strong { color: var(--ink); }
+[data-theme="dark"] .debt-row-amounts strong { color: #e8efff; }
+
+.debt-empty {
+	color: var(--muted);
+	text-align: center;
+	padding: 0.8rem 0;
+}
+
+.debt-inline-confirm {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	margin-top: 0.4rem;
+	padding: 0.4rem 0.5rem;
+	background: #fff3f5;
+	border: 1px solid #f0b0bc;
+	border-radius: var(--control-radius);
+	font-size: 0.88rem;
+}
+[data-theme="dark"] .debt-inline-confirm { background: #2b1520; border-color: #7a3050; }
+
+@media (max-width: 700px) {
+	.debt-layout { grid-template-columns: 1fr; }
+	.debt-controls { grid-template-columns: 1fr; }
+	.debt-controls .control-action { grid-column: 1; }
+}
