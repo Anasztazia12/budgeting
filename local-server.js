@@ -37,6 +37,8 @@ function safePath(urlPath) {
     return path.join(ROOT, normalized);
 }
 
+const NO_CACHE_EXTENSIONS = new Set([".html", ".js", ".css", ".json", ".webmanifest"]);
+
 function sendFile(filePath, res) {
     fs.readFile(filePath, (error, data) => {
         if (error) {
@@ -47,7 +49,12 @@ function sendFile(filePath, res) {
 
         const extension = path.extname(filePath).toLowerCase();
         const contentType = MIME_TYPES[extension] || "application/octet-stream";
-        res.writeHead(200, { "Content-Type": contentType });
+        const headers = { "Content-Type": contentType };
+        if (NO_CACHE_EXTENSIONS.has(extension)) {
+            headers["Cache-Control"] = "no-store, no-cache, must-revalidate";
+            headers["Pragma"] = "no-cache";
+        }
+        res.writeHead(200, headers);
         res.end(data);
     });
 }
