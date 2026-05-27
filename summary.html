@@ -94,28 +94,24 @@ választó</label>
 			<p data-i18n="loginRequired">Az összesítéshez jelentkezz be a Költségvetés oldalon.</p>
 		</section>
 
-		<section id="diagramm" class="card">
-    <h2 data-i18n="chartTitle">Bevételek és kiadások alakulása</h2>
-    <h3 data-i18n="chartDescription">
-        Az alábbi diagram a kiválasztott időszakban rögzített bevételek és kiadások összegét mutatja
-    </h3>
-
-   <!-- Diagram típus választó -->
-<div class="chart-controls">
-    <label for="chart-type" data-i18n="chartTypeLabel">Diagram típusa:</label>
-
-    <select id="chart-type">
-        <option value="pie" data-i18n="chartTypePie">Torta diagram</option>
-        <option value="bar" data-i18n="chartTypeBar">Oszlop diagram</option>
-    </select>
-</div>
-
-<!-- A diagram vászna -->
-<canvas id="summary-chart" aria-label="summaryChart" role="img"></canvas>
-
-<!-- Színmagyarázat -->
-<div id="chart-legend" class="chart-legend" data-i18n="chartLegend"></div>
-</section>
+		<section id="diagramm" class="card hidden">
+			<div class="chart-header">
+				<h2 id="summary-chart-title-el">Bevételek és kiadások alakulása</h2>
+				<div class="chart-type-selector">
+					<label for="chart-type" id="summary-chart-type-label-el">Típus</label>
+					<select id="chart-type">
+						<option value="pie" id="summary-chart-opt-pie">Kördiagram</option>
+						<option value="bar" id="summary-chart-opt-bar">Oszlopdiagram</option>
+					</select>
+				</div>
+			</div>
+			<div class="chart-body">
+				<div class="chart-canvas-wrap">
+					<canvas id="summary-chart"></canvas>
+				</div>
+				<div id="summary-chart-legend" class="chart-legend"></div>
+			</div>
+		</section>
 
 <section id="summary-content" class="hidden">
 			<section class="grid stats-grid">
@@ -205,6 +201,7 @@ választó</label>
 		</div>
 	</div>
 
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 	<script src="assets/js/app-shared.js"></script>
 	<script type="module" src="assets/js/summary.js"></script>
 </body>

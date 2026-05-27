@@ -80,7 +80,8 @@ const dictionary = {
 		appDownloaded: "Az app letöltve.",
 		editAction: "Szerkesztés",
 		typeIncome: "Bevétel",
-		typeExpense: "Kiadás"
+		typeExpense: "Kiadás",
+		managingDebtLink: "Adósságkezelő"
 	},
 	en: {
 		pageTitle: "Budget Forecast Planner",
@@ -152,7 +153,8 @@ const dictionary = {
 		appDownloaded: "App downloaded.",
 		editAction: "Edit",
 		typeIncome: "Income",
-		typeExpense: "Expense"
+		typeExpense: "Expense",
+		managingDebtLink: "Debt Manager"
 	}
 };
 
@@ -230,6 +232,10 @@ if (summaryToggleButton) {
 		const periodStart = periodStartInput?.value || shared.toDateInput(today);
 		window.location.href = `summary.html?month=${encodeURIComponent(periodStart.slice(0, 7))}`;
 	});
+}
+const managingDebtToggleButton = document.getElementById("managing-debt-toggle-button");
+if (managingDebtToggleButton) {
+	managingDebtToggleButton.addEventListener("click", () => { window.location.href = "managing-debt.html"; });
 }
 
 addWhatIfRowButton.addEventListener("click", () => {
