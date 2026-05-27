@@ -384,16 +384,14 @@ function wireEvents() {
                 loginForm.reset();
                 showMessage(t("loginSuccess"), false);
                 completeLogin(session);
-           } catch (error) {
-    console.log(error?.code, error);
-    showMessage(getFirebaseErrorMessage(error, appLanguage, "login"), true);
-    const errorCode = error?.code || "";
+            } catch (error) {
+                showMessage(getFirebaseErrorMessage(error, appLanguage, "login"), true);
+                const errorCode = error?.code || "";
                 if (
                     errorCode === "auth/invalid-credential" ||
                     errorCode === "auth/wrong-password" ||
                     errorCode === "auth/user-not-found"
                 ) {
-
                     authOptions.classList.remove("hidden");
                     showSingleAuthCard(resetCard);
                     if (resetIdentifierInput && username) {

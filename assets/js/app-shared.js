@@ -11,6 +11,7 @@
     };
 
     const GUEST_SESSION_VALUE = "__guest__";
+    const VALID_CURRENCIES = ["HUF", "GBP", "USD", "EUR"];
 
     function safeParseObject(raw) {
         if (!raw) {
@@ -33,55 +34,28 @@
     }
 
     function loadLanguage() {
-        if (localStorage.getItem(KEYS.LANGUAGE_KEY) === "en") {
-            return "en";
-        }
-
-        return "hu";
+        return localStorage.getItem(KEYS.LANGUAGE_KEY) === "en" ? "en" : "hu";
     }
 
     function saveLanguage(language) {
-        if (language === "en") {
-            localStorage.setItem(KEYS.LANGUAGE_KEY, "en");
-            return;
-        }
-
-        localStorage.setItem(KEYS.LANGUAGE_KEY, "hu");
+        localStorage.setItem(KEYS.LANGUAGE_KEY, language === "en" ? "en" : "hu");
     }
 
     function loadTheme() {
-        if (localStorage.getItem(KEYS.THEME_KEY) === "dark") {
-            return "dark";
-        }
-
-        return "light";
+        return localStorage.getItem(KEYS.THEME_KEY) === "dark" ? "dark" : "light";
     }
 
     function saveTheme(theme) {
-        if (theme === "dark") {
-            localStorage.setItem(KEYS.THEME_KEY, "dark");
-            return;
-        }
-
-        localStorage.setItem(KEYS.THEME_KEY, "light");
+        localStorage.setItem(KEYS.THEME_KEY, theme === "dark" ? "dark" : "light");
     }
 
     function loadCurrency() {
         const saved = localStorage.getItem(KEYS.CURRENCY_KEY);
-        if (saved === "HUF" || saved === "GBP" || saved === "USD" || saved === "EUR") {
-            return saved;
-        }
-
-        return "HUF";
+        return VALID_CURRENCIES.includes(saved) ? saved : "HUF";
     }
 
     function saveCurrency(currency) {
-        if (currency === "HUF" || currency === "GBP" || currency === "USD" || currency === "EUR") {
-            localStorage.setItem(KEYS.CURRENCY_KEY, currency);
-            return;
-        }
-
-        localStorage.setItem(KEYS.CURRENCY_KEY, "HUF");
+        localStorage.setItem(KEYS.CURRENCY_KEY, VALID_CURRENCIES.includes(currency) ? currency : "HUF");
     }
 
     function toMonthInput(dateObj) {

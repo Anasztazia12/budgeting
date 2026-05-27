@@ -300,9 +300,9 @@ const today = new Date();
 const pageParams = new URLSearchParams(window.location.search);
 let currentUser = localStorage.getItem(SESSION_KEY) || "";
 let currentProfile = null;
-let appLanguage = loadLanguage();
-let appTheme = loadTheme();
-let appCurrency = loadCurrency();
+let appLanguage = shared.loadLanguage();
+let appTheme = shared.loadTheme();
+let appCurrency = shared.loadCurrency();
 let appState = { incomes: [], expenses: [] };
 let deleteAccountConfirmArmed = false;
 let deleteAccountConfirmTimer = null;
@@ -358,14 +358,14 @@ void initializePage();
 
 languageSelect.addEventListener("change", () => {
 	appLanguage = languageSelect.value;
-	saveLanguage();
+	shared.saveLanguage(appLanguage);
 	applyTranslations();
 	render();
 });
 
 currencySelect.addEventListener("change", () => {
 	appCurrency = currencySelect.value;
-	saveCurrency();
+	shared.saveCurrency(appCurrency);
 	render();
 });
 
@@ -383,14 +383,14 @@ forecastToggleButton.addEventListener("click", () => {
 });
 if (summaryToggleButton) {
 	summaryToggleButton.addEventListener("click", () => {
-		const periodStart = periodStartInput?.value || toDateInput(today);
+		const periodStart = periodStartInput?.value || shared.toDateInput(today);
 		const monthParam = encodeURIComponent(periodStart.slice(0, 7));
 		window.location.href = `monthly_budget.html?month=${monthParam}`;
 	});
 }
 forecastTargetDateInput.addEventListener("change", renderForecastPlanner);
 addWhatIfRowButton.addEventListener("click", () => {
-	appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "", rowId: createEntryId() });
+	appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "", rowId: shared.createEntryId() });
 	renderForecastPlanner();
 });
 if (forecastLoadScenarioButton) {
@@ -429,7 +429,7 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 		}
 		rowElement.remove();
 		if (!whatIfRowsContainer.children.length) {
-			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "", rowId: createEntryId() });
+			appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value, note: "", rowId: shared.createEntryId() });
 		}
 		renderForecastPlanner();
 		return;
@@ -446,7 +446,7 @@ if (menuBackButton) {
 }
 if (installAppButton) {
 	installAppButton.addEventListener("click", async () => {
-		if (isAppInstalled() && !deferredInstallPrompt) {
+		if (shared.isAppInstalled() && !deferredInstallPrompt) {
 			showMessage(t("appDownloaded"), false);
 			return;
 		}
@@ -565,7 +565,7 @@ incomeForm.addEventListener("submit", (event) => {
 		upsertEntry("incomes", { ...entry, id: editId });
 		showMessage(t("entryUpdated"), false);
 	} else {
-		upsertEntry("incomes", { ...entry, id: createEntryId() });
+		upsertEntry("incomes", { ...entry, id: shared.createEntryId() });
 		showMessage(t("entrySaved"), false);
 	}
 
@@ -587,7 +587,7 @@ expenseForm.addEventListener("submit", (event) => {
 		upsertEntry("expenses", { ...entry, id: editId });
 		showMessage(t("entryUpdated"), false);
 	} else {
-		upsertEntry("expenses", { ...entry, id: createEntryId() });
+		upsertEntry("expenses", { ...entry, id: shared.createEntryId() });
 		showMessage(t("entrySaved"), false);
 	}
 
@@ -606,7 +606,7 @@ expenseList.addEventListener("click", (event) => {
 
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
-		appState = loadGuestData();
+		appState = shared.loadGuestData();
 	} else {
 		const session = await restoreSession(currentUser);
 		if (!session) {
@@ -667,7 +667,7 @@ function getForecastScenarioStorageKey() {
 
 function normalizeScenarioRows(rows) {
 	return (Array.isArray(rows) ? rows : []).map((row) => {
-		const rowId = String(row?.rowId || createEntryId());
+		const rowId = String(row?.rowId || shared.createEntryId());
 		const type = row?.type === "income" ? "income" : "expense";
 		const amount = Number(row?.amount || 0);
 		const date = String(row?.date || "");
@@ -686,7 +686,7 @@ function loadForecastScenarios() {
 	try {
 		const parsed = JSON.parse(raw);
 		forecastScenarios = (Array.isArray(parsed) ? parsed : []).map((scenario) => ({
-			id: String(scenario?.id || createEntryId()),
+			id: String(scenario?.id || shared.createEntryId()),
 			name: String(scenario?.name || "").trim().slice(0, 50),
 			targetDate: String(scenario?.targetDate || ""),
 			rows: normalizeScenarioRows(scenario?.rows)
@@ -734,7 +734,7 @@ function renderScenarioList() {
 
 function getWhatIfRowsForScenario() {
 	return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => ({
-		rowId: row.dataset.rowId || createEntryId(),
+		rowId: row.dataset.rowId || shared.createEntryId(),
 		type: row.querySelector(".forecast-whatif-type")?.value || "expense",
 		amount: Number(row.querySelector(".forecast-whatif-amount")?.value || 0),
 		date: row.querySelector(".forecast-whatif-date")?.value || "",
@@ -761,7 +761,7 @@ function ensureActiveScenario(scenarioName) {
 	}
 
 	const created = {
-		id: createEntryId(),
+		id: shared.createEntryId(),
 		name: scenarioName,
 		targetDate,
 		rows: []
@@ -794,7 +794,7 @@ function loadSelectedForecastScenarios() {
 	});
 
 	if (!whatIfRowsContainer.children.length) {
-		appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || toDateInput(today), note: "", rowId: createEntryId() });
+		appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
 	}
 
 	if (selectedScenarios.length === 1) {
@@ -821,7 +821,7 @@ function saveWhatIfRow(rowElement) {
 	}
 
 	const rowData = {
-		rowId: rowElement.dataset.rowId || createEntryId(),
+		rowId: rowElement.dataset.rowId || shared.createEntryId(),
 		type: rowElement.querySelector(".forecast-whatif-type")?.value || "expense",
 		amount: Number(rowElement.querySelector(".forecast-whatif-amount")?.value || 0),
 		date: rowElement.querySelector(".forecast-whatif-date")?.value || "",
@@ -889,14 +889,14 @@ function render() {
 	}
 
 	const period = getSelectedPeriod();
-	const todayText = toDateInput(new Date());
+	const todayText = shared.toDateInput(new Date());
 	const incomes = periodEntries(appState.incomes, period.start, period.end);
 	const expenses = periodEntries(appState.expenses, period.start, period.end);
 
-	monthlyIncomeEl.textContent = formatCurrency(sumEntries(incomes));
-	monthlyExpenseEl.textContent = formatCurrency(sumEntries(expenses));
-	spentToDateEl.textContent = formatCurrency(sumEntries(expenses.filter((item) => item.date <= todayText)));
-	monthEndLeftEl.textContent = formatCurrency(sumEntries(incomes) - sumEntries(expenses));
+	monthlyIncomeEl.textContent = formatCurrency(shared.sumEntries(incomes));
+	monthlyExpenseEl.textContent = formatCurrency(shared.sumEntries(expenses));
+	spentToDateEl.textContent = formatCurrency(shared.sumEntries(expenses.filter((item) => item.date <= todayText)));
+	monthEndLeftEl.textContent = formatCurrency(shared.sumEntries(incomes) - shared.sumEntries(expenses));
 
 	paintList(incomeList, incomes, "incomes");
 	paintList(expenseList, expenses, "expenses");
@@ -910,13 +910,13 @@ function setDefaultForecastDates() {
 
 function setDefaultWhatIfRows() {
 	whatIfRowsContainer.innerHTML = "";
-	appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || toDateInput(today), note: "", rowId: createEntryId() });
+	appendWhatIfRow({ type: "expense", amount: "", date: forecastTargetDateInput.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
 }
 
 function appendWhatIfRow(row) {
 	const wrapper = document.createElement("div");
 	wrapper.className = "grid forecast-grid whatif-row";
-	wrapper.dataset.rowId = String(row.rowId || createEntryId());
+	wrapper.dataset.rowId = String(row.rowId || shared.createEntryId());
 	wrapper.innerHTML = `
 		<div>
 			<label>${t("forecastRowTypeLabel")}</label>
@@ -1030,15 +1030,15 @@ function renderForecastPlanner() {
 	forecastTargetDateInput.value = targetDate;
 
 	const whatIfRows = collectWhatIfRows(period.start, period.end);
-	const baseUntil = sumEntries(incomes.filter((item) => item.date <= targetDate)) - sumEntries(expenses.filter((item) => item.date <= targetDate));
+	const baseUntil = shared.sumEntries(incomes.filter((item) => item.date <= targetDate)) - shared.sumEntries(expenses.filter((item) => item.date <= targetDate));
 	const adjustmentsUntilTarget = whatIfRows
 		.filter((item) => item.valid && item.date <= targetDate)
 		.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
 	const simulatedUntil = baseUntil + adjustmentsUntilTarget;
 	const difference = adjustmentsUntilTarget;
 
-	const monthIncomeTotal = sumEntries(incomes);
-	const monthExpenseTotal = sumEntries(expenses);
+	const monthIncomeTotal = shared.sumEntries(incomes);
+	const monthExpenseTotal = shared.sumEntries(expenses);
 	const allAdjustmentsInPeriod = whatIfRows
 		.filter((item) => item.valid)
 		.reduce((sum, item) => sum + (item.type === "income" ? item.amount : -item.amount), 0);
@@ -1135,7 +1135,7 @@ function populateFormForEdit(listType, entry) {
 function resetIncomeForm() {
 	incomeForm.reset();
 	document.getElementById("income-edit-id").value = "";
-	document.getElementById("income-date").value = toDateInput(today);
+	document.getElementById("income-date").value = shared.toDateInput(today);
 	incomeCancelEdit.classList.add("hidden");
 	updateFormButtonLabels();
 }
@@ -1143,7 +1143,7 @@ function resetIncomeForm() {
 function resetExpenseForm() {
 	expenseForm.reset();
 	document.getElementById("expense-edit-id").value = "";
-	document.getElementById("expense-date").value = toDateInput(today);
+	document.getElementById("expense-date").value = shared.toDateInput(today);
 	expenseCancelEdit.classList.add("hidden");
 	updateFormButtonLabels();
 }
@@ -1272,7 +1272,7 @@ function getDateRange(startDate, endDate) {
 
 function getSelectedPeriod() {
 	normalizePeriodInputs();
-	const fallback = toDateInput(today);
+	const fallback = shared.toDateInput(today);
 	const start = periodStartInput?.value || fallback;
 	const end = periodEndInput?.value || start;
 	return getDateRange(start, end);
@@ -1292,9 +1292,9 @@ function normalizePeriodInputs() {
 }
 
 function setDefaultPeriodRange(queryMonth) {
-	const monthValue = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : toMonthInput(today);
+	const monthValue = queryMonth && /^\d{4}-\d{2}$/.test(queryMonth) ? queryMonth : shared.toMonthInput(today);
 	const start = `${monthValue}-01`;
-	const end = getMonthEndDate(monthValue);
+	const end = shared.getMonthEndDate(monthValue);
 	if (periodStartInput) {
 		periodStartInput.value = start;
 	}
@@ -1313,10 +1313,6 @@ function clampDateToRange(dateText, startDate, endDate) {
 	return dateText;
 }
 
-function sumEntries(entries) {
-	return shared.sumEntries(entries);
-}
-
 function translateCategory(value) {
 	return t(`categories.${value}`) || value;
 }
@@ -1328,10 +1324,6 @@ function t(key) {
 		current = current ? current[part] : undefined;
 	}
 	return current || key;
-}
-
-function loadTheme() {
-	return shared.loadTheme();
 }
 
 function applyTheme() {
@@ -1405,15 +1397,11 @@ function formatDisplayDate(isoDate) {
 	return dateObj.toLocaleDateString("hu-HU");
 }
 
-function isAppInstalled() {
-	return shared.isAppInstalled();
-}
-
 function updateInstallButtonState() {
 	if (!installAppButton) {
 		return;
 	}
-	const installed = isAppInstalled();
+	const installed = shared.isAppInstalled();
 	if (installed && !deferredInstallPrompt) {
 		installAppButton.textContent = t("appDownloaded");
 		installAppButton.disabled = true;
@@ -1422,30 +1410,6 @@ function updateInstallButtonState() {
 
 	installAppButton.textContent = t("downloadAppButton");
 	installAppButton.disabled = false;
-}
-
-function loadCurrency() {
-	return shared.loadCurrency();
-}
-
-function saveCurrency() {
-	shared.saveCurrency(appCurrency);
-}
-
-function toMonthInput(dateObj) {
-	return shared.toMonthInput(dateObj);
-}
-
-function toDateInput(dateObj) {
-	return shared.toDateInput(dateObj);
-}
-
-function getMonthEndDate(monthValue) {
-	return shared.getMonthEndDate(monthValue, today);
-}
-
-function createEntryId() {
-	return shared.createEntryId();
 }
 
 function applyAuthenticatedState(session) {
@@ -1459,7 +1423,7 @@ function applyAuthenticatedState(session) {
 
 function saveState() {
 	if (currentUser === GUEST_SESSION_VALUE) {
-		saveGuestData(appState);
+		shared.saveGuestData(appState);
 		return;
 	}
 
@@ -1476,18 +1440,3 @@ function saveState() {
 		});
 }
 
-function loadLanguage() {
-	return shared.loadLanguage();
-}
-
-function saveLanguage() {
-	shared.saveLanguage(appLanguage);
-}
-
-function loadGuestData() {
-	return shared.loadGuestData();
-}
-
-function saveGuestData(data) {
-	shared.saveGuestData(data);
-}
