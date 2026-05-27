@@ -37,10 +37,13 @@ Based on these extra planned items, the app recalculates expected results for th
 ## Key features
 
 - registration / login / guest mode
+- password change and password reset via email
 - income and expense tracking
 - edit and delete entries
+- recurring entries (show every month, with per-month exclude support)
 - date range filtering
-- forecast page with what-if rows
+- CSV export of entries
+- forecast page with what-if rows and saved scenarios
 - monthly summary page
 - light/dark theme switch
 - HU/EN language switch
@@ -50,8 +53,9 @@ Based on these extra planned items, the app recalculates expected results for th
 
 - `index.html` - start page (auth, language, theme, menu)
 - `budget.html` - main budgeting page (CRUD + stats + lists)
-- `budget-forecast.html` - forecast planner
+- `budget-forecast.html` - forecast planner with what-if scenarios
 - `monthly_budget.html` - monthly summary
+- `contact.html` - contact page
 
 ## Tech stack
 
