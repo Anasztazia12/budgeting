@@ -71,6 +71,8 @@ const dictionary = {
 		deleteAction: "Törlés",
 		repeatMonthlyAction: "Megjelenítés minden hónapban",
 		repeatMonthlyBadge: "Ismétlődő",
+		repeatEnabled: "Ismétlődő megjelenítés bekapcsolva.",
+		repeatDisabled: "Ismétlődő megjelenítés kikapcsolva.",
 		repeatInEveryMonthLabel: "Megjelenítés minden hónapban",
 		entryUpdated: "A tétel frissítve.",
 		entryDeleted: "A tétel törölve.",
@@ -146,6 +148,8 @@ const dictionary = {
 		deleteAction: "Delete",
 		repeatMonthlyAction: "Show every month",
 		repeatMonthlyBadge: "Monthly repeat",
+		repeatEnabled: "Monthly repeat enabled.",
+		repeatDisabled: "Monthly repeat disabled.",
 		repeatInEveryMonthLabel: "Show in every month",
 		entryUpdated: "Entry updated.",
 		entryDeleted: "Entry deleted.",
@@ -460,6 +464,7 @@ async function handleEntryAction(event, listType) {
 		entry.repeatMonthly = target instanceof HTMLInputElement ? target.checked : !entry.repeatMonthly;
 		if (entry.repeatMonthly) entry.excludedMonths = [];
 		await saveState();
+		showMessage(t(entry.repeatMonthly ? "repeatEnabled" : "repeatDisabled"), false);
 		render();
 		return;
 	}

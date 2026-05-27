@@ -75,6 +75,8 @@ const dictionary = {
 		forecastScenarioSelectRequired: "Válassz ki legalább egy mentett tervet.",
 		forecastRowSaved: "A sor elmentve a tervhez.",
 		forecastRowDone: "Kész",
+		forecastRowRemoved: "A sor törölve.",
+		forecastRowConfirmed: "A sor mentve.",
 		deleteAccountNeedsSecondClick: "Kattints újra 7 másodpercen belül a fiók törléséhez.",
 		registerTitle: "Regisztráció",
 		loginTitle: "Bejelentkezés",
@@ -215,6 +217,8 @@ const dictionary = {
 		forecastScenarioSelectRequired: "Select at least one saved plan.",
 		forecastRowSaved: "Row saved to plan.",
 		forecastRowDone: "Done",
+		forecastRowRemoved: "Row removed.",
+		forecastRowConfirmed: "Row saved.",
 		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete the account.",
 		registerTitle: "Register",
 		loginTitle: "Sign in",
@@ -444,6 +448,7 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 			}
 		}
 		rowElement.remove();
+		showMessage(t("forecastRowRemoved"), false);
 		renderForecastPlanner();
 		return;
 	}
@@ -466,12 +471,17 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 		const amount = rowElement.querySelector(".forecast-whatif-amount")?.value || "";
 		const date = rowElement.querySelector(".forecast-whatif-date")?.value || "";
 		const note = String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
+		if (!Number(amount) || !date) {
+			showMessage(t("forecastScenarioEmpty"), true);
+			return;
+		}
 		rowElement.dataset.type = type;
 		rowElement.dataset.amount = amount;
 		rowElement.dataset.date = date;
 		rowElement.dataset.note = note;
 		rowElement.classList.remove("edit-mode");
 		rowElement.innerHTML = buildWhatIfRowDisplayHTML(rowElement);
+		showMessage(t("forecastRowConfirmed"), false);
 		renderForecastPlanner();
 	}
 });

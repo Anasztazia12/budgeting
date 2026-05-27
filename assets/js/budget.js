@@ -120,6 +120,8 @@ const dictionary = {
 		repeatMonthlyAction: "Megjelenít minden hónapban",
 		stopRepeatMonthlyAction: "Ismétlés kikapcsolása",
 		repeatMonthlyBadge: "Ismétlődő",
+		repeatEnabled: "Ismétlődő megjelenítés bekapcsolva.",
+		repeatDisabled: "Ismétlődő megjelenítés kikapcsolva.",
 		moreActionsLabel: "További műveletek",
 		csvType: "Típus",
 		csvCategory: "Kategória",
@@ -256,6 +258,8 @@ const dictionary = {
 		repeatMonthlyAction: "Show every month",
 		stopRepeatMonthlyAction: "Stop monthly repeat",
 		repeatMonthlyBadge: "Monthly repeat",
+		repeatEnabled: "Monthly repeat enabled.",
+		repeatDisabled: "Monthly repeat disabled.",
 		moreActionsLabel: "More actions",
 		csvType: "Type",
 		csvCategory: "Category",
@@ -867,6 +871,7 @@ async function handleEntryAction(event, listType) {
 			entry.excludedMonths = [];
 		}
 		saveState();
+		showMessage(t(entry.repeatMonthly ? "repeatEnabled" : "repeatDisabled"), false);
 		render();
 		return;
 	}
