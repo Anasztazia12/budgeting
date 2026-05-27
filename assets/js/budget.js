@@ -829,21 +829,28 @@ function renderChart(incomes, expenses) {
 		});
 	}
 
-	// Show section and set labels directly (no data-i18n, no applyTranslations dependency)
+	// Show section first so canvas gets layout dimensions
 	section.classList.remove("hidden");
+
+	// Set labels with hardcoded strings — no t() dependency, cannot show raw keys
+	const isHu = appLanguage !== "en";
 	const titleEl = document.getElementById("chart-title-el");
 	const typeLabelEl = document.getElementById("chart-type-label-el");
 	const pieOpt = document.getElementById("chart-opt-pie");
 	const barOpt = document.getElementById("chart-opt-bar");
-	if (titleEl) titleEl.textContent = t("chartTitle");
-	if (typeLabelEl) typeLabelEl.textContent = t("chartTypeLabel");
-	if (pieOpt) pieOpt.textContent = t("chartTypePie");
-	if (barOpt) barOpt.textContent = t("chartTypeBar");
-	if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+	if (titleEl) titleEl.textContent = isHu ? "Diagram" : "Chart";
+	if (typeLabelEl) typeLabelEl.textContent = isHu ? "Típus" : "Type";
+	if (pieOpt) pieOpt.textContent = isHu ? "Kördiagram" : "Pie chart";
+	if (barOpt) barOpt.textContent = isHu ? "Oszlopdiagram" : "Bar chart";
 
-	requestAnimationFrame(() => {
-		if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-		chartInstance = new Chart(canvas.getContext("2d"), {
+	// Destroy old instance, then replace canvas to avoid Chart.js residue
+	if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+	const freshCanvas = document.createElement("canvas");
+	freshCanvas.id = "budget-chart";
+	canvas.replaceWith(freshCanvas);
+
+	try {
+		chartInstance = new Chart(freshCanvas, {
 			type: chartType,
 			data: {
 				labels,
@@ -856,7 +863,7 @@ function renderChart(incomes, expenses) {
 			},
 			options: {
 				responsive: true,
-				maintainAspectRatio: true,
+				maintainAspectRatio: false,
 				plugins: {
 					legend: { display: false },
 					tooltip: {
@@ -877,7 +884,11 @@ function renderChart(incomes, expenses) {
 				} : {})
 			}
 		});
-	});
+	} catch (_err) {
+		// Chart.js failed — hide section gracefully
+		section.classList.add("hidden");
+		chartInstance = null;
+	}
 }
 
 async function handleEntryAction(event, listType) {
