@@ -1,4 +1,4 @@
-﻿import {
+import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	loadCurrentUserData,
@@ -11,7 +11,6 @@ const shared = window.BudgetAppShared;
 const {
 	SESSION_KEY,
 	DISPLAY_NAME_KEY,
-	THEME_KEY,
 	INSTALL_STATUS_KEY
 } = shared.KEYS;
 const { GUEST_SESSION_VALUE } = shared;
@@ -25,7 +24,6 @@ const dictionary = {
 		homeLink: "Kezdőlap",
 		budgetLink: "Költségvetés",
 		summaryLink: "Összesítés",
-		themeModeLabel: "Téma",
 		versionLabel: "Verzió",
 		themeModeLight: "Világos",
 		themeModeDark: "Sötét",
@@ -39,30 +37,17 @@ const dictionary = {
 		currencySelectorAria: "Pénznem választó",
 		incomeFiltersAria: "Bevétel dátumszűrők",
 		expenseFiltersAria: "Kiadás dátumszűrők",
-		appName: "Költségvetési app",
 		currencyLabel: "Pénznem\nválasztó",
 		currencyHuf: "HUF (forint)",
 		currencyGbp: "GBP (font)",
 		currencyUsd: "USD (dollár)",
 		currencyEur: "EUR (euró)",
-		monthLabel: "Választott hónap",
 		periodLabel: "Választott időszak",
 		periodFromLabel: "-tól",
 		periodToLabel: "-ig",
 		forecastButton: "Költségvetési előrejelző",
-		saveAllButton: "Mentés",
 		saveAllDone: "A módosítások mentve.",
-		registerTitle: "Regisztráció",
-		loginTitle: "Bejelentkezés",
-		usernameLabel: "Felhasználónév",
-		emailLabel: "Email cím",
-		emailConfirmLabel: "Email cím megerősítése",
-		passwordLabel: "Jelszó",
-		passwordConfirmLabel: "Jelszó megerősítése",
-		registerButton: "Regisztrálok",
-		loginButton: "Belépés",
 		logoutButton: "Kijelentkezés",
-		loginRequired: "A rögzítéshez jelentkezz be vagy regisztrálj.",
 		incomeFormTitle: "Bevétel",
 		expenseFormTitle: "Kiadás",
 		categoryLabel: "Kategória",
@@ -78,7 +63,6 @@ const dictionary = {
 		repeatInEveryMonthLabel: "Megjelenítés minden hónapban",
 		listFromDateLabel: "Ettől",
 		listToDateLabel: "Eddig",
-		cancelEditButton: "Szerkesztés",
 		monthlyIncomeTitle: "Bevétel",
 		monthlyExpenseTitle: "Kiadás",
 		spentToDateTitle: "Várható kiadás",
@@ -88,18 +72,9 @@ const dictionary = {
 		loggedOut: "Nincs bejelentkezett felhasználó.",
 		loggedIn: "Bejelentkezve:",
 		guestUser: "Vendég",
-		emailMismatch: "Az email címek nem egyeznek.",
-		passwordMismatch: "A jelszavak nem egyeznek.",
-		usernameTaken: "Ez a felhasználónév már foglalt.",
-		registerSuccess: "Sikeres regisztráció.",
-		loginSuccess: "Sikeres bejelentkezés.",
-		logoutSuccess: "Sikeres kijelentkezés.",
-		invalidLogin: "Hibás felhasználónév vagy jelszó.",
-		welcomeRegistered: "Welcome, {username}!",
 		appDownloaded: "Az app letöltve.",
 		appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
 		deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
-		loginFirst: "Először jelentkezz be.",
 		entrySaved: "A tétel elmentve.",
 		entryUpdated: "A tétel frissítve.",
 		entryDeleted: "A tétel törölve.",
@@ -110,25 +85,13 @@ const dictionary = {
 		deleteOnlyThisMonthButton: "Törlés csak ebből a hónapból",
 		deleteAllMonthsButton: "Törlés minden hónapból",
 		cancelModalButton: "Mégse",
-		confirmDeleteAllMonths: "Biztos törlöd minden hónapból?",
-		confirmDeleteThisMonth: "Biztos törlöd ebből a hónapból?",
 		emptyEntries: "Nincs rögzített tétel a megadott időszakra.",
-		exportEmpty: "Nincs exportálható tétel ebben a hónapban.",
-		exportDone: "A CSV export letöltése elindult.",
 		editAction: "Szerkesztés",
 		deleteAction: "Törlés",
 		repeatMonthlyAction: "Megjelenít minden hónapban",
-		stopRepeatMonthlyAction: "Ismétlés kikapcsolása",
 		repeatMonthlyBadge: "Ismétlődő",
 		repeatEnabled: "Ismétlődő megjelenítés bekapcsolva.",
 		repeatDisabled: "Ismétlődő megjelenítés kikapcsolva.",
-		moreActionsLabel: "További műveletek",
-		csvType: "Típus",
-		csvCategory: "Kategória",
-		csvAmount: "Összeg",
-		csvDate: "Dátum",
-		typeIncome: "Bevétel",
-		typeExpense: "Kiadás",
 		categories: {
 			fizetes: "Fizetés",
 			egyeb: "Egyéb",
@@ -151,7 +114,6 @@ const dictionary = {
 			telefon: "Telefon",
 			internet: "Internet",
 			iskola: "Iskola",
-			suli: "Iskola",
 			"egyeb kiadas": "Egyéb kiadás"
 		}
 	},
@@ -163,7 +125,6 @@ const dictionary = {
 		homeLink: "Home",
 		budgetLink: "Budget",
 		summaryLink: "Summary",
-		themeModeLabel: "Theme",
 		versionLabel: "Version",
 		themeModeLight: "Light",
 		themeModeDark: "Dark",
@@ -177,30 +138,17 @@ const dictionary = {
 		currencySelectorAria: "Currency selector",
 		incomeFiltersAria: "Income date filters",
 		expenseFiltersAria: "Expense date filters",
-		appName: "Budgeting App",
 		currencyLabel: "Currency\nselector",
 		currencyHuf: "HUF (forint)",
 		currencyGbp: "GBP (pound)",
 		currencyUsd: "USD (dollar)",
 		currencyEur: "EUR (euro)",
-		monthLabel: "Selected month",
 		periodLabel: "Selected period",
 		periodFromLabel: "from",
 		periodToLabel: "to",
 		forecastButton: "Budget Forecast Planner",
-		saveAllButton: "Save",
 		saveAllDone: "Changes saved.",
-		registerTitle: "Register",
-		loginTitle: "Sign in",
-		usernameLabel: "Username",
-		emailLabel: "Email address",
-		emailConfirmLabel: "Confirm email address",
-		passwordLabel: "Password",
-		passwordConfirmLabel: "Confirm password",
-		registerButton: "Create account",
-		loginButton: "Sign in",
 		logoutButton: "Sign out",
-		loginRequired: "Please sign in or register to manage entries.",
 		incomeFormTitle: "Income",
 		expenseFormTitle: "Expenses",
 		categoryLabel: "Category",
@@ -216,7 +164,6 @@ const dictionary = {
 		repeatInEveryMonthLabel: "Show in every month",
 		listFromDateLabel: "From",
 		listToDateLabel: "To",
-		cancelEditButton: "Edit",
 		monthlyIncomeTitle: "Income",
 		monthlyExpenseTitle: "Expenses",
 		spentToDateTitle: "Expected expense",
@@ -226,18 +173,9 @@ const dictionary = {
 		loggedOut: "No user is signed in.",
 		loggedIn: "Signed in as:",
 		guestUser: "Guest",
-		emailMismatch: "Email addresses do not match.",
-		passwordMismatch: "Passwords do not match.",
-		usernameTaken: "This username is already taken.",
-		registerSuccess: "Registration successful.",
-		loginSuccess: "Signed in successfully.",
-		logoutSuccess: "Signed out successfully.",
-		invalidLogin: "Invalid username or password.",
-		welcomeRegistered: "Welcome, {username}!",
 		appDownloaded: "App downloaded.",
 		appInstallUnavailable: "App install is not available on this device right now.",
 		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
-		loginFirst: "Please sign in first.",
 		entrySaved: "Entry saved.",
 		entryUpdated: "Entry updated.",
 		entryDeleted: "Entry deleted.",
@@ -248,25 +186,13 @@ const dictionary = {
 		deleteOnlyThisMonthButton: "Delete only from this month",
 		deleteAllMonthsButton: "Delete from all months",
 		cancelModalButton: "Cancel",
-		confirmDeleteAllMonths: "Are you sure you want to delete from all months?",
-		confirmDeleteThisMonth: "Are you sure you want to delete only from this month?",
 		emptyEntries: "No saved entries for the selected period.",
-		exportEmpty: "There are no entries to export for this month.",
-		exportDone: "CSV export started.",
 		editAction: "Edit",
 		deleteAction: "Delete",
 		repeatMonthlyAction: "Show every month",
-		stopRepeatMonthlyAction: "Stop monthly repeat",
 		repeatMonthlyBadge: "Monthly repeat",
 		repeatEnabled: "Monthly repeat enabled.",
 		repeatDisabled: "Monthly repeat disabled.",
-		moreActionsLabel: "More actions",
-		csvType: "Type",
-		csvCategory: "Category",
-		csvAmount: "Amount",
-		csvDate: "Date",
-		typeIncome: "Income",
-		typeExpense: "Expense",
 		categories: {
 			fizetes: "Salary",
 			egyeb: "Other",
@@ -281,7 +207,6 @@ const dictionary = {
 			rent: "Rent",
 			biztositas: "Insurance",
 			hitelkartya: "Credit card",
-			"hitelkartya 3": "Credit card",
 			council: "Council",
 			onkormanyzat: "Municipality",
 			travel: "Travel",
@@ -290,7 +215,6 @@ const dictionary = {
 			telefon: "Phone",
 			internet: "Internet",
 			iskola: "School",
-			suli: "School",
 			"egyeb kiadas": "Other expense"
 		}
 	}
@@ -371,26 +295,25 @@ currencySelect.addEventListener("change", () => {
 });
 
 [periodStartInput, periodEndInput].forEach((input) => {
-	if (!input) {
-		return;
-	}
+	if (!input) return;
 	input.addEventListener("change", () => {
 		syncPeriodInputOrder();
 		setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
 		render();
 	});
- 		});
+});
+
 [incomeFilterStart, incomeFilterEnd, expenseFilterStart, expenseFilterEnd].forEach((input) => {
-	if (!input) {
-		return;
-	}
+	if (!input) return;
 	input.addEventListener("change", render);
- 		});
+});
+
 forecastToggleButton.addEventListener("click", () => {
 	const periodStart = periodStartInput?.value || shared.toDateInput(today);
 	const monthParam = encodeURIComponent(periodStart.slice(0, 7));
 	window.location.href = `budget-forecast.html?month=${monthParam}`;
 });
+
 if (summaryToggleButton) {
 	summaryToggleButton.addEventListener("click", () => {
 		const periodStart = periodStartInput?.value || shared.toDateInput(today);
@@ -405,11 +328,13 @@ if (saveStateButton) {
 		showMessage(t("saveAllDone"), false);
 	});
 }
+
 if (menuBackButton) {
 	menuBackButton.addEventListener("click", () => {
 		window.history.back();
 	});
 }
+
 if (installAppButton) {
 	installAppButton.addEventListener("click", async () => {
 		if (shared.isAppInstalled() && !deferredInstallPrompt) {
@@ -435,12 +360,15 @@ if (installAppButton) {
 		updateInstallButtonState();
 	});
 }
+
 if (menuLogoutButton) {
 	menuLogoutButton.addEventListener("click", handleLogout);
 }
+
 if (deleteAccountButton) {
 	deleteAccountButton.addEventListener("click", handleAccountDelete);
 }
+
 if (themeLightButton) {
 	themeLightButton.addEventListener("click", () => {
 		setTheme("light");
@@ -452,43 +380,52 @@ if (themeDarkButton) {
 		setTheme("dark");
 	});
 }
+
 if (contactUsButton) {
 	contactUsButton.addEventListener("click", () => {
 		window.location.href = "contact.html";
 	});
 }
+
 if (incomeCancelEdit) {
 	incomeCancelEdit.addEventListener("click", resetIncomeForm);
 }
+
 if (incomeDeleteButton) {
 	incomeDeleteButton.addEventListener("click", async (event) => {
 		await handleDeleteFromForm("incomes", "income-edit-id", resetIncomeForm, event.currentTarget);
 	});
 }
+
 if (expenseCancelEdit) {
 	expenseCancelEdit.addEventListener("click", resetExpenseForm);
 }
+
 if (expenseDeleteButton) {
 	expenseDeleteButton.addEventListener("click", async (event) => {
 		await handleDeleteFromForm("expenses", "expense-edit-id", resetExpenseForm, event.currentTarget);
 	});
 }
+
 if (deleteThisMonthButton) {
 	deleteThisMonthButton.addEventListener("click", () => {
 		closeDeleteScopeModal("month");
 	});
 }
+
 if (deleteAllMonthsButton) {
 	deleteAllMonthsButton.addEventListener("click", () => {
 		closeDeleteScopeModal("all");
 	});
 }
+
 if (deleteScopeCancelButton) {
 	deleteScopeCancelButton.addEventListener("click", () => {
 		closeDeleteScopeModal(null);
 	});
 }
- 		if (deleteScopeModal) {
+
+if (deleteScopeModal) {
 	deleteScopeModal.addEventListener("click", (event) => {
 		if (event.target === deleteScopeModal) {
 			closeDeleteScopeModal(null);
@@ -544,17 +481,13 @@ window.addEventListener("appinstalled", () => {
 
 if ("serviceWorker" in navigator) {
 	window.addEventListener("load", () => {
-		navigator.serviceWorker.register("sw.js").catch(() => {
-			// Service worker errors should not block usage.
-		});
+		navigator.serviceWorker.register("sw.js").catch(() => {});
 	});
 }
 
 incomeForm.addEventListener("submit", (event) => {
 	event.preventDefault();
-	if (!requireLogin()) {
-		return;
-	}
+	if (!requireLogin()) return;
 
 	const entry = buildEntryFromForm("income");
 	if (!entry.amount) {
@@ -589,9 +522,7 @@ incomeForm.addEventListener("submit", (event) => {
 
 expenseForm.addEventListener("submit", (event) => {
 	event.preventDefault();
-	if (!requireLogin()) {
-		return;
-	}
+	if (!requireLogin()) return;
 
 	const entry = buildEntryFromForm("expense");
 	if (!entry.amount) {
@@ -650,7 +581,12 @@ async function initializePage() {
 			return;
 		}
 
-		applyAuthenticatedState(session);
+		currentUser = String(session?.profile?.username || currentUser || "").trim();
+		currentProfile = session?.profile || null;
+		if (currentUser) {
+			localStorage.setItem(SESSION_KEY, currentUser);
+		}
+
 		appState = session.data || await loadCurrentUserData();
 	}
 
@@ -687,58 +623,42 @@ function applyTranslations() {
 	});
 
 	document.querySelectorAll("#income-category option, #expense-category option").forEach((option) => {
-		if (option.value === "__separator__") {
-			return;
-		}
+		if (option.value === "__separator__") return;
 		option.textContent = translateCategory(option.value);
 	});
 
 	sortExpenseCategoryOptions();
-
 	updateFormButtonLabels();
 	updateMenuSessionLabel();
 }
 
 function updateMenuSessionLabel() {
-	if (!menuSessionInfo) {
-		return;
-	}
+	if (!menuSessionInfo) return;
 
 	if (!currentUser) {
 		menuSessionInfo.textContent = t("loggedOut");
 		return;
 	}
 
-	const name = getSignedInDisplayName();
+	const name = currentUser === GUEST_SESSION_VALUE
+		? t("guestUser")
+		: (localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser);
 	menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
-}
-
-function getSignedInDisplayName() {
-	if (!currentUser) {
-		return t("guestUser");
-	}
-	if (currentUser === GUEST_SESSION_VALUE) {
-		return t("guestUser");
-	}
-
-	return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
 }
 
 function sortExpenseCategoryOptions() {
 	const expenseCategorySelect = document.getElementById("expense-category");
-	if (!expenseCategorySelect) {
-		return;
-	}
+	if (!expenseCategorySelect) return;
 
 	const selectedValue = expenseCategorySelect.value;
 	const options = Array.from(expenseCategorySelect.options);
 	const regularOptions = options
 		.filter((option) => option.value !== "egyeb kiadas" && option.value !== "__separator__")
 		.sort((left, right) => {
-		const leftLabel = translateCategory(left.value);
-		const rightLabel = translateCategory(right.value);
-		return leftLabel.localeCompare(rightLabel, appLanguage, { sensitivity: "base" });
-	});
+			const leftLabel = translateCategory(left.value);
+			const rightLabel = translateCategory(right.value);
+			return leftLabel.localeCompare(rightLabel, appLanguage, { sensitivity: "base" });
+		});
 	const otherExpenseOption = options.find((option) => option.value === "egyeb kiadas") || null;
 	const separatorOption = options.find((option) => option.value === "__separator__") || null;
 
@@ -836,7 +756,6 @@ function paintList(target, entries, listType) {
 						<button type="button" class="inline-icon-button" title="${t("editAction")}" aria-label="${t("editAction")}" data-action="edit" data-id="${entry.id}">✎</button>
 						<button type="button" class="inline-icon-button danger" title="${t("deleteAction")}" aria-label="${t("deleteAction")}" data-action="delete" data-id="${entry.id}" data-date="${entry.date}">✖</button>
 					</div>
-					</div>
 				</div>
 			`;
 			target.appendChild(li);
@@ -845,18 +764,14 @@ function paintList(target, entries, listType) {
 
 async function handleEntryAction(event, listType) {
 	const actionTarget = event.target.closest("[data-action]");
-	if (!actionTarget) {
-		return;
-	}
+	if (!actionTarget) return;
 
 	const entryId = actionTarget.dataset.id;
 	const clickedDate = actionTarget.dataset.date || "";
 	const action = actionTarget.dataset.action;
 	const entry = appState[listType].find((item) => item.id === entryId);
 
-	if (!entry) {
-		return;
-	}
+	if (!entry) return;
 
 	if (action === "edit") {
 		populateFormForEdit(listType, entry);
@@ -892,24 +807,18 @@ async function handleEntryAction(event, listType) {
 
 async function handleEntryDelete(listType, entryId, clickedDate, triggerElement) {
 	const entry = appState[listType].find((item) => item.id === entryId);
-	if (!entry) {
-		return false;
-	}
+	if (!entry) return false;
 
 	if (!entry.repeatMonthly) {
 		const isConfirmed = await openInlineDeleteConfirm(triggerElement, t("confirmDelete"));
-		if (!isConfirmed) {
-			return false;
-		}
+		if (!isConfirmed) return false;
 		appState[listType] = appState[listType].filter((item) => item.id !== entryId);
 		saveState();
 		return true;
 	}
 
 	const scope = await openDeleteScopeModal();
-	if (!scope) {
-		return false;
-	}
+	if (!scope) return false;
 
 	if (scope === "all") {
 		appState[listType] = appState[listType].filter((item) => item.id !== entryId);
@@ -934,9 +843,7 @@ async function handleEntryDelete(listType, entryId, clickedDate, triggerElement)
 }
 
 function openDeleteScopeModal() {
-	if (!deleteScopeModal) {
-		return Promise.resolve(null);
-	}
+	if (!deleteScopeModal) return Promise.resolve(null);
 
 	if (inlineDeleteConfirmResolver) {
 		closeInlineDeleteConfirm(false);
@@ -964,9 +871,7 @@ function closeDeleteScopeModal(choice) {
 }
 
 function openInlineDeleteConfirm(anchorElement, message) {
-	if (!anchorElement || !document.body) {
-		return Promise.resolve(false);
-	}
+	if (!anchorElement || !document.body) return Promise.resolve(false);
 
 	if (inlineDeleteConfirmResolver) {
 		closeInlineDeleteConfirm(false);
@@ -1008,9 +913,7 @@ function openInlineDeleteConfirm(anchorElement, message) {
 	cancelButton?.addEventListener("click", () => closeInlineDeleteConfirm(false));
 
 	inlineDeleteConfirmOutsideHandler = (event) => {
-		if (!inlineDeleteConfirmElement) {
-			return;
-		}
+		if (!inlineDeleteConfirmElement) return;
 		const clickedInsidePopover = inlineDeleteConfirmElement.contains(event.target);
 		const clickedAnchor = anchorElement.contains(event.target);
 		if (!clickedInsidePopover && !clickedAnchor) {
@@ -1128,9 +1031,7 @@ function buildEntryFromForm(prefix) {
 function parseAmountValue(rawValue) {
 	const normalized = String(rawValue || "").replace(",", ".").trim();
 	const amount = Number(normalized);
-	if (!Number.isFinite(amount) || amount <= 0) {
-		return 0;
-	}
+	if (!Number.isFinite(amount) || amount <= 0) return 0;
 	return Math.round(amount * 100) / 100;
 }
 
@@ -1143,12 +1044,8 @@ function getDateRange(startDate, endDate) {
 
 function filterEntriesByRange(entries, startDate, endDate) {
 	return entries.filter((entry) => {
-		if (startDate && entry.date < startDate) {
-			return false;
-		}
-		if (endDate && entry.date > endDate) {
-			return false;
-		}
+		if (startDate && entry.date < startDate) return false;
+		if (endDate && entry.date > endDate) return false;
 		return true;
 	});
 }
@@ -1178,14 +1075,10 @@ function entriesForListByDateRange(entries, startDate, endDate, activeMonth) {
 }
 
 function expandRecurringEntries(entry, startDate, endDate) {
-	if (!startDate || !endDate) {
-		return [entry];
-	}
+	if (!startDate || !endDate) return [entry];
 
 	const sourceMonth = (entry.date || "").slice(0, 7);
-	if (!/^\d{4}-\d{2}$/.test(sourceMonth)) {
-		return [entry];
-	}
+	if (!/^\d{4}-\d{2}$/.test(sourceMonth)) return [entry];
 
 	const rangeStartMonth = startDate.slice(0, 7);
 	const rangeEndMonth = endDate.slice(0, 7);
@@ -1212,9 +1105,7 @@ function getNextMonth(monthValue) {
 	const [yearText, monthText] = monthValue.split("-");
 	let year = Number(yearText);
 	let month = Number(monthText);
-	if (!Number.isFinite(year) || !Number.isFinite(month)) {
-		return monthValue;
-	}
+	if (!Number.isFinite(year) || !Number.isFinite(month)) return monthValue;
 	month += 1;
 	if (month > 12) {
 		year += 1;
@@ -1227,40 +1118,24 @@ function setDefaultListDateFilters(startDate, endDate) {
 	const range = getDateRange(startDate, endDate);
 	const start = range.start || shared.toDateInput(today);
 	const end = range.end || start;
-	if (incomeFilterStart) {
-		incomeFilterStart.value = start;
-	}
-	if (incomeFilterEnd) {
-		incomeFilterEnd.value = end;
-	}
-	if (expenseFilterStart) {
-		expenseFilterStart.value = start;
-	}
-	if (expenseFilterEnd) {
-		expenseFilterEnd.value = end;
-	}
+	if (incomeFilterStart) incomeFilterStart.value = start;
+	if (incomeFilterEnd) incomeFilterEnd.value = end;
+	if (expenseFilterStart) expenseFilterStart.value = start;
+	if (expenseFilterEnd) expenseFilterEnd.value = end;
 }
 
 function setDefaultPeriodRange() {
 	const month = shared.toMonthInput(today);
 	const start = `${month}-01`;
 	const end = shared.getMonthEndDate(month);
-	if (periodStartInput) {
-		periodStartInput.value = start;
-	}
-	if (periodEndInput) {
-		periodEndInput.value = end;
-	}
+	if (periodStartInput) periodStartInput.value = start;
+	if (periodEndInput) periodEndInput.value = end;
 }
 
 function syncPeriodInputOrder() {
 	const range = getDateRange(periodStartInput?.value, periodEndInput?.value);
-	if (periodStartInput && range.start) {
-		periodStartInput.value = range.start;
-	}
-	if (periodEndInput && range.end) {
-		periodEndInput.value = range.end;
-	}
+	if (periodStartInput && range.start) periodStartInput.value = range.start;
+	if (periodEndInput && range.end) periodEndInput.value = range.end;
 }
 
 function alignDateToMonth(sourceDate, targetMonth) {
@@ -1286,7 +1161,6 @@ function upsertEntry(collectionName, entry) {
 		appState[collectionName][existingIndex] = entry;
 		return;
 	}
-
 	appState[collectionName].push(entry);
 }
 
@@ -1382,19 +1256,14 @@ function requireLogin() {
 	return Boolean(currentUser);
 }
 
-
 function translateCategory(value) {
 	const normalizedValue = normalizeCategory(value);
 	return t(`categories.${normalizedValue}`) || normalizedValue;
 }
 
 function normalizeCategory(value) {
-	if (value === "hitelkartya 3") {
-		return "hitelkartya";
-	}
-	if (value === "suli") {
-		return "iskola";
-	}
+	if (value === "hitelkartya 3") return "hitelkartya";
+	if (value === "suli") return "iskola";
 	return value;
 }
 
@@ -1432,9 +1301,7 @@ function syncThemeButtons() {
 }
 
 function showMessage(message, isError) {
-	if (!authMessage) {
-		return;
-	}
+	if (!authMessage) return;
 	authMessage.textContent = message;
 	authMessage.classList.toggle("hidden", !message);
 	authMessage.classList.toggle("error", isError);
@@ -1443,12 +1310,7 @@ function showMessage(message, isError) {
 
 function formatCurrency(amount) {
 	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
-	const symbols = {
-		HUF: "Ft",
-		GBP: "£",
-		USD: "$",
-		EUR: "€"
-	};
+	const symbols = { HUF: "Ft", GBP: "£", USD: "$", EUR: "€" };
 	const numericAmount = Number(amount) || 0;
 	const valueText = new Intl.NumberFormat(locale, {
 		minimumFractionDigits: 0,
@@ -1458,14 +1320,10 @@ function formatCurrency(amount) {
 }
 
 function formatDisplayDate(isoDate) {
-	if (!isoDate) {
-		return "";
-	}
+	if (!isoDate) return "";
 
 	const dateObj = new Date(`${isoDate}T00:00:00`);
-	if (Number.isNaN(dateObj.getTime())) {
-		return isoDate;
-	}
+	if (Number.isNaN(dateObj.getTime())) return isoDate;
 
 	if (appLanguage === "en") {
 		return dateObj.toLocaleDateString("en-US", {
@@ -1479,27 +1337,15 @@ function formatDisplayDate(isoDate) {
 }
 
 function updateInstallButtonState() {
-	if (!installAppButton) {
-		return;
-	}
+	if (!installAppButton) return;
 	const installed = shared.isAppInstalled();
 	if (installed && !deferredInstallPrompt) {
 		installAppButton.textContent = t("appDownloaded");
 		installAppButton.disabled = true;
 		return;
 	}
-
 	installAppButton.textContent = t("downloadAppButton");
 	installAppButton.disabled = false;
-}
-
-function applyAuthenticatedState(session) {
-	currentUser = String(session?.profile?.username || currentUser || "").trim();
-	currentProfile = session?.profile || null;
-	if (!currentUser) {
-		return;
-	}
-	localStorage.setItem(SESSION_KEY, currentUser);
 }
 
 function normalizeEntriesData(data) {
@@ -1510,9 +1356,7 @@ function normalizeEntriesData(data) {
 }
 
 function normalizeEntries(entries) {
-	if (!Array.isArray(entries)) {
-		return [];
-	}
+	if (!Array.isArray(entries)) return [];
 
 	return entries
 		.filter((entry) => entry && entry.id && entry.category && entry.date)
@@ -1527,9 +1371,7 @@ function normalizeEntries(entries) {
 }
 
 function normalizeExcludedMonths(value) {
-	if (!Array.isArray(value)) {
-		return [];
-	}
+	if (!Array.isArray(value)) return [];
 	return value.filter((monthText) => typeof monthText === "string" && /^\d{4}-\d{2}$/.test(monthText));
 }
 
@@ -1539,9 +1381,7 @@ function saveState() {
 		return;
 	}
 
-	if (!currentUser) {
-		return;
-	}
+	if (!currentUser) return;
 
 	void saveCurrentUserData(appState)
 		.then((savedState) => {
@@ -1551,5 +1391,3 @@ function saveState() {
 			showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
 		});
 }
-
-
