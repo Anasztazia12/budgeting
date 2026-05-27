@@ -849,6 +849,11 @@ function renderChart(incomes, expenses) {
 	freshCanvas.id = "budget-chart";
 	canvas.replaceWith(freshCanvas);
 
+	// Force a synchronous layout reflow so Chart.js reads correct canvas dimensions.
+	// Without this, the browser may not have computed the size of the newly-visible
+	// section yet, causing Chart.js to see a 0×0 canvas and render nothing.
+	void section.offsetHeight;
+
 	try {
 		chartInstance = new Chart(freshCanvas, {
 			type: chartType,
@@ -863,7 +868,10 @@ function renderChart(incomes, expenses) {
 			},
 			options: {
 				responsive: true,
-				maintainAspectRatio: false,
+				// maintainAspectRatio: true lets Chart.js control the canvas height
+				// based on width ÷ aspectRatio — works without any explicit CSS height
+				// on the container. (false requires an explicit container height in CSS.)
+				maintainAspectRatio: true,
 				plugins: {
 					legend: { display: false },
 					tooltip: {
