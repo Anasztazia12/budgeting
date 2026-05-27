@@ -74,6 +74,7 @@ const dictionary = {
 		forecastScenarioLoaded: "A kiválasztott terv(ek) betöltve.",
 		forecastScenarioSelectRequired: "Válassz ki legalább egy mentett tervet.",
 		forecastRowSaved: "A sor elmentve a tervhez.",
+		forecastRowDone: "Kész",
 		deleteAccountNeedsSecondClick: "Kattints újra 7 másodpercen belül a fiók törléséhez.",
 		registerTitle: "Regisztráció",
 		loginTitle: "Bejelentkezés",
@@ -213,6 +214,7 @@ const dictionary = {
 		forecastScenarioLoaded: "Selected plan(s) loaded.",
 		forecastScenarioSelectRequired: "Select at least one saved plan.",
 		forecastRowSaved: "Row saved to plan.",
+		forecastRowDone: "Done",
 		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete the account.",
 		registerTitle: "Register",
 		loginTitle: "Sign in",
@@ -349,6 +351,9 @@ const forecastBaseUntilEl = document.getElementById("forecast-base-until");
 const forecastWithPurchaseEl = document.getElementById("forecast-with-purchase");
 const forecastDifferenceEl = document.getElementById("forecast-difference");
 const forecastMonthEndEl = document.getElementById("forecast-month-end");
+const scenarioDropdownToggle = document.getElementById("scenario-dropdown-toggle");
+const scenarioSelectedNameEl = document.getElementById("scenario-selected-name");
+const scenarioSelector = document.getElementById("scenario-selector");
 let deferredInstallPrompt = null;
 let forecastScenarios = [];
 let activeForecastScenarioId = "";
@@ -395,6 +400,15 @@ addWhatIfRowButton.addEventListener("click", () => {
 if (forecastLoadScenarioButton) {
 	forecastLoadScenarioButton.addEventListener("click", loadSelectedForecastScenarios);
 }
+if (scenarioDropdownToggle && forecastScenarioList) {
+	scenarioDropdownToggle.addEventListener("click", (event) => {
+		event.stopPropagation();
+		const isNowHidden = forecastScenarioList.classList.toggle("hidden");
+		const nowOpen = !isNowHidden;
+		scenarioDropdownToggle.setAttribute("aria-expanded", String(nowOpen));
+		scenarioSelector?.classList.toggle("is-open", nowOpen);
+	});
+}
 whatIfRowsContainer.addEventListener("input", renderForecastPlanner);
 whatIfRowsContainer.addEventListener("change", renderForecastPlanner);
 whatIfRowsContainer.addEventListener("click", (event) => {
@@ -436,6 +450,29 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 
 	if (action === "save-whatif") {
 		saveWhatIfRow(rowElement);
+	}
+
+	if (action === "edit-whatif") {
+		rowElement.classList.add("edit-mode");
+		rowElement.innerHTML = buildWhatIfRowEditHTML(rowElement);
+		const typeSelect = rowElement.querySelector(".forecast-whatif-type");
+		if (typeSelect) {
+			typeSelect.value = rowElement.dataset.type || "expense";
+		}
+	}
+
+	if (action === "confirm-edit") {
+		const type = rowElement.querySelector(".forecast-whatif-type")?.value || "expense";
+		const amount = rowElement.querySelector(".forecast-whatif-amount")?.value || "";
+		const date = rowElement.querySelector(".forecast-whatif-date")?.value || "";
+		const note = String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
+		rowElement.dataset.type = type;
+		rowElement.dataset.amount = amount;
+		rowElement.dataset.date = date;
+		rowElement.dataset.note = note;
+		rowElement.classList.remove("edit-mode");
+		rowElement.innerHTML = buildWhatIfRowDisplayHTML(rowElement);
+		renderForecastPlanner();
 	}
 });
 if (menuBackButton) {
@@ -519,14 +556,24 @@ document.addEventListener("click", (event) => {
 		menuToggle.classList.remove("is-open");
 		menuToggle.setAttribute("aria-expanded", "false");
 	}
+	if (!event.target.closest("#scenario-selector")) {
+		forecastScenarioList?.classList.add("hidden");
+		scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
+		scenarioSelector?.classList.remove("is-open");
+	}
 });
 
 document.addEventListener("keydown", (event) => {
-	if (event.key === "Escape" && menuPanel.classList.contains("is-open")) {
-		menuPanel.classList.remove("is-open");
-		menuToggle.classList.remove("is-open");
-		menuToggle.setAttribute("aria-expanded", "false");
-		menuToggle.focus();
+	if (event.key === "Escape") {
+		if (menuPanel.classList.contains("is-open")) {
+			menuPanel.classList.remove("is-open");
+			menuToggle.classList.remove("is-open");
+			menuToggle.setAttribute("aria-expanded", "false");
+			menuToggle.focus();
+		}
+		forecastScenarioList?.classList.add("hidden");
+		scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
+		scenarioSelector?.classList.remove("is-open");
 	}
 });
 
@@ -702,9 +749,12 @@ function renderScenarioList() {
 	if (!forecastScenarioList) {
 		return;
 	}
-	const selectedIds = new Set(
-		Array.from(forecastScenarioList.querySelectorAll(".forecast-scenario-checkbox:checked")).map((checkbox) => checkbox.value)
-	);
+
+	if (scenarioSelectedNameEl) {
+		const active = forecastScenarios.find((s) => s.id === activeForecastScenarioId);
+		const last = forecastScenarios[forecastScenarios.length - 1];
+		scenarioSelectedNameEl.textContent = (active || last)?.name || t("forecastScenarioNone");
+	}
 
 	forecastScenarioList.innerHTML = "";
 	if (!forecastScenarios.length) {
@@ -716,28 +766,44 @@ function renderScenarioList() {
 	}
 
 	forecastScenarios.forEach((scenario) => {
-		const row = document.createElement("label");
-		row.className = "forecast-scenario-item";
-		row.innerHTML = `
-			<input type="checkbox" class="forecast-scenario-checkbox" value="${scenario.id}">
-			<span>${scenario.name}</span>
-		`;
-		const checkbox = row.querySelector(".forecast-scenario-checkbox");
-		if (checkbox && (selectedIds.has(scenario.id) || scenario.id === activeForecastScenarioId)) {
-			checkbox.checked = true;
+		const item = document.createElement("button");
+		item.type = "button";
+		item.className = "scenario-dropdown-item";
+		if (scenario.id === activeForecastScenarioId) {
+			item.classList.add("is-selected");
 		}
-		forecastScenarioList.appendChild(row);
+		item.dataset.scenarioId = scenario.id;
+		item.textContent = scenario.name;
+		item.addEventListener("click", () => {
+			activeForecastScenarioId = scenario.id;
+			loadSpecificScenario(scenario);
+			forecastScenarioList.classList.add("hidden");
+			scenarioDropdownToggle?.setAttribute("aria-expanded", "false");
+			scenarioSelector?.classList.remove("is-open");
+			renderScenarioList();
+			showMessage(t("forecastScenarioLoaded"), false);
+		});
+		forecastScenarioList.appendChild(item);
 	});
 }
 
 function getWhatIfRowsForScenario() {
-	return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => ({
-		rowId: row.dataset.rowId || shared.createEntryId(),
-		type: row.querySelector(".forecast-whatif-type")?.value || "expense",
-		amount: Number(row.querySelector(".forecast-whatif-amount")?.value || 0),
-		date: row.querySelector(".forecast-whatif-date")?.value || "",
-		note: String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80)
-	})).filter((row) => row.amount > 0 || row.date || row.note);
+	return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => {
+		const rowId = row.dataset.rowId || shared.createEntryId();
+		let type, amount, date, note;
+		if (row.classList.contains("edit-mode")) {
+			type = row.querySelector(".forecast-whatif-type")?.value || "expense";
+			amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
+			date = row.querySelector(".forecast-whatif-date")?.value || "";
+			note = String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
+		} else {
+			type = row.dataset.type || "expense";
+			amount = Number(row.dataset.amount || 0);
+			date = row.dataset.date || "";
+			note = row.dataset.note || "";
+		}
+		return { rowId, type, amount, date, note };
+	}).filter((row) => row.amount > 0 || row.date || row.note);
 }
 
 function ensureActiveScenario(scenarioName) {
@@ -770,45 +836,32 @@ function ensureActiveScenario(scenarioName) {
 }
 
 function loadSelectedForecastScenarios() {
-	const selectedIds = Array.from(forecastScenarioList?.querySelectorAll(".forecast-scenario-checkbox:checked") || [])
-		.map((checkbox) => checkbox.value);
-
-	if (!selectedIds.length) {
+	if (!activeForecastScenarioId) {
 		showMessage(t("forecastScenarioSelectRequired"), true);
 		return;
 	}
-
-	const selectedScenarios = forecastScenarios.filter((scenario) => selectedIds.includes(scenario.id));
-	if (!selectedScenarios.length) {
+	const scenario = forecastScenarios.find((s) => s.id === activeForecastScenarioId);
+	if (!scenario) {
 		showMessage(t("forecastScenarioSelectRequired"), true);
 		return;
 	}
+	loadSpecificScenario(scenario);
+	showMessage(t("forecastScenarioLoaded"), false);
+}
 
+function loadSpecificScenario(scenario) {
 	whatIfRowsContainer.innerHTML = "";
-	selectedScenarios.forEach((scenario) => {
-		normalizeScenarioRows(scenario.rows).forEach((row) => {
-			appendWhatIfRow(row);
-		});
+	normalizeScenarioRows(scenario.rows).forEach((row) => {
+		appendWhatIfRow(row);
 	});
-
 	if (!whatIfRowsContainer.children.length) {
 		appendWhatIfRow({ type: "expense", amount: "", date: periodEndInput?.value || shared.toDateInput(today), note: "", rowId: shared.createEntryId() });
 	}
-
-	if (selectedScenarios.length === 1) {
-		activeForecastScenarioId = selectedScenarios[0].id;
-		if (forecastScenarioNameInput) {
-			forecastScenarioNameInput.value = selectedScenarios[0].name;
-		}
-	} else {
-		activeForecastScenarioId = "";
-		if (forecastScenarioNameInput) {
-			forecastScenarioNameInput.value = "";
-		}
+	activeForecastScenarioId = scenario.id;
+	if (forecastScenarioNameInput) {
+		forecastScenarioNameInput.value = scenario.name;
 	}
-
 	renderForecastPlanner();
-	showMessage(t("forecastScenarioLoaded"), false);
 }
 
 function saveWhatIfRow(rowElement) {
@@ -818,14 +871,23 @@ function saveWhatIfRow(rowElement) {
 		return;
 	}
 
-	const rowData = {
-		rowId: rowElement.dataset.rowId || shared.createEntryId(),
-		type: rowElement.querySelector(".forecast-whatif-type")?.value || "expense",
-		amount: Number(rowElement.querySelector(".forecast-whatif-amount")?.value || 0),
-		date: rowElement.querySelector(".forecast-whatif-date")?.value || "",
-		note: String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80)
-	};
-	rowElement.dataset.rowId = rowData.rowId;
+	const isEdit = rowElement.classList.contains("edit-mode");
+	const rowId = rowElement.dataset.rowId || shared.createEntryId();
+	rowElement.dataset.rowId = rowId;
+
+	const type = isEdit ? (rowElement.querySelector(".forecast-whatif-type")?.value || "expense") : (rowElement.dataset.type || "expense");
+	const amount = isEdit ? Number(rowElement.querySelector(".forecast-whatif-amount")?.value || 0) : Number(rowElement.dataset.amount || 0);
+	const date = isEdit ? (rowElement.querySelector(".forecast-whatif-date")?.value || "") : (rowElement.dataset.date || "");
+	const note = isEdit ? String(rowElement.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80) : (rowElement.dataset.note || "");
+
+	if (isEdit) {
+		rowElement.dataset.type = type;
+		rowElement.dataset.amount = String(amount);
+		rowElement.dataset.date = date;
+		rowElement.dataset.note = note;
+	}
+
+	const rowData = { rowId, type, amount, date, note };
 
 	if (!(rowData.amount > 0 && rowData.date)) {
 		showMessage(t("forecastScenarioEmpty"), true);
@@ -845,9 +907,6 @@ function saveWhatIfRow(rowElement) {
 	scenario.targetDate = periodEndInput?.value || scenario.targetDate;
 	saveForecastScenarios();
 	renderScenarioList();
-	if (forecastScenarioNameInput) {
-		forecastScenarioNameInput.value = "";
-	}
 }
 
 function updateMenuSessionLabel() {
@@ -908,42 +967,25 @@ function setDefaultWhatIfRows() {
 
 function appendWhatIfRow(row, prepend = false) {
 	const wrapper = document.createElement("div");
-	wrapper.className = "grid forecast-grid whatif-row";
+	wrapper.className = "whatif-row";
 	wrapper.dataset.rowId = String(row.rowId || shared.createEntryId());
-	wrapper.innerHTML = `
-		<div>
-			<label>${t("forecastRowTypeLabel")}</label>
-			<select class="forecast-whatif-type">
-				<option value="expense">${t("forecastTypeExpense")}</option>
-				<option value="income">${t("forecastTypeIncome")}</option>
-			</select>
-		</div>
-		<div>
-			<label>${t("forecastRowAmountLabel")}</label>
-			<input type="number" class="forecast-whatif-amount" min="0" step="1" value="${row.amount ?? ""}">
-		</div>
-		<div>
-			<label>${t("forecastRowDateLabel")}</label>
-			<input type="date" class="forecast-whatif-date" value="${row.date || ""}">
-		</div>
-		<div>
-			<label>${t("forecastRowNoteLabel")}</label>
-			<input type="text" class="forecast-whatif-note" maxlength="80" placeholder="${t("forecastRowNotePlaceholder")}">
-		</div>
-		<div class="control-action">
-			<button type="button" class="secondary" data-action="remove-whatif">${t("forecastRemoveRow")}</button>
-		</div>
-		<div class="control-action">
-			<button type="button" class="btn btn-outline-info" data-action="save-whatif">${t("forecastSaveRow")}</button>
-		</div>
-	`;
+	wrapper.dataset.type = row.type || "expense";
+	wrapper.dataset.amount = String(row.amount ?? "");
+	wrapper.dataset.date = row.date || "";
+	wrapper.dataset.note = String(row.note || "").slice(0, 80);
 
-	const typeSelect = wrapper.querySelector(".forecast-whatif-type");
-	typeSelect.value = row.type || "expense";
-	const noteInput = wrapper.querySelector(".forecast-whatif-note");
-	if (noteInput) {
-		noteInput.value = String(row.note || "").slice(0, 80);
+	const hasData = Number(row.amount) > 0 || Boolean(row.date);
+	if (hasData) {
+		wrapper.innerHTML = buildWhatIfRowDisplayHTML(wrapper);
+	} else {
+		wrapper.classList.add("edit-mode");
+		wrapper.innerHTML = buildWhatIfRowEditHTML(wrapper);
+		const typeSelect = wrapper.querySelector(".forecast-whatif-type");
+		if (typeSelect) {
+			typeSelect.value = wrapper.dataset.type;
+		}
 	}
+
 	if (prepend) {
 		whatIfRowsContainer.insertBefore(wrapper, whatIfRowsContainer.firstChild);
 	} else {
@@ -951,62 +993,97 @@ function appendWhatIfRow(row, prepend = false) {
 	}
 }
 
+function buildWhatIfRowDisplayHTML(wrapper) {
+	const type = wrapper.dataset.type || "expense";
+	const amount = Number(wrapper.dataset.amount || 0);
+	const date = wrapper.dataset.date || "";
+	const note = wrapper.dataset.note || "";
+	const typeLabel = type === "income" ? t("forecastTypeIncome") : t("forecastTypeExpense");
+	const displayAmount = amount > 0 ? formatCurrency(amount) : "–";
+	const displayDate = date ? formatDisplayDate(date) : "–";
+	return `
+		<div class="whatif-row-display">
+			<span class="whatif-type-tag ${type}">${typeLabel}</span>
+			<span class="whatif-amount">${displayAmount}</span>
+			<span class="whatif-date">${displayDate}</span>
+			${note ? `<span class="whatif-note">${note}</span>` : ""}
+		</div>
+		<div class="whatif-row-actions">
+			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
+			<button type="button" class="icon-btn confirm-edit" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
+			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
+		</div>
+	`;
+}
+
+function buildWhatIfRowEditHTML(wrapper) {
+	const amount = wrapper.dataset.amount || "";
+	const date = wrapper.dataset.date || "";
+	const note = wrapper.dataset.note || "";
+	return `
+		<div class="whatif-row-fields">
+			<div class="whatif-field">
+				<label>${t("forecastRowTypeLabel")}</label>
+				<select class="forecast-whatif-type">
+					<option value="expense">${t("forecastTypeExpense")}</option>
+					<option value="income">${t("forecastTypeIncome")}</option>
+				</select>
+			</div>
+			<div class="whatif-field">
+				<label>${t("forecastRowAmountLabel")}</label>
+				<input type="number" class="forecast-whatif-amount" min="0" step="1" value="${amount}">
+			</div>
+			<div class="whatif-field">
+				<label>${t("forecastRowDateLabel")}</label>
+				<input type="date" class="forecast-whatif-date" value="${date}">
+			</div>
+			<div class="whatif-field">
+				<label>${t("forecastRowNoteLabel")}</label>
+				<input type="text" class="forecast-whatif-note" maxlength="80" placeholder="${t("forecastRowNotePlaceholder")}" value="${note}">
+			</div>
+		</div>
+		<div class="whatif-row-actions">
+			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">✓</button>
+			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveRow")}">✖</button>
+		</div>
+	`;
+}
+
 function refreshWhatIfRowLabels() {
 	whatIfRowsContainer.querySelectorAll(".whatif-row").forEach((row) => {
-		const labels = row.querySelectorAll("label");
-		if (labels[0]) {
-			labels[0].textContent = t("forecastRowTypeLabel");
-		}
-		if (labels[1]) {
-			labels[1].textContent = t("forecastRowAmountLabel");
-		}
-		if (labels[2]) {
-			labels[2].textContent = t("forecastRowDateLabel");
-		}
-		if (labels[3]) {
-			labels[3].textContent = t("forecastRowNoteLabel");
-		}
-
-		const typeSelect = row.querySelector(".forecast-whatif-type");
-		const currentType = typeSelect ? typeSelect.value : "expense";
-		if (typeSelect) {
-			typeSelect.innerHTML = `
-				<option value="expense">${t("forecastTypeExpense")}</option>
-				<option value="income">${t("forecastTypeIncome")}</option>
-			`;
-			typeSelect.value = currentType;
-		}
-
-		const removeButton = row.querySelector("button[data-action='remove-whatif']");
-		if (removeButton) {
-			removeButton.textContent = t("forecastRemoveRow");
-		}
-
-		const saveButton = row.querySelector("button[data-action='save-whatif']");
-		if (saveButton) {
-			saveButton.textContent = t("forecastSaveRow");
-		}
-
-		const noteInput = row.querySelector(".forecast-whatif-note");
-		if (noteInput) {
-			noteInput.setAttribute("placeholder", t("forecastRowNotePlaceholder"));
+		if (row.classList.contains("edit-mode")) {
+			const type = row.querySelector(".forecast-whatif-type")?.value;
+			const amount = row.querySelector(".forecast-whatif-amount")?.value;
+			const date = row.querySelector(".forecast-whatif-date")?.value;
+			const note = row.querySelector(".forecast-whatif-note")?.value;
+			if (type !== undefined) row.dataset.type = type;
+			if (amount !== undefined) row.dataset.amount = amount;
+			if (date !== undefined) row.dataset.date = date;
+			if (note !== undefined) row.dataset.note = note;
+			row.innerHTML = buildWhatIfRowEditHTML(row);
+			const typeSelect = row.querySelector(".forecast-whatif-type");
+			if (typeSelect) typeSelect.value = row.dataset.type || "expense";
+		} else {
+			row.innerHTML = buildWhatIfRowDisplayHTML(row);
 		}
 	});
 }
 
 function collectWhatIfRows(periodStart, periodEnd) {
 	return Array.from(whatIfRowsContainer.querySelectorAll(".whatif-row")).map((row) => {
-		const type = row.querySelector(".forecast-whatif-type")?.value || "expense";
-		const amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
-		const date = row.querySelector(".forecast-whatif-date")?.value || "";
-		const note = String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
-		return {
-			type,
-			amount,
-			date,
-			note,
-			valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd
-		};
+		let type, amount, date, note;
+		if (row.classList.contains("edit-mode")) {
+			type = row.querySelector(".forecast-whatif-type")?.value || "expense";
+			amount = Number(row.querySelector(".forecast-whatif-amount")?.value || 0);
+			date = row.querySelector(".forecast-whatif-date")?.value || "";
+			note = String(row.querySelector(".forecast-whatif-note")?.value || "").trim().slice(0, 80);
+		} else {
+			type = row.dataset.type || "expense";
+			amount = Number(row.dataset.amount || 0);
+			date = row.dataset.date || "";
+			note = row.dataset.note || "";
+		}
+		return { type, amount, date, note, valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd };
 	});
 }
 

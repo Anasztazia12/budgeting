@@ -181,21 +181,22 @@
 			<section id="forecast-planner" class="card">
 				<h2 data-i18n="forecastTitle">Költségvetési előrejelző</h2>
 				<p id="auth-message" class="auth-message hidden" aria-live="polite"></p>
-				<div class="grid forecast-scenario-grid">
-					<div>
-						<label data-i18n="forecastScenarioSavedLabel">Mentett tervek</label>
-						<div id="forecast-scenario-list" class="forecast-scenario-list" role="group" aria-label="Saved plans"></div>
+				<div class="forecast-top-bar">
+					<div class="scenario-selector" id="scenario-selector">
+						<button type="button" id="scenario-dropdown-toggle" class="scenario-selector-btn" aria-expanded="false" aria-haspopup="listbox">
+							<span id="scenario-selected-name">–</span>
+							<span class="scenario-dropdown-arrow" aria-hidden="true">▾</span>
+						</button>
+						<div id="forecast-scenario-list" class="scenario-dropdown-list hidden" role="listbox" aria-label="Saved plans"></div>
 					</div>
-					<div>
-						<label for="forecast-scenario-name" data-i18n="forecastScenarioNameLabel">Terv neve</label>
-						<input type="text" id="forecast-scenario-name" maxlength="50" data-i18n-placeholder="forecastScenarioNamePlaceholder" placeholder="Pl. Nyári terv">
-					</div>
-					<div class="control-action forecast-scenario-actions">
-						<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
-						<button id="forecast-load-scenario" type="button" class="secondary" data-i18n="forecastLoadButton">Betöltés</button>
-					</div>
+					<button id="forecast-load-scenario" type="button" class="secondary" data-i18n="forecastLoadButton">Betöltés</button>
+					<button id="add-whatif-row" type="button" class="secondary" data-i18n="forecastAddRowButton">+ Extra, váratlan tétel hozzáadása</button>
 				</div>
-				<div id="whatif-rows" class="stack forecast-rows"></div>
+				<div class="forecast-plan-name-bar">
+					<label for="forecast-scenario-name" data-i18n="forecastScenarioNameLabel">Terv neve</label>
+					<input type="text" id="forecast-scenario-name" maxlength="50" data-i18n-placeholder="forecastScenarioNamePlaceholder" placeholder="Pl. Nyári terv">
+				</div>
+				<div id="whatif-rows" class="forecast-rows"></div>
 				<div class="forecast-results">
 					<p><strong data-i18n="forecastBaseUntilLabel">Egyenleg eddig a dátumig:</strong> <span id="forecast-base-until">0</span></p>
 					<p><strong data-i18n="forecastWithPurchaseLabel">Egyenleg a tervezett tételekkel:</strong> <span id="forecast-with-purchase">0</span></p>
