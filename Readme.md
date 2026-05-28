@@ -391,6 +391,16 @@ These fixes were applied to pass the W3C HTML validator without errors or warnin
 - Kept `<section id="diagramm">` and `<section class="card">` (both have `<h2>` inside)
 - Removed `required` from `<select id="edit-entry-category">` (select is empty, populated by JS)
 
+### budget-forecast.html
+
+- Changed `<section class="card controls">` → `<div>` (no heading inside)
+- Changed `<section id="budget-content">` → `<div>` (no heading inside)
+
+### managing-debt.html
+
+- Changed `<section class="card controls debt-controls">` → `<div>` (no heading inside)
+- Changed `<section class="grid budget-stat-pair">` → `<div>` (no heading inside)
+
 ## Known limitations
 
 - no full automated test suite yet
