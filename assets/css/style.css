@@ -986,8 +986,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.budget-controls .period-range-inputs .small-date-input { width: 7.8rem; max-width: min(42vw,7.8rem); }
 	.budget-controls > div.currency-control select { width: fit-content; inline-size: auto; max-width: min(100%,96px); justify-self: start; }
 	.budget-controls .control-action { grid-column: 1 / -1; }
-	.budget-controls .control-action .stack { gap: 0.35rem; flex-wrap: wrap; }
-	.budget-controls .control-action .stack > button { flex: 1 1 auto; font-size: 0.85rem; padding: 0.44rem 0.5rem; }
+	.budget-controls .control-action .stack { gap: 0.3rem; flex-wrap: nowrap; }
+	.budget-controls .control-action .stack > button { flex: 1 1 0; min-width: 0; font-size: 0.75rem; padding: 0.38rem 0.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 	input[type="date"], input[type="month"] { width: 80%; max-width: 80%; min-width: 0; }
 	.budget-columns .stack input[type="date"],
