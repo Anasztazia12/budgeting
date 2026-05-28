@@ -613,7 +613,7 @@ function paintList() {
 			</div>
 			<div class="row-actions row-actions-icons">
 				<button type="button" class="inline-icon-button" title="${t("editAction")}" aria-label="${t("editAction")}" data-action="edit" data-id="${debt.id}">✎</button>
-				<button type="button" class="inline-icon-button danger" title="${t("deleteAction")}" aria-label="${t("deleteAction")}" data-action="delete" data-id="${debt.id}">✖</button>
+				<button type="button" class="inline-icon-button danger" title="${t("deleteAction")}" aria-label="${t("deleteAction")}" data-action="delete" data-id="${debt.id}">🗑</button>
 			</div>
 		`;
 		debtList.appendChild(li);
