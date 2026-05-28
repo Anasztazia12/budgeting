@@ -333,9 +333,7 @@ if (chartTypeSelect) {
 }
 
 forecastToggleButton.addEventListener("click", () => {
-	const periodStart = periodStartInput?.value || shared.toDateInput(today);
-	const monthParam = encodeURIComponent(periodStart.slice(0, 7));
-	window.location.href = `budget-forecast.html?month=${monthParam}`;
+	window.location.href = "budget-forecast.html";
 });
 
 if (summaryToggleButton) {

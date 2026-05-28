@@ -247,8 +247,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 	if (forecastToggleButton) {
 		forecastToggleButton.addEventListener("click", () => {
-			const start = periodStartInput?.value || shared.toDateInput(today);
-			window.location.href = `budget-forecast.html?month=${encodeURIComponent(start.slice(0, 7))}`;
+			window.location.href = "budget-forecast.html";
 		});
 	}
 	if (summaryToggleButton) {

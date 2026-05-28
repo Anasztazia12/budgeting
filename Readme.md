@@ -361,6 +361,36 @@ Currently I test mostly manually.
 - mobile layout is usable
 - PWA install button gives meaningful response
 
+## HTML validation fixes
+
+These fixes were applied to pass the W3C HTML validator without errors or warnings.
+
+### index.html
+
+- Changed `<section id="auth-actions">` → `<div>` (no heading inside)
+- Changed `<section class="card session-card">` → `<div>` (no heading inside)
+- Changed `<section id="auth-options">` → `<div>` (no heading inside)
+
+### budget.html
+
+- Changed `<section class="card controls">` → `<div>` (no heading inside)
+- Changed `<section id="budget-content">` → `<div>` (no heading inside)
+- Changed 2× `<section class="grid budget-stat-pair">` → `<div>` (no heading inside)
+- Changed `<section class="grid summary-grid">` → `<div>` (no heading inside)
+- Kept `<section id="chart-section">` (has `<h2>` inside)
+- Removed `required` from `<select id="income-category">` and `<select id="expense-category">` (first option has content, not empty placeholder)
+- Added `role="group"` to both `.entry-filters` `<div>` elements that use `aria-label`
+
+### summary.html
+
+- Changed `<section class="card controls">` → `<div>` (no heading inside)
+- Changed `<section id="locked-message">` → `<div>` (no heading inside)
+- Changed `<section id="summary-content">` → `<div>` (no heading inside)
+- Changed `<section class="grid stats-grid">` → `<div>` (no heading inside)
+- Changed `<section class="grid summary-grid">` → `<div>` (no heading inside)
+- Kept `<section id="diagramm">` and `<section class="card">` (both have `<h2>` inside)
+- Removed `required` from `<select id="edit-entry-category">` (select is empty, populated by JS)
+
 ## Known limitations
 
 - no full automated test suite yet

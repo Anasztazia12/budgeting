@@ -92,7 +92,7 @@ választó</label>
 		</div>
 		<div id="locked-message" class="card">
 			<p data-i18n="loginRequired">Az összesítéshez jelentkezz be a Költségvetés oldalon.</p>
-		</section>
+		</div>
 
 		<section id="diagramm" class="card hidden">
 			<div class="chart-header">
@@ -113,8 +113,8 @@ választó</label>
 			</div>
 		</section>
 
-<section id="summary-content" class="hidden">
-			<section class="grid stats-grid">
+<div id="summary-content" class="hidden">
+			<div class="grid stats-grid">
 				<article class="card stat">
 					<h3 data-i18n="monthlyIncomeTitle">Bevétel</h3>
 					<p id="monthly-income">0</p>
@@ -134,11 +134,11 @@ választó</label>
 					<h3 data-i18n="spentToDateTitle">Mai napig kiadás</h3>
 					<p id="spent-to-date">0</p>
 				</article>
-			</section>
+			</div>
 
 			<p id="entry-status-message" class="auth-message hidden" aria-live="polite"></p>
 
-			<section class="grid summary-grid">
+			<div class="grid summary-grid">
 				<article class="card">
 					<h2 data-i18n="incomeEntriesTitle">Bevételek ebben az időszakban</h2>
 					<ul id="income-list" class="entry-list action-list"></ul>
@@ -148,13 +148,13 @@ választó</label>
 					<h2 data-i18n="expenseEntriesTitle">Kiadások ebben az időszakban</h2>
 					<ul id="expense-list" class="entry-list action-list"></ul>
 				</article>
-			</section>
+			</div>
 
 			<section class="card">
 				<h2 data-i18n="projectionTitle">Időszakvégi becslés</h2>
 				<p id="projection-text">Nincs adat</p>
 			</section>
-		</section>
+		</div>
 	</main>
 
 	<div id="delete-scope-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="delete-scope-title">
@@ -177,7 +177,7 @@ választó</label>
 				<input type="hidden" id="edit-entry-type">
 
 				<label for="edit-entry-category" data-i18n="categoryLabel">Kategória</label>
-				<select id="edit-entry-category" required></select>
+				<select id="edit-entry-category"></select>
 
 				<label for="edit-entry-amount" data-i18n="amountLabel">Összeg</label>
 				<input type="number" id="edit-entry-amount" min="0.01" step="0.01" inputmode="decimal" required>
