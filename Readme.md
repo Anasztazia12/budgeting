@@ -64,7 +64,8 @@ Based on these extra planned items, the app recalculates expected results for th
 
 - HTML, CSS, Vanilla JS
 - Firebase Auth
-- Firestore
+- Firestore (backend / database)
+- Web3Forms (contact form submission)
 - localStorage / sessionStorage
 - Service Worker + manifest (PWA)
 - local run with Node server

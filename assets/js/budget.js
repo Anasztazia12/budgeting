@@ -101,6 +101,10 @@ const dictionary = {
 		chartTypeBar: "Oszlopdiagram",
 		categories: {
 			fizetes: "Fizetés",
+			"child benefit": "Child Benefit",
+			"universal credit": "Universal Credit",
+			"jobseeker allowance": "Jobseeker's Allowance",
+			"maternity allowance": "Maternity Allowance",
 			egyeb: "Egyéb",
 			szamlak: "Számlák",
 			viz: "Víz",
@@ -211,6 +215,10 @@ const dictionary = {
 		chartTypeBar: "Bar chart",
 		categories: {
 			fizetes: "Salary",
+			"child benefit": "Child Benefit",
+			"universal credit": "Universal Credit",
+			"jobseeker allowance": "Jobseeker's Allowance",
+			"maternity allowance": "Maternity Allowance",
 			egyeb: "Other",
 			szamlak: "Bills",
 			viz: "Water",
