@@ -51,6 +51,11 @@ const dictionary = {
 		debtTotalAmountLabel: "Teljes összeg",
 		debtPaidAmountLabel: "Már kifizetett",
 		debtMonthlyPaymentLabel: "Havi törlesztő",
+		debtPaymentDateLabel: "Törlesztés dátuma",
+		debtRemainingAmountLabel: "Fennmaradó összeg",
+		debtEarlyPaymentDateLabel: "Tervezett előbbi kifizetés dátuma",
+		debtPlannedAmountLabel: "Tervezett összeg",
+		debtAddToForecastLabel: "Hozzáadás a költségvetési előrejelzőhöz",
 		debtStartDateLabel: "Kezdő dátum",
 		debtDueDateLabel: "Lejárat",
 		noteLabel: "Megjegyzés (opcionális)",
@@ -118,6 +123,11 @@ const dictionary = {
 		debtTotalAmountLabel: "Total amount",
 		debtPaidAmountLabel: "Amount already paid",
 		debtMonthlyPaymentLabel: "Monthly payment",
+		debtPaymentDateLabel: "Payment date",
+		debtRemainingAmountLabel: "Remaining amount",
+		debtEarlyPaymentDateLabel: "Planned early payment date",
+		debtPlannedAmountLabel: "Planned amount",
+		debtAddToForecastLabel: "Add to budget forecast",
 		debtStartDateLabel: "Start date",
 		debtDueDateLabel: "Due date",
 		noteLabel: "Note (optional)",
@@ -297,35 +307,53 @@ debtForm.addEventListener("submit", (event) => {
 	event.preventDefault();
 
 	const name = document.getElementById("debt-name").value.trim();
-	const totalAmount = parseFloat(document.getElementById("debt-total-amount").value) || 0;
-	const paidAmount = parseFloat(document.getElementById("debt-paid-amount").value) || 0;
 	const monthlyPayment = parseFloat(document.getElementById("debt-monthly-payment").value) || 0;
-	const startDate = document.getElementById("debt-start-date").value || "";
+	const paymentDate = document.getElementById("debt-payment-date").value || "";
+	const remainingAmount = parseFloat(document.getElementById("debt-remaining-amount").value) || 0;
 	const dueDate = document.getElementById("debt-due-date").value || "";
-	const note = document.getElementById("debt-note").value.trim();
+	const earlyPaymentDate = document.getElementById("debt-early-payment-date").value || "";
+	const plannedAmount = parseFloat(document.getElementById("debt-planned-amount").value) || 0;
+	const addToForecast = document.getElementById("debt-add-to-forecast").checked;
 	const editId = document.getElementById("debt-edit-id").value;
 
 	if (!name) { showMessage(t("invalidName"), true); return; }
-	if (totalAmount <= 0) { showMessage(t("invalidAmount"), true); return; }
-	if (paidAmount > totalAmount) { showMessage(t("paidExceedsTotal"), true); return; }
 
 	if (editId) {
 		const index = debts.findIndex((d) => d.id === editId);
 		if (index !== -1) {
-			debts[index] = { ...debts[index], name, totalAmount, paidAmount, monthlyPayment, startDate, dueDate, note };
+			const existing = debts[index];
+			let forecastScenarioId = existing.forecastScenarioId || null;
+
+			if (addToForecast) {
+				const debtData = { ...existing, name, monthlyPayment, paymentDate, remainingAmount, dueDate, earlyPaymentDate, plannedAmount, forecastScenarioId };
+				forecastScenarioId = addOrUpdateForecastScenario(debtData);
+			} else if (forecastScenarioId) {
+				removeForecastScenario(forecastScenarioId);
+				forecastScenarioId = null;
+			}
+
+			debts[index] = { ...existing, name, monthlyPayment, paymentDate, remainingAmount, dueDate, earlyPaymentDate, plannedAmount, addToForecast, forecastScenarioId };
 		}
 		showMessage(t("entryUpdated"), false);
 	} else {
-		debts.push({
+		const newDebt = {
 			id: shared.createEntryId(),
 			name,
-			totalAmount,
-			paidAmount,
 			monthlyPayment,
-			startDate,
+			paymentDate,
+			remainingAmount,
 			dueDate,
-			note
-		});
+			earlyPaymentDate,
+			plannedAmount,
+			addToForecast,
+			forecastScenarioId: null
+		};
+
+		if (addToForecast) {
+			newDebt.forecastScenarioId = addOrUpdateForecastScenario(newDebt);
+		}
+
+		debts.push(newDebt);
 		showMessage(t("entrySaved"), false);
 	}
 
@@ -438,7 +466,68 @@ function saveDebts() {
 	localStorage.setItem(key, JSON.stringify(debts));
 }
 
+function getForecastKey() {
+	return `budgetAppForecastScenarios:${currentUser || "guest"}`;
+}
+
+function loadForecastScenarios() {
+	try {
+		const raw = localStorage.getItem(getForecastKey());
+		const parsed = raw ? JSON.parse(raw) : [];
+		return Array.isArray(parsed) ? parsed : [];
+	} catch {
+		return [];
+	}
+}
+
+function saveForecastScenarios(scenarios) {
+	localStorage.setItem(getForecastKey(), JSON.stringify(scenarios));
+}
+
+function addOrUpdateForecastScenario(debt) {
+	const scenarios = loadForecastScenarios();
+	const existingIndex = debt.forecastScenarioId
+		? scenarios.findIndex((s) => s.id === debt.forecastScenarioId)
+		: -1;
+
+	const existingRowId = existingIndex >= 0 && scenarios[existingIndex].rows?.[0]?.rowId
+		? scenarios[existingIndex].rows[0].rowId
+		: shared.createEntryId();
+
+	const scenario = {
+		id: debt.forecastScenarioId || shared.createEntryId(),
+		name: debt.name,
+		targetDate: debt.dueDate || debt.earlyPaymentDate || "",
+		rows: [{
+			rowId: existingRowId,
+			type: "expense",
+			amount: debt.monthlyPayment || 0,
+			date: debt.paymentDate || "",
+			note: ""
+		}]
+	};
+
+	if (existingIndex >= 0) {
+		scenarios[existingIndex] = scenario;
+	} else {
+		scenarios.push(scenario);
+	}
+
+	saveForecastScenarios(scenarios);
+	return scenario.id;
+}
+
+function removeForecastScenario(scenarioId) {
+	if (!scenarioId) return;
+	const scenarios = loadForecastScenarios();
+	saveForecastScenarios(scenarios.filter((s) => s.id !== scenarioId));
+}
+
 function deleteDebt(id) {
+	const debt = debts.find((d) => d.id === id);
+	if (debt?.forecastScenarioId) {
+		removeForecastScenario(debt.forecastScenarioId);
+	}
 	debts = debts.filter((d) => d.id !== id);
 	saveDebts();
 	showMessage(t("entryDeleted"), false);
@@ -449,12 +538,13 @@ function deleteDebt(id) {
 function populateFormForEdit(debt) {
 	document.getElementById("debt-edit-id").value = debt.id;
 	document.getElementById("debt-name").value = debt.name;
-	document.getElementById("debt-total-amount").value = debt.totalAmount;
-	document.getElementById("debt-paid-amount").value = debt.paidAmount || 0;
 	document.getElementById("debt-monthly-payment").value = debt.monthlyPayment || "";
-	document.getElementById("debt-start-date").value = debt.startDate || "";
+	document.getElementById("debt-payment-date").value = debt.paymentDate || "";
+	document.getElementById("debt-remaining-amount").value = debt.remainingAmount || "";
 	document.getElementById("debt-due-date").value = debt.dueDate || "";
-	document.getElementById("debt-note").value = debt.note || "";
+	document.getElementById("debt-early-payment-date").value = debt.earlyPaymentDate || "";
+	document.getElementById("debt-planned-amount").value = debt.plannedAmount || "";
+	document.getElementById("debt-add-to-forecast").checked = debt.addToForecast || false;
 
 	debtSubmitButton.textContent = t("updateDebtButton");
 	debtCancelButton.classList.remove("hidden");
@@ -466,7 +556,6 @@ function populateFormForEdit(debt) {
 function resetForm() {
 	debtForm.reset();
 	document.getElementById("debt-edit-id").value = "";
-	document.getElementById("debt-paid-amount").value = "0";
 	debtSubmitButton.textContent = t("saveDebtButton");
 	debtCancelButton.classList.add("hidden");
 	debtDeleteButton.classList.add("hidden");
@@ -474,14 +563,13 @@ function resetForm() {
 }
 
 function render() {
-	const totalDebt = debts.reduce((sum, d) => sum + d.totalAmount, 0);
-	const totalPaid = debts.reduce((sum, d) => sum + (d.paidAmount || 0), 0);
-	const totalRemaining = totalDebt - totalPaid;
+	const totalRemaining = debts.reduce((sum, d) => sum + (d.remainingAmount || 0), 0);
 	const totalMonthly = debts.reduce((sum, d) => sum + (d.monthlyPayment || 0), 0);
+	const totalPlanned = debts.reduce((sum, d) => sum + (d.plannedAmount || 0), 0);
 
-	document.getElementById("stat-total-debt").textContent = formatCurrency(totalDebt);
-	document.getElementById("stat-paid-debt").textContent = formatCurrency(totalPaid);
+	document.getElementById("stat-total-debt").textContent = formatCurrency(totalRemaining);
 	document.getElementById("stat-remaining-debt").textContent = formatCurrency(totalRemaining);
+	document.getElementById("stat-paid-debt").textContent = formatCurrency(totalPlanned);
 	document.getElementById("stat-monthly-total").textContent = formatCurrency(totalMonthly);
 
 	paintList();
@@ -501,32 +589,27 @@ function paintList() {
 	const sorted = [...debts].sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""));
 
 	sorted.forEach((debt) => {
-		const total = debt.totalAmount || 0;
-		const paid = debt.paidAmount || 0;
-		const remaining = total - paid;
-		const pct = total > 0 ? Math.min(100, Math.round((paid / total) * 100)) : 0;
-		const note = debt.note ? `<span class="debt-note">(${escapeHtml(debt.note)})</span>` : "";
 		const monthly = debt.monthlyPayment > 0 ? `<span>${t("monthlyLabel")}: <strong>${formatCurrency(debt.monthlyPayment)}</strong></span>` : "";
 		const dueText = debt.dueDate ? `<span>${t("dueDateLabel")}: <strong>${formatDisplayDate(debt.dueDate)}</strong></span>` : "";
+		const paymentDateText = debt.paymentDate ? `<span>${t("debtPaymentDateLabel")}: <strong>${formatDisplayDate(debt.paymentDate)}</strong></span>` : "";
+		const earlyText = debt.earlyPaymentDate ? `<span>${t("debtEarlyPaymentDateLabel")}: <strong>${formatDisplayDate(debt.earlyPaymentDate)}</strong></span>` : "";
+		const plannedText = debt.plannedAmount > 0 ? `<span>${t("debtPlannedAmountLabel")}: <strong>${formatCurrency(debt.plannedAmount)}</strong></span>` : "";
+		const forecastBadge = debt.addToForecast ? `<span class="debt-forecast-badge" title="${t("debtAddToForecastLabel")}">📋</span>` : "";
 
 		const li = document.createElement("li");
 		li.className = "debt-row";
 		li.innerHTML = `
 			<div class="debt-row-header">
 				<strong class="debt-name">${escapeHtml(debt.name)}</strong>
-				${note}
-			</div>
-			<div class="debt-progress-wrap">
-				<div class="debt-progress-bar" title="${pct}%">
-					<div class="debt-progress-fill" style="width:${pct}%"></div>
-				</div>
-				<span class="debt-progress-pct">${pct}%</span>
+				${forecastBadge}
 			</div>
 			<div class="debt-row-amounts">
-				<span>${t("paidLabel")}: <strong>${formatCurrency(paid)}</strong></span>
-				<span>${t("remainingLabel")}: <strong>${formatCurrency(remaining)}</strong></span>
+				<span>${t("remainingLabel")}: <strong>${formatCurrency(debt.remainingAmount || 0)}</strong></span>
 				${monthly}
+				${paymentDateText}
 				${dueText}
+				${earlyText}
+				${plannedText}
 			</div>
 			<div class="row-actions row-actions-icons">
 				<button type="button" class="inline-icon-button" title="${t("editAction")}" aria-label="${t("editAction")}" data-action="edit" data-id="${debt.id}">✎</button>

@@ -44,39 +44,25 @@
 					<div id="menu-panel" class="menu-panel">
 						<p id="menu-session-info" class="menu-session-info" aria-live="polite"></p>
 						<a href="index.html" data-i18n="homeLink">Kezdőlap</a>
-                        <a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
-						<a href="budget-forecast.html" data-i18n="forecastButton">Költségvetési előrejelző</a>
+						<a href="budget.html" data-i18n="budgetLink">Költségvetés</a>
+						<a href="budget-forecast.html" data-i18n="forecastButton">Előrejelző</a>
 						<a href="summary.html" data-i18n="summaryLink">Összesítés</a>
+						<a href="managing-debt.html" data-i18n="managingDebtLink">Adósságkezelő</a>
 						<button id="menu-back-button" type="button" data-i18n="backAction">Vissza</button>
 						<button id="install-app-button" type="button" data-i18n="downloadAppButton">App letöltése</button>
 						<button id="menu-logout-button" type="button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
 						<hr class="menu-divider">
 						<button type="button" class="btn btn-danger w-100 menu-danger-action" id="delete-account-button" data-i18n="deleteAccountButton">Regisztráció törlése</button>
-
 					</div>
 				</nav>
 			</div>
 			<h1 data-i18n="heroTitle">Adósságkezelő</h1>
-			<p data-i18n="heroText">Kezeld az adósságaidat és kövesd nyomon a törlesztéseket.</p>
+			<p data-i18n="heroText">Kezeld hatékonyan az adósságaidat és tervezd meg a visszafizetést.</p>
 		</header>
 
-		<section class="card controls compact-controls budget-controls">
-			<div class="period-control">
-				<label for="period-start" data-i18n="periodLabel">Választott időszak</label>
-				<div class="period-range-inputs">
-					<div class="period-range-item">
-						<label for="period-start" data-i18n="periodFromLabel">-tól</label>
-						<input type="date" id="period-start" class="small-date-input">
-					</div>
-					<div class="period-range-item">
-						<label for="period-end" data-i18n="periodToLabel">-ig</label>
-						<input type="date" id="period-end" class="small-date-input">
-					</div>
-				</div>
-			</div>
+		<section class="card controls compact-controls budget-controls debt-controls">
 			<div class="currency-control">
-				<label for="app-currency" data-i18n="currencyLabel">Pénznem
-választó</label>
+				<label for="app-currency" data-i18n="currencyLabel">Pénznem választó</label>
 				<select id="app-currency" data-i18n-aria-label="currencySelectorAria" aria-label="Pénznem választó">
 					<option value="HUF" data-i18n="currencyHuf">HUF (forint)</option>
 					<option value="GBP" data-i18n="currencyGbp">GBP (font)</option>
@@ -84,14 +70,56 @@ választó</label>
 					<option value="EUR" data-i18n="currencyEur">EUR (euró)</option>
 				</select>
 			</div>
-			<div class="control-action">
+						<div class="control-action">
 				<div class="stack">
 					<button id="summary-toggle-button" type="button" class="btn btn-primary" data-i18n="summaryLink">Összesítés</button>
 					<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Költségvetési előrejelző</button>
-					 <button id="managing-debt-toggle-button" type="button" class="btn btn-primary" data-i18n="managingDebtLink">Adósságkezelő</button>
+			<button id="forecast-toggle-button" type="button" data-i18n="forecastButton">Költségvetés</button>
 				</div>
 			</div>
 		</section>
+
+		<div id="debt-content" class="debt-layout">
+
+			<article class="card">
+				<h2 id="debt-form-title" data-i18n="debtFormTitle">Adósság hozzáadása</h2>
+				<form id="debt-form" class="stack">
+					<input type="hidden" id="debt-edit-id">
+
+					<label for="debt-name" data-i18n="debtNameLabel">Hitel neve</label>
+					<input type="text" id="debt-name" maxlength="100" required
+					       data-i18n-placeholder="debtNamePlaceholder" placeholder="pl. Autóhitel...">
+
+					<label for="debt-monthly-payment" data-i18n="debtMonthlyPaymentLabel">Havi törlesztő</label>
+					<input type="number" id="debt-monthly-payment" min="0" step="0.01" inputmode="decimal" required>
+
+					<label for="debt-payment-date" data-i18n="debtPaymentDateLabel">Törlesztés dátuma</label>
+					<input type="date" id="debt-payment-date" required>
+
+					<label for="debt-remaining-amount" data-i18n="debtRemainingAmountLabel">Fennmaradó összeg</label>
+					<input type="number" id="debt-remaining-amount" min="0" step="0.01" inputmode="decimal" required>
+
+					<label for="debt-due-date" data-i18n="debtDueDateLabel">Kifutás dátuma</label>
+					<input type="date" id="debt-due-date">
+
+					<label for="debt-early-payment-date" data-i18n="debtEarlyPaymentDateLabel">Tervezett előbbi kifizetés dátuma</label>
+					<input type="date" id="debt-early-payment-date">
+
+					<label for="debt-planned-amount" data-i18n="debtPlannedAmountLabel">Tervezett összeg</label>
+					<input type="number" id="debt-planned-amount" min="0" step="0.01" inputmode="decimal">
+
+					<label class="inline-check">
+						<input type="checkbox" id="debt-add-to-forecast">
+						<span data-i18n="debtAddToForecastLabel">Hozzáadás a költségvetési előrejelzőhöz</span>
+					</label>
+
+					<div class="form-actions">
+						<button type="submit" id="debt-submit-button" class="btn btn-outline-info" data-i18n="saveDebtButton">Adósság mentése</button>
+						<button type="button" id="debt-cancel-button" class="btn btn-outline-info hidden" data-i18n="cancelEditButton">Mégsem</button>
+						<button type="button" id="debt-delete-button" class="btn btn-danger hidden" data-i18n="deleteAction">Törlés</button>
+					</div>
+				</form>
+			</article>
 
 			<div class="debt-sidebar">
 				<section class="grid budget-stat-pair">
