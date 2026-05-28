@@ -409,6 +409,14 @@ These fixes were applied to pass the W3C HTML validator without errors or warnin
 
 ## Screenshots
 
+### Charts
+
+![pie chart 1](assets/images/pie-chart1.png)
+![pie chart 2](assets/images/pie-chart2.png)
+![bar chart](assets/images/bar-chart1.png)
+
+### App UI
+
 ![hungarian ui](assets/images/budgeting-app-hungarian.png)
 ![english ui](assets/images/budgeting-app-english.png)
 ![mobile view](assets/images/app-mobile-view.png)
