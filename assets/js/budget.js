@@ -8,6 +8,12 @@ import {
 } from "./firebase-service.js";
 
 const shared = window.BudgetAppShared;
+
+const CHART_PALETTE = [
+	"#3b82f6","#ef4444","#22c55e","#f59e0b","#8b5cf6",
+	"#ec4899","#14b8a6","#f97316","#06b6d4","#84cc16",
+	"#a78bfa","#fb923c","#34d399","#60a5fa","#f472b6"
+];
 const {
 	SESSION_KEY,
 	DISPLAY_NAME_KEY,
@@ -790,12 +796,6 @@ function paintList(target, entries, listType) {
 			target.appendChild(li);
 		});
 }
-
-const CHART_PALETTE = [
-	"#3b82f6","#ef4444","#22c55e","#f59e0b","#8b5cf6",
-	"#ec4899","#14b8a6","#f97316","#06b6d4","#84cc16",
-	"#a78bfa","#fb923c","#34d399","#60a5fa","#f472b6"
-];
 
 function renderChart(incomes, expenses) {
 	const section = document.getElementById("chart-section");
