@@ -229,8 +229,7 @@ currencySelect.addEventListener("change", () => {
 if (forecastToggleButton) forecastToggleButton.addEventListener("click", () => { window.location.href = "budget.html"; });
 if (summaryToggleButton) {
 	summaryToggleButton.addEventListener("click", () => {
-		const periodStart = periodStartInput?.value || shared.toDateInput(today);
-		window.location.href = `summary.html?month=${encodeURIComponent(periodStart.slice(0, 7))}`;
+		window.location.href = "summary.html";
 	});
 }
 const managingDebtToggleButton = document.getElementById("managing-debt-toggle-button");

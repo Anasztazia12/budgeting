@@ -60,7 +60,7 @@
 			<p data-i18n="heroText">Rögzítsd a várható bevételeket és kiadásokat dátum szerint.</p>
 		</header>
 
-		<section class="card controls compact-controls budget-controls">
+		<div class="card controls compact-controls budget-controls">
 			<div class="period-control">
 				<label for="period-start" data-i18n="periodLabel">Választott időszak</label>
 				<div class="period-range-inputs">
@@ -91,17 +91,17 @@ választó</label>
 					<button id="managing-debt-toggle-button" type="button" class="btn btn-primary" data-i18n="managingDebtLink">Adósságkezelő</button>
 				</div>
 			</div>
-		</section>
- 
-		<section id="budget-content">
-			<section class="grid budget-columns">
+		</div>
+
+		<div id="budget-content">
+			<div class="grid budget-columns">
 				<div class="budget-column">
 					<article class="card">
 						<h2 data-i18n="incomeFormTitle">Bevételek</h2>
 						<form id="income-form" class="stack">
 							<input type="hidden" id="income-edit-id">
 							<label for="income-category" data-i18n="categoryLabel">Kategória</label>
-							<select id="income-category" required>
+							<select id="income-category">
 								<option value="fizetes">Fizetés</option>
 								<option value="egyeb">Egyéb</option>
 							</select>
@@ -128,7 +128,7 @@ választó</label>
 						</form>
 					</article>
 
-					<section class="grid budget-stat-pair">
+					<div class="grid budget-stat-pair">
 						<article class="card stat">
 							<h3 data-i18n="monthlyIncomeTitle">Összes bevétel</h3>
 							<p id="monthly-income">0</p>
@@ -138,7 +138,7 @@ választó</label>
 							<h3 data-i18n="monthEndTitle">Várható bevétel</h3>
 							<p id="month-end-left">0</p>
 						</article>
-					</section>
+					</div>
 				</div>
 
 				<div class="budget-column">
@@ -147,7 +147,7 @@ választó</label>
 						<form id="expense-form" class="stack">
 							<input type="hidden" id="expense-edit-id">
 							<label for="expense-category" data-i18n="categoryLabel">Kategória</label>
-							<select id="expense-category" required>
+							<select id="expense-category">
 								<option value="auto">Autó</option>
 								<option value="aram">Áram</option>
 								<option value="benzin">Benzin</option>
@@ -194,7 +194,7 @@ választó</label>
 						</form>
 					</article>
 
-					<section class="grid budget-stat-pair">
+					<div class="grid budget-stat-pair">
 						<article class="card stat">
 							<h3 data-i18n="monthlyExpenseTitle">Összes kiadás</h3>
 							<p id="monthly-expense">0</p>
@@ -204,14 +204,14 @@ választó</label>
 							<h3 data-i18n="spentToDateTitle">Várható kiadás</h3>
 							<p id="spent-to-date">0</p>
 						</article>
-					</section>
+					</div>
 				</div>
-			</section>
+			</div>
 
-			<section class="grid summary-grid">
+			<div class="grid summary-grid">
 				<article class="card">
 					<h2 data-i18n="incomeEntriesTitle">Bevételek listája</h2>
-					<div class="entry-filters" data-i18n-aria-label="incomeFiltersAria" aria-label="Bevétel dátumszűrők">
+					<div class="entry-filters" role="group" data-i18n-aria-label="incomeFiltersAria" aria-label="Bevétel dátumszűrők">
 						<label for="income-filter-start" data-i18n="listFromDateLabel">Ettől</label>
 						<input type="date" id="income-filter-start">
 						<label for="income-filter-end" data-i18n="listToDateLabel">Eddig</label>
@@ -222,7 +222,7 @@ választó</label>
 
 				<article class="card">
 					<h2 data-i18n="expenseEntriesTitle">Kiadások listája</h2>
-					<div class="entry-filters" data-i18n-aria-label="expenseFiltersAria" aria-label="Kiadás dátumszűrők">
+					<div class="entry-filters" role="group" data-i18n-aria-label="expenseFiltersAria" aria-label="Kiadás dátumszűrők">
 						<label for="expense-filter-start" data-i18n="listFromDateLabel">Ettől</label>
 						<input type="date" id="expense-filter-start">
 						<label for="expense-filter-end" data-i18n="listToDateLabel">Eddig</label>
@@ -230,7 +230,7 @@ választó</label>
 					</div>
 					<ul id="expense-list" class="entry-list action-list"></ul>
 				</article>
-			</section>
+			</div>
 
 			<section id="chart-section" class="card hidden">
 				<div class="chart-header">
@@ -250,7 +250,7 @@ választó</label>
 					<div id="chart-legend" class="chart-legend"></div>
 				</div>
 			</section>
-		</section>
+		</div>
 	</main>
 
 	<div id="delete-scope-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="delete-scope-title">
