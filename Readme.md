@@ -45,7 +45,8 @@ Based on these extra planned items, the app recalculates expected results for th
 - date range filtering
 - CSV export of entries
 - forecast page with what-if rows and saved scenarios
-- monthly summary page
+- monthly summary page with category charts (pie and bar)
+- debt management page (track loans, monthly payments, remaining amounts, planned early payoff, optional forecast integration)
 - light/dark theme switch
 - HU/EN language switch
 - PWA install support
@@ -53,9 +54,10 @@ Based on these extra planned items, the app recalculates expected results for th
 ## Main pages
 
 - `index.html` - start page (auth, language, theme, menu)
-- `budget.html` - main budgeting page (CRUD + stats + lists)
+- `budget.html` - main budgeting page (CRUD + stats + lists + category chart)
 - `budget-forecast.html` - forecast planner with what-if scenarios
-- `summary.html` - monthly summary
+- `summary.html` - monthly summary with income/expense chart
+- `managing-debt.html` - debt manager (loans, repayments, remaining amounts, forecast integration)
 - `contact.html` - contact page
 
 ## Tech stack
@@ -154,7 +156,8 @@ Included now:
 - auth flow
 - budget CRUD
 - forecast
-- summary
+- summary with charts
+- debt management
 - HU/EN
 - PWA install
 - recurring entries
@@ -174,9 +177,10 @@ Why this scope:
 ### 3) Structure (how it works)
 
 - index: entry + basic settings
-- budget: day-to-day usage
-- forecast: planning
-- summary: quick check
+- budget: day-to-day usage + category chart
+- forecast: planning with what-if scenarios
+- summary: quick period check + income/expense chart
+- managing-debt: loan and repayment tracking
 
 Main rules:
 
@@ -324,6 +328,19 @@ Currently I test mostly manually.
 | FC-04 | Remove what-if row | Forecast updates correctly |
 | SUM-01 | Open summary page | Cards show period totals |
 | SUM-02 | Change period | Summary values refresh |
+| SUM-03 | Check chart on summary page | Pie and bar chart renders for selected period |
+| SUM-04 | Switch chart type | Chart updates to selected type |
+
+#### Debt manager
+
+| ID | Test step | Expected |
+| --- | --- | --- |
+| DEBT-01 | Add a debt with all fields | Appears in list, stats update |
+| DEBT-02 | Add debt with forecast checkbox | Scenario appears in forecast page |
+| DEBT-03 | Edit a debt entry | Updated values visible in list and stats |
+| DEBT-04 | Delete a debt | Removed from list, stats recalculated |
+| DEBT-05 | Delete debt that was added to forecast | Scenario removed from forecast too |
+| DEBT-06 | Check stats cards | Total remaining and monthly totals correct |
 
 #### Language consistency
 

@@ -276,6 +276,30 @@ body {
 	line-height: 1.2;
 	font-weight: 700;
 }
+.budget-controls .control-action .stack > button.btn-primary:hover,
+.budget-controls .control-action .stack > button.btn-primary:focus-visible,
+.debt-controls .control-action .stack > button.btn-primary:hover,
+.debt-controls .control-action .stack > button.btn-primary:focus-visible {
+	background: linear-gradient(125deg, #2f5fd0, #234eae);
+	border-color: #1f4fbf;
+	box-shadow: none;
+}
+[data-theme="dark"] .budget-controls .control-action .stack > button.btn-primary:hover,
+[data-theme="dark"] .budget-controls .control-action .stack > button.btn-primary:focus-visible,
+[data-theme="dark"] .debt-controls .control-action .stack > button.btn-primary:hover,
+[data-theme="dark"] .debt-controls .control-action .stack > button.btn-primary:focus-visible {
+	background: linear-gradient(125deg, #4f83ff, #355fbf);
+	border-color: #7aa0ef;
+	box-shadow: none;
+}
+.budget-controls .control-action .stack > button.btn-success:hover,
+.budget-controls .control-action .stack > button.btn-success:focus-visible,
+.debt-controls .control-action .stack > button.btn-success:hover,
+.debt-controls .control-action .stack > button.btn-success:focus-visible {
+	background-color: #28a745;
+	border-color: #28a745;
+	box-shadow: none;
+}
  
 .period-range-inputs {
 	display: grid;
