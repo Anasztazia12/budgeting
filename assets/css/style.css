@@ -908,6 +908,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.budget-controls > div:not(.control-action) input,
 	.budget-controls > div:not(.control-action) select { width: 100%; }
 	.budget-controls .control-action .stack { display: flex; grid-template-columns: none; justify-content: flex-start; flex-wrap: nowrap; }
+	.budget-controls .period-control, .budget-controls > div.currency-control { justify-items: start; }
 	.budget-stat-pair .stat p { font-size: clamp(0.92rem, 1.55vw + 0.45rem, 1.08rem); line-height: 1.08; }
 }
  
@@ -950,7 +951,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.budget-controls { grid-template-columns: 1fr; align-items: start; row-gap: 0.75rem; column-gap: 0.65rem; }
 	.budget-controls .period-control, .budget-controls .currency-control { min-width: 0; padding-top: 0; }
 	.budget-controls .period-control { grid-column: 1; }
-	.budget-controls > div.currency-control { grid-column: 1; align-content: start; }
+	.budget-controls > div.currency-control { grid-column: 1; align-content: start; justify-items: start; }
 	.budget-controls > div.currency-control > label { white-space: normal; max-width: none; font-size: 0.89rem; }
 	.budget-controls .period-range-inputs { max-width: none; gap: 0.4rem; }
 	.budget-controls .period-range-inputs .small-date-input,
@@ -961,7 +962,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.budget-controls .period-range-inputs .small-date-input { width: 7.8rem; max-width: min(42vw,7.8rem); }
 	.budget-controls > div.currency-control select { width: fit-content; inline-size: auto; max-width: min(100%,96px); justify-self: start; }
 	.budget-controls .control-action { grid-column: 1 / -1; }
- 
+	.budget-controls .control-action .stack { gap: 0.35rem; flex-wrap: wrap; }
+	.budget-controls .control-action .stack > button { flex: 1 1 auto; font-size: 0.85rem; padding: 0.44rem 0.5rem; }
+
 	input[type="date"], input[type="month"] { width: 80%; max-width: 80%; min-width: 0; }
 	.budget-columns .stack input[type="date"],
 	.budget-columns .stack input[type="month"],
@@ -1163,4 +1166,5 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.debt-layout { grid-template-columns: 1fr; }
 	.debt-controls { grid-template-columns: 1fr; }
 	.debt-controls .control-action { grid-column: 1; }
+	.debt-controls .currency-control { justify-items: start; }
 }
