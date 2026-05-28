@@ -416,19 +416,25 @@ The summary page shows income and expenses for the selected period as a chart.
 The user can switch between pie chart and bar chart view.
 
 ![pie chart 1](assets/images/pie-chart1.png)
+
 ![pie chart 2](assets/images/pie-chart2.png)
+
 ![bar chart](assets/images/bar-chart1.png)
 
 ### App UI
 
 ![hungarian ui](assets/images/budgeting-app-hungarian.png)
+
 ![english ui](assets/images/budgeting-app-english.png)
+
 ![mobile view](assets/images/app-mobile-view.png)
 
 ### Password change/reset screenshots
 
 ![password change result](assets/images/password-changed.png)
+
 ![password reset step](assets/images/password-reset.png)
+
 ![password reset result](assets/images/password-reset2.png)
 
 ## Note
