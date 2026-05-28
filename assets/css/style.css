@@ -1091,7 +1091,33 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 /* ── Debt Manager ── */
 .debt-controls { grid-template-columns: auto 1fr; align-items: center; }
-.debt-controls .control-action { grid-column: 1 / -1; }
+.debt-controls .control-action { grid-column: 1 / -1; display: flex; justify-content: center; }
+.debt-controls .control-action .stack { display: flex; gap: 0.7rem; flex-wrap: nowrap; justify-content: center; }
+.debt-controls .control-action .stack > button {
+	flex: 0 1 auto;
+	margin: 0;
+	width: auto;
+	white-space: normal;
+	padding: var(--btn-padding-y) var(--btn-padding-x);
+	font-size: var(--btn-font-size);
+	line-height: 1.2;
+	font-weight: 700;
+}
+.debt-controls .control-action .stack > button.btn-primary {
+	color: #fff;
+	background: linear-gradient(125deg, #2f5fd0, #234eae);
+	border-color: #1f4fbf;
+}
+.debt-controls .control-action .stack > button.btn-success {
+	color: #fff;
+	background-color: #28a745;
+	border-color: #28a745;
+}
+[data-theme="dark"] .debt-controls .control-action .stack > button.btn-primary {
+	background: linear-gradient(125deg, #4f83ff, #355fbf);
+	border-color: #7aa0ef;
+	color: #fff;
+}
 
 .debt-layout {
 	display: grid;
@@ -1191,4 +1217,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.debt-controls { grid-template-columns: 1fr; }
 	.debt-controls .control-action { grid-column: 1 / -1; }
 	.debt-controls .currency-control { justify-items: start; }
+	.debt-controls .control-action .stack { gap: 0.3rem; flex-wrap: nowrap; }
+	.debt-controls .control-action .stack > button { flex: 1 1 0; min-width: 0; font-size: 0.75rem; padding: 0.38rem 0.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
