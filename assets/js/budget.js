@@ -9,11 +9,6 @@ import {
 
 const shared = window.BudgetAppShared;
 
-const CHART_PALETTE = [
-	"#3b82f6","#ef4444","#22c55e","#f59e0b","#8b5cf6",
-	"#ec4899","#14b8a6","#f97316","#06b6d4","#84cc16",
-	"#a78bfa","#fb923c","#34d399","#60a5fa","#f472b6"
-];
 const {
 	SESSION_KEY,
 	DISPLAY_NAME_KEY,
@@ -295,8 +290,6 @@ const deleteScopeModal = document.getElementById("delete-scope-modal");
 const deleteThisMonthButton = document.getElementById("delete-this-month-btn");
 const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
 const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
-const chartTypeSelect = document.getElementById("chart-type");
-let chartInstance = null;
 let deleteScopeResolver = null;
 let inlineDeleteConfirmResolver = null;
 let inlineDeleteConfirmElement = null;
@@ -334,9 +327,6 @@ currencySelect.addEventListener("change", () => {
 	input.addEventListener("change", render);
 });
 
-if (chartTypeSelect) {
-	chartTypeSelect.addEventListener("change", render);
-}
 
 forecastToggleButton.addEventListener("click", () => {
 	window.location.href = "budget-forecast.html";
@@ -725,9 +715,6 @@ function render() {
 		monthEndLeftEl.textContent = formatCurrency(0);
 		paintList(incomeList, []);
 		paintList(expenseList, []);
-		const chartSection = document.getElementById("chart-section");
-		if (chartSection) chartSection.classList.add("hidden");
-		if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 		return;
 	}
 
@@ -748,7 +735,6 @@ function render() {
 
 	paintList(incomeList, filteredIncomes, "incomes");
 	paintList(expenseList, filteredExpenses, "expenses");
-	renderChart(incomes, expenses);
 }
 
 function paintList(target, entries, listType) {
@@ -795,115 +781,6 @@ function paintList(target, entries, listType) {
 			`;
 			target.appendChild(li);
 		});
-}
-
-function renderChart(incomes, expenses) {
-	const section = document.getElementById("chart-section");
-	const canvas = document.getElementById("budget-chart");
-	const legendEl = document.getElementById("chart-legend");
-	if (!section || !canvas || typeof Chart === "undefined") return;
-
-	const dataMap = {};
-	[...incomes, ...expenses].forEach((e) => {
-		const cat = translateCategory(e.category);
-		dataMap[cat] = (dataMap[cat] || 0) + e.amount;
-	});
-
-	const entries = Object.entries(dataMap).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
-
-	if (!entries.length) {
-		section.classList.add("hidden");
-		if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-		return;
-	}
-
-	const labels = entries.map(([k]) => k);
-	const amounts = entries.map(([, v]) => v);
-	const bgColors = labels.map((_, i) => CHART_PALETTE[i % CHART_PALETTE.length]);
-	const chartType = chartTypeSelect?.value || "pie";
-
-	// Build legend immediately (doesn't need layout)
-	if (legendEl) {
-		legendEl.innerHTML = "";
-		entries.forEach(([label, amount], i) => {
-			const item = document.createElement("div");
-			item.className = "chart-legend-item";
-			item.innerHTML = `
-				<span class="chart-legend-color" style="background:${bgColors[i]}"></span>
-				<span class="chart-legend-label">${escapeHtml(label)}: <strong>${formatCurrency(amount)}</strong></span>
-			`;
-			legendEl.appendChild(item);
-		});
-	}
-
-	// Show section first so canvas gets layout dimensions
-	section.classList.remove("hidden");
-
-	// Set labels with hardcoded strings — no t() dependency, cannot show raw keys
-	const isHu = appLanguage !== "en";
-	const titleEl = document.getElementById("chart-title-el");
-	const typeLabelEl = document.getElementById("chart-type-label-el");
-	const pieOpt = document.getElementById("chart-opt-pie");
-	const barOpt = document.getElementById("chart-opt-bar");
-	if (titleEl) titleEl.textContent = isHu ? "Diagram" : "Chart";
-	if (typeLabelEl) typeLabelEl.textContent = isHu ? "Típus" : "Type";
-	if (pieOpt) pieOpt.textContent = isHu ? "Kördiagram" : "Pie chart";
-	if (barOpt) barOpt.textContent = isHu ? "Oszlopdiagram" : "Bar chart";
-
-	// Destroy old instance, then replace canvas to avoid Chart.js residue
-	if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-	const freshCanvas = document.createElement("canvas");
-	freshCanvas.id = "budget-chart";
-	canvas.replaceWith(freshCanvas);
-
-	// Force a synchronous layout reflow so Chart.js reads correct canvas dimensions.
-	// Without this, the browser may not have computed the size of the newly-visible
-	// section yet, causing Chart.js to see a 0×0 canvas and render nothing.
-	void section.offsetHeight;
-
-	try {
-		chartInstance = new Chart(freshCanvas, {
-			type: chartType,
-			data: {
-				labels,
-				datasets: [{
-					data: amounts,
-					backgroundColor: bgColors,
-					borderWidth: chartType === "bar" ? 0 : 2,
-					borderColor: "#fff"
-				}]
-			},
-			options: {
-				responsive: true,
-				// maintainAspectRatio: true lets Chart.js control the canvas height
-				// based on width ÷ aspectRatio — works without any explicit CSS height
-				// on the container. (false requires an explicit container height in CSS.)
-				maintainAspectRatio: true,
-				plugins: {
-					legend: { display: false },
-					tooltip: {
-						callbacks: {
-							label: (ctx) => ` ${formatCurrency(ctx.raw)}`
-						}
-					}
-				},
-				...(chartType === "bar" ? {
-					scales: {
-						y: {
-							beginAtZero: true,
-							ticks: {
-								callback: (v) => new Intl.NumberFormat(appLanguage === "en" ? "en-GB" : "hu-HU", { maximumFractionDigits: 0 }).format(v)
-							}
-						}
-					}
-				} : {})
-			}
-		});
-	} catch (_err) {
-		// Chart.js failed — hide section gracefully
-		section.classList.add("hidden");
-		chartInstance = null;
-	}
 }
 
 async function handleEntryAction(event, listType) {
