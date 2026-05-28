@@ -510,7 +510,7 @@ function renderChart(incomes, expenses) {
 	const typeLabelEl = document.getElementById("summary-chart-type-label-el");
 	const pieOpt = document.getElementById("summary-chart-opt-pie");
 	const barOpt = document.getElementById("summary-chart-opt-bar");
-	if (titleEl) titleEl.textContent = isHu ? "Bevételek és kiadások alakulása" : "Income and expenses";
+	if (titleEl) titleEl.textContent = isHu ? "Bevételek és kiadások alakulása a kiválasztott időszakban" : "Income and expenses in the selected period";
 	if (typeLabelEl) typeLabelEl.textContent = isHu ? "Típus" : "Type";
 	if (pieOpt) pieOpt.textContent = isHu ? "Kördiagram" : "Pie chart";
 	if (barOpt) barOpt.textContent = isHu ? "Oszlopdiagram" : "Bar chart";
