@@ -56,7 +56,7 @@ Based on these extra planned items, the app recalculates expected results for th
 - `index.html` - start page (auth, language, theme, menu)
 - `budget.html` - main budgeting page (CRUD + stats + lists + category chart)
 - `budget-forecast.html` - forecast planner with what-if scenarios
-- `summary.html` - monthly summary with income/expense chart
+- `summary.html` - monthly summary with income/expense chart (pie and bar chart, switchable)
 - `managing-debt.html` - debt manager (loans, repayments, remaining amounts, forecast integration)
 - `contact.html` - contact page
 
@@ -410,6 +410,9 @@ These fixes were applied to pass the W3C HTML validator without errors or warnin
 ## Screenshots
 
 ### Charts
+
+The summary page shows income and expenses for the selected period as a chart.
+The user can switch between pie chart and bar chart view.
 
 ![pie chart 1](assets/images/pie-chart1.png)
 ![pie chart 2](assets/images/pie-chart2.png)
