@@ -451,6 +451,7 @@ async function initializePage() {
 	loadForecastScenarios();
 	renderScenarioList();
 	applyTranslations();
+	syncThemeButtons();
 	updateAccessUI();
 	updateInstallButtonState();
 	renderForecastPlanner();

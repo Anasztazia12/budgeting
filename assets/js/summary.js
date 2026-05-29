@@ -380,11 +380,11 @@ async function initializePage() {
 	}
 
 	applyTheme();
-	syncThemeButtons();
 	setDefaultPeriodRange();
 	languageSelect.value = appLanguage;
 	currencySelect.value = appCurrency;
 	applyTranslations();
+	syncThemeButtons();
 	updateAccessUI();
 	updateInstallButtonState();
 	render();

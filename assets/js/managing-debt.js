@@ -445,10 +445,10 @@ async function initializePage() {
 	}
 
 	applyTheme();
-	syncThemeButtons();
 	languageSelect.value = appLanguage;
 	currencySelect.value = appCurrency;
 	applyTranslations();
+	syncThemeButtons();
 	updateInstallButtonState();
 	render();
 

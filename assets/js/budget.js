@@ -629,7 +629,6 @@ async function initializePage() {
 	}
 
 	applyTheme();
-	syncThemeButtons();
 	setDefaultPeriodRange();
 	setDefaultListDateFilters(periodStartInput?.value, periodEndInput?.value);
 	languageSelect.value = appLanguage;
@@ -637,6 +636,7 @@ async function initializePage() {
 	resetIncomeForm();
 	resetExpenseForm();
 	applyTranslations();
+	syncThemeButtons();
 	updateAccessUI();
 	updateInstallButtonState();
 	render();
