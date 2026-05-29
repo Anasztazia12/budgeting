@@ -1058,9 +1058,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.budget-controls .period-range-inputs .small-date-input { width: 6rem; max-width: min(32vw,6rem); }
 	.budget-controls > div.currency-control select { width: 5rem; max-width: min(26vw,5rem); }
 	.budget-controls .control-action { grid-column: 1 / -1; }
-	.budget-controls .control-action .stack { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
-	.budget-controls .control-action .stack > button { flex: 1 1 calc(50% - 0.4rem); max-width: calc(50% - 0.2rem); font-size: 0.8rem; padding: 0.38rem 0.4rem; line-height: 1.2; white-space: normal; min-height: 2.2rem; }
-	.budget-controls .control-action .stack > button:last-child { flex: 0 0 100%; max-width: 100%; min-height: 2.2rem; padding: 0.38rem 0.4rem; }
+	.budget-controls .control-action .stack { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; justify-items: stretch; }
+	.budget-controls .control-action .stack > button { font-size: 0.8rem; padding: 0.38rem 0.4rem; line-height: 1.2; white-space: normal; min-height: 2.2rem; width: 100%; }
+	.budget-controls .control-action .stack > button:last-child { grid-column: 1 / -1; }
 
 	input[type="date"], input[type="month"] { width: 80%; max-width: 80%; min-width: 0; }
 	.budget-columns .stack input[type="date"],
@@ -1268,6 +1268,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.debt-controls .currency-control { justify-items: start; }
 	.debt-controls .currency-control select { width: 7.8rem; max-width: min(42vw,7.8rem); height: 2.08rem; min-height: 2.08rem; padding: 0.32rem 0.48rem; font-size: 0.9rem; line-height: 1.1; }
 	.debt-controls .control-action .stack { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
-	.debt-controls .control-action .stack > button { flex: 1 1 calc(50% - 0.4rem); max-width: calc(50% - 0.2rem); font-size: 0.8rem; padding: 0.38rem 0.4rem; line-height: 1.2; white-space: normal; min-height: 2.2rem; }
-	.debt-controls .control-action .stack > button:last-child { flex: 0 0 100%; max-width: 100%; min-height: 2.2rem; padding: 0.38rem 0.4rem; }
+	.debt-controls .control-action .stack { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; justify-items: stretch; }
+	.debt-controls .control-action .stack > button { font-size: 0.8rem; padding: 0.38rem 0.4rem; line-height: 1.2; white-space: normal; min-height: 2.2rem; width: 100%; }
+	.debt-controls .control-action .stack > button:last-child { grid-column: 1 / -1; }
 }
