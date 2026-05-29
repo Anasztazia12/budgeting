@@ -400,17 +400,33 @@ document.addEventListener("DOMContentLoaded", () => {
         closeMenu();
         modalTitle.textContent = isEn ? "Change username" : "Felhasználónév módosítása";
         modalForm.innerHTML = `
-            <label for="pm-username">${isEn ? "New username" : "Új felhasználónév"}</label>
-            <input type="text" id="pm-username" required autocomplete="off">
+            <label for="pm-cur-username">${isEn ? "Current username" : "Jelenlegi felhasználónév"}</label>
+            <input type="text" id="pm-cur-username" required autocomplete="off">
+            <label for="pm-new-username">${isEn ? "New username" : "Új felhasználónév"}</label>
+            <input type="text" id="pm-new-username" required autocomplete="off">
+            <label for="pm-confirm-username">${isEn ? "Confirm new username" : "Új felhasználónév megerősítése"}</label>
+            <input type="text" id="pm-confirm-username" required autocomplete="off">
             <button type="submit" class="btn btn-outline-info">${isEn ? "Save" : "Mentés"}</button>
         `;
         showMsg("", false);
         modal.classList.remove("hidden");
-        document.getElementById("pm-username").focus();
+        document.getElementById("pm-cur-username").focus();
 
         modalForm.onsubmit = async (e) => {
             e.preventDefault();
-            const newUsername = document.getElementById("pm-username").value.trim();
+            const currentUsername = document.getElementById("pm-cur-username").value.trim();
+            const newUsername = document.getElementById("pm-new-username").value.trim();
+            const confirmUsername = document.getElementById("pm-confirm-username").value.trim();
+
+            const storedName = localStorage.getItem("budgetAppDisplayName") || localStorage.getItem("budgetAppSession") || "";
+            if (currentUsername.toLowerCase() !== storedName.toLowerCase()) {
+                showMsg(isEn ? "Current username is incorrect." : "A jelenlegi felhasználónév helytelen.", true);
+                return;
+            }
+            if (newUsername !== confirmUsername) {
+                showMsg(isEn ? "New usernames do not match." : "Az új felhasználónevek nem egyeznek.", true);
+                return;
+            }
             try {
                 const svc = window.BudgetAppFirebaseService;
                 const session = await svc.changeCurrentUsername({ newUsername });
