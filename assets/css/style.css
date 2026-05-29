@@ -825,6 +825,26 @@ label { font-weight: 600; color: var(--muted-strong); font-size: 0.92rem; }
 .session-card { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
 .session-card.hidden { display: none; }
 .session-card p { margin: 0; }
+.profile-toast {
+	position: fixed;
+	bottom: 1.5rem;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #1e8a40;
+	color: #fff;
+	font-weight: 600;
+	font-size: 0.95rem;
+	padding: 0.7rem 1.4rem;
+	border-radius: var(--control-radius);
+	box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+	z-index: 9999;
+	white-space: normal;
+	text-align: center;
+	max-width: min(90vw, 28rem);
+	width: max-content;
+}
+[data-theme="dark"] .profile-toast { background: #2aaa52; }
+
 .today-notice {
 	padding: 0.65rem 1rem;
 	background: #eaf4ff;

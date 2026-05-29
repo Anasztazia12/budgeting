@@ -546,7 +546,7 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 await window.BudgetAppFirebaseService.changeCurrentUserPassword({ currentPassword, newPassword });
                 closeModal();
-                showMsg(isEn ? "Password changed successfully." : "A jelszó sikeresen módosítva.", false);
+                showToast(isEn ? "Password changed successfully." : "A jelszó sikeresen módosítva.");
             } catch (err) {
                 const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "reset") || (isEn ? "An error occurred." : "Hiba történt.");
                 showMsg(msg, true);
