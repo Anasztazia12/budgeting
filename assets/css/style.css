@@ -292,6 +292,17 @@ body {
 	border-color: #7aa0ef;
 	box-shadow: none;
 }
+.budget-controls .control-action .stack > button.btn-success,
+.debt-controls .control-action .stack > button.btn-success {
+	color: #fff;
+	background: linear-gradient(125deg, #2daa56, #1e8a40);
+	border-color: #1a7a38;
+}
+[data-theme="dark"] .budget-controls .control-action .stack > button.btn-success,
+[data-theme="dark"] .debt-controls .control-action .stack > button.btn-success {
+	background: linear-gradient(125deg, #3dcc6a, #2aaa52);
+	border-color: #5cd980;
+}
 .budget-controls .control-action .stack > button.btn-success:hover,
 .budget-controls .control-action .stack > button.btn-success:focus-visible,
 .debt-controls .control-action .stack > button.btn-success:hover,
@@ -858,8 +869,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* ── Saved plans section ── */
 .saved-plans-section { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.85rem; padding: 0.7rem 0.85rem; border: 1px solid #c4d5f2; border-radius: var(--control-radius); background: #f5f8ff; }
 [data-theme="dark"] .saved-plans-section { background: #111e38; border-color: #3a5282; }
-.saved-plans-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
-.saved-plans-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }
+.saved-plans-header { display: flex; flex-direction: column; gap: 0.45rem; }
+.saved-plans-top-row { display: flex; align-items: center; gap: 0.45rem; flex-wrap: nowrap; }
+.saved-plans-top-row .saved-plans-dropdown { flex: 1 1 auto; min-width: 0; }
+.saved-plans-top-row #forecast-load-scenario { flex: 0 0 auto; white-space: nowrap; }
+.saved-plans-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; width: 100%; }
+.saved-plans-actions > button { width: 100%; }
 /* Saved plans dropdown trigger */
 .saved-plans-dropdown { position: relative; }
 .saved-plans-dropdown-trigger { cursor: pointer; display: inline-flex; align-items: center; gap: 0.38rem; font-weight: 700; font-size: 0.92rem; color: var(--text); padding: 0.32rem 0.68rem; border-radius: var(--control-radius); border: 1px solid #c4d5f2; background: #fff; user-select: none; list-style: none; transition: background 0.15s, border-color 0.15s; }
@@ -994,10 +1009,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 		padding: 0.32rem 0.48rem; font-size: 0.9rem; line-height: 1.1;
 	}
 	.budget-controls .period-range-inputs .small-date-input { width: 7.8rem; max-width: min(42vw,7.8rem); }
-	.budget-controls > div.currency-control select { width: fit-content; inline-size: auto; max-width: min(100%,96px); justify-self: start; }
+	.budget-controls > div.currency-control select { width: 7.8rem; max-width: min(42vw,7.8rem); justify-self: start; }
 	.budget-controls .control-action { grid-column: 1 / -1; }
 	.budget-controls .control-action .stack { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
-	.budget-controls .control-action .stack > button { flex: 1 1 calc(50% - 0.4rem); min-width: 0; max-width: calc(50% - 0.2rem); font-size: 0.8rem; padding: 0.38rem 0.5rem; white-space: normal; overflow: visible; text-overflow: clip; }
+	.budget-controls .control-action .stack > button { flex: 0 1 auto; min-width: 0; font-size: 0.78rem; padding: 0.35rem 0.55rem; white-space: normal; }
+	.budget-controls .control-action .stack > button:last-child { flex: 0 0 62%; font-size: 0.82rem; padding: 0.38rem 0.55rem; }
 
 	input[type="date"], input[type="month"] { width: 80%; max-width: 80%; min-width: 0; }
 	.budget-columns .stack input[type="date"],
@@ -1056,7 +1072,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 		padding: 0.28rem 0.3rem;
 	}
 	.whatif-row-fields { grid-template-columns: repeat(2, minmax(0,1fr)); }
-	.saved-plans-header { flex-direction: column; align-items: stretch; }
 	.saved-plans-actions { justify-content: flex-start; }
  
 	.chart-body { flex-direction: column; }
@@ -1212,6 +1227,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.debt-controls { grid-template-columns: 1fr; }
 	.debt-controls .control-action { grid-column: 1 / -1; }
 	.debt-controls .currency-control { justify-items: start; }
+	.debt-controls .currency-control select { width: 7.8rem; max-width: min(42vw,7.8rem); height: 2.08rem; min-height: 2.08rem; padding: 0.32rem 0.48rem; font-size: 0.9rem; line-height: 1.1; }
 	.debt-controls .control-action .stack { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
-	.debt-controls .control-action .stack > button { flex: 1 1 calc(50% - 0.4rem); min-width: 0; max-width: calc(50% - 0.2rem); font-size: 0.8rem; padding: 0.38rem 0.5rem; white-space: normal; overflow: visible; text-overflow: clip; }
+	.debt-controls .control-action .stack > button { flex: 0 1 auto; min-width: 0; font-size: 0.78rem; padding: 0.35rem 0.55rem; white-space: normal; }
+	.debt-controls .control-action .stack > button:last-child { flex: 0 0 62%; font-size: 0.82rem; padding: 0.38rem 0.55rem; }
 }
