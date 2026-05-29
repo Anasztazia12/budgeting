@@ -487,7 +487,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem("budgetAppDisplayName", newName);
                 const sessionEl = document.getElementById("menu-session-info");
                 if (sessionEl) sessionEl.textContent = `${isEn ? "Signed in as:" : "Bejelentkezve:"} ${newName}`;
-                showMsg(isEn ? "Username changed successfully." : "A felhasználónév sikeresen módosítva.", false);
+                showMsg(isEn ? "Your username has been successfully changed." : "A felhasználóneved sikeresen megváltozott.", false);
                 modalForm.querySelector("button[type=submit]").disabled = true;
                 setTimeout(closeModal, 6000);
             } catch (err) {
@@ -546,7 +546,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!strong) { showMsg(isEn ? "Password must be 6-20 chars with uppercase, lowercase and a number." : "A jelszó 6-20 karakter, tartalmazzon kis- és nagybetűt és számot.", true); return; }
             try {
                 await window.BudgetAppFirebaseService.changeCurrentUserPassword({ currentPassword, newPassword });
-                showMsg(isEn ? "Password changed successfully." : "A jelszó sikeresen módosítva.", false);
+                showMsg(isEn ? "Your password has been successfully changed." : "A jelszavad sikeresen megváltozott.", false);
                 modalForm.querySelector("button[type=submit]").disabled = true;
                 setTimeout(closeModal, 6000);
             } catch (err) {
