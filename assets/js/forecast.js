@@ -48,6 +48,9 @@ const dictionary = {
 		forecastTypeExpense: "Extra kiadás",
 		forecastTypeIncome: "Extra bevétel",
 		forecastRemoveRow: "Törlés",
+		forecastConfirmDelete: "Biztosan végleg törlöd?",
+		forecastConfirmYes: "Igen, törlöm",
+		forecastConfirmNo: "Mégsem",
 		forecastSaveRow: "Mentés",
 		forecastBaseUntilLabel: "Egyenleg eddig a dátumig:",
 		forecastWithPurchaseLabel: "Egyenleg tervezett tételekkel:",
@@ -124,6 +127,9 @@ const dictionary = {
 		forecastTypeExpense: "Extra expense",
 		forecastTypeIncome: "Extra income",
 		forecastRemoveRow: "Delete",
+		forecastConfirmDelete: "Are you sure you want to permanently delete this?",
+		forecastConfirmYes: "Yes, delete",
+		forecastConfirmNo: "Cancel",
 		forecastSaveRow: "Save",
 		forecastBaseUntilLabel: "Balance up to selected date:",
 		forecastWithPurchaseLabel: "Balance with planned items:",
@@ -278,7 +284,19 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 
 	if (action === "delete-plan") {
 		const planName = rowElement.dataset.planName;
-		if (planName) {
+		if (!planName) return;
+
+		// Show inline confirmation
+		const actionsEl = actionButton.closest(".whatif-row-actions");
+		if (actionsEl.querySelector(".forecast-confirm-row")) return; // already showing
+		const confirmEl = document.createElement("div");
+		confirmEl.className = "forecast-confirm-row";
+		confirmEl.innerHTML = `<span>${t("forecastConfirmDelete")}</span>
+			<button class="btn btn-danger btn-sm forecast-confirm-yes">${t("forecastConfirmYes")}</button>
+			<button class="btn btn-outline-info btn-sm forecast-confirm-no">${t("forecastConfirmNo")}</button>`;
+		rowElement.appendChild(confirmEl);
+
+		confirmEl.querySelector(".forecast-confirm-yes").addEventListener("click", () => {
 			forecastScenarios = forecastScenarios.filter((s) => s.name !== planName);
 			saveForecastScenarios();
 			renderScenarioList();
@@ -287,7 +305,10 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 			});
 			showMessage(t("forecastPlanDeleted"), false);
 			renderForecastPlanner();
-		}
+		});
+		confirmEl.querySelector(".forecast-confirm-no").addEventListener("click", () => {
+			confirmEl.remove();
+		});
 		return;
 	}
 
@@ -646,8 +667,8 @@ function buildWhatIfRowDisplayHTML(wrapper) {
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
 			<button type="button" class="icon-btn" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
-			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">🗑</button>
-			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">🗑</button>` : ""}
+			<button type="button" class="icon-btn close-btn" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">✕</button>
+			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">✕</button>` : ""}
 		</div>
 	`;
 }
@@ -692,8 +713,8 @@ function buildWhatIfRowEditHTML(wrapper) {
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">💾</button>
 			<button type="button" class="icon-btn" data-action="cancel-edit" title="${t("editAction")}">✎</button>
-			<button type="button" class="icon-btn danger" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">🗑</button>
-			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">🗑</button>` : ""}
+			<button type="button" class="icon-btn close-btn" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">✕</button>
+			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">✕</button>` : ""}
 		</div>
 	`;
 }
