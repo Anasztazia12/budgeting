@@ -299,14 +299,17 @@ Currently I test mostly manually.
 | --- | --- | --- |
 | AUTH-01 | Register with valid values | Success + user saved |
 | AUTH-02 | Register with mismatched email | Validation message |
-| AUTH-03 | Login with correct credentials | Session active |
-| AUTH-04 | Login with wrong password | Error message |
-| AUTH-05 | Continue as guest | Guest session active |
-| AUTH-06 | Logout from menu | Session cleared |
-| AUTH-07 | Change password with new value | Password updated |
-| AUTH-08 | Change password with previously used value | Rejected with message |
-| AUTH-09 | Reset password from email link with new value | Password reset works |
-| AUTH-10 | Reset password from email link with old value | Rejected with message |
+| AUTH-03 | Login with username | Session active |
+| AUTH-04 | Login with email address | Session active |
+| AUTH-05 | Login with wrong password | Error message, no auto-redirect |
+| AUTH-06 | Continue as guest | Guest session active, data cleared on tab close |
+| AUTH-07 | Logout from menu | Session cleared |
+| AUTH-08 | Change username via menu modal | New username active, old username no longer works |
+| AUTH-09 | Change password via menu modal | New password works on next login |
+| AUTH-10 | Change password with previously used value | Rejected with message |
+| AUTH-11 | Reset password from email link with new value | Password reset works |
+| AUTH-12 | Reset password from email link with old value | Rejected with message |
+| AUTH-13 | Auto-logout after 5 min inactivity | Redirected to login page |
 
 #### Budget CRUD and recurring
 
@@ -318,6 +321,8 @@ Currently I test mostly manually.
 | BUD-04 | Delete entry | Removed and totals recalculated |
 | BUD-05 | Toggle recurring | Badge/action state updates |
 | BUD-06 | Filter by date range | Only matching entries shown |
+| BUD-07 | Login on day with scheduled entry | Modal shows today's income/expense |
+| BUD-08 | Dismiss today notice with "don't show again today" | Not shown again on same day |
 
 #### Forecast and summary
 
@@ -326,11 +331,13 @@ Currently I test mostly manually.
 | FC-01 | Set target date | Forecast values recalc |
 | FC-02 | Add extra expense row | Simulated balance decreases |
 | FC-03 | Add extra income row | Simulated balance increases |
-| FC-04 | Remove what-if row | Forecast updates correctly |
+| FC-04 | Close what-if row with black X | Row removed from view, not deleted |
+| FC-05 | Delete plan with red X | Confirmation shown, then permanently deleted |
 | SUM-01 | Open summary page | Cards show period totals |
 | SUM-02 | Change period | Summary values refresh |
 | SUM-03 | Check chart on summary page | Pie and bar chart renders for selected period |
 | SUM-04 | Switch chart type | Chart updates to selected type |
+| SUM-05 | Check projection text | Period-end estimate shows correct balance |
 
 #### Debt manager
 
