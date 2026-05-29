@@ -79,7 +79,7 @@ body {
 	border: 0;
 }
  
-.hidden { display: none; }
+.hidden { display: none !important; }
 .always-hidden { display: none !important; }
  
 /* ── App shell ── */

@@ -361,18 +361,25 @@ export async function registerWithUsername({ username, email, password }) {
 }
 
 export async function loginWithUsername({ username, password }) {
-    const normalizedUsername = normalizeUsername(username);
-    if (!normalizedUsername || !password) {
+    const cleanIdentifier = String(username || "").trim();
+    if (!cleanIdentifier || !password) {
         throw createAppError("app/invalid-login");
     }
 
-    const usernameSnap = await getDoc(doc(db, "usernames", normalizedUsername));
-    if (!usernameSnap.exists()) {
-        throw createAppError("app/invalid-login");
+    let email = "";
+
+    if (cleanIdentifier.includes("@")) {
+        email = normalizeEmail(cleanIdentifier);
+    } else {
+        const normalizedUsername = normalizeUsername(cleanIdentifier);
+        const usernameSnap = await getDoc(doc(db, "usernames", normalizedUsername));
+        if (!usernameSnap.exists()) {
+            throw createAppError("app/invalid-login");
+        }
+        const mapping = usernameSnap.data() || {};
+        email = String(mapping.email || "").trim();
     }
 
-    const mapping = usernameSnap.data() || {};
-    const email = String(mapping.email || "").trim();
     if (!email) {
         throw createAppError("app/invalid-login");
     }

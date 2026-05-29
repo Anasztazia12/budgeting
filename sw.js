@@ -1,4 +1,4 @@
-const CACHE_NAME = "budgeting-app-v7";
+const CACHE_NAME = "budgeting-app-v8";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -7,7 +7,7 @@ const ASSETS_TO_CACHE = [
   "./summary.html",
   "./contact.html",
   "./managing-debt.html",
-  "./assets/css/style.css",
+  "./assets/css/style.css?v=8",
   "./assets/images/budget-icon.png",
   "./assets/images/budget-icon-any-192.png",
   "./assets/images/budget-icon-any-512.png",
@@ -43,7 +43,7 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
-  const isNetworkFirst = url.pathname.endsWith(".html") || url.pathname.endsWith(".js");
+  const isNetworkFirst = url.pathname.endsWith(".html") || url.pathname.endsWith(".js") || url.pathname.endsWith(".css");
 
   if (isNetworkFirst) {
     event.respondWith(
