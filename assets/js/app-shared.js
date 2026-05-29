@@ -398,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const lang = localStorage.getItem("budgetAppLanguage") || "hu";
     const isEn = lang === "en";
 
-    // Inject profile modal
+    // Inject profile modal + toast
     document.body.insertAdjacentHTML("beforeend", `
         <div id="profile-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
             <div class="modal-card">
@@ -408,7 +408,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button type="button" id="profile-modal-close" class="btn btn-outline-info" style="margin-top:0.4rem">${isEn ? "Cancel" : "Mégse"}</button>
             </div>
         </div>
+        <div id="profile-toast" class="profile-toast hidden" aria-live="polite"></div>
     `);
+
+    let toastTimer = null;
+    function showToast(message) {
+        const toast = document.getElementById("profile-toast");
+        if (!toast) return;
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.remove("hidden");
+        toastTimer = setTimeout(() => toast.classList.add("hidden"), 3500);
+    }
 
     const modal = document.getElementById("profile-modal");
     const modalTitle = document.getElementById("profile-modal-title");
@@ -534,8 +545,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!strong) { showMsg(isEn ? "Password must be 6-20 chars with uppercase, lowercase and a number." : "A jelszó 6-20 karakter, tartalmazzon kis- és nagybetűt és számot.", true); return; }
             try {
                 await window.BudgetAppFirebaseService.changeCurrentUserPassword({ currentPassword, newPassword });
+                closeModal();
                 showMsg(isEn ? "Password changed successfully." : "A jelszó sikeresen módosítva.", false);
-                modalForm.reset();
             } catch (err) {
                 const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "reset") || (isEn ? "An error occurred." : "Hiba történt.");
                 showMsg(msg, true);
