@@ -90,8 +90,13 @@ const dictionary = {
 		managingDebtLink: "Adósságkezelő",
 		categories: {
 			fizetes: "Fizetés", egyeb: "Egyéb",
+			"child benefit": "Családi pótlék",
+			"universal credit": "Universal Credit",
+			"jobseeker allowance": "Munkanélküli segély",
+			"maternity allowance": "Anyasági ellátás",
 			szamlak: "Számlák", viz: "Víz", gaz: "Gáz", aram: "Áram",
 			auto: "Autó", benzin: "Benzin", elemiszer: "Élelmiszer", ruhak: "Ruhák",
+			etterem: "Étterem", lakashitel: "Lakáshitel", nyaralas: "Nyaralás",
 			rent: "Albérlet", biztositas: "Biztosítás", hitelkartya: "Hitelkártya",
 			council: "Önkormányzat", tv: "TV", telefon: "Telefon", internet: "Internet",
 			iskola: "Iskola", travel: "Utazás", "egyeb kiadas": "Egyéb kiadás"
@@ -170,8 +175,13 @@ const dictionary = {
 		managingDebtLink: "Debt Manager",
 		categories: {
 			fizetes: "Salary", egyeb: "Other",
+			"child benefit": "Child Benefit",
+			"universal credit": "Universal Credit",
+			"jobseeker allowance": "Jobseeker's Allowance",
+			"maternity allowance": "Maternity Allowance",
 			szamlak: "Bills", viz: "Water", gaz: "Gas", aram: "Electricity",
 			auto: "Car", benzin: "Fuel", elemiszer: "Groceries", ruhak: "Clothes",
+			etterem: "Restaurant", lakashitel: "Mortgage", nyaralas: "Holiday",
 			rent: "Rent", biztositas: "Insurance", hitelkartya: "Credit card",
 			council: "Council tax", tv: "TV", telefon: "Phone", internet: "Internet",
 			iskola: "School", travel: "Travel", "egyeb kiadas": "Other expense"
@@ -472,7 +482,6 @@ function renderChart(incomes, expenses) {
 	const legendEl = document.getElementById("summary-chart-legend");
 	if (!section || !canvas || typeof Chart === "undefined") return;
 
-	// Build category totals
 	const dataMap = {};
 	[...incomes, ...expenses].forEach((e) => {
 		const cat = translateCategory(e.category);
@@ -526,6 +535,9 @@ function renderChart(incomes, expenses) {
 	freshCanvas.id = "summary-chart";
 	canvas.replaceWith(freshCanvas);
 
+	// Bar chart needs explicit container height; pie uses aspect ratio
+	const wrap = freshCanvas.closest(".chart-canvas-wrap");
+
 	// Force synchronous layout reflow so Chart.js sees correct canvas dimensions
 	void section.offsetHeight;
 
@@ -538,12 +550,14 @@ function renderChart(incomes, expenses) {
 					data: amounts,
 					backgroundColor: bgColors,
 					borderWidth: chartType === "bar" ? 0 : 2,
-					borderColor: "#fff"
+					borderColor: "#fff",
+					minBarLength: chartType === "bar" ? 6 : undefined
 				}]
 			},
 			options: {
 				responsive: true,
 				maintainAspectRatio: true,
+				aspectRatio: chartType === "bar" ? 1.6 : 1,
 				plugins: {
 					legend: { display: false },
 					tooltip: {
@@ -556,9 +570,11 @@ function renderChart(incomes, expenses) {
 					scales: {
 						y: {
 							beginAtZero: true,
+							suggestedMax: Math.max(...amounts) * 1.15,
 							ticks: {
 								callback: (v) => new Intl.NumberFormat(appLanguage === "en" ? "en-GB" : "hu-HU", { maximumFractionDigits: 0 }).format(v)
-							}
+							},
+							grid: { color: "rgba(0,0,0,0.06)" }
 						}
 					}
 				} : {})

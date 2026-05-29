@@ -49,9 +49,11 @@ const dictionary = {
 		forecastButton: "Költségvetési előrejelző",
 		managingDebtLink: "Adósságkezelő",
 		saveAllDone: "A módosítások mentve.",
-		todayNoticeIncome: "Ma várható bevétel",
-		todayNoticeExpense: "Ma várható kiadás",
-		todayNoticeNone: "Ma nincs esedékes tétel.",
+		todayNoticeTitle: "📅 Mai esedékes tételek",
+		todayNoticeIncome: "Várható bevétel",
+		todayNoticeExpense: "Várható kiadás",
+		todayNoticeDismiss: "Ne jelenjen meg ma többet",
+		todayNoticeOk: "OK",
 		logoutButton: "Kijelentkezés",
 		profileEditButton: "Adatok módosítása",
 		changeUsernameMenuButton: "Felhasználónév módosítása",
@@ -69,8 +71,8 @@ const dictionary = {
 		noteLabel: "Megjegyzés (opcionális)",
 		notePlaceholder: "Rövid megjegyzés",
 		repeatInEveryMonthLabel: "Megjelenítés minden hónapban",
-		listFromDateLabel: "Ettől",
-		listToDateLabel: "Eddig",
+		listFromDateLabel: "-tól",
+		listToDateLabel: "-ig",
 		monthlyIncomeTitle: "Bevétel",
 		monthlyExpenseTitle: "Kiadás",
 		spentToDateTitle: "Várható kiadás",
@@ -165,9 +167,11 @@ const dictionary = {
 		forecastButton: "Budget Forecast Planner",
 		managingDebtLink: "Debt Manager",
 		saveAllDone: "Changes saved.",
-		todayNoticeIncome: "Income due today",
-		todayNoticeExpense: "Expense due today",
-		todayNoticeNone: "No entries due today.",
+		todayNoticeTitle: "📅 Entries due today",
+		todayNoticeIncome: "Income",
+		todayNoticeExpense: "Expense",
+		todayNoticeDismiss: "Don't show again today",
+		todayNoticeOk: "OK",
 		logoutButton: "Sign out",
 		profileEditButton: "Edit profile",
 		changeUsernameMenuButton: "Change username",
@@ -1351,35 +1355,51 @@ function getTodayEntries(entries) {
 }
 
 function showTodayNotice() {
-	let el = document.getElementById("today-notice");
-	if (!el) {
-		el = document.createElement("div");
-		el.id = "today-notice";
-		el.className = "today-notice hidden";
-		const content = document.getElementById("budget-content");
-		if (content) content.before(el);
-	}
+	const todayText = shared.toDateInput(new Date());
+	const dismissKey = `budgetTodayNoticeDismissed_${todayText}`;
+	if (localStorage.getItem(dismissKey)) return;
 
 	const todayIncomes = getTodayEntries(appState.incomes);
 	const todayExpenses = getTodayEntries(appState.expenses);
+	if (!todayIncomes.length && !todayExpenses.length) return;
 
-	if (!todayIncomes.length && !todayExpenses.length) {
-		el.classList.add("hidden");
-		return;
+	let modal = document.getElementById("today-notice-modal");
+	if (!modal) {
+		modal = document.createElement("div");
+		modal.id = "today-notice-modal";
+		modal.className = "modal-overlay";
+		modal.setAttribute("role", "dialog");
+		modal.setAttribute("aria-modal", "true");
+		document.body.appendChild(modal);
 	}
 
-	const parts = [];
+	const rows = [];
 	if (todayIncomes.length) {
-		const sum = shared.sumEntries(todayIncomes);
-		parts.push(`${t("todayNoticeIncome")}: ${formatCurrency(sum)} (${todayIncomes.length})`);
+		rows.push(`<p class="today-notice-row income">✅ ${t("todayNoticeIncome")}: <strong>${formatCurrency(shared.sumEntries(todayIncomes))}</strong> (${todayIncomes.length} tétel)</p>`);
 	}
 	if (todayExpenses.length) {
-		const sum = shared.sumEntries(todayExpenses);
-		parts.push(`${t("todayNoticeExpense")}: ${formatCurrency(sum)} (${todayExpenses.length})`);
+		rows.push(`<p class="today-notice-row expense">⚠️ ${t("todayNoticeExpense")}: <strong>${formatCurrency(shared.sumEntries(todayExpenses))}</strong> (${todayExpenses.length} tétel)</p>`);
 	}
 
-	el.textContent = "📅 " + parts.join(" · ");
-	el.classList.remove("hidden");
+	modal.innerHTML = `
+		<div class="modal-card today-notice-card">
+			<h3>${t("todayNoticeTitle")}</h3>
+			${rows.join("")}
+			<label class="inline-check today-notice-dismiss-label">
+				<input type="checkbox" id="today-notice-dismiss-check">
+				<span>${t("todayNoticeDismiss")}</span>
+			</label>
+			<button type="button" id="today-notice-ok" class="btn btn-outline-info" style="margin-top:0.5rem;width:100%">${t("todayNoticeOk")}</button>
+		</div>
+	`;
+	modal.classList.remove("hidden");
+
+	document.getElementById("today-notice-ok").addEventListener("click", () => {
+		if (document.getElementById("today-notice-dismiss-check")?.checked) {
+			localStorage.setItem(dismissKey, "1");
+		}
+		modal.classList.add("hidden");
+	});
 }
 
 function showMessage(message, isError) {

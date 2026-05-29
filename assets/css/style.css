@@ -177,7 +177,9 @@ body {
 .budget-column > .card { align-self: stretch; min-width: 0; }
  
 .budget-stat-pair { grid-template-columns: repeat(2, minmax(0,1fr)); align-items: stretch; }
-.budget-stat-pair > .stat { height: 100%; display: flex; flex-direction: column; justify-content: flex-start; gap: 0.3rem; text-align: left; }
+.budget-stat-pair > .stat { height: 100%; display: flex; flex-direction: column; justify-content: space-between; gap: 0.3rem; text-align: left; }
+.stat h3 { text-align: left; }
+.stat p { text-align: left; margin-top: auto; }
  
 .compact-controls {
 	display: grid;
@@ -845,6 +847,15 @@ label { font-weight: 600; color: var(--muted-strong); font-size: 0.92rem; }
 }
 [data-theme="dark"] .profile-toast { background: #2aaa52; }
 
+.today-notice-card { max-width: 22rem; width: 90vw; }
+.today-notice-card h3 { margin-bottom: 0.8rem; font-size: 1.05rem; }
+.today-notice-row { margin: 0.3rem 0; font-size: 0.95rem; }
+.today-notice-row.income { color: #1a7a4e; }
+.today-notice-row.expense { color: #c63e5e; }
+[data-theme="dark"] .today-notice-row.income { color: #79e3b3; }
+[data-theme="dark"] .today-notice-row.expense { color: #f47c97; }
+.today-notice-dismiss-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; margin-top: 0.8rem; cursor: pointer; }
+
 .today-notice {
 	padding: 0.65rem 1rem;
 	background: #eaf4ff;
@@ -945,7 +956,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .chart-type-selector label { margin: 0; font-size: 0.9rem; white-space: nowrap; }
 .chart-type-selector select { width: auto; min-width: 0; }
 .chart-body { display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; }
-.chart-canvas-wrap { flex: 0 0 auto; width: min(300px, 100%); }
+.chart-canvas-wrap { flex: 0 0 auto; width: min(320px, 100%); }
 .chart-legend { flex: 1 1 180px; display: flex; flex-direction: column; gap: 0.45rem; max-height: 320px; overflow-y: auto; }
 .chart-legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; }
 .chart-legend-color { width: 14px; height: 14px; min-width: 14px; border-radius: 3px; }
@@ -1028,10 +1039,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.budget-columns { grid-template-columns: repeat(2, minmax(0,1fr)); }
 	.budget-column > .card, .forms-grid > .card { padding: 0.8rem; overflow: hidden; }
  
-	.budget-controls { grid-template-columns: 1fr; align-items: start; row-gap: 0.75rem; column-gap: 0.65rem; }
+	.budget-controls { grid-template-columns: 1fr auto; align-items: start; row-gap: 0.75rem; column-gap: 0.65rem; }
 	.budget-controls .period-control, .budget-controls .currency-control { min-width: 0; padding-top: 0; }
 	.budget-controls .period-control { grid-column: 1; }
-	.budget-controls > div.currency-control { grid-column: 1; align-content: start; justify-items: start; }
+	.budget-controls > div.currency-control { grid-column: 2; align-content: start; justify-items: start; }
 	.budget-controls > div.currency-control > label { white-space: normal; max-width: none; font-size: 0.89rem; }
 	.budget-controls .period-range-inputs { max-width: none; gap: 0.4rem; }
 	.budget-controls .period-range-inputs .small-date-input,
@@ -1039,8 +1050,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 		height: 2.08rem; min-height: 2.08rem;
 		padding: 0.32rem 0.48rem; font-size: 0.9rem; line-height: 1.1;
 	}
-	.budget-controls .period-range-inputs .small-date-input { width: 7.8rem; max-width: min(42vw,7.8rem); }
-	.budget-controls > div.currency-control select { width: 7.8rem; max-width: min(42vw,7.8rem); justify-self: start; }
+	.budget-controls .period-range-inputs .small-date-input { width: 6.5rem; max-width: min(36vw,6.5rem); }
+	.budget-controls > div.currency-control select { width: 5.5rem; max-width: min(28vw,5.5rem); justify-self: start; }
 	.budget-controls .control-action { grid-column: 1 / -1; }
 	.budget-controls .control-action .stack { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
 	.budget-controls .control-action .stack > button { flex: 0 1 auto; min-width: 0; font-size: 0.8rem; padding: 0.38rem 0.55rem; line-height: 1.2; white-space: normal; }
@@ -1048,20 +1059,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 	input[type="date"], input[type="month"] { width: 80%; max-width: 80%; min-width: 0; }
 	.budget-columns .stack input[type="date"],
-	.budget-columns .stack input[type="month"],
+	.budget-columns .stack input[type="month"] {
+		width: 100%; min-width: 0; max-width: 100%;
+	}
 	.forms-grid .stack input[type="date"],
 	.forms-grid .stack input[type="month"] {
-		width: 100%; min-width: 0;
-		max-width: 120px;
-		font-size: 0.78rem; line-height: 1.1;
-		padding: 0.28rem 0.3rem;
-		overflow: hidden; text-overflow: ellipsis;
-	}
-	.forms-grid input[type="date"],
-	.forms-grid input[type="month"] {
-		width: 100%; max-width: 120px; min-width: 0;
-		font-size: 0.78rem;
-		padding: 0.28rem 0.3rem;
+		width: 100%; min-width: 0; max-width: 100%;
 	}
 	.forms-grid input[type="date"]::-webkit-calendar-picker-indicator,
 	.forms-grid input[type="month"]::-webkit-calendar-picker-indicator {
@@ -1105,17 +1108,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.whatif-row-fields { grid-template-columns: repeat(2, minmax(0,1fr)); }
 	.saved-plans-actions { justify-content: flex-start; }
  
-	.chart-body { flex-direction: column; }
-	.chart-canvas-wrap { width: 100%; }
-	.chart-legend { max-height: none; }
+	.chart-body { flex-direction: column; align-items: stretch; }
+	.chart-canvas-wrap { width: 100%; max-width: 100%; flex: 1 1 auto; }
+	.chart-legend { max-height: none; flex-direction: row; flex-wrap: wrap; gap: 0.35rem 0.8rem; }
 
 	.auth-action-bar { grid-template-columns: 1fr; }
  
 	.entry-list li { grid-template-columns: 1fr; gap: 0.15rem; }
-	.entry-filters { grid-template-columns: 1fr; gap: 0.3rem; justify-items: start; }
+	.entry-filters { grid-template-columns: auto 1fr auto 1fr; gap: 0.3rem 0.5rem; align-items: center; }
 	.entry-filters label { font-size: 0.84rem; }
 	.entry-filters input[type="date"] {
-		width: min(100%,220px); inline-size: min(100%,220px);
+		width: 100%; inline-size: 100%;
 		max-width: 100%; min-width: 0;
 		min-height: 2.12rem; padding: 0.42rem 0.54rem; font-size: 0.84rem; line-height: 1.05;
 	}
