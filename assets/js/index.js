@@ -1,9 +1,7 @@
 import {
-    changeCurrentUserPassword,
-    changeCurrentUsername,
     completePasswordResetWithHistory,
     deleteCurrentAccount,
-    getAuthErrorCode,
+
     getFirebaseErrorMessage,
     loginWithUsername,
     logoutCurrentUser,
@@ -203,39 +201,25 @@ const showLoginButton = document.getElementById("show-login-button");
 const registerCard = document.getElementById("register-card");
 const loginCard = document.getElementById("login-card");
 const resetCard = document.getElementById("reset-card");
-const changePasswordCard = document.getElementById("change-password-card");
-const changeUsernameCard = document.getElementById("change-username-card");
 const resetCompleteCard = document.getElementById("reset-complete-card");
 const registerForm = document.getElementById("register-form");
 const loginForm = document.getElementById("login-form");
 const resetForm = document.getElementById("reset-form");
-const changePasswordForm = document.getElementById("change-password-form");
-const changeUsernameForm = document.getElementById("change-username-form");
 const resetCompleteForm = document.getElementById("reset-complete-form");
 const resetIdentifierInput = document.getElementById("reset-identifier");
 const registerPasswordInput = document.getElementById("register-password");
 const loginPasswordInput = document.getElementById("login-password");
 const loginPasswordToggle = document.getElementById("login-password-toggle");
-const changeNewPasswordInput = document.getElementById("change-new-password");
 const resetNewPasswordInput = document.getElementById("reset-new-password");
 const passwordStrengthMessage = document.getElementById("password-strength-message");
-const showChangePasswordButton = document.getElementById("show-change-password-button");
-const showChangeUsernameButton = document.getElementById("show-change-username-button");
-const profileActions = document.getElementById("profile-actions");
-const profileUsernameDisplay = document.getElementById("profile-username-display");
-const toggleProfileEdit = document.getElementById("toggle-profile-edit");
-const profileEditOptions = document.getElementById("profile-edit-options");
 const guestButton = document.getElementById("guest-button");
 const installAppButton = document.getElementById("install-app-button");
 const deleteAccountButton = document.getElementById("delete-account-button");
 const themeLightButton = document.getElementById("theme-light-button");
 const themeDarkButton = document.getElementById("theme-dark-button");
-const logoutButton = document.getElementById("logout-button");
-const sessionInfo = document.getElementById("session-info");
 const menuSessionInfo = document.getElementById("menu-session-info");
 const authMessage = document.getElementById("auth-message");
 const authMessageCard = authMessage ? authMessage.closest(".session-card") : null;
-const appLinks = document.getElementById("app-links");
 const languageSelect = document.getElementById("app-language");
 const contactUsButton = document.getElementById("contact-us-button");
 
@@ -328,28 +312,6 @@ function wireEvents() {
         showResetButton.addEventListener("click", () => {
             authOptions.classList.remove("hidden");
             showSingleAuthCard(resetCard);
-        });
-    }
-
-    if (toggleProfileEdit) {
-        toggleProfileEdit.addEventListener("click", () => {
-            profileEditOptions?.classList.toggle("hidden");
-            authOptions.classList.add("hidden");
-            showSingleAuthCard(null);
-        });
-    }
-
-    if (showChangeUsernameButton) {
-        showChangeUsernameButton.addEventListener("click", () => {
-            authOptions.classList.remove("hidden");
-            showSingleAuthCard(changeUsernameCard);
-        });
-    }
-
-    if (showChangePasswordButton) {
-        showChangePasswordButton.addEventListener("click", () => {
-            authOptions.classList.remove("hidden");
-            showSingleAuthCard(changePasswordCard);
         });
     }
 
@@ -449,55 +411,6 @@ function wireEvents() {
         });
     }
 
-    if (changeUsernameForm) {
-        changeUsernameForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const newUsername = document.getElementById("change-new-username").value.trim();
-
-            try {
-                const session = await changeCurrentUsername({ newUsername });
-                changeUsernameForm.reset();
-                applyAuthenticatedState(session);
-                if (profileUsernameDisplay) profileUsernameDisplay.textContent = getSignedInDisplayName();
-                if (profileEditOptions) profileEditOptions.classList.add("hidden");
-                showMessage(t("changeUsernameSuccess"), false);
-                showSingleAuthCard(null);
-                authOptions.classList.add("hidden");
-                updateMenuSessionLabel();
-            } catch (error) {
-                showMessage(getFirebaseErrorMessage(error, appLanguage, "generic"), true);
-            }
-        });
-    }
-
-    if (changePasswordForm) {
-        changePasswordForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const currentPassword = document.getElementById("change-current-password").value;
-            const newPassword = document.getElementById("change-new-password").value;
-            const confirmPassword = document.getElementById("change-new-password-confirm").value;
-
-            if (newPassword !== confirmPassword) {
-                showMessage(t("passwordMismatch"), true);
-                return;
-            }
-
-            if (!isPasswordStrong(newPassword)) {
-                showMessage(t("passwordWeak"), true);
-                return;
-            }
-
-            try {
-                await changeCurrentUserPassword({ currentPassword, newPassword });
-                changePasswordForm.reset();
-                showMessage(t("changePasswordSuccess"), false);
-                showSingleAuthCard(loginCard);
-            } catch (error) {
-                showMessage(getFirebaseErrorMessage(error, appLanguage, "reset"), true);
-            }
-        });
-    }
-
     if (resetCompleteForm) {
         resetCompleteForm.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -526,12 +439,6 @@ function wireEvents() {
         });
     }
 
-    if (changeNewPasswordInput) {
-        changeNewPasswordInput.addEventListener("input", () => {
-            showPasswordStrengthForInput(changeNewPasswordInput);
-        });
-    }
-
     if (resetNewPasswordInput) {
         resetNewPasswordInput.addEventListener("input", () => {
             showPasswordStrengthForInput(resetNewPasswordInput);
@@ -542,13 +449,6 @@ function wireEvents() {
         guestButton.addEventListener("click", () => {
             loginGuest();
             showMessage(t("guestSuccess"), false);
-        });
-    }
-
-    if (logoutButton) {
-        logoutButton.addEventListener("click", async () => {
-            await performLogout();
-            showMessage(t("logoutSuccess"), false);
         });
     }
 
@@ -605,7 +505,6 @@ function wireEvents() {
 }
 
 async function initializePage() {
-    ensureGuestData();
 
     if (currentUser === GUEST_SESSION_VALUE) {
         currentUser = "";
@@ -639,23 +538,10 @@ async function initializePage() {
     updateInstallButtonState();
     showMessage("", false);
 
-    const actionParam = urlParams.get("action");
-    if (actionParam && currentUser) {
-        if (actionParam === "changeUsername") {
-            authOptions.classList.remove("hidden");
-            showSingleAuthCard(changeUsernameCard);
-            if (profileEditOptions) profileEditOptions.classList.remove("hidden");
-        } else if (actionParam === "changePassword") {
-            authOptions.classList.remove("hidden");
-            showSingleAuthCard(changePasswordCard);
-            if (profileEditOptions) profileEditOptions.classList.remove("hidden");
-        }
-        window.history.replaceState({}, document.title, "index.html");
-    }
 }
 
 function showSingleAuthCard(cardToShow) {
-    [registerCard, loginCard, resetCard, changeUsernameCard, changePasswordCard, resetCompleteCard].forEach((card) => {
+    [registerCard, loginCard, resetCard, resetCompleteCard].forEach((card) => {
         card?.classList.add("hidden");
     });
     cardToShow?.classList.remove("hidden");
@@ -676,7 +562,6 @@ function applyTranslations() {
     updatePasswordStrengthFeedback();
     syncLoginPasswordToggleButton();
     updateResetFormTexts();
-    updateSessionLabel();
     updateMenuSessionLabel();
 }
 
@@ -810,35 +695,7 @@ function updateAccessUI() {
         authOptions.classList.toggle("hidden", true);
         showSingleAuthCard(null);
     }
-    if (profileActions) {
-        profileActions.classList.toggle("hidden", !loggedIn);
-        if (!loggedIn && profileEditOptions) profileEditOptions.classList.add("hidden");
-    }
-    if (profileUsernameDisplay && loggedIn) {
-        profileUsernameDisplay.textContent = getSignedInDisplayName();
-    }
-    if (logoutButton) {
-        logoutButton.classList.toggle("hidden", !loggedIn);
-    }
-    if (appLinks) {
-        appLinks.classList.toggle("hidden", !loggedIn);
-    }
-    updateSessionLabel();
     updateMenuSessionLabel();
-}
-
-function updateSessionLabel() {
-    if (!currentUser) {
-        if (sessionInfo) {
-            sessionInfo.textContent = t("loggedOut");
-        }
-        return;
-    }
-
-    const name = getSignedInDisplayName();
-    if (sessionInfo) {
-        sessionInfo.textContent = `${t("loggedIn")} ${name}`;
-    }
 }
 
 function updateMenuSessionLabel() {
@@ -991,8 +848,4 @@ function updateInstallButtonState() {
         installAppButton.textContent = t("downloadAppButton");
     }
     installAppButton.disabled = false;
-}
-
-function ensureGuestData() {
-    shared.saveGuestData(shared.loadGuestData());
 }

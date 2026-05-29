@@ -101,11 +101,6 @@ const dictionary = {
 		repeatMonthlyBadge: "Ismétlődő",
 		repeatEnabled: "Ismétlődő megjelenítés bekapcsolva.",
 		repeatDisabled: "Ismétlődő megjelenítés kikapcsolva.",
-		chartTitle: "Diagram",
-		chartDescription: "Bevételek és kiadások kategóriánként",
-		chartTypeLabel: "Típus",
-		chartTypePie: "Kördiagram",
-		chartTypeBar: "Oszlopdiagram",
 		categories: {
 			fizetes: "Fizetés",
 			"child benefit": "Családi pótlék",
@@ -222,11 +217,6 @@ const dictionary = {
 		repeatMonthlyBadge: "Monthly repeat",
 		repeatEnabled: "Monthly repeat enabled.",
 		repeatDisabled: "Monthly repeat disabled.",
-		chartTitle: "Chart",
-		chartDescription: "Income and expenses by category",
-		chartTypeLabel: "Type",
-		chartTypePie: "Pie chart",
-		chartTypeBar: "Bar chart",
 		categories: {
 			fizetes: "Salary",
 			"child benefit": "Child Benefit",
