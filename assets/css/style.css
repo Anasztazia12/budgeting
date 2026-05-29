@@ -899,9 +899,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .icon-btn:hover, .icon-btn:focus-visible { background: #dce9ff; border-color: #6790d8; }
 [data-theme="dark"] .icon-btn { background: #2a4678; border-color: #7fa7f3; color: #eef4ff; }
 [data-theme="dark"] .icon-btn:hover, [data-theme="dark"] .icon-btn:focus-visible { background: #35558f; }
-.icon-btn.danger { background: linear-gradient(125deg, #d44a5b, #a52e3e); border-color: #8b2532; color: #fff; }
-.icon-btn.danger:hover, .icon-btn.danger:focus-visible { background: linear-gradient(125deg, #e05869, #b43748); border-color: #972a38; }
-[data-theme="dark"] .icon-btn.danger { background: linear-gradient(125deg, #a8384b, #7b2637); border-color: #d48a99; }
+.icon-btn.danger { background: #fff1f1; border-color: #e39a9a; color: #c62828; }
+.icon-btn.danger:hover, .icon-btn.danger:focus-visible { background: #ffe0e0; border-color: #d07070; }
+[data-theme="dark"] .icon-btn.danger { background: #51242a; border-color: #ba7f88; color: #ffd7dc; }
 .icon-btn.close-btn { background: #f0f0f0; border-color: #bbb; color: #333; font-weight: 700; }
 .icon-btn.close-btn:hover { background: #e0e0e0; border-color: #999; }
 [data-theme="dark"] .icon-btn.close-btn { background: #2a2a3a; border-color: #666; color: #ccc; }
