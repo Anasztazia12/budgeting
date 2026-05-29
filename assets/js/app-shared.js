@@ -352,3 +352,25 @@
         getDeleteAccountSuccessMessage
     };
 })();
+
+document.addEventListener("DOMContentLoaded", () => {
+    const toggle = document.getElementById("menu-profile-toggle");
+    const options = document.getElementById("menu-profile-options");
+    if (toggle && options) {
+        toggle.addEventListener("click", () => {
+            options.classList.toggle("hidden");
+        });
+    }
+    const changeUsername = document.getElementById("menu-change-username");
+    if (changeUsername) {
+        changeUsername.addEventListener("click", () => {
+            window.location.href = "index.html?action=changeUsername";
+        });
+    }
+    const changePassword = document.getElementById("menu-change-password");
+    if (changePassword) {
+        changePassword.addEventListener("click", () => {
+            window.location.href = "index.html?action=changePassword";
+        });
+    }
+});

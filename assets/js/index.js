@@ -42,7 +42,7 @@ const dictionary = {
         appName: "Költségvetési app",
         registerTitle: "Regisztráció",
         loginTitle: "Bejelentkezés",
-        usernameLabel: "Becenév",
+        usernameLabel: "Felhasználónév",
         emailLabel: "Email cím",
         emailConfirmLabel: "Email cím megerősítése",
         passwordLabel: "Jelszó",
@@ -53,6 +53,7 @@ const dictionary = {
         passwordWeak: "A jelszó túl gyenge.",
         passwordStrong: "A jelszó elég erős.",
         forgotPasswordButton: "Elfelejtett jelszó",
+        profileEditButton: "Adatok módosítása",
         changeUsernameMenuButton: "Felhasználónév módosítása",
         changeUsernameTitle: "Felhasználónév módosítása",
         changeUsernameHint: "Add meg az új felhasználónevedet.",
@@ -69,7 +70,7 @@ const dictionary = {
         changePasswordSuccess: "A jelszó sikeresen módosítva.",
         resetTitle: "Jelszó visszaállítása",
         resetHint: "Add meg a beceneved vagy az email címed, és küldünk egy visszaállító linket.",
-        resetIdentifierLabel: "Becenév vagy email cím",
+        resetIdentifierLabel: "Felhasználónév vagy email cím",
         resetButton: "Reset email küldése",
         resetCompleteTitle: "Új jelszó beállítása",
         resetCompleteHint: "Adj meg egy új jelszót. Korábban használt jelszó nem adható meg.",
@@ -92,12 +93,12 @@ const dictionary = {
         guestUser: "Vendég",
         emailMismatch: "Az email címek nem egyeznek.",
         passwordMismatch: "A jelszavak nem egyeznek.",
-        usernameTaken: "Ez a becenév már foglalt.",
+        usernameTaken: "Ez a felhasználónév már foglalt.",
         registerSuccess: "Sikeres regisztráció.",
         loginSuccess: "Sikeres bejelentkezés.",
         guestSuccess: "Vendég mód aktív.",
         logoutSuccess: "Sikeres kijelentkezés.",
-        invalidLogin: "Hibás becenév vagy jelszó.",
+        invalidLogin: "Hibás felhasználónév vagy jelszó.",
         welcomeRegistered: "Welcome, {username}! A regisztráció sikeres.",
         appInstalled: "Az app telepítve.",
         appDownloaded: "Az app letöltve.",
@@ -124,7 +125,7 @@ const dictionary = {
         appName: "Budgeting App",
         registerTitle: "Register",
         loginTitle: "Sign in",
-        usernameLabel: "Nickname",
+        usernameLabel: "Username",
         emailLabel: "Email address",
         emailConfirmLabel: "Confirm email address",
         passwordLabel: "Password",
@@ -135,12 +136,13 @@ const dictionary = {
         passwordWeak: "Password is too weak.",
         passwordStrong: "Password is strong enough.",
         forgotPasswordButton: "Forgot password",
-        changeUsernameMenuButton: "Change nickname",
-        changeUsernameTitle: "Change nickname",
-        changeUsernameHint: "Enter your new nickname.",
-        newUsernameLabel: "New nickname",
-        changeUsernameButton: "Change nickname",
-        changeUsernameSuccess: "Nickname changed successfully.",
+        profileEditButton: "Edit profile",
+        changeUsernameMenuButton: "Change username",
+        changeUsernameTitle: "Change username",
+        changeUsernameHint: "Enter your new username.",
+        newUsernameLabel: "New username",
+        changeUsernameButton: "Change username",
+        changeUsernameSuccess: "Username changed successfully.",
         changePasswordMenuButton: "Change password",
         changePasswordTitle: "Change password",
         changePasswordHint: "Enter your current password and your new password.",
@@ -150,8 +152,8 @@ const dictionary = {
         changePasswordButton: "Change password",
         changePasswordSuccess: "Password changed successfully.",
         resetTitle: "Reset password",
-        resetHint: "Enter your nickname or email address and we will send a reset link.",
-        resetIdentifierLabel: "Nickname or email address",
+        resetHint: "Enter your username or email address and we will send a reset link.",
+        resetIdentifierLabel: "Username or email address",
         resetButton: "Send reset email",
         resetCompleteTitle: "Set a new password",
         resetCompleteHint: "Enter a new password. Previously used passwords are not allowed.",
@@ -174,12 +176,12 @@ const dictionary = {
         guestUser: "Guest",
         emailMismatch: "Email addresses do not match.",
         passwordMismatch: "Passwords do not match.",
-        usernameTaken: "This nickname is already taken.",
+        usernameTaken: "This username is already taken.",
         registerSuccess: "Registration successful.",
         loginSuccess: "Signed in successfully.",
         guestSuccess: "Guest mode enabled.",
         logoutSuccess: "Signed out successfully.",
-        invalidLogin: "Invalid nickname or password.",
+        invalidLogin: "Invalid username or password.",
         welcomeRegistered: "Welcome, {username}! Registration successful.",
         appInstalled: "App installed.",
         appDownloaded: "App downloaded.",
@@ -217,6 +219,10 @@ const resetNewPasswordInput = document.getElementById("reset-new-password");
 const passwordStrengthMessage = document.getElementById("password-strength-message");
 const showChangePasswordButton = document.getElementById("show-change-password-button");
 const showChangeUsernameButton = document.getElementById("show-change-username-button");
+const profileActions = document.getElementById("profile-actions");
+const profileUsernameDisplay = document.getElementById("profile-username-display");
+const toggleProfileEdit = document.getElementById("toggle-profile-edit");
+const profileEditOptions = document.getElementById("profile-edit-options");
 const guestButton = document.getElementById("guest-button");
 const installAppButton = document.getElementById("install-app-button");
 const deleteAccountButton = document.getElementById("delete-account-button");
@@ -323,15 +329,18 @@ function wireEvents() {
         });
     }
 
+    if (toggleProfileEdit) {
+        toggleProfileEdit.addEventListener("click", () => {
+            profileEditOptions?.classList.toggle("hidden");
+            authOptions.classList.add("hidden");
+            showSingleAuthCard(null);
+        });
+    }
+
     if (showChangeUsernameButton) {
         showChangeUsernameButton.addEventListener("click", () => {
             authOptions.classList.remove("hidden");
             showSingleAuthCard(changeUsernameCard);
-            if (menuPanel && menuToggle) {
-                menuPanel.classList.remove("is-open");
-                menuToggle.classList.remove("is-open");
-                menuToggle.setAttribute("aria-expanded", "false");
-            }
         });
     }
 
@@ -339,11 +348,6 @@ function wireEvents() {
         showChangePasswordButton.addEventListener("click", () => {
             authOptions.classList.remove("hidden");
             showSingleAuthCard(changePasswordCard);
-            if (menuPanel && menuToggle) {
-                menuPanel.classList.remove("is-open");
-                menuToggle.classList.remove("is-open");
-                menuToggle.setAttribute("aria-expanded", "false");
-            }
         });
     }
 
@@ -465,6 +469,8 @@ function wireEvents() {
                 const session = await changeCurrentUsername({ newUsername });
                 changeUsernameForm.reset();
                 applyAuthenticatedState(session);
+                if (profileUsernameDisplay) profileUsernameDisplay.textContent = getSignedInDisplayName();
+                if (profileEditOptions) profileEditOptions.classList.add("hidden");
                 showMessage(t("changeUsernameSuccess"), false);
                 showSingleAuthCard(null);
                 authOptions.classList.add("hidden");
@@ -643,6 +649,20 @@ async function initializePage() {
     updateAccessUI();
     updateInstallButtonState();
     showMessage("", false);
+
+    const actionParam = urlParams.get("action");
+    if (actionParam && currentUser) {
+        if (actionParam === "changeUsername") {
+            authOptions.classList.remove("hidden");
+            showSingleAuthCard(changeUsernameCard);
+            if (profileEditOptions) profileEditOptions.classList.remove("hidden");
+        } else if (actionParam === "changePassword") {
+            authOptions.classList.remove("hidden");
+            showSingleAuthCard(changePasswordCard);
+            if (profileEditOptions) profileEditOptions.classList.remove("hidden");
+        }
+        window.history.replaceState({}, document.title, "index.html");
+    }
 }
 
 function showSingleAuthCard(cardToShow) {
@@ -801,11 +821,12 @@ function updateAccessUI() {
         authOptions.classList.toggle("hidden", true);
         showSingleAuthCard(null);
     }
-    if (showChangeUsernameButton) {
-        showChangeUsernameButton.classList.toggle("hidden", !loggedIn);
+    if (profileActions) {
+        profileActions.classList.toggle("hidden", !loggedIn);
+        if (!loggedIn && profileEditOptions) profileEditOptions.classList.add("hidden");
     }
-    if (showChangePasswordButton) {
-        showChangePasswordButton.classList.toggle("hidden", !loggedIn);
+    if (profileUsernameDisplay && loggedIn) {
+        profileUsernameDisplay.textContent = getSignedInDisplayName();
     }
     if (logoutButton) {
         logoutButton.classList.toggle("hidden", !loggedIn);
@@ -853,7 +874,7 @@ function getSignedInDisplayName() {
         return t("guestUser");
     }
 
-    return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser;
+    return localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.username || currentProfile?.username || currentUser;
 }
 
 function showMessage(message, isError) {
@@ -928,7 +949,7 @@ function applyAuthenticatedState(session) {
     currentUser = username;
     currentProfile = session.profile || null;
     localStorage.setItem(SESSION_KEY, username);
-    localStorage.setItem(DISPLAY_NAME_KEY, currentProfile?.nickname || currentProfile?.username || username);
+    localStorage.setItem(DISPLAY_NAME_KEY, currentProfile?.username || currentProfile?.username || username);
 }
 
 function clearAuthenticatedState() {

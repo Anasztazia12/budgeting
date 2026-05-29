@@ -47,8 +47,6 @@
                         <p id="menu-session-info" class="menu-session-info" aria-live="polite"></p>
                         <a href="index.html" data-i18n="homeLink">Kezdőlap</a>
                         <button type="button" id="menu-back-button" data-i18n="backAction">Vissza</button>
-                        <button type="button" id="show-change-username-button" data-i18n="changeUsernameMenuButton">Felhasználónév módosítása</button>
-                        <button type="button" id="show-change-password-button" data-i18n="changePasswordMenuButton">Jelszó módosítása</button>
                         <button type="button" id="install-app-button" data-i18n="downloadAppButton">App letöltése</button>
                         <button type="button" id="menu-logout-button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
                         <hr class="menu-divider">
@@ -66,6 +64,15 @@
             <button type="button" id="guest-button" class="guest-accent" data-i18n="guestButton">Folytatás vendégként</button>
         </div>
 
+        <div id="profile-actions" class="card hidden">
+            <p><span data-i18n="loggedIn">Bejelentkezve:</span> <strong id="profile-username-display"></strong></p>
+            <button type="button" id="toggle-profile-edit" data-i18n="profileEditButton">Adatok módosítása</button>
+            <div id="profile-edit-options" class="stack hidden">
+                <button type="button" id="show-change-username-button" data-i18n="changeUsernameMenuButton">Felhasználónév módosítása</button>
+                <button type="button" id="show-change-password-button" data-i18n="changePasswordMenuButton">Jelszó módosítása</button>
+            </div>
+        </div>
+
         <div class="card session-card hidden">
             <p id="auth-message" class="auth-message hidden" aria-live="polite"></p>
         </div>
@@ -74,7 +81,7 @@
             <article class="card hidden" id="register-card">
                 <h2 data-i18n="registerTitle">Regisztráció</h2>
                 <form id="register-form" class="stack">
-                    <label for="register-username" data-i18n="usernameLabel">Becenév</label>
+                    <label for="register-username" data-i18n="usernameLabel">Felhasználónév</label>
                     <input type="text" id="register-username" required>
 
                     <label for="register-email" data-i18n="emailLabel">Email cím</label>
@@ -97,7 +104,7 @@
             <article class="card hidden" id="login-card">
                 <h2 data-i18n="loginTitle">Bejelentkezés</h2>
                 <form id="login-form" class="stack">
-                    <label for="login-username" data-i18n="usernameLabel">Becenév</label>
+                    <label for="login-username" data-i18n="usernameLabel">Felhasználónév</label>
                     <input type="text" id="login-username" required>
 
                     <label for="login-password" data-i18n="passwordLabel">Jelszó</label>
@@ -115,7 +122,7 @@
                 <h2 data-i18n="resetTitle">Jelszó visszaállítása</h2>
                 <p data-i18n="resetHint">Add meg a beceneved vagy az email címed, és küldünk egy visszaállító linket.</p>
                 <form id="reset-form" class="stack">
-                    <label for="reset-identifier" data-i18n="resetIdentifierLabel">Becenév vagy email cím</label>
+                    <label for="reset-identifier" data-i18n="resetIdentifierLabel">Felhasználónév vagy email cím</label>
                     <input type="text" id="reset-identifier" required>
                     <button type="submit" data-i18n="resetButton">Reset email küldése</button>
                 </form>
@@ -127,7 +134,7 @@
                 <form id="change-username-form" class="stack">
                     <label for="change-new-username" data-i18n="newUsernameLabel">Új felhasználónév</label>
                     <input type="text" id="change-new-username" required>
-                    <button type="submit" data-i18n="changeUsernameButton">Becenév módosítása</button>
+                    <button type="submit" data-i18n="changeUsernameButton">Felhasználónév módosítása</button>
                 </form>
             </article>
 

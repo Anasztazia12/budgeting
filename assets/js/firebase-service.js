@@ -606,15 +606,15 @@ export function getFirebaseErrorMessage(error, language, operation) {
 
     const messageMap = {
         "app/username-taken": {
-            en: "This nickname is already taken.",
-            hu: "Ez a becenév már foglalt."
+            en: "This username is already taken.",
+            hu: "Ez a felhasználónév már foglalt."
         },
         "app/username-same": {
-            en: "This is already your current nickname.",
+            en: "This is already your current username.",
             hu: "Ez már a jelenlegi beceneved."
         },
         "app/invalid-username-change": {
-            en: "Please enter a valid nickname.",
+            en: "Please enter a valid username.",
             hu: "Adj meg egy érvényes becenevet."
         },
         "app/email-already-exists": {
@@ -630,11 +630,11 @@ export function getFirebaseErrorMessage(error, language, operation) {
             hu: "A regisztrációs adatok hiányosak."
         },
         "app/invalid-login": {
-            en: "Invalid nickname or password.",
-            hu: "Hibás becenév vagy jelszó."
+            en: "Invalid username or password.",
+            hu: "Hibás felhasználónév vagy jelszó."
         },
         "app/invalid-reset-request": {
-            en: "Please enter a valid nickname or email address.",
+            en: "Please enter a valid username or email address.",
             hu: "Adj meg egy érvényes becenevet vagy email címet."
         },
         "app/invalid-password-change": {
@@ -674,24 +674,24 @@ export function getFirebaseErrorMessage(error, language, operation) {
             hu: "A Firebase Email/Password bejelentkezés még nincs bekapcsolva."
         },
         "auth/invalid-credential": {
-            en: "Invalid nickname or password.",
-            hu: "Hibás becenév vagy jelszó."
+            en: "Invalid username or password.",
+            hu: "Hibás felhasználónév vagy jelszó."
         },
         "auth/invalid-login-credentials": {
-            en: "Invalid nickname or password.",
-            hu: "Hibás becenév vagy jelszó."
+            en: "Invalid username or password.",
+            hu: "Hibás felhasználónév vagy jelszó."
         },
         "auth/invalid-email": {
             en: "Please enter a valid email address.",
             hu: "Adj meg egy érvényes email címet."
         },
         "auth/user-not-found": {
-            en: "Invalid nickname or password.",
-            hu: "Hibás becenév vagy jelszó."
+            en: "Invalid username or password.",
+            hu: "Hibás felhasználónév vagy jelszó."
         },
         "auth/wrong-password": {
-            en: "Invalid nickname or password.",
-            hu: "Hibás becenév vagy jelszó."
+            en: "Invalid username or password.",
+            hu: "Hibás felhasználónév vagy jelszó."
         },
         "auth/requires-recent-login": {
             en: "Please sign in again, then try the action once more.",

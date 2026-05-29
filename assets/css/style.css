@@ -527,12 +527,6 @@ button.secondary:hover, button.secondary:focus-visible { filter: brightness(1.08
 	font-size: var(--btn-font-size); line-height: 1.2; font-weight: 700;
 	border-radius: var(--control-radius); border-width: 1px;
 }
-#forecast-toggle-button {
-	background: linear-gradient(125deg, #1b9d8f, #167f73);
-	border: 1px solid #1b7c71; color: #fff; font-weight: 700;
-}
-#forecast-toggle-button:hover, #forecast-toggle-button:focus-visible { filter: brightness(1.08) saturate(1.04); box-shadow: 0 12px 22px rgba(23,104,95,.26); }
-[data-theme="dark"] #forecast-toggle-button { background: linear-gradient(125deg, #2f9f92, #217a70); border-color: #71d0c3; }
  
 /* ── Language corner ── */
 .language-corner {
@@ -635,6 +629,7 @@ button.secondary:hover, button.secondary:focus-visible { filter: brightness(1.08
 }
 .menu-panel a:focus-visible { outline: 2px solid #8cb2ef; outline-offset: 2px; }
 .menu-panel .menu-logout { background: linear-gradient(125deg, #4769c6, #2f4fa7); }
+.menu-profile-options { display: flex; flex-direction: column; gap: 0.3rem; padding-left: 0.7rem; border-left: 3px solid rgba(255,255,255,0.3); }
 .menu-panel .menu-divider { margin: 0.3rem 0 0.1rem; border: 0; border-top: 1px solid #d66883; opacity: 1; }
 [data-theme="dark"] .menu-panel .menu-divider { border-top-color: #8f3f56; }
  
