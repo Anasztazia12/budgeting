@@ -799,6 +799,7 @@ async function handleLogout() {
 	currentProfile = null;
 	appState = { incomes: [], expenses: [] };
 	localStorage.removeItem(SESSION_KEY);
+	sessionStorage.removeItem("budgetAppGuestData");
 	window.location.href = "index.html";
 }
 

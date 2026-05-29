@@ -1007,6 +1007,7 @@ async function handleLogout() {
 	menuToggle.setAttribute("aria-expanded", "false");
 	if (currentUser && currentUser !== GUEST_SESSION_VALUE) await logoutCurrentUser().catch(() => null);
 	localStorage.removeItem(SESSION_KEY);
+	sessionStorage.removeItem("budgetAppGuestData");
 	window.location.href = "index.html";
 }
 

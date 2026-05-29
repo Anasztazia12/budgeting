@@ -664,6 +664,9 @@ button.secondary:hover, button.secondary:focus-visible { filter: brightness(1.08
 }
 .menu-panel a:focus-visible { outline: 2px solid #8cb2ef; outline-offset: 2px; }
 .menu-panel .menu-logout { background: linear-gradient(125deg, #4769c6, #2f4fa7); }
+.menu-panel .btn-info { background: linear-gradient(125deg, #138496, #0c6675); border-color: #0d7080; color: #fff; }
+.menu-panel .btn-info:hover, .menu-panel .btn-info:focus-visible { background: linear-gradient(125deg, #1a9aaf, #107889); border-color: #0d7080; }
+[data-theme="dark"] .menu-panel .btn-info { background: linear-gradient(125deg, #1ab8d4, #0d8fa8); border-color: #1ecde8; }
 .menu-profile-options { display: flex; flex-direction: column; gap: 0.3rem; padding-left: 0.7rem; border-left: 3px solid rgba(255,255,255,0.3); }
 .menu-panel .menu-divider { margin: 0.3rem 0 0.1rem; border: 0; border-top: 1px solid #d66883; opacity: 1; }
 [data-theme="dark"] .menu-panel .menu-divider { border-top-color: #8f3f56; }

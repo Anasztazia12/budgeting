@@ -743,6 +743,7 @@ async function handleLogout() {
 		// ignore
 	}
 	localStorage.removeItem(SESSION_KEY);
+	sessionStorage.removeItem("budgetAppGuestData");
 	window.location.href = "index.html";
 }
 

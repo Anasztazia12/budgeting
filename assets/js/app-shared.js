@@ -487,8 +487,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem("budgetAppDisplayName", newName);
                 const sessionEl = document.getElementById("menu-session-info");
                 if (sessionEl) sessionEl.textContent = `${isEn ? "Signed in as:" : "Bejelentkezve:"} ${newName}`;
-                closeModal();
-                showToast(isEn ? "Username changed successfully." : "A felhasználónév sikeresen módosítva.");
+                showMsg(isEn ? "Username changed successfully." : "A felhasználónév sikeresen módosítva.", false);
+                modalForm.querySelector("button[type=submit]").disabled = true;
+                setTimeout(closeModal, 6000);
             } catch (err) {
                 const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "generic") || (isEn ? "An error occurred." : "Hiba történt.");
                 showMsg(msg, true);
@@ -545,8 +546,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!strong) { showMsg(isEn ? "Password must be 6-20 chars with uppercase, lowercase and a number." : "A jelszó 6-20 karakter, tartalmazzon kis- és nagybetűt és számot.", true); return; }
             try {
                 await window.BudgetAppFirebaseService.changeCurrentUserPassword({ currentPassword, newPassword });
-                closeModal();
-                showToast(isEn ? "Password changed successfully." : "A jelszó sikeresen módosítva.");
+                showMsg(isEn ? "Password changed successfully." : "A jelszó sikeresen módosítva.", false);
+                modalForm.querySelector("button[type=submit]").disabled = true;
+                setTimeout(closeModal, 6000);
             } catch (err) {
                 const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "reset") || (isEn ? "An error occurred." : "Hiba történt.");
                 showMsg(msg, true);
@@ -570,4 +572,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const menuChangePassword = document.getElementById("menu-change-password");
     if (menuChangePassword) menuChangePassword.addEventListener("click", openPasswordModal);
+
+    // Hide profile edit section for guest users
+    const session = localStorage.getItem("budgetAppSession");
+    const isGuest = !session || session === "__guest__";
+    if (isGuest) {
+        const profileToggle = document.getElementById("menu-profile-toggle");
+        const profileOptions = document.getElementById("menu-profile-options");
+        if (profileToggle) profileToggle.classList.add("hidden");
+        if (profileOptions) profileOptions.classList.add("hidden");
+    }
 });
