@@ -1044,19 +1044,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.budget-columns { grid-template-columns: repeat(2, minmax(0,1fr)); }
 	.budget-column > .card, .forms-grid > .card { padding: 0.8rem; overflow: hidden; }
  
-	.budget-controls { grid-template-columns: 1fr auto; align-items: end; row-gap: 0.55rem; column-gap: 0.5rem; }
+	.budget-controls { grid-template-columns: 1fr auto; align-items: start; row-gap: 0.55rem; column-gap: 0.5rem; }
 	.budget-controls .period-control, .budget-controls .currency-control { min-width: 0; padding-top: 0; }
 	.budget-controls .period-control { grid-column: 1; }
-	.budget-controls > div.currency-control { grid-column: 2; align-content: end; justify-items: start; }
-	.budget-controls > div.currency-control > label { display: none; }
+	.budget-controls > div.currency-control { grid-column: 2; align-content: start; justify-items: start; }
+	.budget-controls > div.currency-control > label { display: block; font-size: 0.82rem; margin-bottom: 0.2rem; white-space: normal; }
 	.budget-controls .period-range-inputs { max-width: none; gap: 0.4rem; }
 	.budget-controls .period-range-inputs .small-date-input,
 	.budget-controls > div.currency-control select {
 		height: 2.08rem; min-height: 2.08rem;
-		padding: 0.32rem 0.4rem; font-size: 0.85rem; line-height: 1.1;
+		padding: 0.32rem 0.4rem; font-size: 0.9rem; line-height: 1.1;
 	}
-	.budget-controls .period-range-inputs .small-date-input { width: 6rem; max-width: min(32vw,6rem); }
-	.budget-controls > div.currency-control select { width: 5rem; max-width: min(26vw,5rem); }
+	.budget-controls .period-range-inputs .small-date-input { width: 8rem; max-width: min(38vw,8rem); }
+	.budget-controls > div.currency-control select { width: 5.5rem; max-width: min(28vw,5.5rem); }
 	.budget-controls .control-action { grid-column: 1 / -1; }
 	.budget-controls .control-action .stack { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; justify-items: stretch; }
 	.budget-controls .control-action .stack > button { font-size: 0.8rem; padding: 0.38rem 0.4rem; line-height: 1.2; white-space: normal; min-height: 2.2rem; width: 100%; }
