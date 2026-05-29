@@ -487,8 +487,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem("budgetAppDisplayName", newName);
                 const sessionEl = document.getElementById("menu-session-info");
                 if (sessionEl) sessionEl.textContent = `${isEn ? "Signed in as:" : "Bejelentkezve:"} ${newName}`;
-                showMsg(isEn ? "Username changed successfully." : "A felhasználónév sikeresen módosítva.", false);
-                modalForm.reset();
+                closeModal();
+                showToast(isEn ? "Username changed successfully." : "A felhasználónév sikeresen módosítva.");
             } catch (err) {
                 const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "generic") || (isEn ? "An error occurred." : "Hiba történt.");
                 showMsg(msg, true);
