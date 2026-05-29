@@ -1,5 +1,6 @@
 import {
     changeCurrentUserPassword,
+    changeCurrentUsername,
     completePasswordResetWithHistory,
     deleteCurrentAccount,
     getAuthErrorCode,
@@ -52,6 +53,12 @@ const dictionary = {
         passwordWeak: "A jelszó túl gyenge.",
         passwordStrong: "A jelszó elég erős.",
         forgotPasswordButton: "Elfelejtett jelszó",
+        changeUsernameMenuButton: "Felhasználónév módosítása",
+        changeUsernameTitle: "Felhasználónév módosítása",
+        changeUsernameHint: "Add meg az új felhasználónevedet.",
+        newUsernameLabel: "Új felhasználónév",
+        changeUsernameButton: "Felhasználónév módosítása",
+        changeUsernameSuccess: "A felhasználónév sikeresen módosítva.",
         changePasswordMenuButton: "Jelszó módosítása",
         changePasswordTitle: "Jelszó módosítása",
         changePasswordHint: "Add meg a jelenlegi jelszavadat és az új jelszót.",
@@ -128,6 +135,12 @@ const dictionary = {
         passwordWeak: "Password is too weak.",
         passwordStrong: "Password is strong enough.",
         forgotPasswordButton: "Forgot password",
+        changeUsernameMenuButton: "Change nickname",
+        changeUsernameTitle: "Change nickname",
+        changeUsernameHint: "Enter your new nickname.",
+        newUsernameLabel: "New nickname",
+        changeUsernameButton: "Change nickname",
+        changeUsernameSuccess: "Nickname changed successfully.",
         changePasswordMenuButton: "Change password",
         changePasswordTitle: "Change password",
         changePasswordHint: "Enter your current password and your new password.",
@@ -187,11 +200,13 @@ const registerCard = document.getElementById("register-card");
 const loginCard = document.getElementById("login-card");
 const resetCard = document.getElementById("reset-card");
 const changePasswordCard = document.getElementById("change-password-card");
+const changeUsernameCard = document.getElementById("change-username-card");
 const resetCompleteCard = document.getElementById("reset-complete-card");
 const registerForm = document.getElementById("register-form");
 const loginForm = document.getElementById("login-form");
 const resetForm = document.getElementById("reset-form");
 const changePasswordForm = document.getElementById("change-password-form");
+const changeUsernameForm = document.getElementById("change-username-form");
 const resetCompleteForm = document.getElementById("reset-complete-form");
 const resetIdentifierInput = document.getElementById("reset-identifier");
 const registerPasswordInput = document.getElementById("register-password");
@@ -201,6 +216,7 @@ const changeNewPasswordInput = document.getElementById("change-new-password");
 const resetNewPasswordInput = document.getElementById("reset-new-password");
 const passwordStrengthMessage = document.getElementById("password-strength-message");
 const showChangePasswordButton = document.getElementById("show-change-password-button");
+const showChangeUsernameButton = document.getElementById("show-change-username-button");
 const guestButton = document.getElementById("guest-button");
 const installAppButton = document.getElementById("install-app-button");
 const deleteAccountButton = document.getElementById("delete-account-button");
@@ -304,6 +320,18 @@ function wireEvents() {
         showResetButton.addEventListener("click", () => {
             authOptions.classList.remove("hidden");
             showSingleAuthCard(resetCard);
+        });
+    }
+
+    if (showChangeUsernameButton) {
+        showChangeUsernameButton.addEventListener("click", () => {
+            authOptions.classList.remove("hidden");
+            showSingleAuthCard(changeUsernameCard);
+            if (menuPanel && menuToggle) {
+                menuPanel.classList.remove("is-open");
+                menuToggle.classList.remove("is-open");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
         });
     }
 
@@ -424,6 +452,25 @@ function wireEvents() {
                 );
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error, appLanguage, "reset"), true);
+            }
+        });
+    }
+
+    if (changeUsernameForm) {
+        changeUsernameForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const newUsername = document.getElementById("change-new-username").value.trim();
+
+            try {
+                const session = await changeCurrentUsername({ newUsername });
+                changeUsernameForm.reset();
+                applyAuthenticatedState(session);
+                showMessage(t("changeUsernameSuccess"), false);
+                showSingleAuthCard(null);
+                authOptions.classList.add("hidden");
+                updateMenuSessionLabel();
+            } catch (error) {
+                showMessage(getFirebaseErrorMessage(error, appLanguage, "generic"), true);
             }
         });
     }
@@ -599,7 +646,7 @@ async function initializePage() {
 }
 
 function showSingleAuthCard(cardToShow) {
-    [registerCard, loginCard, resetCard, changePasswordCard, resetCompleteCard].forEach((card) => {
+    [registerCard, loginCard, resetCard, changeUsernameCard, changePasswordCard, resetCompleteCard].forEach((card) => {
         card?.classList.add("hidden");
     });
     cardToShow?.classList.remove("hidden");
@@ -753,6 +800,9 @@ function updateAccessUI() {
     if (!isResetPasswordMode) {
         authOptions.classList.toggle("hidden", true);
         showSingleAuthCard(null);
+    }
+    if (showChangeUsernameButton) {
+        showChangeUsernameButton.classList.toggle("hidden", !loggedIn);
     }
     if (showChangePasswordButton) {
         showChangePasswordButton.classList.toggle("hidden", !loggedIn);

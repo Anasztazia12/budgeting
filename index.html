@@ -47,6 +47,7 @@
                         <p id="menu-session-info" class="menu-session-info" aria-live="polite"></p>
                         <a href="index.html" data-i18n="homeLink">Kezdőlap</a>
                         <button type="button" id="menu-back-button" data-i18n="backAction">Vissza</button>
+                        <button type="button" id="show-change-username-button" data-i18n="changeUsernameMenuButton">Felhasználónév módosítása</button>
                         <button type="button" id="show-change-password-button" data-i18n="changePasswordMenuButton">Jelszó módosítása</button>
                         <button type="button" id="install-app-button" data-i18n="downloadAppButton">App letöltése</button>
                         <button type="button" id="menu-logout-button" class="menu-logout" data-i18n="logoutButton">Kijelentkezés</button>
@@ -117,6 +118,16 @@
                     <label for="reset-identifier" data-i18n="resetIdentifierLabel">Becenév vagy email cím</label>
                     <input type="text" id="reset-identifier" required>
                     <button type="submit" data-i18n="resetButton">Reset email küldése</button>
+                </form>
+            </article>
+
+            <article class="card hidden" id="change-username-card">
+                <h2 data-i18n="changeUsernameTitle">Felhasználónév módosítása</h2>
+                <p data-i18n="changeUsernameHint">Add meg az új felhasználónevedet.</p>
+                <form id="change-username-form" class="stack">
+                    <label for="change-new-username" data-i18n="newUsernameLabel">Új felhasználónév</label>
+                    <input type="text" id="change-new-username" required>
+                    <button type="submit" data-i18n="changeUsernameButton">Becenév módosítása</button>
                 </form>
             </article>
 
