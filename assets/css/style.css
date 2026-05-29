@@ -115,6 +115,13 @@ body {
 	justify-content: space-between;
 	gap: 0.9rem;
 	margin-bottom: 1rem;
+	position: relative;
+}
+.version-badge {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	pointer-events: none;
 }
 .hero-toolbar-group { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
  
@@ -1024,7 +1031,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.language-corner select { height: auto; padding: 0.28rem 0.4rem; }
 	.hero-toolbar-group { display: contents; }
 	.mobile-app-title { grid-area: title; display: block; font-size: 1rem; min-width: 0; padding-right: 0.25rem; }
-	.version-badge { display: inline-flex; grid-area: version; justify-self: end; align-self: center; font-size: 0.78rem; padding: 0.26rem 0.55rem; }
+	.version-badge { display: inline-flex; grid-area: version; justify-self: end; align-self: center; font-size: 0.78rem; padding: 0.26rem 0.55rem; position: static; transform: none; }
  
 	.landing-grid, .summary-grid, .lists-grid, .auth-grid { grid-template-columns: 1fr; }
 	.stats-grid { grid-template-columns: repeat(2, minmax(140px,1fr)); }
