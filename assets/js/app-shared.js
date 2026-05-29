@@ -488,18 +488,41 @@ document.addEventListener("DOMContentLoaded", () => {
     function openPasswordModal() {
         closeMenu();
         modalTitle.textContent = isEn ? "Change password" : "Jelszó módosítása";
+        const showLabel = isEn ? "Show password" : "Jelszó mutatása";
+        const hideLabel = isEn ? "Hide password" : "Jelszó elrejtése";
         modalForm.innerHTML = `
             <label for="pm-cur-pw">${isEn ? "Current password" : "Jelenlegi jelszó"}</label>
-            <input type="password" id="pm-cur-pw" required>
+            <div class="password-wrapper">
+                <input type="password" id="pm-cur-pw" required>
+                <button type="button" class="password-visibility-toggle" data-for="pm-cur-pw" aria-label="${showLabel}" aria-pressed="false" title="${showLabel}">👁</button>
+            </div>
             <label for="pm-new-pw">${isEn ? "New password" : "Új jelszó"}</label>
-            <input type="password" id="pm-new-pw" minlength="6" maxlength="20" required>
+            <div class="password-wrapper">
+                <input type="password" id="pm-new-pw" minlength="6" maxlength="20" required>
+                <button type="button" class="password-visibility-toggle" data-for="pm-new-pw" aria-label="${showLabel}" aria-pressed="false" title="${showLabel}">👁</button>
+            </div>
             <label for="pm-confirm-pw">${isEn ? "Confirm new password" : "Új jelszó megerősítése"}</label>
-            <input type="password" id="pm-confirm-pw" minlength="6" maxlength="20" required>
+            <div class="password-wrapper">
+                <input type="password" id="pm-confirm-pw" minlength="6" maxlength="20" required>
+                <button type="button" class="password-visibility-toggle" data-for="pm-confirm-pw" aria-label="${showLabel}" aria-pressed="false" title="${showLabel}">👁</button>
+            </div>
             <button type="submit" class="btn btn-outline-info">${isEn ? "Save" : "Mentés"}</button>
         `;
         showMsg("", false);
         modal.classList.remove("hidden");
         document.getElementById("pm-cur-pw").focus();
+
+        modalForm.querySelectorAll(".password-visibility-toggle").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const input = document.getElementById(btn.dataset.for);
+                if (!input) return;
+                const show = input.type === "password";
+                input.type = show ? "text" : "password";
+                btn.setAttribute("aria-pressed", String(show));
+                btn.setAttribute("aria-label", show ? hideLabel : showLabel);
+                btn.setAttribute("title", show ? hideLabel : showLabel);
+            });
+        });
 
         modalForm.onsubmit = async (e) => {
             e.preventDefault();

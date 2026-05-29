@@ -1024,8 +1024,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.budget-controls > div.currency-control select { width: 7.8rem; max-width: min(42vw,7.8rem); justify-self: start; }
 	.budget-controls .control-action { grid-column: 1 / -1; }
 	.budget-controls .control-action .stack { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
-	.budget-controls .control-action .stack > button { flex: 0 1 auto; min-width: 0; font-size: 0.78rem; padding: 0.35rem 0.55rem; white-space: normal; }
-	.budget-controls .control-action .stack > button:last-child { flex: 0 0 62%; font-size: 0.82rem; padding: 0.38rem 0.55rem; }
+	.budget-controls .control-action .stack > button { flex: 0 1 auto; min-width: 0; font-size: 0.8rem; padding: 0.38rem 0.55rem; line-height: 1.2; white-space: normal; }
+	.budget-controls .control-action .stack > button:last-child { flex: 0 0 65%; padding-inline: 0.8rem; }
 
 	input[type="date"], input[type="month"] { width: 80%; max-width: 80%; min-width: 0; }
 	.budget-columns .stack input[type="date"],
@@ -1241,6 +1241,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	.debt-controls .currency-control { justify-items: start; }
 	.debt-controls .currency-control select { width: 7.8rem; max-width: min(42vw,7.8rem); height: 2.08rem; min-height: 2.08rem; padding: 0.32rem 0.48rem; font-size: 0.9rem; line-height: 1.1; }
 	.debt-controls .control-action .stack { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
-	.debt-controls .control-action .stack > button { flex: 0 1 auto; min-width: 0; font-size: 0.78rem; padding: 0.35rem 0.55rem; white-space: normal; }
-	.debt-controls .control-action .stack > button:last-child { flex: 0 0 62%; font-size: 0.82rem; padding: 0.38rem 0.55rem; }
+	.debt-controls .control-action .stack > button { flex: 0 1 auto; min-width: 0; font-size: 0.8rem; padding: 0.38rem 0.55rem; line-height: 1.2; white-space: normal; }
+	.debt-controls .control-action .stack > button:last-child { flex: 0 0 65%; padding-inline: 0.8rem; }
 }
