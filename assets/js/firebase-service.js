@@ -463,6 +463,51 @@ export async function completePasswordResetWithHistory({ oobCode, newPassword })
     return { email };
 }
 
+export async function changeCurrentUsername({ newUsername }) {
+    await ensureAuthReady();
+
+    const user = auth.currentUser;
+    if (!user) throw createAppError("app/not-authenticated");
+
+    const cleanNew = String(newUsername || "").trim();
+    if (!cleanNew) throw createAppError("app/invalid-username-change");
+
+    const newNormalized = normalizeUsername(cleanNew);
+
+    const snapshot = await getDoc(doc(db, "users", user.uid));
+    if (!snapshot.exists()) throw createAppError("app/not-authenticated");
+
+    const payload = snapshot.data() || {};
+    const oldNormalized = normalizeUsername(payload.profile?.username || "");
+
+    if (newNormalized === oldNormalized) throw createAppError("app/username-same");
+
+    const email = String(payload.profile?.email || user.email || "").trim();
+
+    await runTransaction(db, async (transaction) => {
+        const newUsernameRef = doc(db, "usernames", newNormalized);
+        const checkSnap = await transaction.get(newUsernameRef);
+        if (checkSnap.exists()) throw createAppError("app/username-taken");
+
+        const newProfile = {
+            ...(payload.profile || {}),
+            username: cleanNew,
+            nickname: cleanNew,
+            normalizedUsername: newNormalized
+        };
+
+        transaction.set(doc(db, "users", user.uid), { profile: newProfile, updatedAt: new Date().toISOString() }, { merge: true });
+        transaction.set(newUsernameRef, { uid: user.uid, username: cleanNew, email, normalizedUsername: newNormalized, updatedAt: new Date().toISOString() });
+
+        if (oldNormalized && oldNormalized !== newNormalized) {
+            transaction.delete(doc(db, "usernames", oldNormalized));
+        }
+    });
+
+    await updateProfile(user, { displayName: cleanNew });
+    return getCurrentSession();
+}
+
 export async function logoutCurrentUser() {
     await signOut(auth);
 }
@@ -563,6 +608,14 @@ export function getFirebaseErrorMessage(error, language, operation) {
         "app/username-taken": {
             en: "This nickname is already taken.",
             hu: "Ez a becenév már foglalt."
+        },
+        "app/username-same": {
+            en: "This is already your current nickname.",
+            hu: "Ez már a jelenlegi beceneved."
+        },
+        "app/invalid-username-change": {
+            en: "Please enter a valid nickname.",
+            hu: "Adj meg egy érvényes becenevet."
         },
         "app/email-already-exists": {
             en: "This email address is already registered.",

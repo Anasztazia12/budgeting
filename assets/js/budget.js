@@ -74,6 +74,7 @@ const dictionary = {
 		loggedOut: "Nincs bejelentkezett felhasználó.",
 		loggedIn: "Bejelentkezve:",
 		guestUser: "Vendég",
+		guestNotice: "Vendég mód – az adatok csak erre a munkamenetre érvényesek, bezárás után törlődnek.",
 		appDownloaded: "Az app letöltve.",
 		appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
 		deleteAccountNeedsSecondClick: "A fiok torlesehez kattints ujra 7 masodpercen belul.",
@@ -101,10 +102,10 @@ const dictionary = {
 		chartTypeBar: "Oszlopdiagram",
 		categories: {
 			fizetes: "Fizetés",
-			"child benefit": "Child Benefit",
+			"child benefit": "Családi pótlék",
 			"universal credit": "Universal Credit",
-			"jobseeker allowance": "Jobseeker's Allowance",
-			"maternity allowance": "Maternity Allowance",
+			"jobseeker allowance": "Munkanélküli segély",
+			"maternity allowance": "Anyasági ellátás",
 			egyeb: "Egyéb",
 			szamlak: "Számlák",
 			viz: "Víz",
@@ -188,6 +189,7 @@ const dictionary = {
 		loggedOut: "No user is signed in.",
 		loggedIn: "Signed in as:",
 		guestUser: "Guest",
+		guestNotice: "Guest mode – data is only saved for this session and will be deleted when you close the browser.",
 		appDownloaded: "App downloaded.",
 		appInstallUnavailable: "App install is not available on this device right now.",
 		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete your account.",
@@ -603,6 +605,7 @@ expenseList.addEventListener("change", async (event) => {
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
 		appState = shared.loadGuestData();
+		showMessage(t("guestNotice"), false);
 	} else {
 		const session = await restoreSession(currentUser);
 		if (!session) {

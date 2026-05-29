@@ -195,12 +195,12 @@
     }
 
     function loadGuestData() {
-        const parsed = safeParseObject(localStorage.getItem(KEYS.GUEST_DATA_KEY));
+        const parsed = safeParseObject(sessionStorage.getItem(KEYS.GUEST_DATA_KEY));
         return normalizeEntriesData(parsed);
     }
 
     function saveGuestData(data) {
-        localStorage.setItem(KEYS.GUEST_DATA_KEY, JSON.stringify(normalizeEntriesData(data)));
+        sessionStorage.setItem(KEYS.GUEST_DATA_KEY, JSON.stringify(normalizeEntriesData(data)));
     }
 
     function buildMailtoUrl(to, subject, body) {
