@@ -353,6 +353,47 @@
     };
 })();
 
+// ── Auto-logout after 5 minutes of inactivity ──
+(function setupAutoLogout() {
+    const TIMEOUT_MS = 5 * 60 * 1000;
+    const GUEST_VALUE = "__guest__";
+    let timer = null;
+
+    function isLoggedIn() {
+        const s = localStorage.getItem("budgetAppSession");
+        return s && s !== GUEST_VALUE;
+    }
+
+    function onIndexPage() {
+        const p = window.location.pathname;
+        return p.endsWith("index.html") || p.endsWith("/");
+    }
+
+    function performLogout() {
+        localStorage.removeItem("budgetAppSession");
+        localStorage.removeItem("budgetAppDisplayName");
+        const svc = window.BudgetAppFirebaseService;
+        if (svc?.logoutCurrentUser) {
+            svc.logoutCurrentUser().catch(() => null).finally(() => { window.location.href = "index.html"; });
+        } else {
+            window.location.href = "index.html";
+        }
+    }
+
+    function resetTimer() {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(performLogout, TIMEOUT_MS);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        if (!isLoggedIn() || onIndexPage()) return;
+        ["click", "keydown", "mousemove", "touchstart", "scroll"].forEach((e) => {
+            document.addEventListener(e, resetTimer, { passive: true });
+        });
+        resetTimer();
+    });
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
     const lang = localStorage.getItem("budgetAppLanguage") || "hu";
     const isEn = lang === "en";
@@ -473,7 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 showMsg(isEn ? "Password changed successfully." : "A jelszó sikeresen módosítva.", false);
                 modalForm.reset();
             } catch (err) {
-                const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "generic") || (isEn ? "An error occurred." : "Hiba történt.");
+                const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "reset") || (isEn ? "An error occurred." : "Hiba történt.");
                 showMsg(msg, true);
             }
         };

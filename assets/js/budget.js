@@ -49,6 +49,9 @@ const dictionary = {
 		forecastButton: "Költségvetési előrejelző",
 		managingDebtLink: "Adósságkezelő",
 		saveAllDone: "A módosítások mentve.",
+		todayNoticeIncome: "Ma várható bevétel",
+		todayNoticeExpense: "Ma várható kiadás",
+		todayNoticeNone: "Ma nincs esedékes tétel.",
 		logoutButton: "Kijelentkezés",
 		profileEditButton: "Adatok módosítása",
 		changeUsernameMenuButton: "Felhasználónév módosítása",
@@ -167,6 +170,9 @@ const dictionary = {
 		forecastButton: "Budget Forecast Planner",
 		managingDebtLink: "Debt Manager",
 		saveAllDone: "Changes saved.",
+		todayNoticeIncome: "Income due today",
+		todayNoticeExpense: "Expense due today",
+		todayNoticeNone: "No entries due today.",
 		logoutButton: "Sign out",
 		profileEditButton: "Edit profile",
 		changeUsernameMenuButton: "Change username",
@@ -640,6 +646,7 @@ async function initializePage() {
 	updateAccessUI();
 	updateInstallButtonState();
 	render();
+	showTodayNotice();
 	const flashMessage = shared.consumeFlashMessage();
 	if (flashMessage) {
 		showMessage(flashMessage.message, flashMessage.isError);
@@ -1336,6 +1343,53 @@ function syncThemeButtons() {
 		themeDarkButton.classList.toggle("is-active", isDark);
 		themeDarkButton.setAttribute("aria-pressed", String(isDark));
 	}
+}
+
+function getTodayEntries(entries) {
+	const todayText = shared.toDateInput(new Date());
+	const todayMonth = todayText.slice(0, 7);
+	const todayDay = todayText.slice(8, 10);
+	return (entries || []).filter((e) => {
+		const d = String(e.date || "");
+		if (d === todayText) return true;
+		if (e.repeatMonthly && d.slice(8, 10) === todayDay) {
+			const excluded = Array.isArray(e.excludedMonths) ? e.excludedMonths : [];
+			return !excluded.includes(todayMonth);
+		}
+		return false;
+	});
+}
+
+function showTodayNotice() {
+	let el = document.getElementById("today-notice");
+	if (!el) {
+		el = document.createElement("div");
+		el.id = "today-notice";
+		el.className = "today-notice hidden";
+		const content = document.getElementById("budget-content");
+		if (content) content.before(el);
+	}
+
+	const todayIncomes = getTodayEntries(appState.incomes);
+	const todayExpenses = getTodayEntries(appState.expenses);
+
+	if (!todayIncomes.length && !todayExpenses.length) {
+		el.classList.add("hidden");
+		return;
+	}
+
+	const parts = [];
+	if (todayIncomes.length) {
+		const sum = shared.sumEntries(todayIncomes);
+		parts.push(`${t("todayNoticeIncome")}: ${formatCurrency(sum)} (${todayIncomes.length})`);
+	}
+	if (todayExpenses.length) {
+		const sum = shared.sumEntries(todayExpenses);
+		parts.push(`${t("todayNoticeExpense")}: ${formatCurrency(sum)} (${todayExpenses.length})`);
+	}
+
+	el.textContent = "📅 " + parts.join(" · ");
+	el.classList.remove("hidden");
 }
 
 function showMessage(message, isError) {

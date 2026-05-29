@@ -825,6 +825,17 @@ label { font-weight: 600; color: var(--muted-strong); font-size: 0.92rem; }
 .session-card { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
 .session-card.hidden { display: none; }
 .session-card p { margin: 0; }
+.today-notice {
+	padding: 0.65rem 1rem;
+	background: #eaf4ff;
+	border: 1px solid #84a9e8;
+	border-radius: var(--control-radius);
+	font-weight: 600;
+	font-size: 0.95rem;
+	color: #143f90;
+	margin-bottom: 0.5rem;
+}
+[data-theme="dark"] .today-notice { background: #1a2e55; border-color: #4a6eb0; color: #c8dcff; }
 .auth-message { width: 100%; font-weight: 600; }
 .auth-message.error { color: var(--danger); }
 .auth-message.ok { color: var(--good); }

@@ -491,10 +491,18 @@ export async function changeCurrentUsername({ newUsername }) {
 
     const email = String(payload.profile?.email || user.email || "").trim();
 
+    const oldUsernameRef = oldNormalized ? doc(db, "usernames", oldNormalized) : null;
+
     await runTransaction(db, async (transaction) => {
         const newUsernameRef = doc(db, "usernames", newNormalized);
+
+        // Read both docs inside the transaction (required before writes/deletes)
         const checkSnap = await transaction.get(newUsernameRef);
         if (checkSnap.exists()) throw createAppError("app/username-taken");
+
+        if (oldUsernameRef && oldNormalized !== newNormalized) {
+            await transaction.get(oldUsernameRef);
+        }
 
         const newProfile = {
             ...(payload.profile || {}),
@@ -506,10 +514,15 @@ export async function changeCurrentUsername({ newUsername }) {
         transaction.set(doc(db, "users", user.uid), { profile: newProfile, updatedAt: new Date().toISOString() }, { merge: true });
         transaction.set(newUsernameRef, { uid: user.uid, username: cleanNew, email, normalizedUsername: newNormalized, updatedAt: new Date().toISOString() });
 
-        if (oldNormalized && oldNormalized !== newNormalized) {
-            transaction.delete(doc(db, "usernames", oldNormalized));
+        if (oldUsernameRef && oldNormalized !== newNormalized) {
+            transaction.delete(oldUsernameRef);
         }
     });
+
+    // Backup: delete old username doc outside transaction in case transaction delete was blocked
+    if (oldUsernameRef && oldNormalized !== newNormalized) {
+        await deleteDoc(oldUsernameRef).catch(() => null);
+    }
 
     await updateProfile(user, { displayName: cleanNew });
     return getCurrentSession();
