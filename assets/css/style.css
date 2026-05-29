@@ -296,8 +296,8 @@ body {
 .budget-controls .control-action .stack > button.btn-success:focus-visible,
 .debt-controls .control-action .stack > button.btn-success:hover,
 .debt-controls .control-action .stack > button.btn-success:focus-visible {
-	background-color: #28a745;
-	border-color: #28a745;
+	background: linear-gradient(125deg, #34bb61, #24994a);
+	border-color: #1e8a40;
 	box-shadow: none;
 }
  
@@ -450,7 +450,22 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 [data-theme="dark"] .btn.btn-primary:hover, [data-theme="dark"] .btn.btn-primary:focus-visible {
 	background: linear-gradient(125deg, #5a8cff, #406acd); border-color: #8eb0f3; color: #fff;
 }
- 
+.btn.btn-success {
+	color: #fff;
+	background: linear-gradient(125deg, #2daa56, #1e8a40);
+	border-color: #1a7a38;
+}
+.btn.btn-success:hover, .btn.btn-success:focus-visible {
+	color: #fff;
+	background: linear-gradient(125deg, #34bb61, #24994a);
+	border-color: #1e8a40;
+	box-shadow: 0 10px 18px rgba(30,120,60,.24);
+}
+[data-theme="dark"] .btn.btn-success { background: linear-gradient(125deg, #3dcc6a, #2aaa52); border-color: #5cd980; color: #fff; }
+[data-theme="dark"] .btn.btn-success:hover, [data-theme="dark"] .btn.btn-success:focus-visible {
+	background: linear-gradient(125deg, #48d975, #33bb60); border-color: #70e090; color: #fff;
+}
+
 .btn.btn-outline-info { color: #143f90; background: #edf4ff; border-color: #84a9e8; }
 .btn.btn-outline-info:hover, .btn.btn-outline-info:focus-visible { color: #0f3276; background: #dce9ff; border-color: #6790d8; }
 [data-theme="dark"] .btn.btn-outline-info { color: #eef4ff; background: #2a4678; border-color: #7fa7f3; }
