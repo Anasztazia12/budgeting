@@ -354,23 +354,129 @@
 })();
 
 document.addEventListener("DOMContentLoaded", () => {
-    const toggle = document.getElementById("menu-profile-toggle");
-    const options = document.getElementById("menu-profile-options");
-    if (toggle && options) {
-        toggle.addEventListener("click", () => {
-            options.classList.toggle("hidden");
-        });
+    const lang = localStorage.getItem("budgetAppLanguage") || "hu";
+    const isEn = lang === "en";
+
+    // Inject profile modal
+    document.body.insertAdjacentHTML("beforeend", `
+        <div id="profile-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+            <div class="modal-card">
+                <h3 id="profile-modal-title"></h3>
+                <p id="profile-modal-message" class="auth-message hidden" aria-live="polite"></p>
+                <form id="profile-modal-form" class="stack"></form>
+                <button type="button" id="profile-modal-close" class="btn btn-outline-info" style="margin-top:0.4rem">${isEn ? "Cancel" : "Mégse"}</button>
+            </div>
+        </div>
+    `);
+
+    const modal = document.getElementById("profile-modal");
+    const modalTitle = document.getElementById("profile-modal-title");
+    const modalMsg = document.getElementById("profile-modal-message");
+    const modalForm = document.getElementById("profile-modal-form");
+    const modalClose = document.getElementById("profile-modal-close");
+
+    function showMsg(text, isError) {
+        modalMsg.textContent = text;
+        modalMsg.classList.toggle("hidden", !text);
+        modalMsg.classList.toggle("error", isError);
+        modalMsg.classList.toggle("ok", !isError);
     }
-    const changeUsername = document.getElementById("menu-change-username");
-    if (changeUsername) {
-        changeUsername.addEventListener("click", () => {
-            window.location.href = "index.html?action=changeUsername";
-        });
+
+    function closeModal() {
+        modal.classList.add("hidden");
+        showMsg("", false);
+        modalForm.innerHTML = "";
+        modalForm.onsubmit = null;
     }
-    const changePassword = document.getElementById("menu-change-password");
-    if (changePassword) {
-        changePassword.addEventListener("click", () => {
-            window.location.href = "index.html?action=changePassword";
-        });
+
+    function closeMenu() {
+        const panel = document.getElementById("menu-panel");
+        const toggle = document.getElementById("menu-toggle");
+        if (panel) { panel.classList.remove("is-open"); }
+        if (toggle) { toggle.classList.remove("is-open"); toggle.setAttribute("aria-expanded", "false"); }
     }
+
+    function openUsernameModal() {
+        closeMenu();
+        modalTitle.textContent = isEn ? "Change username" : "Felhasználónév módosítása";
+        modalForm.innerHTML = `
+            <label for="pm-username">${isEn ? "New username" : "Új felhasználónév"}</label>
+            <input type="text" id="pm-username" required autocomplete="off">
+            <button type="submit" class="btn btn-outline-info">${isEn ? "Save" : "Mentés"}</button>
+        `;
+        showMsg("", false);
+        modal.classList.remove("hidden");
+        document.getElementById("pm-username").focus();
+
+        modalForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById("pm-username").value.trim();
+            try {
+                const svc = window.BudgetAppFirebaseService;
+                const session = await svc.changeCurrentUsername({ newUsername });
+                const newName = session?.profile?.username || newUsername;
+                localStorage.setItem("budgetAppSession", newName);
+                localStorage.setItem("budgetAppDisplayName", newName);
+                const sessionEl = document.getElementById("menu-session-info");
+                if (sessionEl) sessionEl.textContent = `${isEn ? "Signed in as:" : "Bejelentkezve:"} ${newName}`;
+                showMsg(isEn ? "Username changed successfully." : "A felhasználónév sikeresen módosítva.", false);
+                modalForm.reset();
+            } catch (err) {
+                const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "generic") || (isEn ? "An error occurred." : "Hiba történt.");
+                showMsg(msg, true);
+            }
+        };
+    }
+
+    function openPasswordModal() {
+        closeMenu();
+        modalTitle.textContent = isEn ? "Change password" : "Jelszó módosítása";
+        modalForm.innerHTML = `
+            <label for="pm-cur-pw">${isEn ? "Current password" : "Jelenlegi jelszó"}</label>
+            <input type="password" id="pm-cur-pw" required>
+            <label for="pm-new-pw">${isEn ? "New password" : "Új jelszó"}</label>
+            <input type="password" id="pm-new-pw" minlength="6" maxlength="20" required>
+            <label for="pm-confirm-pw">${isEn ? "Confirm new password" : "Új jelszó megerősítése"}</label>
+            <input type="password" id="pm-confirm-pw" minlength="6" maxlength="20" required>
+            <button type="submit" class="btn btn-outline-info">${isEn ? "Save" : "Mentés"}</button>
+        `;
+        showMsg("", false);
+        modal.classList.remove("hidden");
+        document.getElementById("pm-cur-pw").focus();
+
+        modalForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById("pm-cur-pw").value;
+            const newPassword = document.getElementById("pm-new-pw").value;
+            const confirmPassword = document.getElementById("pm-confirm-pw").value;
+            if (newPassword !== confirmPassword) { showMsg(isEn ? "Passwords do not match." : "A jelszavak nem egyeznek.", true); return; }
+            const strong = newPassword.length >= 6 && newPassword.length <= 20 && /[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword) && /\d/.test(newPassword);
+            if (!strong) { showMsg(isEn ? "Password must be 6-20 chars with uppercase, lowercase and a number." : "A jelszó 6-20 karakter, tartalmazzon kis- és nagybetűt és számot.", true); return; }
+            try {
+                await window.BudgetAppFirebaseService.changeCurrentUserPassword({ currentPassword, newPassword });
+                showMsg(isEn ? "Password changed successfully." : "A jelszó sikeresen módosítva.", false);
+                modalForm.reset();
+            } catch (err) {
+                const msg = window.BudgetAppFirebaseService?.getFirebaseErrorMessage?.(err, lang, "generic") || (isEn ? "An error occurred." : "Hiba történt.");
+                showMsg(msg, true);
+            }
+        };
+    }
+
+    modalClose.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.classList.contains("hidden")) closeModal(); });
+
+    // Menu toggle
+    const menuProfileToggle = document.getElementById("menu-profile-toggle");
+    const menuProfileOptions = document.getElementById("menu-profile-options");
+    if (menuProfileToggle && menuProfileOptions) {
+        menuProfileToggle.addEventListener("click", () => menuProfileOptions.classList.toggle("hidden"));
+    }
+
+    const menuChangeUsername = document.getElementById("menu-change-username");
+    if (menuChangeUsername) menuChangeUsername.addEventListener("click", openUsernameModal);
+
+    const menuChangePassword = document.getElementById("menu-change-password");
+    if (menuChangePassword) menuChangePassword.addEventListener("click", openPasswordModal);
 });

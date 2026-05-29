@@ -731,6 +731,7 @@ window.BudgetAppFirebaseService = {
     registerWithUsername,
     loginWithUsername,
     changeCurrentUserPassword,
+    changeCurrentUsername,
     completePasswordResetWithHistory,
     logoutCurrentUser,
     loadCurrentUserData,

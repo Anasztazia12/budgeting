@@ -719,8 +719,16 @@ function setTheme(mode) {
 }
 
 function syncThemeButtons() {
-	themeLightButton?.classList.toggle("active", appTheme === "light");
-	themeDarkButton?.classList.toggle("active", appTheme === "dark");
+	if (themeLightButton) {
+		const isLight = appTheme === "light";
+		themeLightButton.classList.toggle("is-active", isLight);
+		themeLightButton.setAttribute("aria-pressed", String(isLight));
+	}
+	if (themeDarkButton) {
+		const isDark = appTheme === "dark";
+		themeDarkButton.classList.toggle("is-active", isDark);
+		themeDarkButton.setAttribute("aria-pressed", String(isDark));
+	}
 }
 
 function updateInstallButtonState() {
