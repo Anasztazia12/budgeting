@@ -1,4 +1,4 @@
-import {
+﻿import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	logoutCurrentUser,
@@ -41,6 +41,7 @@ const dictionary = {
 		currencyEur: "EUR (euró)",
 		logoutButton: "Kijelentkezés",
 		footerText: "Minden jog fenntartva.",
+		helpLink: "Súgó",
 		profileEditButton: "Adatok módosítása",
 		changeUsernameMenuButton: "Felhasználónév módosítása",
 		changePasswordMenuButton: "Jelszó módosítása",
@@ -117,6 +118,7 @@ const dictionary = {
 		currencyEur: "EUR (euro)",
 		logoutButton: "Sign out",
 		footerText: "All rights reserved.",
+		helpLink: "Help",
 		profileEditButton: "Edit profile",
 		changeUsernameMenuButton: "Change username",
 		changePasswordMenuButton: "Change password",
@@ -774,3 +776,5 @@ async function handleAccountDelete() {
 		showMessage(getFirebaseErrorMessage(error, appLanguage), true);
 	}
 }
+
+

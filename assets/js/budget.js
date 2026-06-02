@@ -1,4 +1,4 @@
-import {
+﻿import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	loadCurrentUserData,
@@ -56,6 +56,7 @@ const dictionary = {
 		todayNoticeOk: "OK",
 		logoutButton: "Kijelentkezés",
 		footerText: "Minden jog fenntartva.",
+		helpLink: "Súgó",
 		profileEditButton: "Adatok módosítása",
 		changeUsernameMenuButton: "Felhasználónév módosítása",
 		changePasswordMenuButton: "Jelszó módosítása",
@@ -175,6 +176,7 @@ const dictionary = {
 		todayNoticeOk: "OK",
 		logoutButton: "Sign out",
 		footerText: "All rights reserved.",
+		helpLink: "Help",
 		profileEditButton: "Edit profile",
 		changeUsernameMenuButton: "Change username",
 		changePasswordMenuButton: "Change password",
@@ -1496,3 +1498,5 @@ function saveState() {
 			showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
 		});
 }
+
+

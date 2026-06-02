@@ -1,4 +1,4 @@
-import {
+﻿import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	logoutCurrentUser,
@@ -34,6 +34,7 @@ const dictionary = {
 		deleteAccountButton: "Regisztráció törlése",
 		logoutAction: "Kijelentkezés",
 		footerText: "Minden jog fenntartva.",
+		helpLink: "Súgó",
 		profileEditButton: "Adatok módosítása",
 		changeUsernameMenuButton: "Felhasználónév módosítása",
 		changePasswordMenuButton: "Jelszó módosítása",
@@ -120,6 +121,7 @@ const dictionary = {
 		deleteAccountButton: "Delete account",
 		logoutAction: "Sign out",
 		footerText: "All rights reserved.",
+		helpLink: "Help",
 		profileEditButton: "Edit profile",
 		changeUsernameMenuButton: "Change username",
 		changePasswordMenuButton: "Change password",
@@ -1048,3 +1050,5 @@ function resetDeleteAccountConfirmState() {
 	deleteAccountConfirmArmed = false;
 	if (deleteAccountConfirmTimer) { window.clearTimeout(deleteAccountConfirmTimer); deleteAccountConfirmTimer = null; }
 }
+
+

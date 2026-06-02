@@ -1,152 +1,107 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="hu">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="theme-color" content="#2452b8">
-	<title>Help – Budgeting App</title>
+	<title>Súgó – Budgeting App</title>
 	<link rel="manifest" href="manifest.webmanifest">
 	<link rel="icon" type="image/png" href="assets/images/budget-icon.png">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<link rel="stylesheet" href="assets/css/style.css?v=10">
 </head>
 <body>
-	<a class="skip-link" href="#main-content">Skip to content</a>
+	<a class="skip-link" href="#main-content">Ugrás a tartalomra</a>
 	<main id="main-content" class="app-shell" tabindex="-1">
 
 		<header class="hero">
 			<div class="hero-toolbar">
-				<a href="index.html" class="btn btn-outline-info" style="width:auto;font-size:0.9rem;">← Home</a>
-				<p class="version-badge" style="position:static;transform:none;">Help</p>
-				<a href="budget.html" class="btn btn-outline-info" style="width:auto;font-size:0.9rem;">Open Budget →</a>
+				<div class="hero-toolbar-group">
+					<div class="language-corner">
+						<label for="help-language" class="sr-only">Nyelv</label>
+						<select id="help-language">
+							<option value="hu">HU</option>
+							<option value="en">EN</option>
+						</select>
+					</div>
+					<div class="help-btn" style="display:none"></div>
+				</div>
+				<p class="version-badge"><span id="help-title-badge">Súgó</span></p>
+				<button type="button" onclick="history.back()" class="btn btn-outline-info" style="width:auto;font-size:0.88rem;" id="help-home-link">← Vissza</button>
 			</div>
-			<h1>Help &amp; Guide</h1>
-			<p>A quick overview of every feature in the app.</p>
+			<h1 id="help-h1">Súgó &amp; Útmutató</h1>
+			<p id="help-subtitle">Az app minden funkciójának rövid összefoglalója.</p>
 		</header>
 
-		<div class="grid" style="gap:1rem;margin-top:1rem;">
+		<div class="grid" style="gap:1rem;margin-top:1rem;" id="help-content">
 
-			<!-- Getting started -->
 			<article class="card">
-				<h2>🚀 Getting started</h2>
-				<p>There are two ways to use the app:</p>
+				<h2 class="help-section-title" data-hu="1. Első lépések" data-en="1. Getting started">1. Első lépések</h2>
+				<p data-hu="Az appot kétféleképpen lehet használni:" data-en="There are two ways to use the app:">Az appot kétféleképpen lehet használni:</p>
 				<ul>
-					<li><strong>Registered user</strong> – create a free account with a username, email and password. Once registered, sign in using your username <em>or</em> email address and your password. Your data is saved to the cloud and is available on any device.</li>
-					<li><strong>Guest mode</strong> – no account needed. Data is saved only for the current browser tab and is permanently deleted when you close it or sign out.</li>
+					<li><strong data-hu="Regisztrált felhasználó" data-en="Registered user">Regisztrált felhasználó</strong> – <span data-hu="hozz létre fiókot felhasználónévvel, email-lel és jelszóval. A bejelentkezéshez a felhasználónevet vagy az email-t is használhatod. Az adatok a felhőben tárolódnak, bármely eszközről elérhetők." data-en="create a free account with a username, email and password. You can sign in using your username or email address. Your data is saved to the cloud and available on any device.">hozz létre fiókot felhasználónévvel, email-lel és jelszóval. A bejelentkezéshez a felhasználónevet vagy az email-t is használhatod. Az adatok a felhőben tárolódnak, bármely eszközről elérhetők.</span></li>
+					<li><strong data-hu="Vendég mód" data-en="Guest mode">Vendég mód</strong> – <span data-hu="nincs szükség fiókra. Az adatok csak az aktuális böngészőfülben tárolódnak, és kilépéskor vagy a fül bezárásakor törlődnek." data-en="no account needed. Data is saved only for the current browser tab and is deleted when you sign out or close the tab.">nincs szükség fiókra. Az adatok csak az aktuális böngészőfülben tárolódnak, és kilépéskor vagy a fül bezárásakor törlődnek.</span></li>
 				</ul>
-				<p><strong>Password rules:</strong> 6–20 characters, must include at least one lowercase letter, one uppercase letter, and one number.</p>
+				<p><strong data-hu="Jelszó szabályok:" data-en="Password rules:">Jelszó szabályok:</strong> <span data-hu="6–20 karakter, tartalmazzon legalább egy kisbetűt, egy nagybetűt és egy számot." data-en="6–20 characters, must include at least one lowercase letter, one uppercase letter, and one number.">6–20 karakter, tartalmazzon legalább egy kisbetűt, egy nagybetűt és egy számot.</span></p>
 			</article>
 
-			<!-- Budget page -->
 			<article class="card">
-				<h2>📋 Budget page</h2>
-				<p>The main page for recording your expected income and expenses.</p>
-				<h3>Income form</h3>
+				<h2 class="help-section-title" data-hu="2. Költségvetés oldal" data-en="2. Budget page">2. Költségvetés oldal</h2>
+				<p data-hu="A várható bevételek és kiadások rögzítésének fő oldala." data-en="The main page for recording your expected income and expenses.">A várható bevételek és kiadások rögzítésének fő oldala.</p>
+				<h3 data-hu="Bevétel / kiadás hozzáadása" data-en="Add income / expense">Bevétel / kiadás hozzáadása</h3>
 				<ul>
-					<li><strong>Category</strong> – choose the type of income (Salary, Child Benefit, Universal Credit, etc.).</li>
-					<li><strong>Amount</strong> – enter the value (decimals allowed).</li>
-					<li><strong>Date</strong> – when do you expect to receive this income?</li>
-					<li><strong>Note</strong> – optional short description (max 280 characters).</li>
-					<li><strong>Show in every month</strong> – tick this to make the entry repeat every month automatically.</li>
+					<li><strong data-hu="Kategória" data-en="Category">Kategória</strong> – <span data-hu="válassz a listából (pl. Fizetés, Albérlet, Élelmiszer stb.)." data-en="choose from the list (e.g. Salary, Rent, Groceries etc.).">válassz a listából (pl. Fizetés, Albérlet, Élelmiszer stb.).</span></li>
+					<li><strong data-hu="Összeg" data-en="Amount">Összeg</strong> – <span data-hu="add meg az értéket (tizedes is megengedett)." data-en="enter the value (decimals allowed).">add meg az értéket (tizedes is megengedett).</span></li>
+					<li><strong data-hu="Dátum" data-en="Date">Dátum</strong> – <span data-hu="mikor várható a bevétel / kiadás?" data-en="when do you expect the income / expense?">mikor várható a bevétel / kiadás?</span></li>
+					<li><strong data-hu="Megjegyzés" data-en="Note">Megjegyzés</strong> – <span data-hu="opcionális, max. 280 karakter." data-en="optional, max 280 characters.">opcionális, max. 280 karakter.</span></li>
+					<li><strong data-hu="Megjelenítés minden hónapban" data-en="Show in every month">Megjelenítés minden hónapban</strong> – <span data-hu="pipáld be, hogy a tétel havonta automatikusan megjelenjen." data-en="tick this to make the entry repeat every month automatically.">pipáld be, hogy a tétel havonta automatikusan megjelenjen.</span></li>
 				</ul>
-				<h3>Expense form</h3>
-				<p>Same fields as income. Categories include Rent, Mortgage, Car, Groceries, Electricity, and many more.</p>
-				<h3>Statistics cards</h3>
-				<ul>
-					<li><strong>Total income / Expected income</strong> – sum of income entries in the selected period.</li>
-					<li><strong>Total expenses / Expected expense</strong> – sum of expense entries in the selected period.</li>
-				</ul>
-				<h3>List filters</h3>
-				<p>Below the forms, use the <strong>-tól / -ig</strong> date filters to narrow down which entries appear in each list.</p>
-				<h3>Period selector</h3>
-				<p>At the top, set a <strong>from</strong> and <strong>to</strong> date to define which period the totals and lists cover.</p>
-				<h3>Today's notice</h3>
-				<p>If any income or expense is due today, a modal pops up when you log in. Tick <em>"Don't show again today"</em> to suppress it for the rest of the day.</p>
+				<h3 data-hu="Mai értesítő" data-en="Today's notice">Mai értesítő</h3>
+				<p data-hu="Belépéskor megjelenik egy ablak, ha ma esedékes bevétel vagy kiadás van. A 'Ne jelenjen meg ma többet' opció az aktuális napra elnyomja az értesítőt." data-en="A modal appears on login if any income or expense is due today. The 'Don't show again today' option suppresses it for the rest of the day.">Belépéskor megjelenik egy ablak, ha ma esedékes bevétel vagy kiadás van. A 'Ne jelenjen meg ma többet' opció az aktuális napra elnyomja az értesítőt.</p>
 			</article>
 
-			<!-- Budget Forecast -->
 			<article class="card">
-				<h2>🔮 Budget Forecast</h2>
-				<p>Plan ahead and test "what if" scenarios without affecting your real budget.</p>
+				<h2 class="help-section-title" data-hu="3. Költségvetési előrejelző" data-en="3. Budget Forecast">3. Költségvetési előrejelző</h2>
+				<p data-hu="Tervezd meg előre a pénzügyeidet és tesztelj 'mi lenne ha' forgatókönyveket anélkül, hogy az éles adatokat megváltoztatnád." data-en="Plan ahead and test 'what if' scenarios without affecting your real budget.">Tervezd meg előre a pénzügyeidet és tesztelj 'mi lenne ha' forgatókönyveket anélkül, hogy az éles adatokat megváltoztatnád.</p>
 				<ul>
-					<li><strong>Period selector</strong> – choose the date range the forecast should cover.</li>
-					<li><strong>+ Add extra / unexpected item</strong> – add a one-off income or expense row to the simulation.</li>
-					<li><strong>Each row needs:</strong> type (income or expense), amount, date, and an optional note and plan name.</li>
-					<li><strong>Save row (💾)</strong> – saves the row as a named scenario so you can reload it later.</li>
-					<li><strong>Add to budget (budget icon)</strong> – copies this item directly into your real budget in one click.</li>
-					<li><strong>Close row (✕ black)</strong> – removes the row from the view without deleting the saved scenario.</li>
-					<li><strong>Delete plan (✕ red)</strong> – permanently deletes the saved scenario (asks for confirmation first).</li>
-					<li><strong>Saved plans</strong> – click the dropdown to see your saved scenarios, select one and press <em>Load</em> to restore its rows.</li>
-				</ul>
-				<h3>Forecast results</h3>
-				<ul>
-					<li><strong>Balance up to date</strong> – income minus expenses from your real budget within the period.</li>
-					<li><strong>Balance with planned items</strong> – the above figure adjusted for all what-if rows.</li>
-					<li><strong>Difference</strong> – how much the what-if items change your balance.</li>
-					<li><strong>New balance</strong> – your estimated end-of-period balance if all planned items occur.</li>
+					<li><strong data-hu="+ Extra tétel hozzáadása" data-en="+ Add extra item">+ Extra tétel hozzáadása</strong> – <span data-hu="adj hozzá egy egyszeri bevételt vagy kiadást a szimulációhoz (típus, összeg, dátum szükséges)." data-en="add a one-off income or expense to the simulation (type, amount, date required).">adj hozzá egy egyszeri bevételt vagy kiadást a szimulációhoz (típus, összeg, dátum szükséges).</span></li>
+					<li><strong data-hu="Mentés (💾)" data-en="Save (💾)">Mentés (💾)</strong> – <span data-hu="elmenti a sort névvel ellátott tervként, hogy később újra betölthesd." data-en="saves the row as a named scenario to reload later.">elmenti a sort névvel ellátott tervként, hogy később újra betölthesd.</span></li>
+					<li><strong data-hu="Hozzáadás a költségvetéshez (ikon)" data-en="Add to budget (icon)">Hozzáadás a költségvetéshez (ikon)</strong> – <span data-hu="egy kattintással átveszi a tételt az éles költségvetésbe." data-en="copies the item directly into your real budget in one click.">egy kattintással átveszi a tételt az éles költségvetésbe.</span></li>
+					<li><strong data-hu="Bezárás (fekete ✕)" data-en="Close (black ✕)">Bezárás (fekete ✕)</strong> – <span data-hu="eltávolítja a sort a nézetből, de nem törli a mentett tervet." data-en="removes the row from view without deleting the saved scenario.">eltávolítja a sort a nézetből, de nem törli a mentett tervet.</span></li>
+					<li><strong data-hu="Törlés (piros ✕)" data-en="Delete (red ✕)">Törlés (piros ✕)</strong> – <span data-hu="véglegesen törli a mentett tervet (megerősítés szükséges)." data-en="permanently deletes the saved scenario (confirmation required).">véglegesen törli a mentett tervet (megerősítés szükséges).</span></li>
 				</ul>
 			</article>
 
-			<!-- Summary -->
 			<article class="card">
-				<h2>📊 Summary</h2>
-				<p>A read-only overview of your income and expenses for any selected period.</p>
+				<h2 class="help-section-title" data-hu="4. Összesítés" data-en="4. Summary">4. Összesítés</h2>
+				<p data-hu="Áttekintés a kiválasztott időszak bevételeiről és kiadásairól." data-en="An overview of income and expenses for the selected period.">Áttekintés a kiválasztott időszak bevételeiről és kiadásairól.</p>
 				<ul>
-					<li><strong>Period selector</strong> – choose from and to dates. The cards and lists update automatically.</li>
-					<li><strong>Total income / Total expense</strong> – sums for the period.</li>
-					<li><strong>Balance</strong> – income minus expenses.</li>
-					<li><strong>Spending to date</strong> – expenses up to today's date within the period.</li>
-					<li><strong>Chart</strong> – shows all income and expense categories together on a pie or bar chart. Switch between the two using the <em>Type</em> selector.</li>
-					<li><strong>End-of-period projection</strong> – an estimate of your closing balance at the end of the selected period.</li>
+					<li><strong data-hu="Időszak" data-en="Period">Időszak</strong> – <span data-hu="állítsd be a kezdő és záró dátumot. A kártyák és listák automatikusan frissülnek." data-en="set the from and to dates. The cards and lists update automatically.">állítsd be a kezdő és záró dátumot. A kártyák és listák automatikusan frissülnek.</span></li>
+					<li><strong data-hu="Diagram" data-en="Chart">Diagram</strong> – <span data-hu="kördiagram vagy oszlopdiagram. Típus váltható a Típus választóval." data-en="pie chart or bar chart. Switch type using the Type selector.">kördiagram vagy oszlopdiagram. Típus váltható a Típus választóval.</span></li>
+					<li><strong data-hu="Időszak végi becslés" data-en="End-of-period projection">Időszak végi becslés</strong> – <span data-hu="becsült záróegyenleg az időszak végére." data-en="estimated closing balance at the end of the period.">becsült záróegyenleg az időszak végére.</span></li>
 				</ul>
 			</article>
 
-			<!-- Debt Manager -->
 			<article class="card">
-				<h2>💳 Debt Manager</h2>
-				<p>Track your loans, repayments and projected payoff dates.</p>
+				<h2 class="help-section-title" data-hu="5. Adósságkezelő" data-en="5. Debt Manager">5. Adósságkezelő</h2>
+				<p data-hu="Kövesd nyomon a hiteleidet, törlesztéseidet és a tervezett végtörlesztést." data-en="Track your loans, repayments and planned payoff dates.">Kövesd nyomon a hiteleidet, törlesztéseidet és a tervezett végtörlesztést.</p>
 				<ul>
-					<li><strong>Debt name</strong> – a label for the loan (e.g. "Car loan").</li>
-					<li><strong>Monthly payment</strong> – how much you pay each month.</li>
-					<li><strong>Payment date</strong> – the date your next payment is due.</li>
-					<li><strong>Remaining amount</strong> – how much you still owe.</li>
-					<li><strong>Due date</strong> – optional: when the loan is scheduled to end.</li>
-					<li><strong>Planned early payment date</strong> – optional: if you plan to pay it off early, enter the date here.</li>
-					<li><strong>Planned amount</strong> – the lump sum you plan to use for early repayment.</li>
-					<li><strong>Add to budget forecast</strong> – tick this to automatically create a forecast scenario for this debt's monthly payment.</li>
-				</ul>
-				<h3>Statistics cards</h3>
-				<ul>
-					<li><strong>Total debt</strong> – sum of all monthly payments.</li>
-					<li><strong>Remaining</strong> – total remaining balances across all debts.</li>
-					<li><strong>Paid</strong> – difference between total and remaining.</li>
-					<li><strong>Monthly payments</strong> – total amount due each month.</li>
+					<li><strong data-hu="Adósság neve" data-en="Debt name">Adósság neve</strong> – <span data-hu="pl. 'Autóhitel'." data-en="e.g. 'Car loan'.">pl. 'Autóhitel'.</span></li>
+					<li><strong data-hu="Havi törlesztő" data-en="Monthly payment">Havi törlesztő</strong> – <span data-hu="havonta fizetett összeg." data-en="amount paid each month.">havonta fizetett összeg.</span></li>
+					<li><strong data-hu="Törlesztés dátuma" data-en="Payment date">Törlesztés dátuma</strong> – <span data-hu="a következő esedékes fizetés napja." data-en="the date your next payment is due.">a következő esedékes fizetés napja.</span></li>
+					<li><strong data-hu="Fennmaradó összeg" data-en="Remaining amount">Fennmaradó összeg</strong> – <span data-hu="mennyit kell még visszafizetni." data-en="how much you still owe.">mennyit kell még visszafizetni.</span></li>
+					<li><strong data-hu="Hozzáadás az előrejelzőhöz" data-en="Add to forecast">Hozzáadás az előrejelzőhöz</strong> – <span data-hu="pipáld be, hogy a havi törlesztő automatikusan megjelenjen az előrejelzőben." data-en="tick to automatically add the monthly payment to the forecast.">pipáld be, hogy a havi törlesztő automatikusan megjelenjen az előrejelzőben.</span></li>
 				</ul>
 			</article>
 
-			<!-- Settings & navigation -->
 			<article class="card">
-				<h2>⚙️ Settings &amp; navigation</h2>
+				<h2 class="help-section-title" data-hu="6. Beállítások" data-en="6. Settings">6. Beállítások</h2>
 				<ul>
-					<li><strong>Language</strong> – switch between Hungarian (HU) and English (EN) using the selector in the top-left corner. The choice is remembered.</li>
-					<li><strong>Light / Dark theme</strong> – toggle in the toolbar. The choice is remembered.</li>
-					<li><strong>Currency</strong> – choose HUF, GBP, USD or EUR. Amounts are displayed in the chosen currency (no conversion is applied).</li>
-					<li><strong>Hamburger menu (☰)</strong> – access Home, Adatok módosítása (profile), navigation links, Install app, Sign out, and Delete account.</li>
-					<li><strong>Change username</strong> – available in the hamburger menu when signed in. You must enter your current username, then the new one twice.</li>
-					<li><strong>Change password</strong> – available in the hamburger menu when signed in. Enter your current password, then the new one twice.</li>
-					<li><strong>Auto sign-out</strong> – after 5 minutes of inactivity you will be signed out automatically.</li>
-					<li><strong>Install app</strong> – on supported browsers you can install the app to your home screen for offline use.</li>
-				</ul>
-			</article>
-
-			<!-- Recurring entries -->
-			<article class="card">
-				<h2>🔄 Recurring entries</h2>
-				<p>Tick <em>"Show in every month"</em> when adding an income or expense to make it appear automatically in every month's view.</p>
-				<ul>
-					<li>Recurring entries use the <strong>day of the month</strong> from their original date.</li>
-					<li>You can <strong>exclude individual months</strong> by using the toggle on each list item – this removes it from just that month without deleting the entry.</li>
-					<li>When deleting a recurring entry you can choose to delete it from <strong>this month only</strong> or from <strong>all months</strong>.</li>
+					<li><strong data-hu="Nyelv" data-en="Language">Nyelv</strong> – <span data-hu="HU / EN választó a bal felső sarokban. A választás tárolódik." data-en="HU / EN selector in the top-left corner. The choice is remembered.">HU / EN választó a bal felső sarokban. A választás tárolódik.</span></li>
+					<li><strong data-hu="Világos / Sötét mód" data-en="Light / Dark mode">Világos / Sötét mód</strong> – <span data-hu="a fejlécben váltható. A választás tárolódik." data-en="toggle in the header. The choice is remembered.">a fejlécben váltható. A választás tárolódik.</span></li>
+					<li><strong data-hu="Pénznem" data-en="Currency">Pénznem</strong> – <span data-hu="HUF, GBP, USD vagy EUR. Átváltás nem történik, csak megjelenítés." data-en="HUF, GBP, USD or EUR. No conversion, display only.">HUF, GBP, USD vagy EUR. Átváltás nem történik, csak megjelenítés.</span></li>
+					<li><strong data-hu="Felhasználónév / jelszó módosítás" data-en="Change username / password">Felhasználónév / jelszó módosítás</strong> – <span data-hu="hamburger menü → Adatok módosítása." data-en="hamburger menu → Edit profile.">hamburger menü → Adatok módosítása.</span></li>
+					<li><strong data-hu="Automatikus kijelentkezés" data-en="Auto sign-out">Automatikus kijelentkezés</strong> – <span data-hu="5 perc inaktivitás után az app automatikusan kijelentkeztet." data-en="after 5 minutes of inactivity the app signs you out automatically.">5 perc inaktivitás után az app automatikusan kijelentkeztet.</span></li>
 				</ul>
 			</article>
 
@@ -154,17 +109,59 @@
 
 		<footer class="footer-content" style="margin-top:2rem;">
 			<p>@ 2026 Amethyst Nexalune.</p>
-			<p>All rights reserved.</p>
+			<p id="help-footer-text">Minden jog fenntartva.</p>
 		</footer>
 
 	</main>
-	<script src="assets/js/app-shared.js?v=3"></script>
 
-	 <footer class="footer-content">
-        <p>@ 2026 Amethyst Nexalune.</p>
-        <p data-i18n="footerText">Minden jog fenntartva.</p>
-    </footer>
-	
+	<script src="assets/js/app-shared.js?v=3"></script>
+	<script>
+	(function() {
+		const langKey = "budgetAppLanguage";
+		const sel = document.getElementById("help-language");
+		const texts = {
+			hu: {
+				title: "Súgó – Budgeting App",
+				badge: "Súgó",
+				h1: "Súgó &amp; Útmutató",
+				subtitle: "Az app minden funkciójának rövid összefoglalója.",
+				homeLink: "← Vissza",
+				footer: "Minden jog fenntartva."
+			},
+			en: {
+				title: "Help – Budgeting App",
+				badge: "Help",
+				h1: "Help &amp; Guide",
+				subtitle: "A quick overview of every feature in the app.",
+				homeLink: "← Back",
+				footer: "All rights reserved."
+			}
+		};
+
+		function applyLang(lang) {
+			const t = texts[lang] || texts.hu;
+			document.documentElement.lang = lang;
+			document.title = t.title;
+			document.getElementById("help-title-badge").textContent = t.badge;
+			document.getElementById("help-h1").innerHTML = t.h1;
+			document.getElementById("help-subtitle").textContent = t.subtitle;
+			document.getElementById("help-home-link").textContent = t.homeLink;
+			document.getElementById("help-footer-text").textContent = t.footer;
+			document.querySelectorAll("[data-" + lang + "]").forEach(el => {
+				el.textContent = el.getAttribute("data-" + lang);
+			});
+			sel.value = lang;
+		}
+
+		const saved = localStorage.getItem(langKey) || "hu";
+		applyLang(saved);
+
+		sel.addEventListener("change", function() {
+			const lang = this.value;
+			localStorage.setItem(langKey, lang);
+			applyLang(lang);
+		});
+	})();
+	</script>
 </body>
 </html>
-

@@ -1,4 +1,4 @@
-import {
+﻿import {
     completePasswordResetWithHistory,
     deleteCurrentAccount,
 
@@ -102,7 +102,8 @@ const dictionary = {
         appInstalled: "Az app telepítve.",
         appDownloaded: "Az app letöltve.",
         appInstallUnavailable: "Az app letöltés most ezen az eszközön nem érhető el.",
-        footerText: "Minden jog fenntartva."
+        footerText: "Minden jog fenntartva.",
+        helpLink: "Súgó"
     },
     en: {
         pageTitle: "Budgeting App",
@@ -186,7 +187,8 @@ const dictionary = {
         appInstalled: "App installed.",
         appDownloaded: "App downloaded.",
         appInstallUnavailable: "App install is not available on this device right now.",
-        footerText: "All rights reserved."
+        footerText: "All rights reserved.",
+        helpLink: "Help"
     }
 };
 

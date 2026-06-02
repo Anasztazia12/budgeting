@@ -1,4 +1,4 @@
-import {
+﻿import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	logoutCurrentUser,
@@ -81,6 +81,7 @@ const dictionary = {
 		deleteAccountNeedsSecondClick: "Kattints újra 7 másodpercen belül a fiók törléséhez.",
 		logoutButton: "Kijelentkezés",
 		footerText: "Minden jog fenntartva.",
+		helpLink: "Súgó",
 		profileEditButton: "Adatok módosítása",
 		changeUsernameMenuButton: "Felhasználónév módosítása",
 		changePasswordMenuButton: "Jelszó módosítása",
@@ -163,6 +164,7 @@ const dictionary = {
 		deleteAccountNeedsSecondClick: "Click again within 7 seconds to delete the account.",
 		logoutButton: "Sign out",
 		footerText: "All rights reserved.",
+		helpLink: "Help",
 		profileEditButton: "Edit profile",
 		changeUsernameMenuButton: "Change username",
 		changePasswordMenuButton: "Change password",
@@ -989,3 +991,5 @@ function updateMenuSessionLabel() {
 		: (localStorage.getItem(DISPLAY_NAME_KEY) || currentProfile?.nickname || currentProfile?.username || currentUser);
 	menuSessionInfo.textContent = `${t("loggedIn")} ${name}`;
 }
+
+
