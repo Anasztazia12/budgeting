@@ -710,8 +710,8 @@ function buildWhatIfRowDisplayHTML(wrapper) {
 			<button type="button" class="icon-btn add-to-budget-btn" data-action="add-to-budget" title="${t("forecastAddToBudget")}"><img src="assets/images/budget-icon.png" alt="" style="width:2.8rem;height:2.8rem;object-fit:contain;display:block;"></button>
 			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
 			<button type="button" class="icon-btn" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
-			<button type="button" class="icon-btn close-btn" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">✕</button>
-			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">✕</button>` : ""}
+			<button type="button" class="icon-btn close-btn" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}"><strong style="font-size:1.1rem;">✕</strong></button>
+			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">🗑</button>` : ""}
 		</div>
 	`;
 }
@@ -756,8 +756,8 @@ function buildWhatIfRowEditHTML(wrapper) {
 		<div class="whatif-row-actions">
 			<button type="button" class="icon-btn confirm-edit" data-action="confirm-edit" title="${t("forecastRowDone")}">💾</button>
 			<button type="button" class="icon-btn" data-action="cancel-edit" title="${t("editAction")}">✎</button>
-			<button type="button" class="icon-btn close-btn" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">✕</button>
-			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">✕</button>` : ""}
+			<button type="button" class="icon-btn close-btn" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}"><strong style="font-size:1.1rem;">✕</strong></button>
+			${planName ? `<span class="icon-btn-divider" aria-hidden="true"></span><button type="button" class="icon-btn danger" data-action="delete-plan" title="${t("forecastPermanentDelete")}">🗑</button>` : ""}
 		</div>
 	`;
 }

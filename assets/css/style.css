@@ -904,15 +904,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .icon-btn:hover, .icon-btn:focus-visible { background: #dce9ff; border-color: #6790d8; }
 [data-theme="dark"] .icon-btn { background: #2a4678; border-color: #7fa7f3; color: #eef4ff; }
 [data-theme="dark"] .icon-btn:hover, [data-theme="dark"] .icon-btn:focus-visible { background: #35558f; }
-.icon-btn.danger { background: #fff1f1; border-color: #e39a9a; color: #c62828; }
-.icon-btn.danger:hover, .icon-btn.danger:focus-visible { background: #ffe0e0; border-color: #d07070; }
-[data-theme="dark"] .icon-btn.danger { background: #51242a; border-color: #ba7f88; color: #ffd7dc; }
+.icon-btn.danger { background: linear-gradient(125deg, #d44a5b, #a52e3e); border-color: #8b2532; color: #fff; font-size: 1.3rem; }
+.icon-btn.danger:hover, .icon-btn.danger:focus-visible { background: linear-gradient(125deg, #e05869, #b43748); border-color: #972a38; }
+[data-theme="dark"] .icon-btn.danger { background: linear-gradient(125deg, #a8384b, #7b2637); border-color: #d48a99; color: #fff; }
+.icon-btn.close-btn { background: #f0f0f0; border-color: #999; color: #222; font-size: 1.15rem; font-weight: 800; }
+.icon-btn.close-btn:hover { background: #e0e0e0; border-color: #666; }
+[data-theme="dark"] .icon-btn.close-btn { background: #2a2a3a; border-color: #666; color: #ccc; }
 .icon-btn.add-to-budget-btn { background: #eafaf1; border-color: #7dcea0; color: #1e8a40; }
 .icon-btn.add-to-budget-btn:hover { background: #d5f5e3; border-color: #52be80; }
 [data-theme="dark"] .icon-btn.add-to-budget-btn { background: #0e2b1e; border-color: #2a7a54; color: #79e3b3; }
-.icon-btn.close-btn { background: #f0f0f0; border-color: #bbb; color: #333; font-weight: 700; }
-.icon-btn.close-btn:hover { background: #e0e0e0; border-color: #999; }
-[data-theme="dark"] .icon-btn.close-btn { background: #2a2a3a; border-color: #666; color: #ccc; }
 .forecast-confirm-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.6rem; background: #fff3f5; border: 1px solid #f0b0bc; border-radius: var(--control-radius); font-size: 0.85rem; flex-wrap: wrap; margin-top: 0.3rem; }
 [data-theme="dark"] .forecast-confirm-row { background: #2b1520; border-color: #7a3050; color: #ffd4e0; }
 .icon-btn.confirm-edit { background: linear-gradient(125deg, #1b9d8f, #167f73); border-color: #1b7c71; color: #fff; }
@@ -925,8 +925,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .saved-plans-section { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.85rem; padding: 0.7rem 0.85rem; border: 1px solid #c4d5f2; border-radius: var(--control-radius); background: #f5f8ff; }
 [data-theme="dark"] .saved-plans-section { background: #111e38; border-color: #3a5282; }
 .saved-plans-header { display: flex; flex-direction: column; gap: 0.45rem; }
-.saved-plans-top-row { display: flex; align-items: stretch; gap: 0.45rem; flex-wrap: nowrap; }
-.saved-plans-top-row .saved-plans-dropdown { flex: 1 1 auto; min-width: 0; }
+.saved-plans-top-row { display: flex; align-items: stretch; gap: 0.45rem; flex-wrap: wrap; }
+.saved-plans-top-row .saved-plans-dropdown { flex: 1 1 auto; min-width: 0; max-width: 16rem; }
 .saved-plans-top-row .saved-plans-dropdown-trigger { width: 100%; display: flex; }
 .saved-plans-top-row #forecast-load-scenario { flex: 0 0 auto; white-space: nowrap; align-self: stretch; }
 .saved-plans-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; width: 100%; }
@@ -1121,6 +1121,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	}
 	.whatif-row-fields { grid-template-columns: repeat(2, minmax(0,1fr)); }
 	.saved-plans-actions { justify-content: flex-start; }
+	.saved-plans-top-row { flex-wrap: wrap; }
+	.saved-plans-top-row .saved-plans-dropdown { max-width: none; flex: 1 1 auto; }
+	.saved-plans-top-row #add-whatif-row { flex: 0 0 100%; width: 100%; white-space: normal; font-size: 0.86rem; }
  
 	.chart-body { flex-direction: column; align-items: stretch; }
 	.chart-canvas-wrap { width: 100%; max-width: 100%; flex: 1 1 auto; }
