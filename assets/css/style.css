@@ -563,6 +563,10 @@ button.secondary:hover, button.secondary:focus-visible { filter: brightness(1.08
 	border-radius: var(--control-radius); border-width: 1px;
 }
  
+/* ── Help button ── */
+.help-btn { display: inline-flex; align-items: center; }
+.help-btn a { width: auto; font-size: 0.88rem; padding: 0.32rem 0.75rem; font-weight: 700; white-space: nowrap; }
+
 /* ── Language corner ── */
 .language-corner {
 	display: inline-flex; align-items: center;
@@ -912,6 +916,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .icon-btn.danger { background: #fff1f1; border-color: #e39a9a; color: #c62828; }
 .icon-btn.danger:hover, .icon-btn.danger:focus-visible { background: #ffe0e0; border-color: #d07070; }
 [data-theme="dark"] .icon-btn.danger { background: #51242a; border-color: #ba7f88; color: #ffd7dc; }
+.icon-btn.add-to-budget-btn { background: #eafaf1; border-color: #7dcea0; color: #1e8a40; }
+.icon-btn.add-to-budget-btn:hover { background: #d5f5e3; border-color: #52be80; }
+[data-theme="dark"] .icon-btn.add-to-budget-btn { background: #0e2b1e; border-color: #2a7a54; color: #79e3b3; }
 .icon-btn.close-btn { background: #f0f0f0; border-color: #bbb; color: #333; font-weight: 700; }
 .icon-btn.close-btn:hover { background: #e0e0e0; border-color: #999; }
 [data-theme="dark"] .icon-btn.close-btn { background: #2a2a3a; border-color: #666; color: #ccc; }
@@ -1032,6 +1039,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 	}
 	.language-corner { grid-area: language; min-width: 0; min-height: 0; height: auto; padding: 0.1rem 0.2rem; width: fit-content; }
 	.language-corner select { height: auto; padding: 0.28rem 0.4rem; }
+	.help-btn a { font-size: 0.78rem; padding: 0.25rem 0.55rem; }
 	.hero-toolbar-group { display: contents; }
 	.mobile-app-title { grid-area: title; display: block; font-size: 1rem; min-width: 0; padding-right: 0.25rem; }
 	.version-badge { display: inline-flex; grid-area: version; justify-self: end; align-self: center; font-size: 0.78rem; padding: 0.26rem 0.55rem; position: static; transform: none; }

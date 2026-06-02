@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#2452b8">
+	<title>Help – Budgeting App</title>
+	<link rel="manifest" href="manifest.webmanifest">
+	<link rel="icon" type="image/png" href="assets/images/budget-icon.png">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="assets/css/style.css?v=9">
+</head>
+<body>
+	<a class="skip-link" href="#main-content">Skip to content</a>
+	<main id="main-content" class="app-shell" tabindex="-1">
+
+		<header class="hero">
+			<div class="hero-toolbar">
+				<a href="index.html" class="btn btn-outline-info" style="width:auto;font-size:0.9rem;">← Home</a>
+				<p class="version-badge" style="position:static;transform:none;">Help</p>
+				<a href="budget.html" class="btn btn-outline-info" style="width:auto;font-size:0.9rem;">Open Budget →</a>
+			</div>
+			<h1>Help &amp; Guide</h1>
+			<p>A quick overview of every feature in the app.</p>
+		</header>
+
+		<div class="grid" style="gap:1rem;margin-top:1rem;">
+
+			<!-- Getting started -->
+			<article class="card">
+				<h2>🚀 Getting started</h2>
+				<p>There are two ways to use the app:</p>
+				<ul>
+					<li><strong>Registered user</strong> – create a free account with a username, email and password. Once registered, sign in using your username <em>or</em> email address and your password. Your data is saved to the cloud and is available on any device.</li>
+					<li><strong>Guest mode</strong> – no account needed. Data is saved only for the current browser tab and is permanently deleted when you close it or sign out.</li>
+				</ul>
+				<p><strong>Password rules:</strong> 6–20 characters, must include at least one lowercase letter, one uppercase letter, and one number.</p>
+			</article>
+
+			<!-- Budget page -->
+			<article class="card">
+				<h2>📋 Budget page</h2>
+				<p>The main page for recording your expected income and expenses.</p>
+				<h3>Income form</h3>
+				<ul>
+					<li><strong>Category</strong> – choose the type of income (Salary, Child Benefit, Universal Credit, etc.).</li>
+					<li><strong>Amount</strong> – enter the value (decimals allowed).</li>
+					<li><strong>Date</strong> – when do you expect to receive this income?</li>
+					<li><strong>Note</strong> – optional short description (max 280 characters).</li>
+					<li><strong>Show in every month</strong> – tick this to make the entry repeat every month automatically.</li>
+				</ul>
+				<h3>Expense form</h3>
+				<p>Same fields as income. Categories include Rent, Mortgage, Car, Groceries, Electricity, and many more.</p>
+				<h3>Statistics cards</h3>
+				<ul>
+					<li><strong>Total income / Expected income</strong> – sum of income entries in the selected period.</li>
+					<li><strong>Total expenses / Expected expense</strong> – sum of expense entries in the selected period.</li>
+				</ul>
+				<h3>List filters</h3>
+				<p>Below the forms, use the <strong>-tól / -ig</strong> date filters to narrow down which entries appear in each list.</p>
+				<h3>Period selector</h3>
+				<p>At the top, set a <strong>from</strong> and <strong>to</strong> date to define which period the totals and lists cover.</p>
+				<h3>Today's notice</h3>
+				<p>If any income or expense is due today, a modal pops up when you log in. Tick <em>"Don't show again today"</em> to suppress it for the rest of the day.</p>
+			</article>
+
+			<!-- Budget Forecast -->
+			<article class="card">
+				<h2>🔮 Budget Forecast</h2>
+				<p>Plan ahead and test "what if" scenarios without affecting your real budget.</p>
+				<ul>
+					<li><strong>Period selector</strong> – choose the date range the forecast should cover.</li>
+					<li><strong>+ Add extra / unexpected item</strong> – add a one-off income or expense row to the simulation.</li>
+					<li><strong>Each row needs:</strong> type (income or expense), amount, date, and an optional note and plan name.</li>
+					<li><strong>Save row (💾)</strong> – saves the row as a named scenario so you can reload it later.</li>
+					<li><strong>Add to budget (budget icon)</strong> – copies this item directly into your real budget in one click.</li>
+					<li><strong>Close row (✕ black)</strong> – removes the row from the view without deleting the saved scenario.</li>
+					<li><strong>Delete plan (✕ red)</strong> – permanently deletes the saved scenario (asks for confirmation first).</li>
+					<li><strong>Saved plans</strong> – click the dropdown to see your saved scenarios, select one and press <em>Load</em> to restore its rows.</li>
+				</ul>
+				<h3>Forecast results</h3>
+				<ul>
+					<li><strong>Balance up to date</strong> – income minus expenses from your real budget within the period.</li>
+					<li><strong>Balance with planned items</strong> – the above figure adjusted for all what-if rows.</li>
+					<li><strong>Difference</strong> – how much the what-if items change your balance.</li>
+					<li><strong>New balance</strong> – your estimated end-of-period balance if all planned items occur.</li>
+				</ul>
+			</article>
+
+			<!-- Summary -->
+			<article class="card">
+				<h2>📊 Summary</h2>
+				<p>A read-only overview of your income and expenses for any selected period.</p>
+				<ul>
+					<li><strong>Period selector</strong> – choose from and to dates. The cards and lists update automatically.</li>
+					<li><strong>Total income / Total expense</strong> – sums for the period.</li>
+					<li><strong>Balance</strong> – income minus expenses.</li>
+					<li><strong>Spending to date</strong> – expenses up to today's date within the period.</li>
+					<li><strong>Chart</strong> – shows all income and expense categories together on a pie or bar chart. Switch between the two using the <em>Type</em> selector.</li>
+					<li><strong>End-of-period projection</strong> – an estimate of your closing balance at the end of the selected period.</li>
+				</ul>
+			</article>
+
+			<!-- Debt Manager -->
+			<article class="card">
+				<h2>💳 Debt Manager</h2>
+				<p>Track your loans, repayments and projected payoff dates.</p>
+				<ul>
+					<li><strong>Debt name</strong> – a label for the loan (e.g. "Car loan").</li>
+					<li><strong>Monthly payment</strong> – how much you pay each month.</li>
+					<li><strong>Payment date</strong> – the date your next payment is due.</li>
+					<li><strong>Remaining amount</strong> – how much you still owe.</li>
+					<li><strong>Due date</strong> – optional: when the loan is scheduled to end.</li>
+					<li><strong>Planned early payment date</strong> – optional: if you plan to pay it off early, enter the date here.</li>
+					<li><strong>Planned amount</strong> – the lump sum you plan to use for early repayment.</li>
+					<li><strong>Add to budget forecast</strong> – tick this to automatically create a forecast scenario for this debt's monthly payment.</li>
+				</ul>
+				<h3>Statistics cards</h3>
+				<ul>
+					<li><strong>Total debt</strong> – sum of all monthly payments.</li>
+					<li><strong>Remaining</strong> – total remaining balances across all debts.</li>
+					<li><strong>Paid</strong> – difference between total and remaining.</li>
+					<li><strong>Monthly payments</strong> – total amount due each month.</li>
+				</ul>
+			</article>
+
+			<!-- Settings & navigation -->
+			<article class="card">
+				<h2>⚙️ Settings &amp; navigation</h2>
+				<ul>
+					<li><strong>Language</strong> – switch between Hungarian (HU) and English (EN) using the selector in the top-left corner. The choice is remembered.</li>
+					<li><strong>Light / Dark theme</strong> – toggle in the toolbar. The choice is remembered.</li>
+					<li><strong>Currency</strong> – choose HUF, GBP, USD or EUR. Amounts are displayed in the chosen currency (no conversion is applied).</li>
+					<li><strong>Hamburger menu (☰)</strong> – access Home, Adatok módosítása (profile), navigation links, Install app, Sign out, and Delete account.</li>
+					<li><strong>Change username</strong> – available in the hamburger menu when signed in. You must enter your current username, then the new one twice.</li>
+					<li><strong>Change password</strong> – available in the hamburger menu when signed in. Enter your current password, then the new one twice.</li>
+					<li><strong>Auto sign-out</strong> – after 5 minutes of inactivity you will be signed out automatically.</li>
+					<li><strong>Install app</strong> – on supported browsers you can install the app to your home screen for offline use.</li>
+				</ul>
+			</article>
+
+			<!-- Recurring entries -->
+			<article class="card">
+				<h2>🔄 Recurring entries</h2>
+				<p>Tick <em>"Show in every month"</em> when adding an income or expense to make it appear automatically in every month's view.</p>
+				<ul>
+					<li>Recurring entries use the <strong>day of the month</strong> from their original date.</li>
+					<li>You can <strong>exclude individual months</strong> by using the toggle on each list item – this removes it from just that month without deleting the entry.</li>
+					<li>When deleting a recurring entry you can choose to delete it from <strong>this month only</strong> or from <strong>all months</strong>.</li>
+				</ul>
+			</article>
+
+		</div>
+
+		<footer class="footer-content" style="margin-top:2rem;">
+			<p>@ 2026 Amethyst Nexalune.</p>
+			<p>All rights reserved.</p>
+		</footer>
+
+	</main>
+	<script src="assets/js/app-shared.js?v=3"></script>
+
+	 <footer class="footer-content">
+        <p>@ 2026 Amethyst Nexalune.</p>
+        <p data-i18n="footerText">Minden jog fenntartva.</p>
+    </footer>
+	
+</body>
+</html>

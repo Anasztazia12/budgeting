@@ -48,6 +48,8 @@ const dictionary = {
 		forecastRowNotePlaceholder: "Rövid megjegyzés (opcionális)",
 		forecastTypeExpense: "Extra kiadás",
 		forecastTypeIncome: "Extra bevétel",
+		forecastAddToBudget: "Hozzáadás a költségvetéshez",
+		forecastAddedToBudget: "Hozzáadva a költségvetéshez.",
 		forecastRemoveRow: "Törlés",
 		forecastConfirmDelete: "Biztosan végleg törlöd?",
 		forecastConfirmYes: "Igen, törlöm",
@@ -127,6 +129,8 @@ const dictionary = {
 		forecastRowNotePlaceholder: "Short note (optional)",
 		forecastTypeExpense: "Extra expense",
 		forecastTypeIncome: "Extra income",
+		forecastAddToBudget: "Add to budget",
+		forecastAddedToBudget: "Added to budget.",
 		forecastRemoveRow: "Delete",
 		forecastConfirmDelete: "Are you sure you want to permanently delete this?",
 		forecastConfirmYes: "Yes, delete",
@@ -275,6 +279,38 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 	const rowElement = actionButton.closest(".whatif-row");
 	if (!rowElement) return;
 	const action = actionButton.dataset.action;
+
+	if (action === "add-to-budget") {
+		const type = rowElement.dataset.type || "expense";
+		const amount = parseFloat(rowElement.dataset.amount || 0);
+		const date = rowElement.dataset.date || shared.toDateInput(new Date());
+		const note = rowElement.dataset.note || "";
+		const category = type === "income" ? "egyeb" : "egyeb kiadas";
+		const entry = {
+			id: shared.createEntryId(),
+			category,
+			amount,
+			date,
+			note,
+			repeatMonthly: false,
+			excludedMonths: []
+		};
+		if (type === "income") {
+			appState.incomes = [...(appState.incomes || []), entry];
+		} else {
+			appState.expenses = [...(appState.expenses || []), entry];
+		}
+		if (currentUser === GUEST_SESSION_VALUE) {
+			shared.saveGuestData(appState);
+		} else if (currentUser) {
+			saveCurrentUserData(appState).catch(() => null);
+		}
+		actionButton.disabled = true;
+		actionButton.innerHTML = "✓";
+		actionButton.title = t("forecastAddedToBudget");
+		showMessage(t("forecastAddedToBudget"), false);
+		return;
+	}
 
 	if (action === "remove-whatif") {
 		rowElement.remove();
@@ -667,6 +703,7 @@ function buildWhatIfRowDisplayHTML(wrapper) {
 			${note ? `<span class="whatif-note">${escapeHtml(note)}</span>` : ""}
 		</div>
 		<div class="whatif-row-actions">
+			<button type="button" class="icon-btn add-to-budget-btn" data-action="add-to-budget" title="${t("forecastAddToBudget")}"><img src="assets/images/budget-icon.png" alt="" style="width:2.8rem;height:2.8rem;object-fit:contain;display:block;"></button>
 			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
 			<button type="button" class="icon-btn" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
 			<button type="button" class="icon-btn close-btn" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}">✕</button>
