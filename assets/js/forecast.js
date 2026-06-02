@@ -2,7 +2,8 @@ import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
 	logoutCurrentUser,
-	restoreSession
+	restoreSession,
+	saveCurrentUserData
 } from "./firebase-service.js";
 
 const shared = window.BudgetAppShared;

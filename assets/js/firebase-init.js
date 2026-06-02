@@ -20,16 +20,12 @@ const firebaseState = {
 
 window.BudgetAppFirebase = firebaseState;
 
-export const analyticsReady = isSupported()
-    .then((supported) => {
-        if (!supported) {
-            return null;
-        }
+const isLocalhost = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
 
+export const analyticsReady = (!isLocalhost ? isSupported() : Promise.resolve(false))
+    .then((supported) => {
+        if (!supported) return null;
         firebaseState.analytics = getAnalytics(app);
         return firebaseState.analytics;
     })
-    .catch(() => {
-        // Analytics support depends on the browser environment.
-        return null;
-    });
+    .catch(() => null);
