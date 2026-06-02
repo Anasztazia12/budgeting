@@ -408,18 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <button type="button" id="profile-modal-close" class="btn btn-outline-info" style="margin-top:0.4rem">${isEn ? "Cancel" : "Mégse"}</button>
             </div>
         </div>
-        <div id="profile-toast" class="profile-toast hidden" aria-live="polite"></div>
     `);
-
-    let toastTimer = null;
-    function showToast(message) {
-        const toast = document.getElementById("profile-toast");
-        if (!toast) return;
-        if (toastTimer) clearTimeout(toastTimer);
-        toast.textContent = message;
-        toast.classList.remove("hidden");
-        toastTimer = setTimeout(() => toast.classList.add("hidden"), 3500);
-    }
 
     const modal = document.getElementById("profile-modal");
     const modalTitle = document.getElementById("profile-modal-title");

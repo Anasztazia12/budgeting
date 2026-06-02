@@ -861,25 +861,6 @@ label { font-weight: 600; color: var(--muted-strong); font-size: 0.92rem; }
 .session-card { margin-top: 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
 .session-card.hidden { display: none; }
 .session-card p { margin: 0; }
-.profile-toast {
-	position: fixed;
-	bottom: 1.5rem;
-	left: 50%;
-	transform: translateX(-50%);
-	background: #1e8a40;
-	color: #fff;
-	font-weight: 600;
-	font-size: 0.95rem;
-	padding: 0.7rem 1.4rem;
-	border-radius: var(--control-radius);
-	box-shadow: 0 4px 18px rgba(0,0,0,0.22);
-	z-index: 9999;
-	white-space: normal;
-	text-align: center;
-	max-width: min(90vw, 28rem);
-	width: max-content;
-}
-[data-theme="dark"] .profile-toast { background: #2aaa52; }
 
 .today-notice-card { max-width: 22rem; width: 90vw; }
 .today-notice-card h3 { margin-bottom: 0.8rem; font-size: 1.05rem; }
@@ -890,17 +871,7 @@ label { font-weight: 600; color: var(--muted-strong); font-size: 0.92rem; }
 [data-theme="dark"] .today-notice-row.expense { color: #f47c97; }
 .today-notice-dismiss-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; margin-top: 0.8rem; cursor: pointer; }
 
-.today-notice {
-	padding: 0.65rem 1rem;
-	background: #eaf4ff;
-	border: 1px solid #84a9e8;
-	border-radius: var(--control-radius);
-	font-weight: 600;
-	font-size: 0.95rem;
-	color: #143f90;
-	margin-bottom: 0.5rem;
-}
-[data-theme="dark"] .today-notice { background: #1a2e55; border-color: #4a6eb0; color: #c8dcff; }
+
 .auth-message { width: 100%; font-weight: 600; }
 .auth-message.error { color: var(--danger); }
 .auth-message.ok { color: var(--good); }
