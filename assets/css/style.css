@@ -592,16 +592,14 @@ button.secondary:hover, button.secondary:focus-visible { filter: brightness(1.08
 /* ── Language corner ── */
 .language-corner {
 	display: inline-flex; align-items: center;
-	background: rgba(242,247,255,.96);
-	border: 1px solid var(--line);
+	background: transparent;
+	border: none;
 	border-radius: var(--panel-radius);
-	padding: 0.35rem;
-	box-shadow: 0 10px 22px rgba(18,47,102,.178);
-	backdrop-filter: blur(4px);
+	padding: 0;
 }
 [data-theme="dark"] .language-corner { background: rgba(20,33,61,.95); border-color: #4a65a5; box-shadow: 0 10px 22px rgba(0,0,0,.3); }
-.language-corner select { width: auto; min-width: 0; flex: 0 0 auto; padding: 0.45rem 0.55rem; font-weight: 700; text-align: center; text-transform: uppercase; background: #e6f0ff; }
-[data-theme="dark"] .language-corner select { background: #1a2b53; color: #f1f5ff; border-color: #4a65a5; }
+.language-corner select { width: auto; min-width: 0; flex: 0 0 auto; padding: 0.35rem 0.55rem; font-weight: 700; text-align: center; text-transform: uppercase; background: rgba(242,247,255,.96); border: 1px solid var(--line); border-radius: var(--panel-radius); }
+[data-theme="dark"] .language-corner select { background: rgba(20,33,61,.95); color: #f1f5ff; border-color: #4a65a5; }
  
 /* ── Theme switch ── */
 .theme-switch-inline {
