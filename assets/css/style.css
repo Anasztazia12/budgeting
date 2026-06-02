@@ -565,7 +565,21 @@ button.secondary:hover, button.secondary:focus-visible { filter: brightness(1.08
  
 /* ── Help button ── */
 .help-btn { display: inline-flex; align-items: center; }
-.help-btn a { width: auto; font-size: 0.88rem; padding: 0.32rem 0.75rem; font-weight: 700; white-space: nowrap; }
+.help-btn a {
+	width: auto; white-space: nowrap;
+	display: inline-flex; align-items: center;
+	background: rgba(242,247,255,.96);
+	border: 1px solid var(--line);
+	border-radius: var(--panel-radius);
+	padding: 0.35rem 0.75rem;
+	box-shadow: 0 10px 22px rgba(18,47,102,.178);
+	backdrop-filter: blur(4px);
+	font-size: 0.9rem; font-weight: 700;
+	color: var(--muted-strong); text-decoration: none;
+}
+.help-btn a:hover { background: #e6f0ff; border-color: #84a9e8; color: var(--accent); text-decoration: none; }
+[data-theme="dark"] .help-btn a { background: rgba(20,33,61,.95); border-color: #4a65a5; box-shadow: 0 10px 22px rgba(0,0,0,.3); color: #b5c3e6; }
+[data-theme="dark"] .help-btn a:hover { background: rgba(30,50,90,.95); color: #e8efff; }
 
 /* ── Language corner ── */
 .language-corner {
