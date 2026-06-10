@@ -205,6 +205,8 @@ Navigation idea:
 
 ### 4) Skeleton (layout)
 
+![wireframe](assets/images/wireframe.png)
+
 - controls at the top
 - forms below
 - stats next to/below forms
