@@ -486,49 +486,72 @@ function renderChart(incomes, expenses) {
 	const legendEl = document.getElementById("summary-chart-legend");
 	if (!section || !canvas || typeof Chart === "undefined") return;
 
-	const dataMap = {};
-	[...incomes, ...expenses].forEach((e) => {
-		const cat = translateCategory(e.category);
-		dataMap[cat] = (dataMap[cat] || 0) + e.amount;
-	});
-
-	const entries = Object.entries(dataMap).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
-
-	if (!entries.length) {
+	const totalIncome = shared.sumEntries(incomes);
+	if (totalIncome <= 0) {
 		section.classList.add("hidden");
 		if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 		return;
 	}
 
-	const labels = entries.map(([k]) => k);
-	const amounts = entries.map(([, v]) => v);
-	const bgColors = labels.map((_, i) => CHART_PALETTE[i % CHART_PALETTE.length]);
+	const expenseMap = {};
+	expenses.forEach((e) => {
+		const cat = translateCategory(e.category);
+		expenseMap[cat] = (expenseMap[cat] || 0) + e.amount;
+	});
+
+	const expenseEntries = Object.entries(expenseMap).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+	const totalExpense = expenseEntries.reduce((s, [, v]) => s + v, 0);
+	const remaining = Math.max(0, totalIncome - totalExpense);
+
+	const isHu = appLanguage !== "en";
+	const remainingLabel = isHu ? "Maradék" : "Remaining";
+	const incomeLabel = isHu ? "Bevétel" : "Income";
 	const chartType = chartTypeSelect?.value || "pie";
+
+	function pct(amount) {
+		return ((amount / totalIncome) * 100).toFixed(1) + "%";
+	}
 
 	// Build legend
 	if (legendEl) {
 		legendEl.innerHTML = "";
-		entries.forEach(([label, amount], i) => {
+		const incomeItem = document.createElement("div");
+		incomeItem.className = "chart-legend-item";
+		incomeItem.innerHTML = `
+			<span class="chart-legend-color" style="background:#22c55e"></span>
+			<span class="chart-legend-label"><strong>${incomeLabel}: ${formatCurrency(totalIncome)} (100%)</strong></span>
+		`;
+		legendEl.appendChild(incomeItem);
+
+		expenseEntries.forEach(([label, amount], i) => {
 			const item = document.createElement("div");
 			item.className = "chart-legend-item";
 			item.innerHTML = `
-				<span class="chart-legend-color" style="background:${bgColors[i]}"></span>
-				<span class="chart-legend-label">${escapeHtml(label)}: <strong>${formatCurrency(amount)}</strong></span>
+				<span class="chart-legend-color" style="background:${CHART_PALETTE[i % CHART_PALETTE.length]}"></span>
+				<span class="chart-legend-label">${escapeHtml(label)}: <strong>${formatCurrency(amount)} (${pct(amount)})</strong></span>
 			`;
 			legendEl.appendChild(item);
 		});
+
+		if (remaining > 0) {
+			const remItem = document.createElement("div");
+			remItem.className = "chart-legend-item";
+			remItem.innerHTML = `
+				<span class="chart-legend-color" style="background:#d1d5db"></span>
+				<span class="chart-legend-label">${remainingLabel}: <strong>${formatCurrency(remaining)} (${pct(remaining)})</strong></span>
+			`;
+			legendEl.appendChild(remItem);
+		}
 	}
 
 	// Show section
 	section.classList.remove("hidden");
 
-	// Set labels with hardcoded strings — avoids raw-key fallback completely
-	const isHu = appLanguage !== "en";
 	const titleEl = document.getElementById("summary-chart-title-el");
 	const typeLabelEl = document.getElementById("summary-chart-type-label-el");
 	const pieOpt = document.getElementById("summary-chart-opt-pie");
 	const barOpt = document.getElementById("summary-chart-opt-bar");
-	if (titleEl) titleEl.textContent = isHu ? "Bevételek és kiadások alakulása a kiválasztott időszakban" : "Income and expenses in the selected period";
+	if (titleEl) titleEl.textContent = isHu ? "Kiadások a bevétel arányában" : "Expenses as a share of income";
 	if (typeLabelEl) typeLabelEl.textContent = isHu ? "Típus" : "Type";
 	if (pieOpt) pieOpt.textContent = isHu ? "Kördiagram" : "Pie chart";
 	if (barOpt) barOpt.textContent = isHu ? "Oszlopdiagram" : "Bar chart";
@@ -539,54 +562,96 @@ function renderChart(incomes, expenses) {
 	freshCanvas.id = "summary-chart";
 	canvas.replaceWith(freshCanvas);
 
-	// Bar chart needs explicit container height; pie uses aspect ratio
 	const wrap = freshCanvas.closest(".chart-canvas-wrap");
-
-	// Force synchronous layout reflow so Chart.js sees correct canvas dimensions
 	void section.offsetHeight;
 
-	try {
-		chartInstance = new Chart(freshCanvas, {
-			type: chartType,
-			data: {
-				labels,
-				datasets: [{
-					data: amounts,
-					backgroundColor: bgColors,
-					borderWidth: chartType === "bar" ? 0 : 2,
-					borderColor: "#fff",
-					minBarLength: chartType === "bar" ? 6 : undefined
-				}]
-			},
-			options: {
-				responsive: true,
-				maintainAspectRatio: true,
-				aspectRatio: chartType === "bar" ? 1.6 : 1,
-				plugins: {
-					legend: { display: false },
-					tooltip: {
-						callbacks: {
-							label: (ctx) => ` ${formatCurrency(ctx.raw)}`
+	if (chartType === "pie") {
+		const labels = [...expenseEntries.map(([k]) => k), ...(remaining > 0 ? [remainingLabel] : [])];
+		const amounts = [...expenseEntries.map(([, v]) => v), ...(remaining > 0 ? [remaining] : [])];
+		const bgColors = [
+			...expenseEntries.map((_, i) => CHART_PALETTE[i % CHART_PALETTE.length]),
+			...(remaining > 0 ? ["#d1d5db"] : [])
+		];
+
+		try {
+			chartInstance = new Chart(freshCanvas, {
+				type: "pie",
+				data: {
+					labels,
+					datasets: [{
+						data: amounts,
+						backgroundColor: bgColors,
+						borderWidth: 2,
+						borderColor: "#fff"
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: true,
+					aspectRatio: 1,
+					plugins: {
+						legend: { display: false },
+						tooltip: {
+							callbacks: {
+								label: (ctx) => ` ${ctx.label}: ${formatCurrency(ctx.raw)} (${pct(ctx.raw)})`
+							}
 						}
 					}
+				}
+			});
+		} catch (_err) {
+			section.classList.add("hidden");
+			chartInstance = null;
+		}
+	} else {
+		const labels = [incomeLabel, ...expenseEntries.map(([k]) => k)];
+		const amounts = [totalIncome, ...expenseEntries.map(([, v]) => v)];
+		const bgColors = ["#22c55e", ...expenseEntries.map((_, i) => CHART_PALETTE[i % CHART_PALETTE.length])];
+
+		try {
+			chartInstance = new Chart(freshCanvas, {
+				type: "bar",
+				data: {
+					labels,
+					datasets: [{
+						data: amounts,
+						backgroundColor: bgColors,
+						borderWidth: 0,
+						minBarLength: 6
+					}]
 				},
-				...(chartType === "bar" ? {
+				options: {
+					responsive: true,
+					maintainAspectRatio: true,
+					aspectRatio: 1.6,
+					plugins: {
+						legend: { display: false },
+						tooltip: {
+							callbacks: {
+								label: (ctx) => {
+									const val = ctx.raw;
+									const percent = ctx.dataIndex === 0 ? "100%" : pct(val);
+									return ` ${formatCurrency(val)} (${percent})`;
+								}
+							}
+						}
+					},
 					scales: {
 						y: {
 							beginAtZero: true,
-							suggestedMax: Math.max(...amounts) * 1.15,
+							suggestedMax: totalIncome * 1.15,
 							ticks: {
 								callback: (v) => new Intl.NumberFormat(appLanguage === "en" ? "en-GB" : "hu-HU", { maximumFractionDigits: 0 }).format(v)
 							},
 							grid: { color: "rgba(0,0,0,0.06)" }
 						}
 					}
-				} : {})
-			}
-		});
-	} catch (_err) {
-		section.classList.add("hidden");
-		chartInstance = null;
+				}
+			});
+		} catch (_err) {
+			section.classList.add("hidden");
+			chartInstance = null;
+		}
 	}
 }
 
