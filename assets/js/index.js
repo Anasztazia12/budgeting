@@ -394,17 +394,12 @@ function wireEvents() {
             const identifier = resetIdentifierInput?.value.trim() || "";
 
             try {
-                const result = await requestPasswordReset(identifier);
+                await requestPasswordReset(identifier);
                 resetForm.reset();
-                const usernameHint = identifier.includes("@") && result.username
-                    ? (appLanguage === "en"
-                        ? ` Your username is: ${result.username}.`
-                        : ` A felhasználóneved: ${result.username}.`)
-                    : "";
                 showMessage(
                     appLanguage === "en"
-                        ? `Reset email sent to ${result.email}. Please check your spam folder too. Amethyst Nexalune${usernameHint}`
-                        : `A reset email elküldve ide: ${result.email}. Nézd meg a spam mappát is. Amethyst Nexalune${usernameHint}`,
+                        ? "If the account exists, we sent a reset email to its address. Please check your spam folder too."
+                        : "Ha a fiók létezik, elküldtük a visszaállító emailt a hozzá tartozó címre. Nézd meg a spam mappát is.",
                     false
                 );
             } catch (error) {
@@ -513,7 +508,7 @@ async function initializePage() {
         localStorage.removeItem(SESSION_KEY);
     }
 
-    const session = await restoreSession(currentUser);
+    const session = await restoreSession(currentUser).catch(() => null);
 
     if (session) {
         
@@ -765,6 +760,7 @@ async function handleAccountDelete() {
 
     try {
         await deleteCurrentAccount();
+        shared.clearUserLocalData(currentUser);
         await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
         shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
         clearAuthenticatedState();

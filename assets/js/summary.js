@@ -10,10 +10,12 @@ const shared = window.BudgetAppShared;
 const { SESSION_KEY, DISPLAY_NAME_KEY, INSTALL_STATUS_KEY } = shared.KEYS;
 const { GUEST_SESSION_VALUE } = shared;
 
-const INCOME_CATEGORIES = ["fizetes", "egyeb"];
+const INCOME_CATEGORIES = [
+	"fizetes","child benefit","universal credit","jobseeker allowance","maternity allowance","egyeb"
+];
 const EXPENSE_CATEGORIES = [
-	"auto","aram","benzin","biztositas","council","elemiszer","gaz","hitelkartya",
-	"internet","iskola","rent","ruhak","szamlak","telefon","travel","tv","viz","egyeb kiadas"
+	"auto","aram","benzin","biztositas","council","elemiszer","gaz","etterem","hitelkartya",
+	"internet","iskola","lakashitel","nyaralas","rent","ruhak","szamlak","telefon","travel","tv","viz","egyeb kiadas"
 ];
 
 const dictionary = {
@@ -100,7 +102,7 @@ const dictionary = {
 			auto: "Autó", benzin: "Benzin", elemiszer: "Élelmiszer", ruhak: "Ruhák",
 			etterem: "Étterem", lakashitel: "Lakáshitel", nyaralas: "Nyaralás",
 			rent: "Albérlet", biztositas: "Biztosítás", hitelkartya: "Hitelkártya",
-			council: "Önkormányzat", tv: "TV", telefon: "Telefon", internet: "Internet",
+			council: "Önkormányzat", onkormanyzat: "Önkormányzat", zilch: "Zilch", tv: "TV", telefon: "Telefon", internet: "Internet",
 			iskola: "Iskola", travel: "Utazás", "egyeb kiadas": "Egyéb kiadás"
 		}
 	},
@@ -187,7 +189,7 @@ const dictionary = {
 			auto: "Car", benzin: "Fuel", elemiszer: "Groceries", ruhak: "Clothes",
 			etterem: "Restaurant", lakashitel: "Mortgage", nyaralas: "Holiday",
 			rent: "Rent", biztositas: "Insurance", hitelkartya: "Credit card",
-			council: "Council tax", tv: "TV", telefon: "Phone", internet: "Internet",
+			council: "Council tax", onkormanyzat: "Municipality", zilch: "Zilch", tv: "TV", telefon: "Phone", internet: "Internet",
 			iskola: "School", travel: "Travel", "egyeb kiadas": "Other expense"
 		}
 	}
@@ -375,7 +377,7 @@ async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
 		appState = shared.loadGuestData();
 	} else {
-		const session = await restoreSession(currentUser);
+		const session = await restoreSession(currentUser).catch(() => null);
 		if (!session) { window.location.href = "index.html"; return; }
 		currentUser = String(session?.profile?.username || currentUser || "").trim();
 		currentProfile = session?.profile || null;
@@ -405,8 +407,8 @@ function render() {
 	const periodStart = range.start || `${anchorMonth}-01`;
 	const periodEnd = range.end || shared.getMonthEndDate(anchorMonth);
 
-	const incomes = entriesForPeriod(appState.incomes, periodStart, periodEnd, anchorMonth);
-	const expenses = entriesForPeriod(appState.expenses, periodStart, periodEnd, anchorMonth);
+	const incomes = entriesForPeriod(appState.incomes, periodStart, periodEnd);
+	const expenses = entriesForPeriod(appState.expenses, periodStart, periodEnd);
 
 	monthlyIncomeEl.textContent = formatCurrency(shared.sumEntries(incomes));
 	monthlyExpenseEl.textContent = formatCurrency(shared.sumEntries(expenses));
@@ -676,8 +678,8 @@ async function handleEntryAction(event, listType) {
 	if (action === "toggle-repeat") {
 		entry.repeatMonthly = target instanceof HTMLInputElement ? target.checked : !entry.repeatMonthly;
 		if (entry.repeatMonthly) entry.excludedMonths = [];
-		await saveState();
-		showMessage(t(entry.repeatMonthly ? "repeatEnabled" : "repeatDisabled"), false);
+		const saved = await saveState();
+		if (saved) showMessage(t(entry.repeatMonthly ? "repeatEnabled" : "repeatDisabled"), false);
 		render();
 		return;
 	}
@@ -699,8 +701,9 @@ async function handleEntryDelete(listType, entryId, clickedDate, triggerEl) {
 		const confirmed = await openInlineDeleteConfirm(triggerEl, t("confirmDelete"));
 		if (!confirmed) return false;
 		appState[listType] = appState[listType].filter((e) => e.id !== entryId);
-		await saveState();
-		return true;
+		const saved = await saveState();
+		if (!saved) render();
+		return saved;
 	}
 
 	const scope = await openDeleteScopeModal();
@@ -708,8 +711,9 @@ async function handleEntryDelete(listType, entryId, clickedDate, triggerEl) {
 
 	if (scope === "all") {
 		appState[listType] = appState[listType].filter((e) => e.id !== entryId);
-		await saveState();
-		return true;
+		const saved = await saveState();
+		if (!saved) render();
+		return saved;
 	}
 
 	if (scope === "month") {
@@ -718,8 +722,9 @@ async function handleEntryDelete(listType, entryId, clickedDate, triggerEl) {
 			const excl = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
 			if (!excl.includes(monthToExclude)) excl.push(monthToExclude);
 			entry.excludedMonths = excl;
-			await saveState();
-			return true;
+			const saved = await saveState();
+			if (!saved) render();
+			return saved;
 		}
 	}
 
@@ -736,14 +741,16 @@ function openEditModal(listType, entry) {
 	// populate category select
 	const catSelect = document.getElementById("edit-entry-category");
 	catSelect.innerHTML = "";
-	const cats = listType === "incomes" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+	const cats = [...(listType === "incomes" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES)];
+	const entryCategory = normalizeCategory(entry.category);
+	if (entryCategory && !cats.includes(entryCategory)) cats.push(entryCategory);
 	cats.forEach((val) => {
 		const opt = document.createElement("option");
 		opt.value = val;
 		opt.textContent = translateCategory(val);
 		catSelect.appendChild(opt);
 	});
-	catSelect.value = normalizeCategory(entry.category);
+	catSelect.value = entryCategory;
 
 	document.getElementById("edit-entry-amount").value = entry.amount;
 	document.getElementById("edit-entry-date").value = entry.date;
@@ -778,12 +785,12 @@ async function saveEditEntry(event) {
 		date: document.getElementById("edit-entry-date").value,
 		note: document.getElementById("edit-entry-note").value.trim(),
 		repeatMonthly: repeat,
-		excludedMonths: repeat ? [] : normalizeExcludedMonths(existing.excludedMonths)
+		excludedMonths: normalizeExcludedMonths(existing.excludedMonths)
 	};
 
-	await saveState();
+	const saved = await saveState();
 	closeEditModal();
-	showMessage(t("entryUpdated"), false);
+	if (saved) showMessage(t("entryUpdated"), false);
 	render();
 }
 
@@ -877,8 +884,14 @@ async function saveState() {
 	if (currentUser === GUEST_SESSION_VALUE) {
 		shared.saveGuestData(appState);
 	} else if (currentUser) {
-		await saveCurrentUserData(appState).catch(() => {});
+		try {
+			await saveCurrentUserData(appState);
+		} catch (error) {
+			showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
+			return false;
+		}
 	}
+	return true;
 }
 
 function getDateRange(start, end) {
@@ -886,55 +899,15 @@ function getDateRange(start, end) {
 	return { start: end, end: start };
 }
 
-function entriesForPeriod(entries, startDate, endDate, anchorMonth) {
-	const expanded = entries.flatMap((entry) => {
-		const norm = {
-			...entry,
-			note: entry.note || "",
-			repeatMonthly: Boolean(entry.repeatMonthly),
-			excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
-		};
-		return norm.repeatMonthly ? expandRecurring(norm, startDate, endDate) : [norm];
-	});
-	return expanded.filter((e) => e.date >= startDate && e.date <= endDate)
-		.sort((a, b) => a.date.localeCompare(b.date));
-}
-
-function expandRecurring(entry, startDate, endDate) {
-	const sourceMonth = (entry.date || "").slice(0, 7);
-	if (!/^\d{4}-\d{2}$/.test(sourceMonth)) return [entry];
-	const rangeStart = startDate.slice(0, 7);
-	const rangeEnd = endDate.slice(0, 7);
-	let cursor = rangeStart < sourceMonth ? sourceMonth : rangeStart;
-	const result = [];
-
-	while (cursor <= rangeEnd) {
-		const dateInMonth = alignDateToMonth(entry.date, cursor);
-		if (
-			dateInMonth >= startDate &&
-			dateInMonth <= endDate &&
-			dateInMonth >= entry.date &&
-			!entry.excludedMonths.includes(cursor)
-		) {
-			result.push({ ...entry, date: dateInMonth });
-		}
-		cursor = nextMonth(cursor);
-	}
-	return result;
-}
-
-function alignDateToMonth(sourceDate, targetMonth) {
-	const day = Number((sourceDate || "").split("-")[2]);
-	const safeDay = Number.isFinite(day) && day > 0 ? day : 1;
-	const endDay = Number(shared.getMonthEndDate(targetMonth).split("-")[2]);
-	return `${targetMonth}-${String(Math.min(safeDay, endDay)).padStart(2, "0")}`;
-}
-
-function nextMonth(month) {
-	let [y, m] = month.split("-").map(Number);
-	m += 1;
-	if (m > 12) { y += 1; m = 1; }
-	return `${y}-${String(m).padStart(2, "0")}`;
+function entriesForPeriod(entries, startDate, endDate) {
+	const normalized = (entries || []).map((entry) => ({
+		...entry,
+		amount: Number(entry.amount) || 0,
+		note: entry.note || "",
+		repeatMonthly: Boolean(entry.repeatMonthly),
+		excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
+	}));
+	return shared.entriesInRange(normalized, startDate, endDate);
 }
 
 function normalizeExcludedMonths(value) {
@@ -1042,7 +1015,7 @@ function syncThemeButtons() {
 function formatCurrency(amount) {
 	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
 	const symbols = { HUF: "Ft", GBP: "£", USD: "$", EUR: "€" };
-	const value = new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(amount) || 0);
+	const value = new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(Number(amount) || 0);
 	return `${value} ${symbols[appCurrency] || appCurrency}`;
 }
 
@@ -1076,6 +1049,7 @@ async function handleLogout() {
 	menuToggle.setAttribute("aria-expanded", "false");
 	if (currentUser && currentUser !== GUEST_SESSION_VALUE) await logoutCurrentUser().catch(() => null);
 	localStorage.removeItem(SESSION_KEY);
+	localStorage.removeItem(DISPLAY_NAME_KEY);
 	sessionStorage.removeItem("budgetAppGuestData");
 	window.location.href = "index.html";
 }
@@ -1098,6 +1072,7 @@ async function handleAccountDelete() {
 	try {
 		setMenuInfoMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...");
 		await deleteCurrentAccount();
+		shared.clearUserLocalData(currentUser);
 		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
 		await logoutCurrentUser().catch(() => null);
 		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);

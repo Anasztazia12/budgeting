@@ -62,7 +62,7 @@
 					<li><strong data-hu="Mentés (💾)" data-en="Save (💾)">Mentés (💾)</strong> – <span data-hu="elmenti a sort tervként, később visszatölthető." data-en="saves the row as a plan you can reload later.">elmenti a sort tervként, később visszatölthető.</span></li>
 					<li><strong data-hu="Átvitel a költségvetésbe" data-en="Move to budget">Átvitel a költségvetésbe</strong> – <span data-hu="a sor ikonjára kattintva a tétel bekerül az éles költségvetésbe." data-en="click the icon on the row to move the item into your real budget.">a sor ikonjára kattintva a tétel bekerül az éles költségvetésbe.</span></li>
 					<li><strong data-hu="Fekete ✕" data-en="Black ✕">Fekete ✕</strong> – <span data-hu="bezárja a sort a nézetből, de a mentett terv megmarad." data-en="closes the row from view, the saved plan stays.">bezárja a sort a nézetből, de a mentett terv megmarad.</span></li>
-					<li><strong data-hu="Piros ✕" data-en="Red ✕">Piros ✕</strong> – <span data-hu="véglegesen törli a mentett tervet. Megerősítést kér." data-en="permanently deletes the saved plan. Asks for confirmation.">véglegesen törli a mentett tervet. Megerősítést kér.</span></li>
+					<li><strong data-hu="Kuka (🗑)" data-en="Bin (🗑)">Kuka (🗑)</strong> – <span data-hu="véglegesen törli a mentett tervet. Megerősítést kér." data-en="permanently deletes the saved plan. Asks for confirmation.">véglegesen törli a mentett tervet. Megerősítést kér.</span></li>
 				</ul>
 			</article>
 
@@ -144,6 +144,8 @@
 			});
 			sel.value = lang;
 		}
+
+		document.documentElement.setAttribute("data-theme", window.BudgetAppShared.loadTheme());
 
 		const saved = localStorage.getItem(langKey) || "hu";
 		applyLang(saved);

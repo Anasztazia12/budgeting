@@ -289,6 +289,10 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 		const amount = parseFloat(rowElement.dataset.amount || 0);
 		const date = rowElement.dataset.date || shared.toDateInput(new Date());
 		const note = rowElement.dataset.note || "";
+		if (!(amount > 0) || !rowElement.dataset.date) {
+			showMessage(t("forecastScenarioEmpty"), true);
+			return;
+		}
 		const category = type === "income" ? "egyeb" : "egyeb kiadas";
 		const entry = {
 			id: shared.createEntryId(),
@@ -307,12 +311,14 @@ whatIfRowsContainer.addEventListener("click", (event) => {
 		if (currentUser === GUEST_SESSION_VALUE) {
 			shared.saveGuestData(appState);
 		} else if (currentUser) {
-			saveCurrentUserData(appState).catch(() => null);
+			saveCurrentUserData(appState).catch((error) => {
+				showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
+			});
 		}
-		actionButton.disabled = true;
-		actionButton.innerHTML = "✓";
-		actionButton.title = t("forecastAddedToBudget");
+		rowElement.dataset.addedToBudget = "true";
+		rowElement.innerHTML = buildWhatIfRowDisplayHTML(rowElement);
 		showMessage(t("forecastAddedToBudget"), false);
+		renderForecastPlanner();
 		return;
 	}
 
@@ -478,7 +484,7 @@ async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
 		appState = shared.loadGuestData();
 	} else {
-		const session = await restoreSession(currentUser);
+		const session = await restoreSession(currentUser).catch(() => null);
 		if (!session) { window.location.href = "index.html"; return; }
 		currentUser = String(session?.profile?.username || currentUser || "").trim();
 		currentProfile = session?.profile || null;
@@ -514,9 +520,8 @@ function applyTranslations() {
 	updateMenuSessionLabel();
 }
 
-function getForecastScenarioStorageKey() {
-	const key = currentUser === GUEST_SESSION_VALUE ? "guest" : (currentUser || "anon");
-	return `budgetAppForecastScenarios:${key}`;
+function getStorageUser() {
+	return localStorage.getItem(SESSION_KEY) || currentUser;
 }
 
 function normalizeScenarioRows(rows) {
@@ -530,8 +535,8 @@ function normalizeScenarioRows(rows) {
 }
 
 function loadForecastScenarios() {
-	if (currentUser === GUEST_SESSION_VALUE) { forecastScenarios = []; return; }
-	const raw = localStorage.getItem(getForecastScenarioStorageKey());
+	const user = getStorageUser();
+	const raw = shared.getUserStorage(user).getItem(shared.getForecastScenariosKey(user));
 	if (!raw) { forecastScenarios = []; return; }
 	try {
 		const parsed = JSON.parse(raw);
@@ -549,8 +554,8 @@ function loadForecastScenarios() {
 }
 
 function saveForecastScenarios() {
-	if (currentUser === GUEST_SESSION_VALUE) return;
-	localStorage.setItem(getForecastScenarioStorageKey(), JSON.stringify(forecastScenarios));
+	const user = getStorageUser();
+	shared.getUserStorage(user).setItem(shared.getForecastScenariosKey(user), JSON.stringify(forecastScenarios));
 }
 
 function renderScenarioList() {
@@ -707,7 +712,9 @@ function buildWhatIfRowDisplayHTML(wrapper) {
 			${note ? `<span class="whatif-note">${escapeHtml(note)}</span>` : ""}
 		</div>
 		<div class="whatif-row-actions">
-			<button type="button" class="icon-btn add-to-budget-btn" data-action="add-to-budget" title="${t("forecastAddToBudget")}"><img src="assets/images/budget-icon.png" alt="" style="width:2.8rem;height:2.8rem;object-fit:contain;display:block;"></button>
+			${wrapper.dataset.addedToBudget === "true"
+				? `<button type="button" class="icon-btn add-to-budget-btn" disabled title="${t("forecastAddedToBudget")}">✓</button>`
+				: `<button type="button" class="icon-btn add-to-budget-btn" data-action="add-to-budget" title="${t("forecastAddToBudget")}"><img src="assets/images/budget-icon.png" alt="" style="width:2.8rem;height:2.8rem;object-fit:contain;display:block;"></button>`}
 			<button type="button" class="icon-btn" data-action="edit-whatif" title="${t("editAction")}">✎</button>
 			<button type="button" class="icon-btn" data-action="save-whatif" title="${t("forecastSaveRow")}">💾</button>
 			<button type="button" class="icon-btn close-btn" data-action="remove-whatif" title="${t("forecastRemoveFromRow")}"><strong style="font-size:1.1rem;">✕</strong></button>
@@ -796,7 +803,9 @@ function collectWhatIfRows(periodStart, periodEnd) {
 			amount = Number(row.dataset.amount || 0);
 			date = row.dataset.date || "";
 		}
-		return { type, amount, date, valid: amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd };
+		// Rows already added to the budget are part of the base data, so they must not be counted again.
+		const addedToBudget = row.dataset.addedToBudget === "true";
+		return { type, amount, date, valid: !addedToBudget && amount > 0 && Boolean(date) && date >= periodStart && date <= periodEnd };
 	});
 }
 
@@ -810,26 +819,21 @@ function renderForecastPlanner() {
 		return;
 	}
 	const period = getSelectedPeriod();
-	const incomes = (appState.incomes || []).filter((e) => e.date >= period.start && e.date <= period.end);
-	const expenses = (appState.expenses || []).filter((e) => e.date >= period.start && e.date <= period.end);
+	const incomes = entriesForPeriod(appState.incomes || [], period.start, period.end);
+	const expenses = entriesForPeriod(appState.expenses || [], period.start, period.end);
 	const whatIfRows = collectWhatIfRows(period.start, period.end);
 
-	const baseUntil =
-		shared.sumEntries(incomes.filter((e) => e.date <= period.end)) -
-		shared.sumEntries(expenses.filter((e) => e.date <= period.end));
-	const adjustUntil = whatIfRows
-		.filter((r) => r.valid && r.date <= period.end)
-		.reduce((sum, r) => sum + (r.type === "income" ? r.amount : -r.amount), 0);
-	const withPurchase = baseUntil + adjustUntil;
-	const baseMonthEnd = shared.sumEntries(incomes) - shared.sumEntries(expenses);
-	const allAdjust = whatIfRows
-		.filter((r) => r.valid)
-		.reduce((sum, r) => sum + (r.type === "income" ? r.amount : -r.amount), 0);
+	const totals = shared.computeForecastTotals(incomes, expenses, whatIfRows.filter((r) => r.valid));
 
-	if (forecastBaseUntilEl) forecastBaseUntilEl.textContent = formatCurrency(baseUntil);
-	if (forecastWithPurchaseEl) forecastWithPurchaseEl.textContent = formatCurrency(withPurchase);
-	if (forecastDifferenceEl) forecastDifferenceEl.textContent = formatCurrency(withPurchase - baseUntil);
-	if (forecastMonthEndEl) forecastMonthEndEl.textContent = formatCurrency(baseMonthEnd + allAdjust);
+	if (forecastBaseUntilEl) forecastBaseUntilEl.textContent = formatCurrency(totals.baseBalance);
+	if (forecastWithPurchaseEl) forecastWithPurchaseEl.textContent = formatCurrency(totals.plannedBalance);
+	if (forecastDifferenceEl) forecastDifferenceEl.textContent = formatCurrency(totals.difference);
+	if (forecastMonthEndEl) forecastMonthEndEl.textContent = formatCurrency(totals.plannedBalance);
+}
+
+function entriesForPeriod(entries, startDate, endDate) {
+	const normalized = (entries || []).map((entry) => ({ ...entry, amount: Number(entry.amount) || 0 }));
+	return shared.entriesInRange(normalized, startDate, endDate);
 }
 
 async function handleLogout() {
@@ -841,6 +845,7 @@ async function handleLogout() {
 	currentProfile = null;
 	appState = { incomes: [], expenses: [] };
 	localStorage.removeItem(SESSION_KEY);
+	localStorage.removeItem(DISPLAY_NAME_KEY);
 	sessionStorage.removeItem("budgetAppGuestData");
 	window.location.href = "index.html";
 }
@@ -862,6 +867,7 @@ async function handleAccountDelete() {
 	try {
 		showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
 		await deleteCurrentAccount();
+		shared.clearUserLocalData(currentUser);
 		await shared.sendAccountDeletionEmail(appLanguage, currentProfile?.email || "", currentUser);
 		await logoutCurrentUser().catch(() => null);
 		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
@@ -954,7 +960,7 @@ function showMessage(message, isError) {
 function formatCurrency(amount) {
 	const locale = appLanguage === "en" ? "en-GB" : "hu-HU";
 	const symbols = { HUF: "Ft", GBP: "£", USD: "$", EUR: "€" };
-	const value = new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Number(amount) || 0);
+	const value = new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(Number(amount) || 0);
 	return `${value} ${symbols[appCurrency] || appCurrency}`;
 }
 

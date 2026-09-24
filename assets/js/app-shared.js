@@ -87,6 +87,133 @@
         return (Array.isArray(entries) ? entries : []).reduce((sum, item) => sum + Number((item && item.amount) || 0), 0);
     }
 
+    function getNextMonth(monthValue) {
+        let [year, month] = String(monthValue || "").split("-").map(Number);
+        if (!Number.isFinite(year) || !Number.isFinite(month)) {
+            return monthValue;
+        }
+        month += 1;
+        if (month > 12) {
+            year += 1;
+            month = 1;
+        }
+        return `${year}-${String(month).padStart(2, "0")}`;
+    }
+
+    // Moves a date to the same day in another month, clamped to that month's last day
+    // (e.g. Jan 31 -> Feb 28).
+    function alignDateToMonth(sourceDate, targetMonth) {
+        const day = Number(String(sourceDate || "").split("-")[2]);
+        const safeDay = Number.isFinite(day) && day > 0 ? day : 1;
+        const monthEndDay = Number(getMonthEndDate(targetMonth).split("-")[2]);
+        return `${targetMonth}-${String(Math.min(safeDay, monthEndDay)).padStart(2, "0")}`;
+    }
+
+    // One occurrence per month from the entry's own date onwards, skipping excluded months.
+    function expandRecurringEntry(entry, startDate, endDate) {
+        const sourceMonth = String(entry.date || "").slice(0, 7);
+        if (!startDate || !endDate || !/^\d{4}-\d{2}$/.test(sourceMonth)) {
+            return [entry];
+        }
+
+        const excludedMonths = Array.isArray(entry.excludedMonths) ? entry.excludedMonths : [];
+        const rangeStartMonth = startDate.slice(0, 7);
+        const rangeEndMonth = endDate.slice(0, 7);
+        let cursorMonth = rangeStartMonth < sourceMonth ? sourceMonth : rangeStartMonth;
+        const expanded = [];
+
+        while (cursorMonth <= rangeEndMonth) {
+            const dateInMonth = alignDateToMonth(entry.date, cursorMonth);
+            if (
+                dateInMonth >= startDate &&
+                dateInMonth <= endDate &&
+                dateInMonth >= entry.date &&
+                !excludedMonths.includes(cursorMonth)
+            ) {
+                expanded.push({ ...entry, date: dateInMonth });
+            }
+            cursorMonth = getNextMonth(cursorMonth);
+        }
+
+        return expanded;
+    }
+
+    // All entries (recurring ones expanded) whose date falls within [startDate, endDate], sorted by date.
+    function entriesInRange(entries, startDate, endDate) {
+        return (Array.isArray(entries) ? entries : [])
+            .filter(Boolean)
+            .flatMap((entry) => (entry.repeatMonthly ? expandRecurringEntry(entry, startDate, endDate) : [entry]))
+            .filter((entry) => {
+                const date = String(entry.date || "");
+                if (startDate && date < startDate) return false;
+                if (endDate && date > endDate) return false;
+                return true;
+            })
+            .sort((left, right) => String(left.date).localeCompare(String(right.date)));
+    }
+
+    // What-if forecast: base balance of the period, plus/minus the planned rows.
+    function computeForecastTotals(incomes, expenses, plannedRows) {
+        const baseBalance = sumEntries(incomes) - sumEntries(expenses);
+        const difference = (Array.isArray(plannedRows) ? plannedRows : []).reduce((sum, row) => {
+            const amount = Number(row && row.amount) || 0;
+            return sum + (row && row.type === "income" ? amount : -amount);
+        }, 0);
+        return {
+            baseBalance,
+            difference,
+            plannedBalance: baseBalance + difference
+        };
+    }
+
+    // Monthly repayments from the first payment date until the remaining amount is paid off
+    // (or the due date is reached), with an optional one-off early payment.
+    const MAX_DEBT_PAYMENTS = 120;
+
+    function buildDebtPaymentSchedule(debt) {
+        const round = (value) => Math.round(value * 100) / 100;
+        const monthly = Number(debt && debt.monthlyPayment) || 0;
+        const planned = Number(debt && debt.plannedAmount) || 0;
+        const firstDate = String((debt && debt.paymentDate) || "");
+        const dueDate = String((debt && debt.dueDate) || "");
+        const earlyDate = String((debt && debt.earlyPaymentDate) || "");
+        const remaining = Number(debt && debt.remainingAmount) || 0;
+        // Without a remaining amount only the due date can end the schedule.
+        let left = remaining > 0 ? remaining : Infinity;
+        let earlyDone = !(planned > 0 && earlyDate);
+        const payments = [];
+
+        function payEarly() {
+            const amount = round(Math.min(planned, left));
+            if (amount > 0) {
+                payments.push({ date: earlyDate, amount, note: "early" });
+                left = round(left - amount);
+            }
+            earlyDone = true;
+        }
+
+        if (monthly > 0 && /^\d{4}-\d{2}-\d{2}$/.test(firstDate) && (remaining > 0 || dueDate)) {
+            let month = firstDate.slice(0, 7);
+            while (payments.length < MAX_DEBT_PAYMENTS) {
+                const date = alignDateToMonth(firstDate, month);
+                if (dueDate && date > dueDate) break;
+                if (!earlyDone && earlyDate <= date) payEarly();
+                if (left <= 0) break;
+                const amount = round(Math.min(monthly, left));
+                payments.push({ date, amount, note: "" });
+                left = round(left - amount);
+                if (left <= 0) break;
+                month = getNextMonth(month);
+            }
+        } else if (monthly > 0 && firstDate) {
+            payments.push({ date: firstDate, amount: remaining > 0 ? round(Math.min(monthly, remaining)) : monthly, note: "" });
+            left = remaining > 0 ? round(left - payments[0].amount) : left;
+        }
+
+        if (!earlyDone && left > 0) payEarly();
+        return payments.sort((a, b) => a.date.localeCompare(b.date));
+    }
+
     function createEntryId() {
         if (window.crypto && typeof window.crypto.randomUUID === "function") {
             return window.crypto.randomUUID();
@@ -95,52 +222,6 @@
         return `entry-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
 
-    function createSalt() {
-        if (window.crypto && typeof window.crypto.getRandomValues === "function") {
-            const values = new Uint8Array(16);
-            window.crypto.getRandomValues(values);
-            return Array.from(values, (value) => value.toString(16).padStart(2, "0")).join("");
-        }
-
-        return `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`;
-    }
-
-    async function hashPassword(password, salt) {
-        const source = `${salt}:${password}`;
-        if (window.crypto && window.crypto.subtle && typeof TextEncoder !== "undefined") {
-            const data = new TextEncoder().encode(source);
-            const digest = await window.crypto.subtle.digest("SHA-256", data);
-            return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-        }
-
-        let hash = 2166136261;
-        for (let index = 0; index < source.length; index += 1) {
-            hash ^= source.charCodeAt(index);
-            hash = Math.imul(hash, 16777619);
-        }
-
-        return `fallback-${(hash >>> 0).toString(16)}`;
-    }
-
-    async function verifyPassword(userRecord, password, onLegacyUpgrade) {
-        if (userRecord.hashedPassword && userRecord.salt) {
-            const candidateHash = await hashPassword(password, userRecord.salt);
-            return candidateHash === userRecord.hashedPassword;
-        }
-
-        if (userRecord.password && userRecord.password === password) {
-            const salt = createSalt();
-            userRecord.salt = salt;
-            userRecord.hashedPassword = await hashPassword(password, salt);
-            delete userRecord.password;
-            if (typeof onLegacyUpgrade === "function") {
-                onLegacyUpgrade();
-            }
-            return true;
-        }
-
-        return false;
-    }
 
     function isAppInstalled() {
         const standaloneMode = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
@@ -203,30 +284,36 @@
         sessionStorage.setItem(KEYS.GUEST_DATA_KEY, JSON.stringify(normalizeEntriesData(data)));
     }
 
-    function buildMailtoUrl(to, subject, body) {
-        const recipient = encodeURIComponent(String(to || "").trim());
-        const params = new URLSearchParams({
-            subject: String(subject || ""),
-            body: String(body || "")
+    // Debts and forecast plans live in browser storage, keyed per user.
+    // Guests use sessionStorage so their data is gone when the tab closes.
+    function getUserStorage(username) {
+        return username === GUEST_SESSION_VALUE ? sessionStorage : localStorage;
+    }
+
+    function getDebtsKey(username) {
+        return `budgetAppDebts_${username === GUEST_SESSION_VALUE ? "guest" : (username || "guest")}`;
+    }
+
+    function getForecastScenariosKey(username) {
+        return `budgetAppForecastScenarios:${username === GUEST_SESSION_VALUE ? "guest" : (username || "anon")}`;
+    }
+
+    function renameUserLocalData(oldUsername, newUsername) {
+        if (!oldUsername || !newUsername || oldUsername === newUsername) return;
+        [[getDebtsKey(oldUsername), getDebtsKey(newUsername)],
+            [getForecastScenariosKey(oldUsername), getForecastScenariosKey(newUsername)]].forEach(([from, to]) => {
+            const value = localStorage.getItem(from);
+            if (value !== null) {
+                localStorage.setItem(to, value);
+                localStorage.removeItem(from);
+            }
         });
-        return `mailto:${recipient}?${params.toString()}`;
     }
 
-    function openEmailDraft(to, subject, body) {
-        const address = String(to || "").trim();
-        if (!address) {
-            return false;
-        }
-
-        window.location.href = buildMailtoUrl(address, subject, body);
-        return true;
-    }
-
-    async function sendRegistrationEmail(_language, email, username) {
-        const name = username || "";
-        const subject = "Thanks for registering";
-        const body = `Hello ${name},\n\nThank you for registering.\nRegistration successful with this username: ${name}.\n\nBudgeting App`;
-        return openEmailDraft(email, subject, body);
+    function clearUserLocalData(username) {
+        if (!username) return;
+        localStorage.removeItem(getDebtsKey(username));
+        localStorage.removeItem(getForecastScenariosKey(username));
     }
 
     // EmailJS credentials — sign up at https://emailjs.com, create a Gmail service,
@@ -237,6 +324,9 @@
 
     async function sendAccountDeletionEmail(_language, email, username) {
         const name = username || "";
+        if (EMAILJS_SERVICE_ID.startsWith("YOUR_") || !email) {
+            return false;
+        }
         try {
             const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
                 method: "POST",
@@ -335,17 +425,24 @@
         getMonthEndDate,
         monthEntries,
         sumEntries,
+        getNextMonth,
+        alignDateToMonth,
+        expandRecurringEntry,
+        entriesInRange,
+        computeForecastTotals,
+        buildDebtPaymentSchedule,
         createEntryId,
-        createSalt,
-        hashPassword,
-        verifyPassword,
         isAppInstalled,
         getInstallUnavailableMessage,
         loadGuestData,
         saveGuestData,
+        getUserStorage,
+        getDebtsKey,
+        getForecastScenariosKey,
+        renameUserLocalData,
+        clearUserLocalData,
         setFlashMessage,
         consumeFlashMessage,
-        sendRegistrationEmail,
         sendAccountDeletionEmail,
         getDeleteAccountConfirmMessage,
         getDeleteAccountNoSessionMessage,
@@ -472,6 +569,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const svc = window.BudgetAppFirebaseService;
                 const session = await svc.changeCurrentUsername({ newUsername });
                 const newName = session?.profile?.username || newUsername;
+                window.BudgetAppShared.renameUserLocalData(localStorage.getItem("budgetAppSession"), newName);
                 localStorage.setItem("budgetAppSession", newName);
                 localStorage.setItem("budgetAppDisplayName", newName);
                 const sessionEl = document.getElementById("menu-session-info");

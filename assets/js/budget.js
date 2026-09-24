@@ -1,7 +1,6 @@
 ﻿import {
 	deleteCurrentAccount,
 	getFirebaseErrorMessage,
-	loadCurrentUserData,
 	logoutCurrentUser,
 	restoreSession,
 	saveCurrentUserData
@@ -54,6 +53,7 @@ const dictionary = {
 		todayNoticeExpense: "Várható kiadás",
 		todayNoticeDismiss: "Ne jelenjen meg ma többet",
 		todayNoticeOk: "OK",
+		todayNoticeItems: "tétel",
 		logoutButton: "Kijelentkezés",
 		footerText: "Minden jog fenntartva.",
 		helpLink: "Súgó",
@@ -77,8 +77,8 @@ const dictionary = {
 		listToDateLabel: "-ig",
 		monthlyIncomeTitle: "Bevétel",
 		monthlyExpenseTitle: "Kiadás",
-		spentToDateTitle: "Várható kiadás",
-		monthEndTitle: "Várható bevétel",
+		spentToDateTitle: "Kiadás a mai napig",
+		monthEndTitle: "Egyenleg az időszakban",
 		incomeEntriesTitle: "Bevételek listája",
 		expenseEntriesTitle: "Kiadások listája",
 		loggedOut: "Nincs bejelentkezett felhasználó.",
@@ -174,6 +174,7 @@ const dictionary = {
 		todayNoticeExpense: "Expense",
 		todayNoticeDismiss: "Don't show again today",
 		todayNoticeOk: "OK",
+		todayNoticeItems: "items",
 		logoutButton: "Sign out",
 		footerText: "All rights reserved.",
 		helpLink: "Help",
@@ -197,8 +198,8 @@ const dictionary = {
 		listToDateLabel: "To",
 		monthlyIncomeTitle: "Income",
 		monthlyExpenseTitle: "Expenses",
-		spentToDateTitle: "Expected expense",
-		monthEndTitle: "Expected income",
+		spentToDateTitle: "Spent to date",
+		monthEndTitle: "Balance in period",
 		incomeEntriesTitle: "Income entries",
 		expenseEntriesTitle: "Expense entries",
 		loggedOut: "No user is signed in.",
@@ -311,6 +312,8 @@ const deleteThisMonthButton = document.getElementById("delete-this-month-btn");
 const deleteAllMonthsButton = document.getElementById("delete-all-months-btn");
 const deleteScopeCancelButton = document.getElementById("delete-scope-cancel");
 let deleteScopeResolver = null;
+// Date of the recurring occurrence that was opened for editing, so "delete only this month" hits that month.
+const editOccurrenceDates = { incomes: "", expenses: "" };
 let inlineDeleteConfirmResolver = null;
 let inlineDeleteConfirmElement = null;
 let inlineDeleteConfirmOutsideHandler = null;
@@ -543,7 +546,7 @@ incomeForm.addEventListener("submit", (event) => {
 			...entry,
 			id: editId,
 			repeatMonthly: Boolean(incomeRepeatMonthlyCheckbox?.checked),
-			excludedMonths: Boolean(incomeRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
+			excludedMonths: normalizeExcludedMonths(existingEntry?.excludedMonths)
 		});
 		showMessage(t("entryUpdated"), false);
 	} else {
@@ -578,7 +581,7 @@ expenseForm.addEventListener("submit", (event) => {
 			...entry,
 			id: editId,
 			repeatMonthly: Boolean(expenseRepeatMonthlyCheckbox?.checked),
-			excludedMonths: Boolean(expenseRepeatMonthlyCheckbox?.checked) ? [] : normalizeExcludedMonths(existingEntry?.excludedMonths)
+			excludedMonths: normalizeExcludedMonths(existingEntry?.excludedMonths)
 		});
 		showMessage(t("entryUpdated"), false);
 	} else {
@@ -614,10 +617,10 @@ expenseList.addEventListener("change", async (event) => {
 
 async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
-		appState = shared.loadGuestData();
+		appState = normalizeEntriesData(shared.loadGuestData());
 		showMessage(t("guestNotice"), false);
 	} else {
-		const session = await restoreSession(currentUser);
+		const session = await restoreSession(currentUser).catch(() => null);
 		if (!session) {
 			window.location.href = "index.html";
 			return;
@@ -629,7 +632,7 @@ async function initializePage() {
 			localStorage.setItem(SESSION_KEY, currentUser);
 		}
 
-		appState = session.data || await loadCurrentUserData();
+		appState = normalizeEntriesData(session.data);
 	}
 
 	applyTheme();
@@ -796,7 +799,7 @@ function paintList(target, entries, listType) {
 				<div class="entry-main-row entry-main-row-bottom">
 					<span class="entry-amount">${formatCurrency(entry.amount)} ${inlineNoteText}</span>
 					<div class="row-actions row-actions-icons">
-						<button type="button" class="inline-icon-button" title="${t("editAction")}" aria-label="${t("editAction")}" data-action="edit" data-id="${entry.id}">✎</button>
+						<button type="button" class="inline-icon-button" title="${t("editAction")}" aria-label="${t("editAction")}" data-action="edit" data-id="${entry.id}" data-date="${entry.date}">✎</button>
 						<button type="button" class="inline-icon-button danger" title="${t("deleteAction")}" aria-label="${t("deleteAction")}" data-action="delete" data-id="${entry.id}" data-date="${entry.date}">✖</button>
 					</div>
 				</div>
@@ -817,6 +820,7 @@ async function handleEntryAction(event, listType) {
 	if (!entry) return;
 
 	if (action === "edit") {
+		editOccurrenceDates[listType] = clickedDate;
 		populateFormForEdit(listType, entry);
 		return;
 	}
@@ -1030,6 +1034,7 @@ function populateFormForEdit(listType, entry) {
 }
 
 function resetIncomeForm() {
+	editOccurrenceDates.incomes = "";
 	incomeForm.reset();
 	document.getElementById("income-edit-id").value = "";
 	document.getElementById("income-date").value = shared.toDateInput(today);
@@ -1044,6 +1049,7 @@ function resetIncomeForm() {
 }
 
 function resetExpenseForm() {
+	editOccurrenceDates.expenses = "";
 	expenseForm.reset();
 	document.getElementById("expense-edit-id").value = "";
 	document.getElementById("expense-date").value = shared.toDateInput(today);
@@ -1085,76 +1091,19 @@ function getDateRange(startDate, endDate) {
 	return { start: endDate, end: startDate };
 }
 
-function filterEntriesByRange(entries, startDate, endDate) {
-	return entries.filter((entry) => {
-		if (startDate && entry.date < startDate) return false;
-		if (endDate && entry.date > endDate) return false;
-		return true;
-	});
-}
-
 function entriesForListByDateRange(entries, startDate, endDate, activeMonth) {
 	const fallbackStart = `${activeMonth}-01`;
 	const fallbackEnd = shared.getMonthEndDate(activeMonth);
 	const range = getDateRange(startDate || fallbackStart, endDate || fallbackEnd);
 
-	const expandedEntries = entries.flatMap((entry) => {
-		const normalizedEntry = {
-			...entry,
-			note: entry.note || "",
-			repeatMonthly: Boolean(entry.repeatMonthly),
-			excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
-		};
+	const normalizedEntries = entries.map((entry) => ({
+		...entry,
+		note: entry.note || "",
+		repeatMonthly: Boolean(entry.repeatMonthly),
+		excludedMonths: normalizeExcludedMonths(entry.excludedMonths)
+	}));
 
-		if (!normalizedEntry.repeatMonthly) {
-			return [normalizedEntry];
-		}
-
-		return expandRecurringEntries(normalizedEntry, range.start, range.end);
-	});
-
-	return filterEntriesByRange(expandedEntries, range.start, range.end)
-		.sort((left, right) => left.date.localeCompare(right.date));
-}
-
-function expandRecurringEntries(entry, startDate, endDate) {
-	if (!startDate || !endDate) return [entry];
-
-	const sourceMonth = (entry.date || "").slice(0, 7);
-	if (!/^\d{4}-\d{2}$/.test(sourceMonth)) return [entry];
-
-	const rangeStartMonth = startDate.slice(0, 7);
-	const rangeEndMonth = endDate.slice(0, 7);
-	let cursorMonth = rangeStartMonth < sourceMonth ? sourceMonth : rangeStartMonth;
-	const expanded = [];
-
-	while (cursorMonth <= rangeEndMonth) {
-		const dateInMonth = alignDateToMonth(entry.date, cursorMonth);
-		if (
-			dateInMonth >= startDate &&
-			dateInMonth <= endDate &&
-			dateInMonth >= entry.date &&
-			!entry.excludedMonths.includes(cursorMonth)
-		) {
-			expanded.push({ ...entry, date: dateInMonth });
-		}
-		cursorMonth = getNextMonth(cursorMonth);
-	}
-
-	return expanded;
-}
-
-function getNextMonth(monthValue) {
-	const [yearText, monthText] = monthValue.split("-");
-	let year = Number(yearText);
-	let month = Number(monthText);
-	if (!Number.isFinite(year) || !Number.isFinite(month)) return monthValue;
-	month += 1;
-	if (month > 12) {
-		year += 1;
-		month = 1;
-	}
-	return `${year}-${String(month).padStart(2, "0")}`;
+	return shared.entriesInRange(normalizedEntries, range.start, range.end);
 }
 
 function setDefaultListDateFilters(startDate, endDate) {
@@ -1179,14 +1128,6 @@ function syncPeriodInputOrder() {
 	const range = getDateRange(periodStartInput?.value, periodEndInput?.value);
 	if (periodStartInput && range.start) periodStartInput.value = range.start;
 	if (periodEndInput && range.end) periodEndInput.value = range.end;
-}
-
-function alignDateToMonth(sourceDate, targetMonth) {
-	const dayPart = Number((sourceDate || "").split("-")[2]);
-	const safeDay = Number.isFinite(dayPart) && dayPart > 0 ? dayPart : 1;
-	const monthEndDay = Number(shared.getMonthEndDate(targetMonth).split("-")[2]);
-	const day = Math.min(safeDay, monthEndDay);
-	return `${targetMonth}-${String(day).padStart(2, "0")}`;
 }
 
 function escapeHtml(text) {
@@ -1215,7 +1156,7 @@ async function handleDeleteFromForm(collectionName, editIdField, resetForm, trig
 	}
 
 	const sourceDateField = collectionName === "incomes" ? "income-date" : "expense-date";
-	const sourceDate = document.getElementById(sourceDateField)?.value || "";
+	const sourceDate = editOccurrenceDates[collectionName] || document.getElementById(sourceDateField)?.value || "";
 	if (!(await handleEntryDelete(collectionName, editId, sourceDate, triggerElement))) {
 		return;
 	}
@@ -1236,6 +1177,7 @@ async function handleLogout() {
 	currentProfile = null;
 	appState = { incomes: [], expenses: [] };
 	localStorage.removeItem(SESSION_KEY);
+	localStorage.removeItem(DISPLAY_NAME_KEY);
 	sessionStorage.removeItem("budgetAppGuestData");
 	window.location.href = "index.html";
 }
@@ -1265,6 +1207,7 @@ async function handleAccountDelete() {
 	try {
 		showMessage(appLanguage === "en" ? "Deleting account..." : "Fiók törlése folyamatban...", false);
 		await deleteCurrentAccount();
+		shared.clearUserLocalData(currentUser);
 		await shared.sendAccountDeletionEmail(appLanguage, email, currentUser);
 		await logoutCurrentUser().catch(() => null);
 		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
@@ -1347,11 +1290,10 @@ function syncThemeButtons() {
 function getTodayEntries(entries) {
 	const todayText = shared.toDateInput(new Date());
 	const todayMonth = todayText.slice(0, 7);
-	const todayDay = todayText.slice(8, 10);
 	return (entries || []).filter((e) => {
 		const d = String(e.date || "");
 		if (d === todayText) return true;
-		if (e.repeatMonthly && d.slice(8, 10) === todayDay) {
+		if (e.repeatMonthly && d < todayText && shared.alignDateToMonth(d, todayMonth) === todayText) {
 			const excluded = Array.isArray(e.excludedMonths) ? e.excludedMonths : [];
 			return !excluded.includes(todayMonth);
 		}
@@ -1380,10 +1322,10 @@ function showTodayNotice() {
 
 	const rows = [];
 	if (todayIncomes.length) {
-		rows.push(`<p class="today-notice-row income">✅ ${t("todayNoticeIncome")}: <strong>${formatCurrency(shared.sumEntries(todayIncomes))}</strong> (${todayIncomes.length} tétel)</p>`);
+		rows.push(`<p class="today-notice-row income">✅ ${t("todayNoticeIncome")}: <strong>${formatCurrency(shared.sumEntries(todayIncomes))}</strong> (${todayIncomes.length} ${t("todayNoticeItems")})</p>`);
 	}
 	if (todayExpenses.length) {
-		rows.push(`<p class="today-notice-row expense">⚠️ ${t("todayNoticeExpense")}: <strong>${formatCurrency(shared.sumEntries(todayExpenses))}</strong> (${todayExpenses.length} tétel)</p>`);
+		rows.push(`<p class="today-notice-row expense">⚠️ ${t("todayNoticeExpense")}: <strong>${formatCurrency(shared.sumEntries(todayExpenses))}</strong> (${todayExpenses.length} ${t("todayNoticeItems")})</p>`);
 	}
 
 	modal.innerHTML = `
@@ -1491,9 +1433,6 @@ function saveState() {
 	if (!currentUser) return;
 
 	void saveCurrentUserData(appState)
-		.then((savedState) => {
-			appState = normalizeEntriesData(savedState);
-		})
 		.catch((error) => {
 			showMessage(getFirebaseErrorMessage(error, appLanguage, "save"), true);
 		});

@@ -92,13 +92,15 @@ function createAppError(code, cause) {
     return error;
 }
 
-async function hashPassword(password) {
+// Salted with the uid so identical passwords of different users hash differently.
+// Hashes stored before salting was added were computed without a salt (salt = "").
+async function hashPassword(password, salt = "") {
     if (!globalThis.crypto?.subtle) {
         throw createAppError("app/crypto-unavailable");
     }
 
     const encoder = new TextEncoder();
-    const data = encoder.encode(String(password || ""));
+    const data = encoder.encode(salt ? `${salt}:${String(password || "")}` : String(password || ""));
     const hashBuffer = await globalThis.crypto.subtle.digest("SHA-256", data);
     return Array.from(new Uint8Array(hashBuffer))
         .map((byte) => byte.toString(16).padStart(2, "0"))
@@ -165,7 +167,7 @@ async function appendPasswordToHistory(uid, password) {
         return;
     }
 
-    const hash = await hashPassword(password);
+    const hash = await hashPassword(password, cleanUid);
     await setDoc(
         doc(db, "users", cleanUid),
         {
@@ -182,9 +184,10 @@ async function ensurePasswordNotReused(uid, candidatePassword) {
         return;
     }
 
-    const candidateHash = await hashPassword(candidatePassword);
+    const candidateHash = await hashPassword(candidatePassword, cleanUid);
+    const legacyCandidateHash = await hashPassword(candidatePassword);
     const previousPasswords = await readPasswordHistory(cleanUid);
-    if (previousPasswords.includes(candidateHash)) {
+    if (previousPasswords.includes(candidateHash) || previousPasswords.includes(legacyCandidateHash)) {
         throw createAppError("app/password-reused");
     }
 }
@@ -260,7 +263,8 @@ async function getCurrentSession() {
         return null;
     }
 
-    const existing = await ensureUserDocument(user);
+    const record = await getUserRecordByUid(user.uid);
+    const existing = record.profile ? record : await ensureUserDocument(user);
     return {
         uid: user.uid,
         email: user.email || existing.profile?.email || "",
@@ -341,7 +345,7 @@ export async function registerWithUsername({ username, email, password }) {
             transaction.set(doc(db, "users", credential.user.uid), {
                 profile,
                 data: normalizeEntriesData(null),
-                previousPasswords: [await hashPassword(password)],
+                previousPasswords: [await hashPassword(password, credential.user.uid)],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             });
@@ -538,14 +542,15 @@ export async function loadCurrentUserData() {
 }
 
 export async function saveCurrentUserData(data) {
-    const session = await getCurrentSession();
-    if (!session) {
+    await ensureAuthReady();
+    const user = auth.currentUser;
+    if (!user) {
         throw createAppError("app/not-authenticated");
     }
 
     const normalizedData = normalizeEntriesData(data);
     await setDoc(
-        doc(db, "users", session.uid),
+        doc(db, "users", user.uid),
         {
             data: normalizedData,
             updatedAt: new Date().toISOString()

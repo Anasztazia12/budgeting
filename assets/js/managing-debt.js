@@ -9,7 +9,6 @@ const shared = window.BudgetAppShared;
 const { SESSION_KEY, DISPLAY_NAME_KEY, INSTALL_STATUS_KEY } = shared.KEYS;
 const { GUEST_SESSION_VALUE } = shared;
 
-const DEBTS_KEY_PREFIX = "budgetAppDebts_";
 
 const dictionary = {
 	hu: {
@@ -73,7 +72,7 @@ const dictionary = {
 		confirmNo: "Mégsem",
 		totalDebtTitle: "Összes adósság",
 		remainingDebtTitle: "Fennmaradó",
-		paidDebtTitle: "Kifizetett",
+		paidDebtTitle: "Tervezett előtörlesztés",
 		totalMonthlyTitle: "Havi törlesztők",
 		debtListTitle: "Adósságok listája",
 		emptyDebts: "Nincs rögzített adósság.",
@@ -150,7 +149,7 @@ const dictionary = {
 		confirmNo: "Cancel",
 		totalDebtTitle: "Total debt",
 		remainingDebtTitle: "Remaining",
-		paidDebtTitle: "Paid",
+		paidDebtTitle: "Planned early payments",
 		totalMonthlyTitle: "Monthly payments",
 		debtListTitle: "Debt list",
 		emptyDebts: "No debts recorded.",
@@ -437,7 +436,7 @@ async function initializePage() {
 	if (currentUser === GUEST_SESSION_VALUE) {
 		debts = loadDebts();
 	} else {
-		const session = await restoreSession(currentUser);
+		const session = await restoreSession(currentUser).catch(() => null);
 		if (!session) {
 			window.location.href = "index.html";
 			return;
@@ -460,10 +459,15 @@ async function initializePage() {
 	if (flash) showMessage(flash.message, flash.isError);
 }
 
+// Read the session key on every access so a username change in the profile modal is picked up.
+function getStorageUser() {
+	return localStorage.getItem(SESSION_KEY) || currentUser;
+}
+
 function loadDebts() {
-	const key = DEBTS_KEY_PREFIX + (currentUser || "guest");
+	const user = getStorageUser();
 	try {
-		const raw = localStorage.getItem(key);
+		const raw = shared.getUserStorage(user).getItem(shared.getDebtsKey(user));
 		const parsed = raw ? JSON.parse(raw) : [];
 		return Array.isArray(parsed) ? parsed : [];
 	} catch {
@@ -472,17 +476,14 @@ function loadDebts() {
 }
 
 function saveDebts() {
-	const key = DEBTS_KEY_PREFIX + (currentUser || "guest");
-	localStorage.setItem(key, JSON.stringify(debts));
-}
-
-function getForecastKey() {
-	return `budgetAppForecastScenarios:${currentUser || "guest"}`;
+	const user = getStorageUser();
+	shared.getUserStorage(user).setItem(shared.getDebtsKey(user), JSON.stringify(debts));
 }
 
 function loadForecastScenarios() {
+	const user = getStorageUser();
 	try {
-		const raw = localStorage.getItem(getForecastKey());
+		const raw = shared.getUserStorage(user).getItem(shared.getForecastScenariosKey(user));
 		const parsed = raw ? JSON.parse(raw) : [];
 		return Array.isArray(parsed) ? parsed : [];
 	} catch {
@@ -491,7 +492,8 @@ function loadForecastScenarios() {
 }
 
 function saveForecastScenarios(scenarios) {
-	localStorage.setItem(getForecastKey(), JSON.stringify(scenarios));
+	const user = getStorageUser();
+	shared.getUserStorage(user).setItem(shared.getForecastScenariosKey(user), JSON.stringify(scenarios));
 }
 
 function addOrUpdateForecastScenario(debt) {
@@ -500,21 +502,17 @@ function addOrUpdateForecastScenario(debt) {
 		? scenarios.findIndex((s) => s.id === debt.forecastScenarioId)
 		: -1;
 
-	const existingRowId = existingIndex >= 0 && scenarios[existingIndex].rows?.[0]?.rowId
-		? scenarios[existingIndex].rows[0].rowId
-		: shared.createEntryId();
-
 	const scenario = {
 		id: debt.forecastScenarioId || shared.createEntryId(),
 		name: debt.name,
 		targetDate: debt.dueDate || debt.earlyPaymentDate || "",
-		rows: [{
-			rowId: existingRowId,
+		rows: shared.buildDebtPaymentSchedule(debt).map((payment) => ({
+			rowId: shared.createEntryId(),
 			type: "expense",
-			amount: debt.monthlyPayment || 0,
-			date: debt.paymentDate || "",
-			note: ""
-		}]
+			amount: payment.amount,
+			date: payment.date,
+			note: payment.note === "early" ? t("debtPlannedAmountLabel") : ""
+		}))
 	};
 
 	if (existingIndex >= 0) {
@@ -747,6 +745,7 @@ async function handleLogout() {
 		// ignore
 	}
 	localStorage.removeItem(SESSION_KEY);
+	localStorage.removeItem(DISPLAY_NAME_KEY);
 	sessionStorage.removeItem("budgetAppGuestData");
 	window.location.href = "index.html";
 }
@@ -769,6 +768,7 @@ async function handleAccountDelete() {
 
 	try {
 		await deleteCurrentAccount();
+		shared.clearUserLocalData(currentUser);
 		localStorage.removeItem(SESSION_KEY);
 		shared.setFlashMessage(shared.getDeleteAccountSuccessMessage(appLanguage), false);
 		window.location.href = "index.html";

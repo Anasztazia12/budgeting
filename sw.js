@@ -1,4 +1,4 @@
-const CACHE_NAME = "budgeting-app-v10";
+const CACHE_NAME = "budgeting-app-v12";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
@@ -7,7 +7,16 @@ const ASSETS_TO_CACHE = [
   "./summary.html",
   "./contact.html",
   "./managing-debt.html",
+  "./help.html",
   "./assets/css/style.css?v=10",
+  "./assets/js/app-shared.js?v=3",
+  "./assets/js/firebase-init.js",
+  "./assets/js/firebase-service.js",
+  "./assets/js/index.js?v=3",
+  "./assets/js/budget.js?v=3",
+  "./assets/js/summary.js?v=3",
+  "./assets/js/forecast.js?v=3",
+  "./assets/js/managing-debt.js?v=3",
   "./assets/images/budget-icon.png",
   "./assets/images/budget-icon-any-192.png",
   "./assets/images/budget-icon-any-512.png",
